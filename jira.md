@@ -26,10 +26,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev1] SHIFT-006b (baseline) — model the 3 `possible` blobs
-  - `74dc48` 12-byte struct, `a5710` sound entries, `79c170` mixed regions
+- [DOING @dev1] SHIFT-006b1 (baseline) — model `Blob_79c170_79c27c`
+  - 3 Thumb code pointers + count bytes + glyph/offset data + 21-pointer run
+- [DOING @dev3] SHIFT-006b2 (baseline) — model `Blob_74dc48_74e620`
+  - 210 × 12-byte ending-text structs, pointer field to credits blob
+- [TODO] SHIFT-006b3 (baseline) — model `Blob_a5710_a8cdc`
+  - 12-byte sound records + unresolved 144-byte tail; resolve record count first
 - [TODO] SHIFT-006c (emulator) — shift test passes with all tables relocated
-  [deps: SHIFT-006b, SHIFT-007]
+  [deps: SHIFT-006b1, SHIFT-006b2, SHIFT-006b3, SHIFT-007]
 - [DOING @dev2] SHIFT-007 (baseline) — relocatable linker + `check_relocs` gate
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder  [deps: SHIFT-007]
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
