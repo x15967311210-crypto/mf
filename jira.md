@@ -13,10 +13,10 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/005b/006a/006b1/006b2/006b3/006b4/006b5/007
-(harness, audit, symbol map, blob classification, literal and pseudo-literal
-rewrites, all pointer-like blobs, strict gate) and HACK-001/001a/006 (GDD,
-layout, Cantor).  Details in `git log`.
+Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/007
+(harness, audit, symbol map, blob classification, literal/pseudo-literal and
+C-literal planning, all pointer-like blobs, strict gate) and
+HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
 
@@ -27,11 +27,9 @@ layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev2] SHIFT-005c (baseline) — audit/rewrite 7-digit C ROM literals
-  - 1034 C refs missed by the 8-digit regex; 816 in `src/data/sprite_pointers.c`
-  - build `rewrite_c_refs.py` and a dry-run report; do not apply yet
-- [TODO] SHIFT-006b6 (baseline) — apply C ROM literal rewrites
-  [deps: SHIFT-005c]
+- [DOING @dev3] SHIFT-006b6 (baseline) — apply the 1034 C ROM literal rewrites
+  - 314 function pointers + 720 data pointers; 816 in `sprite_pointers.c`
+  - use `tools/shift/rewrite_c_refs.py --write`, then fix declarations and gate
 - [TODO] SHIFT-006c (emulator) — shift-check passes after the C rewrites
   [deps: SHIFT-006b6]
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
