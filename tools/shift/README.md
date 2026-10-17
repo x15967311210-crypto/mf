@@ -73,6 +73,39 @@ becomes `sOmegaMetroidPartOam_LeftLeg_Swiping+0x4264`); `--elf` points at the
 baseline ELF used for that lookup.  The rewrite is address-equivalent: the
 SHA1 of the rebuilt ROM must not change.
 
+`check_relocs.py` and `rewrite_c_refs.py` handle ROM literals in C.  The C
+sources write short seven-digit addresses (`0x8017bd9` is `0x08017BD9`), so the
+scan accepts 1–8 hex digits, range-checks the parsed value against the ROM
+window, and normalizes to eight digits in reports.  It scans `src/**/*.c`,
+`include/**/*.h` (and `hack/` in the gate), masking `//` and `/* */` comments,
+string literals and char literals first.  `include/gba/memory.h`'s `ROM_BASE`
+is the one hardware constant whitelist.
+
+`rewrite_c_refs.py` plans the replacement expressions:
+
+```sh
+python3 tools/shift/rewrite_c_refs.py --dry-run   # default; no writes
+python3 tools/shift/rewrite_c_refs.py --dry-run --report work/shift/c_refs_report.md
+python3 tools/shift/rewrite_c_refs.py --check     # fail while literals remain
+python3 tools/shift/rewrite_c_refs.py --write     # SHIFT-006b6 only
+python3 tools/shift/rewrite_c_refs.py --self-check
+```
+
+It resolves through `SymbolMap` plus the baseline ELF.  An ELF `STT_FUNC`
+target becomes the function symbol (`(Func_T)0x8017bd9` ->
+`(Func_T)SaXElevator`).  Data becomes `&Symbol` plus a byte delta, e.g.
+`(const u16*)0x85dfd6c` ->
+`(const u16*)((u8*)&sIntroSamusRebornBgBottomTilemap + 0x5C0)`.  A local
+(`STB_LOCAL`) target in another object uses the same global same-section anchor
+rule as `apply_refs.py`.  Only the literal token changes; casts and surrounding
+text are preserved.  Unknown targets are refused.
+
+Baseline plan (SHIFT-005c): **1034** C refs in 13 files — 314 function and 720
+data — including 816 in `src/data/sprite_pointers.c` and 160 in
+`src/new_file_intro.c`; 0 unknown.  `--dry-run --report` writes
+`work/shift/c_refs_report.md`.  SHIFT-005c does not apply the plan; the strict
+gate therefore still fails on the 1034 C refs until SHIFT-006b6.
+
 `audit_blobs.py` reads extracted bytes from `data/` by default.  In a worktree
 without extracted data (for example a fresh `git worktree`), the audit reports
 `missing: 47` and exits 0; pass `--data-root /path/to/mf/data` (or set
@@ -84,7 +117,9 @@ without extracted data (for example a fresh `git worktree`), the audit reports
 
 1. an `open` or `unknown` ROM record of either literal kind (`literal` or
    `ldr_literal`) in `abs_refs.json`;
-2. a hardcoded `0x08xxxxxx` literal in `src/`, `include/`, or `hack/` C;
+2. a hardcoded ROM literal in `src/`, `include/`, or `hack/` C or headers,
+   accepting 1–8 hex digits (`0x8017bd9` -> `0x08017BD9`) and ignoring comments
+   and strings; `include/gba/memory.h`'s `ROM_BASE` is whitelisted;
 3. a `pointer_table` or `possible_pointer_table` blob that is still included
    raw, i.e. still named by an `INCBIN` macro in C;
 4. an unreadable blob scan, or a scan with `missing` blobs: the gate fails
@@ -95,8 +130,8 @@ classifies the **extracted bytes**, and those bytes never change when a blob is
 converted.  `check_relocs.py` therefore checks whether the blob filename is
 still used by `INCBIN`.  All ten pointer-like blobs (seven SHIFT-006a tables plus
 the three SHIFT-006b models) are generated C now, so strict mode reports zero
-raw blobs; it still fails on the 660 open track-header literals until
-SHIFT-006b4 rewrites them.
+raw blobs; the remaining strict failure is the 1034 hardcoded C ROM literals
+until SHIFT-006b6 applies `rewrite_c_refs.py`.
 
 Report mode prints the same list but exits 0.  Current output after
 SHIFT-006b5:
@@ -111,6 +146,7 @@ check_relocs: 697 ROM refs in ledger
   ldr pseudo-literals: 0 (must be 0 in strict)
   unknown:       0
   ldr comments:  697 (reference-only)
+  C ROM refs:    1034 (13 file(s); 816 in src/data/sprite_pointers.c)
 PASS: no unclassified ROM references (report mode)
 ```
 
@@ -156,8 +192,11 @@ runs the same audit before linking.
   per-blob evidence and the 11/7 baseline reconciliation.
 - SHIFT-006a converted the 7 pointer tables to C arrays; SHIFT-006b1/2/3
   converted `79c170`, `74dc48` and `a5710`.  The strict gate reports all ten
-  pointer-like blobs as `converted` and zero open literals of either kind, so it
-  passes.
+  pointer-like blobs as `converted` and zero open assembly literals of either
+  kind.  It still fails on the 1034 C ROM literals below.
+- SHIFT-005c: 1034 C ROM literals remain (314 function, 720 data; 816 in
+  `src/data/sprite_pointers.c`).  The C scan now sees the seven-digit form;
+  strict fails on them until SHIFT-006b6 applies the plan.
 
 After SHIFT-005, the six remaining assembly blobs still contain only `ldr`
 reference comments, not data literals:

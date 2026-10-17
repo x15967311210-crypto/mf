@@ -16,6 +16,13 @@ Two evidence sources are combined:
   pointer words in the ROM image, and its replacement C is caught by the
   literal/C scan.
 
+The C scan accepts 1-8 hex-digit literals and normalizes them to eight digits,
+because the C sources write ROM addresses in the short seven-digit form
+(``0x8017bd9`` is ``0x08017BD9``).  It scans ``.c`` and ``.h`` files and masks
+comments and string/char literals first, so a ROM-looking value in a comment or
+a string is not a reference.  The ``ROM_BASE`` definition in
+``include/gba/memory.h`` is a hardware constant and stays whitelisted.
+
 Report mode is informative and always exits 0 once the ledger is readable.
 ``--strict`` exits 1 when any check fails, including an unreadable or
 incomplete blob scan: the gate must not pass when it cannot see the evidence.
@@ -26,9 +33,17 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from collections import Counter
 from pathlib import Path
 
-ROM_RE = re.compile(r"\b0x(08[0-9a-fA-F]{6})\b")
+ROM_START = 0x08000000
+ROM_END = 0x0A000000
+# 1-8 hex digits, not part of a longer token.  The parsed value is range-checked
+# below, so short constants such as 0x20 cannot become ROM references.
+C_LITERAL_RE = re.compile(
+    r"(?<![0-9A-Za-z_])0[xX]([0-9A-Fa-f]{1,8})(?![0-9A-Fa-f])"
+)
+C_SOURCE_SUFFIXES = (".c", ".h")
 INCBIN_RE = re.compile(r'\b_?INCBIN\w*\s*\(\s*"([^"]+)"')
 POINTER_CLASSES = {"pointer_table", "possible_pointer_table"}
 
@@ -39,33 +54,150 @@ WHITELIST = {
 }
 
 
-def strip_comments(line: str) -> str:
-    line = re.sub(r"//.*$", "", line)
-    line = re.sub(r"/\*.*?\*/", "", line)
-    return line
+def mask_c(text: str, mask_strings: bool = True) -> str:
+    """Blank comments (and optionally strings) without changing offsets.
+
+    A character-by-character state machine is used instead of a regular
+    expression so block comments can span lines and so a wrong quote cannot
+    silently hide the rest of a file.  Newlines are always preserved, which
+    keeps line numbers and columns aligned with the original source.
+    """
+    out = list(text)
+    state = "code"
+    i = 0
+    n = len(text)
+    while i < n:
+        c = text[i]
+        if state == "code":
+            if c == "/" and i + 1 < n and text[i + 1] == "/":
+                out[i] = out[i + 1] = " "
+                i += 2
+                state = "line"
+                continue
+            if c == "/" and i + 1 < n and text[i + 1] == "*":
+                out[i] = out[i + 1] = " "
+                i += 2
+                state = "block"
+                continue
+            if c == '"' or c == "'":
+                if mask_strings:
+                    out[i] = " "
+                state = "string" if c == '"' else "char"
+                i += 1
+                continue
+            i += 1
+            continue
+        if state == "line":
+            if c == "\n":
+                state = "code"
+            else:
+                out[i] = " "
+            i += 1
+            continue
+        if state == "block":
+            if c == "*" and i + 1 < n and text[i + 1] == "/":
+                out[i] = out[i + 1] = " "
+                i += 2
+                state = "code"
+                continue
+            if c != "\n":
+                out[i] = " "
+            i += 1
+            continue
+
+        quote = '"' if state == "string" else "'"
+        if c == "\\" and i + 1 < n:
+            if mask_strings:
+                out[i] = " "
+                if text[i + 1] != "\n":
+                    out[i + 1] = " "
+            i += 2
+            continue
+        if c == quote:
+            if mask_strings:
+                out[i] = " "
+            state = "code"
+            i += 1
+            continue
+        if c == "\n":
+            # Unterminated literal: recover at the line break.
+            state = "code"
+            i += 1
+            continue
+        if mask_strings:
+            out[i] = " "
+        i += 1
+    return "".join(out)
+
+
+def strip_comments(text: str) -> str:
+    """Remove C comments but keep string literals (used by INCBIN parsing)."""
+    return mask_c(text, mask_strings=False)
+
+
+def scan_c_text(name: str, text: str) -> list[dict]:
+    """Return every ROM literal in *text*, ignoring comments and strings."""
+    masked = mask_c(text)
+    refs: list[dict] = []
+    for lineno, (line, masked_line) in enumerate(
+        zip(text.split("\n"), masked.split("\n")), 1
+    ):
+        body = line[:-1] if line.endswith("\r") else line
+        for match in C_LITERAL_RE.finditer(masked_line):
+            value = int(match.group(1), 16)
+            if not ROM_START <= value < ROM_END:
+                continue
+            refs.append(
+                {
+                    "file": name,
+                    "line": lineno,
+                    "column": match.start(),
+                    "literal": match.group(0),
+                    "hex_digits": len(match.group(1)),
+                    "value": f"0x{value:08X}",
+                    "text": body.strip(),
+                    "line_text": body,
+                }
+            )
+    return refs
+
+
+def c_source_files(paths: list[Path]) -> list[Path]:
+    """Expand roots to a deterministic list of .c/.h files."""
+    files: set[Path] = set()
+    for root in paths:
+        if root.is_file():
+            files.add(root)
+        elif root.exists():
+            for suffix in C_SOURCE_SUFFIXES:
+                files.update(root.rglob(f"*{suffix}"))
+    return sorted(files, key=lambda path: path.as_posix())
 
 
 def scan_c(paths: list[Path]) -> list[dict]:
-    refs = []
-    for root in paths:
-        if not root.exists():
-            continue
-        for path in sorted(root.rglob("*.c")):
-            for lineno, line in enumerate(
-                path.read_text(errors="replace").splitlines(), 1
-            ):
-                text = strip_comments(line)
-                for m in ROM_RE.finditer(text):
-                    value = int(m.group(1), 16)
-                    refs.append(
-                        {
-                            "file": path.as_posix(),
-                            "line": lineno,
-                            "value": f"0x{value:08X}",
-                            "text": line.strip(),
-                        }
-                    )
+    refs: list[dict] = []
+    for path in c_source_files(paths):
+        refs.extend(
+            scan_c_text(path.as_posix(), path.read_text(errors="replace"))
+        )
     return refs
+
+
+def is_whitelisted(ref: dict) -> bool:
+    """True for the fixed ROM_BASE hardware constant in memory.h."""
+    return (
+        ref["file"].endswith("include/gba/memory.h")
+        and "ROM_BASE" in ref["text"]
+    )
+
+
+def filter_c_refs(refs: list[dict]) -> list[dict]:
+    return [ref for ref in refs if not is_whitelisted(ref)]
+
+
+def c_counts_by_file(refs: list[dict]) -> list[tuple[str, int]]:
+    counts = Counter(ref["file"] for ref in refs)
+    return sorted(counts.items(), key=lambda item: (-item[1], item[0]))
 
 
 def parse_incbin_names(text: str) -> set[str]:
@@ -174,7 +306,7 @@ def print_blob_report(
 
 
 def self_check() -> int:
-    """Deterministic checks for INCBIN detection and blob grouping."""
+    """Deterministic checks for the C scan, INCBIN detection and grouping."""
     cases = [
         (
             "plain INCBIN_U8",
@@ -254,7 +386,111 @@ def self_check() -> int:
         else:
             print(f"  ok   {name}: {got}")
 
-    total = len(cases) + len(checks)
+    # C literal scanning: short ROM forms, comments/strings, token boundaries
+    # and the memory.h ROM_BASE exception.
+    c_cases = [
+        (
+            "7-digit C ROM literal",
+            "src/a.c",
+            "\t[PSPRITE_X] = (Func_T)0x8017bd9,",
+            ["0x08017BD9"],
+        ),
+        (
+            "8-digit C ROM literal",
+            "src/a.c",
+            "p = (const u16*)0x08017bd9;",
+            ["0x08017BD9"],
+        ),
+        (
+            "uppercase 0X literal",
+            "src/a.c",
+            "p = (u8*)0X8017BD9;",
+            ["0x08017BD9"],
+        ),
+        (
+            "line-comment literal",
+            "src/a.c",
+            "// p = (u8*)0x8017bd9;",
+            [],
+        ),
+        (
+            "block-comment literal",
+            "src/a.c",
+            "/* 0x8017bd9\n   0x8017bda */\nint x;",
+            [],
+        ),
+        (
+            "string literal",
+            "src/a.c",
+            'const char* s = "0x8017bd9";',
+            [],
+        ),
+        (
+            "non-ROM constant",
+            "src/a.c",
+            "value = 0x1234567;",
+            [],
+        ),
+        (
+            "too many digits",
+            "src/a.c",
+            "value = 0x080000000;",
+            [],
+        ),
+        (
+            "identifier prefix",
+            "src/a.c",
+            "value = foo0x8017bd9;",
+            [],
+        ),
+        (
+            "0x09 ROM literal",
+            "src/a.c",
+            "p = (u8*)0x09abcdef;",
+            ["0x09ABCDEF"],
+        ),
+    ]
+    for name, path, text, expected in c_cases:
+        got = [ref["value"] for ref in scan_c_text(path, text)]
+        if got != expected:
+            failed += 1
+            print(f"  FAIL {name}: expected {expected}, got {got}")
+        else:
+            print(f"  ok   {name}: {got}")
+
+    whitelist_ref = {
+        "file": "include/gba/memory.h",
+        "text": "#define ROM_BASE (void *)0x08000000",
+    }
+    ordinary_ref = {
+        "file": "src/a.c",
+        "text": "(void *)0x08000000",
+    }
+    filter_checks = [
+        (
+            "ROM_BASE whitelisted",
+            is_whitelisted(whitelist_ref),
+            True,
+        ),
+        (
+            "ordinary ROM literal not whitelisted",
+            is_whitelisted(ordinary_ref),
+            False,
+        ),
+        (
+            "whitelist removes only ROM_BASE",
+            [r["file"] for r in filter_c_refs([whitelist_ref, ordinary_ref])],
+            ["src/a.c"],
+        ),
+    ]
+    for name, got, expected in filter_checks:
+        if got != expected:
+            failed += 1
+            print(f"  FAIL {name}: expected {expected}, got {got}")
+        else:
+            print(f"  ok   {name}: {got}")
+
+    total = len(cases) + len(checks) + len(c_cases) + len(filter_checks)
     if failed:
         print(f"self-check: {failed}/{total} failed")
         return 1
@@ -271,7 +507,7 @@ def main() -> int:
     ap.add_argument(
         "--self-check",
         action="store_true",
-        help="run the INCBIN/blob grouping checks and exit",
+        help="run the C-scan/INCBIN/blob grouping checks and exit",
     )
     args = ap.parse_args()
 
@@ -301,15 +537,7 @@ def main() -> int:
     references = [r for r in rom if r["kind"] == "ldr"]
     whitelisted = [r for r in rom if int(r["value"], 16) in WHITELIST]
 
-    c_refs = scan_c(c_roots)
-    c_refs = [
-        r
-        for r in c_refs
-        if not (
-            r["file"].endswith("include/gba/memory.h")
-            and "ROM_BASE" in r["text"]
-        )
-    ]
+    c_refs = filter_c_refs(scan_c(c_roots))
 
     scan_path = Path(args.blob_scan)
     scan, scan_error = load_blob_scan(scan_path)
@@ -326,6 +554,11 @@ def main() -> int:
     print(f"  ldr comments:  {len(references)} (reference-only)")
     print(f"  whitelisted:   {len(whitelisted)}")
     print(f"  C ROM refs:    {len(c_refs)}")
+    if c_refs:
+        file_counts = c_counts_by_file(c_refs)
+        print(f"  C refs by file ({len(file_counts)} file(s)):")
+        for name, count in file_counts:
+            print(f"    {count:5d}  {name}")
     print_blob_report(scan_path, scan_error, status, uses)
 
     if open_literals:
