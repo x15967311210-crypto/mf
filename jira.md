@@ -84,14 +84,22 @@ input/visual parity) and HACK-001/001a/006
     active type indices** (3,4,5,13,16,17,18,26–29,31–36) and entries 33–36 are
     present in both; only entry 18 differs by one animation frame (0x1A vs
     0x1B). No writer clears 33–36 after setup.
-  - The real counter is `gNextOamSlot` (0x030011EE): normal ProcessOam writes
-    **0x2E/0x2C**, shifted **1** every frame. The 46/1 is the queued-OAM count,
-    so shifted is stuck emitting one entry per frame; the MenuOam data is there
-    but the count/order at the first map-open frame is wrong.
-  - next: trace the first map-open frame (normal 4454 / shifted 5287), dump
-    the call order of SetupOam, MapScreenUpdateArrows, ProcessOam and the
-    initial `gNextOamSlot`/count source; find who supplies 46 normal vs 1
-    shifted, then fix that.
+  - At the first map-open frame (normal 4454 / shifted 5287), MenuOam types
+    are already identical, incl. 33–36; but shifted is missing the **type-0
+    map entries** 9,20,21,22,30,37,38,39 (normal has 7,8,9,20,21,22,30,37–39;
+    shifted only 7,8), and the `+4` word of 33–36 is 1 normal / 0 shifted.
+  - `gNextOamSlot` at that frame: normal **48**, shifted **1**; ProcessOam then
+    emits one entry/frame in shifted. Save data, minimap data, equipment,
+    securityHatchLevel and current area are identical between the pair, so this
+    is not exploration/save progress.
+  - The normal/shifted before states are from different in-game animation
+    frames (4433 vs 5266); the map-screen runtime entries that are missing are
+    animation-flag/pFrame entries, not a relocated ROM table. The pair is not a
+    controlled same-state comparison.
+  - next: produce a same-save, same-frame before pair (normal and shifted from
+    one .sav, identical input) and diff the map-screen OAM builder
+    (`MapScreenUpdateArrowsAndBlinkingSquare`/type-0 entries) before touching
+    code; do not mark BUG-006 DONE on the current pair.
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
