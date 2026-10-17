@@ -32,13 +32,13 @@ padded and section-reordered boot 578/600, strict gate) and HACK-001/001a/006
   - handoff: `work/playtest/m0-2026-10-17/`
   - normal passes; **shifted black-screens after Start**; reordered passes
   - blocked on BUG-001; M0 is not DONE and M1 does not start
-- [DOING @dev1] BUG-001 (playtest) — shifted M0 build black screen after
-  pressing Start; reproduced at frame 778 with the supplied savestates
-  - shifted `gNonGameplayRam` OAM entries are already garbage at frame 778;
-    `gNextOamSlot` reaches 0x17B without a logged CPU store, then
-    `FileSelectDrawOam` overwrites `gVBlankCallback` at `0x030019C4`
-  - root cause likely a DMA/block copy or another raw table in the
-    file-select path; trace first corrupt write and fix
+- [DOING @dev1] BUG-001 (playtest) — shifted M0 black screen after Start
+  - root cause confirmed: `FileSelectDrawOam` selects the raw 74-entry
+    `FrameData` table at `0x08740AB8` (shifted `0x08741AB8`) inside
+    `sBlob_73421e_7478a0`; its internal pFrame pointers are unrelocated, so
+    the draw loop reads 4345 bogus parts and overwrites `gVBlankCallback`
+  - fix: carve that table out of the blob into relocatable C, same pattern as
+    SHIFT-006c4; then add the Start/file-select gate
 - [DOING @dev2] QA-001 (emulator) — add a Start/file-select scenario to the
   headless harness and a `shift-start` gate; current boot smoke does not press
   Start and falsely passed BUG-001
