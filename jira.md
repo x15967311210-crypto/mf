@@ -44,9 +44,13 @@ parity) and HACK-001/001a/006
 - [DOING @dev1] BUG-004 (input replay) — shifted diverges by 30k frames
   - normal/reordered 30k: `frame_counter=29857`, `main=1`, `s1=3`, `s2=256`
   - shifted 30k: `frame_counter=24469`, `main=7`, `s1=11`, `s2=1`
-  - 4k is identical; likely another raw table/pointer in the later intro path
-- [DOING @dev2] QA-006 (emulator) — commit a 30k input fixture and
-  `shift-input-30k` gate; normal PASS expected, shifted FAIL until BUG-004
+  - first divergence at frame 24595: normal in BIOS (`vblank=08091EFD`);
+    shifted runs the elevator-monologue setup (`vblank=0809A941`) one frame
+    ahead; source data 0x085FE1E0 is valid, so not a simple stale pointer
+  - trace the callback/Halt/state divergence before 24595
+- [DONE] QA-006 (emulator) — 30k input fixture + `shift-input-30k` gate
+  - normal/reordered 30k PASS; shifted 30k FAIL (`frame_counter=24469`)
+  - harness binary must be rebuilt after harness changes; noted
 - [DONE] QA-005 (emulator) — screenshot-parity gate
   - `screen-diff` compares framebuffer hashes at 600/900; normal/reordered match,
     shifted currently FAIL (`a64b...`/`fa91...` vs `1aba...`/`e0fa...`)
