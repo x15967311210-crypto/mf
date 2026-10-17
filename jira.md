@@ -179,7 +179,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - blocking follow-up for HACK-004a: broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED`
     checks disable the save/navigation/recharge pads after `0x6F`; fix before
     M1 sign-off.
-- [DOING @dev2] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
+- [TODO] HACK-003a (tools) — harden content pipeline before arbitrary rooms
+  - `gDecompClipdataMap` is 1024 u16 (`0x800`), not 6144; reject rooms above
+    1024 blocks or resize the decoder buffer
+  - enforce spriteset-slot/`SPRITESET_IDX` encoding so `sprite_id` cannot be
+    silently dropped; add regression cases
+  - HACK-003 scaffold landed `dfe4b5a`: `content-check` PASS, synthetic
+    fixture, `docs/content-pipeline.md`; bg3/palettes/composition/scripts are
+    documented gaps
+  - HACK-004a may start with small Test Area 1 rooms (<1024 blocks) but must
+    not rely on arbitrary sprite IDs until this hardening lands
+- [DONE] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
 - [TODO] HACK-004a (content) — blockout: 5 rooms, doors, camera, save pad  [deps: HACK-003]
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a]
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
