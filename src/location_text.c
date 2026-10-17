@@ -3,6 +3,7 @@
 #include "gba.h"
 
 #include "data/sprite_pointers.h"
+#include "data/sprites/area_banner.h"
 
 #include "constants/connection.h"
 #include "constants/sprite.h"
@@ -468,7 +469,7 @@ u8 LocationTextCheckLoad(void)
             
             if (locationText < LT_NAVIGATION_ROOM)
             {
-                DMA3_COPY_16(0x82f82ec, PALRAM_OBJ + 0x100 + gfxSlot * 16 * sizeof(u16), 16);
+                DMA3_COPY_16(&sAreaBannerLocationPal, PALRAM_OBJ + 0x100 + gfxSlot * 16 * sizeof(u16), 16);
             }
         }
     }

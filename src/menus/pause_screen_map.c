@@ -25,17 +25,17 @@ extern u32 sExploredMinimapBitFlags[32];
 
 // Minimap data?
 static u8* sUnk_79be5c[11] = {
-    (u8*)0x8572D48,
-    (u8*)0x8572F9C,
-    (u8*)0x8573748,
-    (u8*)0x857317C,
-    (u8*)0x8573538,
-    (u8*)0x857395C,
-    (u8*)0x8573364,
-    (u8*)0x8572D48,
-    (u8*)0x8572D48,
-    (u8*)0x8573B54,
-    (u8*)0x8572C4C,
+    (u8*)((u8*)&sMinimapTilesGfx + 0x10DA0),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x10FF4),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x117A0),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x111D4),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x11590),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x119B4),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x113BC),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x10DA0),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x10DA0),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x11BAC),
+    (u8*)((u8*)&sMinimapTilesGfx + 0x10CA4),
 };
 
 // 4 byte struct?
@@ -51,11 +51,11 @@ static u8 sUnk_79be88[32] = {
 };
 
 static u8* sUnk_79bea8[5] = {
-    (u8*)0x8576168,
-    (u8*)0x857616D,
-    (u8*)0x8576171,
-    (u8*)0x8576173,
-    (u8*)0x8576175,
+    (u8*)&sPauseDebugBeamFlags,
+    (u8*)&sPauseDebugMissileFlags,
+    (u8*)&sPauseDebugBombFlags,
+    (u8*)&sPauseDebugSuitFlags,
+    (u8*)&sPauseDebugMiscFlags,
 };
 
 static u8 sUnk_79bebc[4] = {

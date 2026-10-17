@@ -6,6 +6,8 @@
 #include "samus.h"
 #include "hud_generic.h"
 
+#include "data/hud_data.h"
+
 #include "constants/demo.h"
 #include "constants/sa_x.h"
 
@@ -436,7 +438,7 @@ void InitAndLoadGenerics(void)
 
     gDebugFlag = FALSE;
 
-    DMA3_COPY_16(0x83e40dc, PALRAM_OBJ + 0x40, 16 * 6);
+    DMA3_COPY_16(&sCommonSpritesPal, PALRAM_OBJ + 0x40, 16 * 6);
 
     SamusInit();
 

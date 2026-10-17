@@ -112,8 +112,8 @@ static const u16 sAudio_a5696 = DMA_ENABLE | DMA_INTR_ENABLE | DMA_START_SPECIAL
 
 const MusicFunc_T sMusicCommandFunctionPointers[30] = {
     [FINE - FINE] = Music_EmptyCommand,
-    [GOTO - FINE] = (MusicFunc_T)0x8004a3d, // AudioCommand_Goto
-    [PATT - FINE] = (MusicFunc_T)0x8004a7d, // AudioCommand_PatternPlay
+    [GOTO - FINE] = (MusicFunc_T)unk_4a3c, // AudioCommand_Goto
+    [PATT - FINE] = (MusicFunc_T)unk_4a7c, // AudioCommand_PatternPlay
     [PEND - FINE] = AudioCommand_PatternEnd,
     [REPT - FINE] = AudioCommand_Repeat,
     [5] = Music_EmptyCommand,

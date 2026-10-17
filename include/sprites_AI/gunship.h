@@ -24,4 +24,8 @@ void Gunship(void);
 void GunshipBeam(void);
 void GunshipPart(void);
 
+void GunshipEnd(void);
+void GunshipEndBottom(void);
+void GunshipEndBeam(void);
+
 #endif /* GUNSHIP_H */
