@@ -4,8 +4,9 @@
 Two evidence sources are combined:
 
 * ``work/shift/abs_refs.json`` -- the relocation ledger.  Every ROM literal
-  starts ``open``; strict mode fails while an ``open``/``unknown`` record or a
-  ROM literal in C survives.
+  and bare ``ldr rX, =0x...`` pseudo-literal starts ``open``; strict mode
+  fails while an ``open``/``unknown`` record or a ROM literal in C survives.
+  The ``ldr rX, _label @ =0x...`` annotation form is reference-only.
 * ``work/shift/blob_scan.json`` -- the extracted-data classification.  A
   ``pointer_table``/``possible_pointer_table`` blob is only a gate failure
   while it is **still included raw** (``INCBIN``).  Converted tables (SHIFT-006a
@@ -289,7 +290,12 @@ def main() -> int:
     rom = [r for r in records if r["category"] == "rom"]
 
     open_literals = [
-        r for r in rom if r["kind"] == "literal" and r["status"] == "open"
+        r
+        for r in rom
+        if r["kind"] in {"literal", "ldr_literal"} and r["status"] == "open"
+    ]
+    open_ldr_literals = [
+        r for r in rom if r["kind"] == "ldr_literal" and r["status"] == "open"
     ]
     unknown = [r for r in rom if r["status"] == "unknown"]
     references = [r for r in rom if r["kind"] == "ldr"]
@@ -312,6 +318,10 @@ def main() -> int:
 
     print(f"check_relocs: {len(rom)} ROM refs in ledger")
     print(f"  open literals: {len(open_literals)}")
+    print(
+        f"  ldr pseudo-literals: {len(open_ldr_literals)} "
+        f"(must be 0 in strict)"
+    )
     print(f"  unknown:       {len(unknown)}")
     print(f"  ldr comments:  {len(references)} (reference-only)")
     print(f"  whitelisted:   {len(whitelisted)}")

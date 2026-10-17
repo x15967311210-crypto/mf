@@ -234,6 +234,11 @@ $(LD_SCRIPT): linker.ld
 	$(MSG) AS $@
 	$Q$(AS) $(ASFLAGS) $< -o $@
 
+# track_data.s includes every generated track header.  The generic rule only
+# knows about track_data.s, so without these prerequisites a stale object can
+# hide a relocation rewrite (and make the shift test lie).
+sound/track_data.o: sound/track_data.s $(wildcard sound/tracks/*.s)
+
 %.s: %.c
 	$(MSG) CC $@
 	$Q$(PREPROC) $< $(PREPROCFLAGS) | $(CPP) $(CPPFLAGS) | $(CC) -o $@ $(CFLAGS) && printf '\t.align 2, 0 @ dont insert nops\n' >> $@

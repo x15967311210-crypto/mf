@@ -582,9 +582,9 @@ unk_4534: @ 0x08004534
 	ldrb r3, [r0, #0xe]
 	cmp r1, r3
 	bne lbl_08004594
-	ldr r3, =0x80a568c
+	ldr r3, =sDma1ControlPointer
 	ldr r3, [r3]
-	ldr r12, =0x80a5690
+	ldr r12, =sDma1ControlValue
 	ldr r12, [r12]
 	str r12, [r3]
 	str r12, [r3, #0xc]

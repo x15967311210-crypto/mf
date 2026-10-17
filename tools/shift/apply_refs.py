@@ -2,17 +2,21 @@
 """Apply relocatable symbol expressions to hardcoded ROM literals in asm.
 
 The audit ledger (`work/shift/abs_refs.json`) records every `.4byte`/`.word`
-ROM address literal and the symbol that covers it.  This tool rewrites the
-numeric operand to a symbol expression:
+ROM address literal and every bare `ldr rX, =0x...` pseudo-literal, together
+with the symbol that covers it.  This tool rewrites the numeric operand to a
+symbol expression:
 
     0x0839EC68        ->  sBlob_39aa34_39f4b0+0x4234
     0x080A8CDC        ->  sMusicTrackDataRom
+    ldr r3, =0x80a568c -> ldr r3, =sDma1ControlPointer
 
 It is deliberately conservative: a record is only rewritten when the target is
-known, the line still has the expected label/directive, and the current operand
-still equals the recorded value.  Numeric operands may use 1-8 hex digits
-(`0x80a5710` is zero-padded to `0x080A5710` in the ledger), but the parsed value
-must match exactly.  Running it twice is a no-op.
+known, the line still has the expected label (and directive/mnemonic/register),
+and the current operand still equals the recorded value.  Numeric operands may
+use 1-8 hex digits (`0x80a5710` is zero-padded to `0x080A5710` in the ledger),
+but the parsed value must match exactly.  Every planned rewrite is re-parsed
+and checked before it is written, so `--dry-run` cannot show a line the real
+run would reject.  Running it twice is a no-op.
 
 Static (`STB_LOCAL`) symbols from C data files are not visible to the linker
 from another object.  For those targets the tool emits an equivalent global
@@ -28,6 +32,7 @@ at the baseline ELF used for that lookup.
 Examples:
 
     python3 tools/shift/apply_refs.py --dry-run asm/audio_internal.s
+    python3 tools/shift/apply_refs.py --dry-run --check
     python3 tools/shift/apply_refs.py asm/disasm_*.s asm/intr_main.s
     python3 tools/shift/apply_refs.py --check
 """
@@ -52,6 +57,23 @@ LITERAL_RE = re.compile(
     r"(?P<suffix>.*)$"
 )
 LABEL_RE = re.compile(r"^\s*([A-Za-z_.$][\w.$@]*):")
+# A bare `ldr rX, =0x...` pseudo-literal; the mnemonic/register are part of the
+# captured line so a changed instruction is rejected instead of rewritten.
+LDR_LITERAL_RE = re.compile(
+    r"^(?P<indent>[ \t]*)"
+    r"(?P<label>(?:[A-Za-z_.$][\w.$@]*:[ \t]*)?)"
+    r"(?P<mnemonic>ldr[a-z]*)"
+    r"(?P<sep>[ \t]+)"
+    r"(?P<reg>\w+)"
+    r"(?P<comma>[ \t]*,[ \t]*)"
+    r"=(?P<operand>[^ \t@]+)"
+    r"(?P<suffix>.*)$",
+    re.IGNORECASE,
+)
+LDR_HEAD_RE = re.compile(
+    r"^\s*(?:[A-Za-z_.$][\w.$@]*:\s*)?(ldr[a-z]*)\s+(\w+)\s*,\s*=",
+    re.IGNORECASE,
+)
 # 1-8 hex digits: the audio track headers use the 7-digit form 0x80a5710.
 # The parsed value is still compared exactly against the ledger's canonical
 # zero-padded value, so a short operand cannot match a different address.
@@ -223,6 +245,14 @@ def expected_line_parts(record: dict) -> tuple[str | None, str | None]:
     )
 
 
+def expected_ldr_parts(record: dict) -> tuple[str | None, str | None]:
+    """Return the recorded mnemonic and register of a pseudo-literal line."""
+    match = LDR_HEAD_RE.match(record.get("text", ""))
+    if match is None:
+        return None, None
+    return match.group(1), match.group(2)
+
+
 def load_records(path: Path) -> list[dict]:
     if not path.exists():
         raise RefError(f"missing ledger {path}; run `make -f Makefile.shift audit`")
@@ -230,7 +260,8 @@ def load_records(path: Path) -> list[dict]:
     return [
         r
         for r in ledger.get("records", [])
-        if r.get("category") == "rom" and r.get("kind") == "literal"
+        if r.get("category") == "rom"
+        and r.get("kind") in {"literal", "ldr_literal"}
     ]
 
 
@@ -269,12 +300,7 @@ def plan_file(path: Path, records: list[dict], elf: ElfSymbols | None) -> tuple[
         raw_line = lines[lineno - 1]
         ending = raw_line[len(raw_line.rstrip("\r\n")) :]
         body = raw_line[: len(raw_line) - len(ending)]
-        match = LITERAL_RE.match(body)
-        if match is None:
-            errors.append(
-                f"{path}:{lineno}: expected .4byte/.word literal, found {body.strip()!r}"
-            )
-            continue
+        kind = record.get("kind", "literal")
 
         expected_label, expected_directive = expected_line_parts(record)
         current_label_match = LABEL_RE.match(body)
@@ -285,6 +311,87 @@ def plan_file(path: Path, records: list[dict], elf: ElfSymbols | None) -> tuple[
                 f"({expected_label!r} -> {current_label!r})"
             )
             continue
+
+        expr = seen[lineno]
+
+        if kind == "ldr_literal":
+            match = LDR_LITERAL_RE.match(body)
+            if match is None:
+                errors.append(
+                    f"{path}:{lineno}: expected ldr rX, =0x... pseudo-literal, "
+                    f"found {body.strip()!r}"
+                )
+                continue
+
+            expected_mnemonic, expected_reg = expected_ldr_parts(record)
+            if (
+                expected_mnemonic is not None
+                and match.group("mnemonic").lower() != expected_mnemonic.lower()
+            ):
+                errors.append(
+                    f"{path}:{lineno}: mnemonic changed "
+                    f"({expected_mnemonic!r} -> {match.group('mnemonic')!r})"
+                )
+                continue
+            if (
+                expected_reg is not None
+                and match.group("reg").lower() != expected_reg.lower()
+            ):
+                errors.append(
+                    f"{path}:{lineno}: register changed "
+                    f"({expected_reg!r} -> {match.group('reg')!r})"
+                )
+                continue
+
+            operand = match.group("operand")
+            numeric = NUMERIC_RE.match(operand)
+            if numeric:
+                current_value = int(numeric.group(1), 16)
+                expected_value = int(record["value"], 16)
+                if current_value != expected_value:
+                    errors.append(
+                        f"{path}:{lineno}: operand changed "
+                        f"({record['value']} -> {operand})"
+                    )
+                    continue
+                new_body = (
+                    match.group("indent")
+                    + match.group("label")
+                    + match.group("mnemonic")
+                    + match.group("sep")
+                    + match.group("reg")
+                    + match.group("comma")
+                    + "="
+                    + expr
+                    + match.group("suffix")
+                )
+                changes.append(
+                    {
+                        "file": path.as_posix(),
+                        "line": lineno,
+                        "kind": "ldr_literal",
+                        "old": operand,
+                        "new": expr,
+                        "line_text": new_body + ending,
+                    }
+                )
+            elif operand == expr:
+                # Already applied, keep the file byte-identical.
+                continue
+            else:
+                errors.append(
+                    f"{path}:{lineno}: operand is {operand!r}, expected "
+                    f"{record['value']} or {expr}"
+                )
+            continue
+
+        match = LITERAL_RE.match(body)
+        if match is None:
+            errors.append(
+                f"{path}:{lineno}: expected .4byte/.word literal, found {body.strip()!r}"
+            )
+            continue
+
         directive = match.group("directive")
         if expected_directive is not None and directive != expected_directive:
             errors.append(
@@ -294,7 +401,6 @@ def plan_file(path: Path, records: list[dict], elf: ElfSymbols | None) -> tuple[
             continue
 
         operand = match.group("operand")
-        expr = seen[lineno]
         numeric = NUMERIC_RE.match(operand)
         if numeric:
             current_value = int(numeric.group(1), 16)
@@ -318,6 +424,7 @@ def plan_file(path: Path, records: list[dict], elf: ElfSymbols | None) -> tuple[
                 {
                     "file": path.as_posix(),
                     "line": lineno,
+                    "kind": "literal",
                     "old": operand,
                     "new": expr,
                     "line_text": new_body + ending,
@@ -335,6 +442,28 @@ def plan_file(path: Path, records: list[dict], elf: ElfSymbols | None) -> tuple[
     return changes, errors
 
 
+def verify_change(change: dict) -> str | None:
+    """Re-parse a planned line; the dry run must show a real rewrite."""
+    body = change["line_text"].rstrip("\r\n")
+    if change.get("kind") == "ldr_literal":
+        match = LDR_LITERAL_RE.match(body)
+        expected = "ldr pseudo-literal"
+    else:
+        match = LITERAL_RE.match(body)
+        expected = ".4byte/.word literal"
+    if match is None:
+        return (
+            f"{change['file']}:{change['line']}: planned rewrite no longer "
+            f"parses as a {expected}"
+        )
+    if match.group("operand") != change["new"]:
+        return (
+            f"{change['file']}:{change['line']}: planned rewrite has operand "
+            f"{match.group('operand')!r}, expected {change['new']!r}"
+        )
+    return None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
@@ -347,10 +476,6 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true", help="show replacements without writing")
     ap.add_argument("--check", action="store_true", help="fail if any literal still needs rewriting")
     args = ap.parse_args()
-
-    if args.dry_run and args.check:
-        print("apply_refs: --dry-run and --check are mutually exclusive", file=sys.stderr)
-        return 2
 
     try:
         records = load_records(Path(args.refs))
@@ -401,6 +526,15 @@ def main() -> int:
         changes, errors = plan_file(path, file_records, elf)
         all_changes.extend(changes)
         all_errors.extend(errors)
+
+    # Dry-run safety: re-parse every planned line and confirm it now carries
+    # exactly the expected symbol expression.  A bad plan is refused in every
+    # mode, before anything is written.
+    if not all_errors:
+        for change in all_changes:
+            problem = verify_change(change)
+            if problem is not None:
+                all_errors.append(problem)
 
     if all_errors:
         for message in all_errors:

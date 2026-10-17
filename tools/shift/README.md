@@ -47,24 +47,31 @@ python3 tools/shift/apply_refs.py --check
 python3 tools/shift/report.py --out docs/shiftability-audit.md
 ```
 
-`audit_asm.py` accepts `.4byte`/`.word` operands with 1–8 hex digits.  The
-audio track headers write a 7-digit address such as `0x80a5710`; the audit
-zero-pads it to the canonical `0x080A5710` in the ledger's `value` field while
-keeping the original source line in `text`.  `--self-check` exercises that
-parsing without needing a map: 8-, 7-, 6- and 1-digit operands, canonical
-zero-padding, non-ROM constants, and symbol/`symbol+offset` operands (which are
-not references and must not be flagged).
+`audit_asm.py` accepts `.4byte`/`.word` operands and bare `ldr rX, =0x...`
+pseudo-literals with 1–8 hex digits.  The audio track headers write a 7-digit
+address such as `0x80a5710`; the audit zero-pads it to the canonical
+`0x080A5710` in the ledger's `value` field while keeping the original source
+line in `text`.  A bare pseudo-literal is a real assembled address and is
+recorded as kind `ldr_literal` with status `open` until rewritten.  The
+disassembly form `ldr rX, _label @ =0x...` keeps the address in a comment, so
+it is reference-only (kind `ldr`) and is not a rewrite target.  `--self-check`
+exercises that parsing without needing a map: 8-, 7-, 6- and 1-digit operands
+and pseudo-literals, canonical zero-padding, non-ROM constants, the annotation
+form, and symbol/`symbol+offset` operands (which are not references).
 
-`apply_refs.py` rewrites the operand of each `.4byte`/`.word` ROM literal in
-`abs_refs.json` to a symbol expression (`symbol` or `symbol+0xNN`).  It refuses
-to touch a line whose label, directive, or value no longer matches the ledger,
-and `--check` fails while any literal is still numeric.  Static (`STB_LOCAL`)
-data symbols in C objects are not link-visible across objects, so those targets
-use an equivalent global anchor in the same output section (for example the
-literal `0x0839EC68` inside `sBlob_39aa34_39f4b0` becomes
-`sOmegaMetroidPartOam_LeftLeg_Swiping+0x4264`); `--elf` points at the baseline
-ELF used for that lookup.  The rewrite is address-equivalent: the SHA1 of the
-rebuilt ROM must not change.
+`apply_refs.py` rewrites the operand of each `.4byte`/`.word` ROM literal and
+each bare `ldr rX, =0x...` pseudo-literal in `abs_refs.json` to a symbol
+expression (`symbol` or `symbol+0xNN`).  It refuses to touch a line whose
+label, directive/mnemonic/register, or value no longer matches the ledger, and
+`--check` fails while any literal is still numeric.  Every planned rewrite is
+re-parsed before anything is written, so `--dry-run` shows only lines the real
+run accepts (`--dry-run --check` lists them and exits nonzero if any remain).
+Static (`STB_LOCAL`) data symbols in C objects are not link-visible across
+objects, so those targets use an equivalent global anchor in the same output
+section (for example the literal `0x0839EC68` inside `sBlob_39aa34_39f4b0`
+becomes `sOmegaMetroidPartOam_LeftLeg_Swiping+0x4264`); `--elf` points at the
+baseline ELF used for that lookup.  The rewrite is address-equivalent: the
+SHA1 of the rebuilt ROM must not change.
 
 `audit_blobs.py` reads extracted bytes from `data/` by default.  In a worktree
 without extracted data (for example a fresh `git worktree`), the audit reports
@@ -75,7 +82,8 @@ without extracted data (for example a fresh `git worktree`), the audit reports
 
 `check_relocs.py --strict` fails on **all** of these:
 
-1. an `open` or `unknown` ROM record in `abs_refs.json`;
+1. an `open` or `unknown` ROM record of either literal kind (`literal` or
+   `ldr_literal`) in `abs_refs.json`;
 2. a hardcoded `0x08xxxxxx` literal in `src/`, `include/`, or `hack/` C;
 3. a `pointer_table` or `possible_pointer_table` blob that is still included
    raw, i.e. still named by an `INCBIN` macro in C;
@@ -90,20 +98,20 @@ the three SHIFT-006b models) are generated C now, so strict mode reports zero
 raw blobs; it still fails on the 660 open track-header literals until
 SHIFT-006b4 rewrites them.
 
-Report mode prints the same list but exits 0.  Current output before
-SHIFT-006b4:
+Report mode prints the same list but exits 0.  Current output after
+SHIFT-006b5:
 
 ```text
 blob scan: 47 blobs, 10 pointer-like (10 converted, 0 still raw)
     converted          Blob_a5224_a5258.bin
     converted          Blob_a5710_a8cdc.bin
     ...
-check_relocs: 1357 ROM refs in ledger
-  open literals: 660
+check_relocs: 697 ROM refs in ledger
+  open literals: 0
+  ldr pseudo-literals: 0 (must be 0 in strict)
   unknown:       0
   ldr comments:  697 (reference-only)
-REPORT: 1 issue(s) would fail --strict:
-  - 660 open ROM literal(s) remain
+PASS: no unclassified ROM references (report mode)
 ```
 
 `check_relocs.py --self-check` exercises the INCBIN parser and the
@@ -130,14 +138,17 @@ runs the same audit before linking.
 ## Current baseline counts
 
 - SHIFT-005 rewrote all 662 eight-digit ROM literals in `.4byte`/`.word` to
-  symbol expressions (0 remain in `asm/`); 697 `ldr =0x08...` reference
-  comments remain.
-- SHIFT-005b found the 660 seven-digit track-header literals in
-  `sound/tracks/*.s` (`.word 0x80a....`); all 660 resolve to
-  `sBlob_a5710_a8cdc+offset` in `.rodata`, and 0 are unknown.  They stay
-  `open` until SHIFT-006b4 rewrites them.
-- Ledger totals after SHIFT-005b: 5513 assembly references, 1357 ROM refs
-  (660 literals + 697 `ldr` comments), 425 unique ROM values.
+  symbol expressions; SHIFT-006b4 rewrote the 660 seven-digit track headers in
+  `sound/tracks/*.s` to `sBlob_a5710_a8cdc+offset`.  Zero directive literals
+  remain.
+- SHIFT-006b5 rewrote the last two bare `ldr` pseudo-literals in
+  `asm/sound_code.s` (`=sDma1ControlPointer` and `=sDma1ControlValue`).  The
+  audit now records bare numeric pseudo-literals as `ldr_literal`; zero remain.
+  `sound/track_data.o` also depends on `sound/track_data.s` and every
+  `sound/tracks/*.s`, so a stale object cannot hide the track-header rewrite.
+- Ledger totals after SHIFT-006b5: 4853 assembly references, 697 ROM refs
+  (0 directive literals + 0 `ldr_literal` + 697 reference comments), 388 unique
+  ROM values.
 - SHIFT-005 rewrite targets: 580 in `.rodata`, 82 in `.data`.
 - 47 extracted blobs: 7 confirmed pointer tables, 3 possible (embedded
   pointers in struct/audio data), 37 data.  The SHIFT-002 density rule is kept
@@ -145,8 +156,8 @@ runs the same audit before linking.
   per-blob evidence and the 11/7 baseline reconciliation.
 - SHIFT-006a converted the 7 pointer tables to C arrays; SHIFT-006b1/2/3
   converted `79c170`, `74dc48` and `a5710`.  The strict gate reports all ten
-  pointer-like blobs as `converted`, but fails on the 660 open track-header
-  literals until SHIFT-006b4 lands.
+  pointer-like blobs as `converted` and zero open literals of either kind, so it
+  passes.
 
 After SHIFT-005, the six remaining assembly blobs still contain only `ldr`
 reference comments, not data literals:
@@ -162,13 +173,11 @@ reference comments, not data literals:
 
 SHIFT-006a converted the seven confirmed blob pointer tables to relocatable C
 arrays.  SHIFT-006b1/2/3 converted the three `possible` blobs (`79c170`,
-`74dc48`, `a5710`) to relocatable structs.  The padded build and static checks
-pass, but the boot smoke still stops at `frame_counter=3`, below the 450-frame
-floor; the shift test remains the proof target.  SHIFT-005b made the 660
-numeric `.word` track-header pointers into `a5710` visible to the audit: every
-one is an `open` literal resolving to `sBlob_a5710_a8cdc+offset` in `.rodata`.
-They are the last absolute-reference surface for the shift test; SHIFT-006b4
-rewrites them to symbol expressions.
+`74dc48`, `a5710`) to relocatable structs.  SHIFT-006b4 rewrote the 660 numeric
+`.word` track-header pointers into `a5710` as `sBlob_a5710_a8cdc+offset`, and
+SHIFT-006b5 fixed the last two bare `ldr` pseudo-literals.  The padded build and
+static checks pass; the dynamic shift-test status is recorded under "Shift
+test" below.
 
 ## Pointer tables (SHIFT-006a)
 
@@ -226,8 +235,9 @@ bytes.  The 37 `data` blobs stay `INCBIN`.
 
 - ROM: `0x08000000`–`0x0A000000`; must become a symbol/label or be whitelisted.
 - EWRAM/IWRAM/MMIO/palette/VRAM/OAM: fixed by D-002; not rewritten.
-- `.4byte`/`.word` records are the actual data word; `ldr` comments are references
-  to that word.  A rewrite fixes the `.4byte` line, not the `ldr` comment.
+- `.4byte`/`.word` records and bare `ldr rX, =0x...` pseudo-literals are the
+  actual data/address; `@ =0x...` annotations are references only.  A rewrite
+  fixes the literal operand, not the annotation comment.
 - Literal operands accept 1–8 hex digits and are zero-padded to eight in the
   ledger (`0x80a5710` -> `0x080A5710`); `text` keeps the original source.
 - A blob is pointer-like when an aligned word lands in a ROM/RAM address range.
@@ -265,7 +275,7 @@ Status lines are explicit and are never inferred from a zero exit alone:
 
 A dynamic run must return 0 **and** contain both the static and dynamic `PASS:`
 markers; a crash, timeout, missing marker, or a 75% frame-counter shortfall is a
-failure.  The current tree builds and statically passes but dynamically fails at
-boot (`frame_counter=3`, below the 450/600 floor) because the two remaining
-SHIFT-006b blobs (`74dc48`, `a5710`) are still raw.  That failing run is the
-refactor's acceptance target.
+failure.  After SHIFT-006b5 the tree builds and statically passes, but the
+padded boot still stops at `frame_counter=3`, below the 450/600 floor, so
+`SHIFT-DYNAMIC` remains **FAIL** and shiftability is not yet claimed.  Making
+that run pass is SHIFT-006c.

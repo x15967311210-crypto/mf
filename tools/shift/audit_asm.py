@@ -10,6 +10,15 @@ Literal operands may omit leading zeros: `sound/tracks/track_1.s` writes
 `.word 0x80a5710` for the address `0x080A5710`.  One to eight hex digits are
 accepted and normalized to the canonical eight-digit `value` in the ledger;
 `text` keeps the original line so the rewrite tools can reproduce it.
+
+Two `ldr` forms are distinguished:
+
+* `ldr r3, =0x80a568c` is a **bare pseudo-literal**.  GAS emits the address in
+  the literal pool, so it is a real absolute ROM reference (`ldr_literal`) that
+  must be rewritten to `=symbol+offset`.  It is `open` until then.
+* `ldr r3, _080a568c @ =0x080A568C` is the disassembly's annotation form.  The
+  `@` makes the address a comment, so the record is reference-only (`ldr`) and
+  is not a rewrite target.
 """
 
 from __future__ import annotations
@@ -29,7 +38,17 @@ from map_symbols import SymbolMap, category  # noqa: E402
 LITERAL_RE = re.compile(
     r"^\s*(?:[A-Za-z_.$][\w.$@]*:\s*)?\.(?:4byte|word)\s+0x([0-9a-fA-F]{1,8})\b"
 )
-LDR_RE = re.compile(r"=\s*0x([0-9a-fA-F]{8})\b")
+# A bare numeric pseudo-literal is assembled by GAS and becomes a real ROM
+# address in the literal pool.
+LDR_LITERAL_RE = re.compile(
+    r"^\s*(?:[A-Za-z_.$][\w.$@]*:\s*)?"
+    r"ldr[a-z]*\s+\w+\s*,\s*=\s*0x([0-9a-fA-F]{1,8})\b",
+    re.IGNORECASE,
+)
+# Disassembly annotations keep the address in a `@` comment, so they are
+# references to the word rather than the literal itself.  This also covers the
+# `@ =0x08000200` annotation on non-ldr instructions.
+LDR_RE = re.compile(r"=\s*0x([0-9a-fA-F]{1,8})\b")
 ANY_ROM_RE = re.compile(r"\b0x(08[0-9a-fA-F]{6})\b")
 
 
@@ -43,8 +62,13 @@ def scan_lines(path: Path, lines: Iterable[str], sm: SymbolMap) -> list[dict]:
         m = LITERAL_RE.search(line)
         if m:
             found.append(("literal", int(m.group(1), 16)))
+        ldr_literal_match = LDR_LITERAL_RE.search(line)
+        if ldr_literal_match:
+            found.append(("ldr_literal", int(ldr_literal_match.group(1), 16)))
+        # A bare pseudo-literal is the literal itself; the `@` annotation form
+        # (and annotations on other instructions) stays reference-only.
         m = LDR_RE.search(line)
-        if m:
+        if m and ldr_literal_match is None:
             found.append(("ldr", int(m.group(1), 16)))
         # Generic operands are useful for catches like `ldr r0, =0x...` without
         # the comment form, but label declarations and `@ 0x...` annotations
@@ -55,7 +79,7 @@ def scan_lines(path: Path, lines: Iterable[str], sm: SymbolMap) -> list[dict]:
 
         # A .4byte/ldr line also matches the generic operand pattern; keep the
         # specific kind and drop the duplicate generic hit on the same line.
-        specific = {v for k, v in found if k in {"literal", "ldr"}}
+        specific = {v for k, v in found if k in {"literal", "ldr_literal", "ldr"}}
         found = [
             (k, v)
             for (k, v) in found
@@ -121,6 +145,41 @@ SELF_CHECK_CASES: list[tuple[str, str, list[tuple[str, str, str, str]]]] = [
         [("literal", "0x080A5710", "rom", "open")],
     ),
     (
+        "bare 8-digit ldr pseudo-literal is a real open literal",
+        "\tldr r3, =0x080A568C",
+        [("ldr_literal", "0x080A568C", "rom", "open")],
+    ),
+    (
+        "bare 7-digit ldr pseudo-literal is zero-padded",
+        "\tldr r12, =0x80a5690",
+        [("ldr_literal", "0x080A5690", "rom", "open")],
+    ),
+    (
+        "bare 6-digit ldr pseudo-literal is zero-padded",
+        "\tldr r0, =0x123456",
+        [("ldr_literal", "0x00123456", "other", "fixed")],
+    ),
+    (
+        "bare 1-digit ldr pseudo-literal is zero-padded",
+        "\tldr r0, =0x1",
+        [("ldr_literal", "0x00000001", "other", "fixed")],
+    ),
+    (
+        "ldr @ annotation stays reference-only",
+        "\tldr r3, _080a568c @ =0x080A568C",
+        [("ldr", "0x080A568C", "rom", "reference")],
+    ),
+    (
+        "7-digit ldr @ annotation is normalized and reference-only",
+        "\tldr r3, _080a568c @ =0x80a568c",
+        [("ldr", "0x080A568C", "rom", "reference")],
+    ),
+    (
+        "symbol ldr pseudo-literal is not a literal",
+        "\tldr r0, =sDma1ControlPointer",
+        [],
+    ),
+    (
         "7-digit ROM literal is zero-padded",
         "\t.word 0x80a5710",
         [("literal", "0x080A5710", "rom", "open")],
@@ -184,10 +243,17 @@ def self_check() -> int:
 def build_summary(records: list[dict]) -> dict:
     rom = [r for r in records if r["category"] == "rom"]
     literals = [r for r in rom if r["kind"] == "literal"]
+    ldr_literals = [r for r in rom if r["kind"] == "ldr_literal"]
+    open_literals = [
+        r
+        for r in rom
+        if r["kind"] in {"literal", "ldr_literal"} and r["status"] == "open"
+    ]
     by_file = Counter(r["file"] for r in rom)
     by_status = Counter(r["status"] for r in rom)
     by_section = Counter(
-        (r["target"] or {}).get("section") or "unknown" for r in literals
+        (r["target"] or {}).get("section") or "unknown"
+        for r in literals + ldr_literals
     )
     by_kind = Counter(r["kind"] for r in records)
     by_category = Counter(r["category"] for r in records)
@@ -202,6 +268,8 @@ def build_summary(records: list[dict]) -> dict:
         "rom": {
             "records": len(rom),
             "literals": len(literals),
+            "ldr_literals": len(ldr_literals),
+            "open_literals": len(open_literals),
             "unique_values": len(unique_rom),
             "status": dict(by_status),
             "by_file": dict(by_file.most_common()),
@@ -255,7 +323,11 @@ def main() -> int:
 
     print(f"asm audit: {summary['records']} refs -> {out}")
     print(f"  categories: {summary['by_category']}")
-    print(f"  ROM refs: {summary['rom']['records']} ({summary['rom']['literals']} literals)")
+    print(
+        f"  ROM refs: {summary['rom']['records']} "
+        f"({summary['rom']['literals']} literals, "
+        f"{summary['rom']['ldr_literals']} ldr pseudo-literals)"
+    )
     print(f"  ROM unique: {summary['rom']['unique_values']}")
     print(f"  ROM status: {summary['rom']['status']}")
     print(f"  ROM target sections: {summary['rom']['literal_target_sections']}")

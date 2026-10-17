@@ -48,6 +48,12 @@ def main() -> int:
     lines.append("")
     lines.append(f"- ROM records: **{rom['records']}**")
     lines.append(f"- `.4byte`/`.word` literals: **{rom['literals']}**")
+    lines.append(
+        f"- bare `ldr` pseudo-literals: **{rom.get('ldr_literals', 0)}**"
+    )
+    lines.append(
+        f"- open ROM literals (both kinds): **{rom.get('open_literals', 0)}**"
+    )
     lines.append(f"- `ldr =0x08...` reference comments: **{rom['status'].get('reference', 0)}**")
     lines.append(f"- Unique ROM values: **{rom['unique_values']}**")
     lines.append(f"- Status: `{rom['status']}`")
