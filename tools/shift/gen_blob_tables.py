@@ -20,8 +20,14 @@ exact same byte size:
 
 The generated initialisers are byte-identical to the extracted blobs in the
 baseline link.  ``--check`` verifies the checked-in C arrays still match the
-baseline bytes; ``--write`` updates the three source files between the
-generated markers.
+baseline bytes; ``--write`` updates the source files between the generated
+markers.
+
+Mixed blobs (SHIFT-006b) are not flat pointer arrays.  ``Blob_79c170_79c27c``
+is modelled as one C struct whose fields cover the whole blob; only the Thumb
+code pointers and the 21-entry text-pointer array become symbol expressions,
+every other byte is emitted verbatim.  The positional struct initialiser keeps
+the exact byte offsets and a compile-time size check catches padding.
 
 Resolution rules
 ----------------
@@ -142,6 +148,55 @@ BLOBS = (
 # Blobs whose words are Thumb function pointers.  The generator verifies every
 # target against the ELF symbol type instead of assuming bit 0.
 THUMB_BLOBS = {"sBlob_a5224_a5258"}
+
+
+@dataclass(frozen=True)
+class MixedField:
+    """One contiguous field in a mixed blob."""
+
+    name: str
+    count: int
+    kind: str  # "thumb", "u8", or "data"
+
+
+@dataclass(frozen=True)
+class MixedBlobSpec:
+    symbol: str
+    file: str  # extracted bytes, relative to --data-root
+    source: str  # C source that owns the declaration
+    data_bytes: int  # database.json count
+    const: bool
+    fields: tuple[MixedField, ...]
+
+
+# Blobs that embed pointers in a record layout.  The field table is the data
+# model from SHIFT-006b; the generator refuses to render if the fields do not
+# cover the baseline bytes exactly.
+MIXED_BLOBS = (
+    MixedBlobSpec(
+        "sBlob_79c170_79c27c",
+        "Blob_79c170_79c27c.bin",
+        "src/text.c",
+        0x10C,
+        False,
+        (
+            MixedField("code", 3, "thumb"),
+            MixedField("counts", 4, "u8"),
+            MixedField("glyphs", 36, "u8"),
+            MixedField("offsetsX", 108, "u8"),
+            MixedField("offsetsNegX", 24, "u8"),
+            MixedField("text", 21, "data"),
+        ),
+    ),
+)
+
+
+def field_size(field: MixedField) -> int:
+    return field.count if field.kind == "u8" else field.count * 4
+
+
+def field_ctype(field: MixedField) -> str:
+    return "u8" if field.kind == "u8" else "u32"
 
 
 @dataclass(frozen=True)
@@ -342,7 +397,7 @@ def pointer_expression(
     return f"(u32){resolve_expression(sm, elf, value)}"
 
 
-def blob_bytes(spec: BlobSpec, data_root: Path) -> bytes:
+def blob_bytes(spec: BlobSpec | MixedBlobSpec, data_root: Path) -> bytes:
     path = data_root / spec.file
     if not path.exists():
         raise GenError(
@@ -381,6 +436,53 @@ def render_block(spec: BlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols) ->
     return "\n".join(lines)
 
 
+def render_mixed_block(
+    spec: MixedBlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols
+) -> str:
+    expected = sum(field_size(field) for field in spec.fields)
+    if expected != len(data):
+        raise GenError(
+            f"{spec.file}: field model covers {expected} bytes, blob has "
+            f"{len(data)}"
+        )
+
+    qualifier = "const " if spec.const else ""
+    lines = [
+        BEGIN_MARKER.format(name=spec.symbol),
+        "static struct {",
+    ]
+    for field in spec.fields:
+        lines.append(f"    {field_ctype(field)} {field.name}[{field.count}];")
+    lines.append(f"}} {spec.symbol} = {{")
+
+    offset = 0
+    for field in spec.fields:
+        lines.append(f"    /* +0x{offset:03X} {field.name} */")
+        lines.append("    {")
+        size = field_size(field)
+        if field.kind == "u8":
+            for start in range(0, size, 12):
+                values = data[offset + start : offset + min(start + 12, size)]
+                rendered = ", ".join(f"0x{value:02X}" for value in values)
+                lines.append(f"        {rendered},")
+        else:
+            thumb = field.kind == "thumb"
+            for pos in range(offset, offset + size, 4):
+                value = struct.unpack_from("<I", data, pos)[0]
+                expr = pointer_expression(sm, elf, value, thumb)
+                lines.append(f"        {expr},")
+        lines.append("    },")
+        offset += size
+
+    lines.append("};")
+    lines.append(
+        f"typedef char {spec.symbol}_size_check"
+        f"[sizeof({spec.symbol}) == {len(data)} ? 1 : -1];"
+    )
+    lines.append(END_MARKER.format(name=spec.symbol))
+    return "\n".join(lines)
+
+
 def marker_region(text: str, symbol: str) -> tuple[int, int] | None:
     begin = BEGIN_MARKER.format(name=symbol)
     end = END_MARKER.format(name=symbol)
@@ -395,7 +497,9 @@ def marker_region(text: str, symbol: str) -> tuple[int, int] | None:
     return first, last + len(end)
 
 
-def check_source(spec: BlobSpec, path: Path, block: str) -> list[str]:
+def check_source(
+    spec: BlobSpec | MixedBlobSpec, path: Path, block: str
+) -> list[str]:
     errors: list[str] = []
     text = path.read_text()
     region = marker_region(text, spec.symbol)
@@ -415,7 +519,9 @@ def check_source(spec: BlobSpec, path: Path, block: str) -> list[str]:
     return errors
 
 
-def write_source(spec: BlobSpec, path: Path, block: str) -> bool:
+def write_source(
+    spec: BlobSpec | MixedBlobSpec, path: Path, block: str
+) -> bool:
     text = path.read_text()
     region = marker_region(text, spec.symbol)
     if region is not None:
@@ -465,7 +571,7 @@ def main() -> int:
     ap.add_argument(
         "--write",
         action="store_true",
-        help="replace the INCBIN declarations with generated arrays",
+        help="replace the INCBIN declarations with generated blocks",
     )
     args = ap.parse_args()
 
@@ -483,8 +589,8 @@ def main() -> int:
 
     errors: list[str] = []
     changed = 0
-    by_source: dict[Path, list[tuple[BlobSpec, str]]] = {}
-    for spec in BLOBS:
+    by_source: dict[Path, list[tuple[BlobSpec | MixedBlobSpec, str]]] = {}
+    for spec in (*BLOBS, *MIXED_BLOBS):
         database_size = sizes.get(spec.file)
         if database_size is not None and database_size != spec.data_bytes:
             errors.append(
@@ -494,7 +600,10 @@ def main() -> int:
             continue
         try:
             data = blob_bytes(spec, Path(args.data_root))
-            block = render_block(spec, data, sm, elf)
+            if isinstance(spec, MixedBlobSpec):
+                block = render_mixed_block(spec, data, sm, elf)
+            else:
+                block = render_block(spec, data, sm, elf)
         except GenError as exc:
             errors.append(str(exc))
             continue
@@ -510,8 +619,8 @@ def main() -> int:
             print("FAIL: generated blob arrays are not up to date", file=sys.stderr)
             return 1
         print(
-            f"PASS: {len(BLOBS)} pointer-table blobs match the baseline bytes "
-            f"and checked-in C arrays"
+            f"PASS: {len(BLOBS)} pointer-table blobs and {len(MIXED_BLOBS)} "
+            f"mixed blob match the baseline bytes and checked-in C arrays"
         )
         return 0
 

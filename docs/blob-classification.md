@@ -111,6 +111,13 @@ would likely be wrong about which word is the pointer in each record.
 where real pointers are embedded in a larger record layout.  Everything else
 is either a confirmed flat table or data.
 
+SHIFT-006b1 update: `Blob_79c170_79c27c` is converted.  It is now the
+268-byte struct `sBlob_79c170_79c27c` in `src/text.c` (3 Thumb code pointers,
+counts/glyph/coordinate bytes, and 21 anchored text pointers); see
+`tools/shift/README.md` for the field table and
+`tools/shift/gen_blob_tables.py --check`.  `74dc48` and `a5710` remain
+unconverted.
+
 ## Data blobs (37)
 
 ### Data with non-trivial pointer-like hits (8) — medium confidence
@@ -247,8 +254,9 @@ converting them.
 - `Blob_a5710_a8cdc` — define the sound-entry struct (`[0x3Cxx, ptr,
   0x00FF00FF]`) or leave the audio blob raw and relocate its pointer fields
   with an audio-aware pass.
-- `Blob_79c170_79c27c` — split the blob into its three regions (3 code
-  pointers, glyph/coordinate data, 21-entry pointer run) before converting.
+- `Blob_79c170_79c27c` — **converted by SHIFT-006b1**: the blob is the
+  268-byte struct `sBlob_79c170_79c27c` in `src/text.c` (3 code pointers,
+  glyph/coordinate data, 21-entry anchored pointer run).
 
 ### Next task: SHIFT-006
 

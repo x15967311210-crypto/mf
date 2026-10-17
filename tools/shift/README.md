@@ -65,9 +65,10 @@ reference comments, not data literals:
 | `asm/disasm_0x08056140.s` | 15 |
 
 SHIFT-006a converted the seven confirmed blob pointer tables to relocatable C
-arrays.  The padded build still fails early at boot because the three
-`possible` blobs (and other unconverted absolute pointer data) remain raw
-until SHIFT-006b; the shift test is the proof target.
+arrays.  SHIFT-006b1 converted the first `possible` blob, `79c170`, to a
+relocatable mixed struct.  The padded build still fails early at boot because
+`74dc48` and `a5710` (and other unconverted absolute pointer data) remain raw;
+the shift test is the proof target.
 
 ## Pointer tables (SHIFT-006a)
 
@@ -87,9 +88,26 @@ Converted tables: `sBlob_a5224_a5258`, `sBlob_79bec0_79c128`,
 `sBlob_79ce10_79e6a0`, `sBlob_79e868_79eca0`.  The generated blocks live
 between `BEGIN GENERATED` / `END GENERATED` markers in
 `src/data/generic_data.c`, `src/menus/pause_screen_map.c`, and
-`src/new_file_intro.c`; do not hand-edit them.  The three `possible` blobs
-(`74dc48`, `a5710`, `79c170`) and the 37 `data` blobs stay raw until
-SHIFT-006b models them.
+`src/new_file_intro.c`; do not hand-edit them.
+
+## Mixed blobs (SHIFT-006b)
+
+`gen_blob_tables.py` also models mixed blobs as one C struct when pointers are
+embedded in a record layout.  `Blob_79c170_79c27c` is emitted as
+`sBlob_79c170_79c27c` in `src/text.c`:
+
+| Offset | Field | Handling |
+|---|---|---|
+| `+0x000` | `u32 code[3]` | Thumb function symbols; the ELF `STT_FUNC` values already carry bit 0. |
+| `+0x00C` | `u8 counts[4]` | Raw bytes. |
+| `+0x010` | `u8 glyphs[36]` | Raw bytes. |
+| `+0x034` | `u8 offsetsX[108]` | Raw bytes (36 three-byte tuples). |
+| `+0x0A0` | `u8 offsetsNegX[24]` | Raw bytes (8 three-byte tuples). |
+| `+0x0B8` | `u32 text[21]` | Pointers into `sBlob_582288_58b3cc`, anchored at global `sUnk_582280`. |
+
+The positional struct initialiser is 268 bytes with no padding; the generated
+block ends with a compile-time `sizeof` check.  `74dc48` and `a5710` remain
+raw until their SHIFT-006b models land, and the 37 `data` blobs stay `INCBIN`.
 
 ## Classification rules
 
