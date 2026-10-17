@@ -41,6 +41,7 @@ def extract_data(region: str, debug: bool, quiet: bool = False) -> None:
     rom.close()
     split_intro_blob()
     split_sa_x_close_up_blob()
+    split_new_file_intro_frame_data_blob()
 
 
 def split_blob(path: Path, table_offset: int, table_size: int,
@@ -94,6 +95,33 @@ def split_sa_x_close_up_blob() -> None:
         Path(DATA_PATH, "Blob_73421e_prefix.bin"),
         Path(DATA_PATH, "Blob_73421e_after.bin"),
     )
+
+
+def split_new_file_intro_frame_data_blob() -> None:
+    """Carve the two raw FrameData tables out of the intro blob.
+
+    `Blob_5f6990_60093c.bin` contains a 26-entry landing `struct FrameData`
+    table at offset 0x79E0 and a 70-entry ship-landing `struct FrameData`
+    table at 0x8B48.  Their pFrame pointers are raw ROM addresses, so both
+    tables must be rebuilt as C data to let the linker relocate them.  Split
+    the blob into the prefix, the bytes between the tables, and the tail; the
+    two tables themselves are skipped.  The spans keep the blob's original
+    size and ordering inside the linked object.
+    """
+    blob_path = Path(DATA_PATH, "Blob_5f6990_60093c.bin")
+    if not blob_path.exists():
+        return
+    blob = blob_path.read_bytes()
+    if len(blob) != 0x9FAC:
+        raise ValueError(
+            f"{blob_path} is {len(blob)} bytes, expected 0x9FAC")
+    spans = (
+        (0x0000, 0x79E0, "Blob_5f6990_prefix.bin"),
+        (0x7AB0, 0x8B48, "Blob_5f6990_middle.bin"),
+        (0x8D78, 0x9FAC, "Blob_5f6990_after.bin"),
+    )
+    for start, end, name in spans:
+        Path(DATA_PATH, name).write_bytes(blob[start:end])
 
 
 def sort_by_address(debug: bool, quiet: bool = False) -> None:

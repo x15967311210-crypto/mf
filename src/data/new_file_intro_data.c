@@ -21112,7 +21112,347 @@ const u32 sIntroArrivingAtBslSpaceMapTilemap[368] = INCBIN_U32("data/new_file_in
 const u32 sIntroSamusMonologueBgTilemap[368] = INCBIN_U32("data/new_file_intro/samus_monologue_bg.tm.lz");
 const u32 sIntroTilemap_5f65d8[238] = INCBIN_U32("data/new_file_intro/5f65d8.tm.lz");
 
-static const u8 sBlob_5f6990_60093c[] = INCBIN_U8("data/Blob_5f6990_60093c.bin");
+static const u8 sBlob_5f6990_prefix[0x79E0] = INCBIN_U8("data/Blob_5f6990_prefix.bin");
+
+static const struct FrameData sIntroLandingFrameData[26] = {
+    [0] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7548),
+        .timer = 8
+    },
+    [1] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7592),
+        .timer = 8
+    },
+    [2] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x75FA),
+        .timer = 8
+    },
+    [3] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7662),
+        .timer = 8
+    },
+    [4] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x76CA),
+        .timer = 8
+    },
+    [5] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7732),
+        .timer = 8
+    },
+    [6] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x77B8),
+        .timer = 8
+    },
+    [7] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x783E),
+        .timer = 8
+    },
+    [8] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x78C4),
+        .timer = 8
+    },
+    [9] = FRAME_DATA_TERMINATOR,
+    [10] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x78C4),
+        .timer = 8
+    },
+    [11] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x783E),
+        .timer = 8
+    },
+    [12] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x77B8),
+        .timer = 8
+    },
+    [13] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7732),
+        .timer = 8
+    },
+    [14] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x76CA),
+        .timer = 8
+    },
+    [15] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7662),
+        .timer = 8
+    },
+    [16] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x75FA),
+        .timer = 8
+    },
+    [17] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7592),
+        .timer = 8
+    },
+    [18] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7548),
+        .timer = 8
+    },
+    [19] = FRAME_DATA_TERMINATOR,
+    [20] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x794A),
+        .timer = 4
+    },
+    [21] = FRAME_DATA_TERMINATOR,
+    [22] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x798E),
+        .timer = 4
+    },
+    [23] = FRAME_DATA_TERMINATOR,
+    [24] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_prefix + 0x7548),
+        .timer = 4
+    },
+    [25] = FRAME_DATA_TERMINATOR
+};
+
+static const u8 sBlob_5f6990_middle[0x1098] = INCBIN_U8("data/Blob_5f6990_middle.bin");
+
+static const struct FrameData sIntroShipLandingFrameData[70] = {
+    [0] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x5CA),
+        .timer = 8
+    },
+    [1] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x538),
+        .timer = 8
+    },
+    [2] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x49A),
+        .timer = 8
+    },
+    [3] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x3FC),
+        .timer = 8
+    },
+    [4] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x352),
+        .timer = 8
+    },
+    [5] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x2A8),
+        .timer = 8
+    },
+    [6] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x1FE),
+        .timer = 8
+    },
+    [7] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x154),
+        .timer = 8
+    },
+    [8] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xAA),
+        .timer = 8
+    },
+    [9] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x0),
+        .timer = 100
+    },
+    [10] = FRAME_DATA_TERMINATOR,
+    [11] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x5CA),
+        .timer = 4
+    },
+    [12] = FRAME_DATA_TERMINATOR,
+    [13] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x5CA),
+        .timer = 12
+    },
+    [14] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x65C),
+        .timer = 12
+    },
+    [15] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x6EE),
+        .timer = 12
+    },
+    [16] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x780),
+        .timer = 12
+    },
+    [17] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x6EE),
+        .timer = 12
+    },
+    [18] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x65C),
+        .timer = 12
+    },
+    [19] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x5CA),
+        .timer = 255
+    },
+    [20] = FRAME_DATA_TERMINATOR,
+    [21] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x0),
+        .timer = 8
+    },
+    [22] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x812),
+        .timer = 8
+    },
+    [23] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x8BC),
+        .timer = 8
+    },
+    [24] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x812),
+        .timer = 8
+    },
+    [25] = FRAME_DATA_TERMINATOR,
+    [26] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x0),
+        .timer = 4
+    },
+    [27] = FRAME_DATA_TERMINATOR,
+    [28] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x966),
+        .timer = 4
+    },
+    [29] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x9D4),
+        .timer = 4
+    },
+    [30] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xA4E),
+        .timer = 4
+    },
+    [31] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xAEC),
+        .timer = 4
+    },
+    [32] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xB8A),
+        .timer = 4
+    },
+    [33] = FRAME_DATA_TERMINATOR,
+    [34] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xC72),
+        .timer = 4
+    },
+    [35] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xCE0),
+        .timer = 4
+    },
+    [36] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xD72),
+        .timer = 4
+    },
+    [37] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xE04),
+        .timer = 4
+    },
+    [38] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xE66),
+        .timer = 4
+    },
+    [39] = FRAME_DATA_TERMINATOR,
+    [40] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xE98),
+        .timer = 4
+    },
+    [41] = FRAME_DATA_TERMINATOR,
+    [42] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xEA6),
+        .timer = 4
+    },
+    [43] = FRAME_DATA_TERMINATOR,
+    [44] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xEE4),
+        .timer = 4
+    },
+    [45] = FRAME_DATA_TERMINATOR,
+    [46] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x0),
+        .timer = 50
+    },
+    [47] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xAA),
+        .timer = 8
+    },
+    [48] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x154),
+        .timer = 8
+    },
+    [49] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x1FE),
+        .timer = 8
+    },
+    [50] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x2A8),
+        .timer = 8
+    },
+    [51] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x352),
+        .timer = 8
+    },
+    [52] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x3FC),
+        .timer = 8
+    },
+    [53] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x49A),
+        .timer = 8
+    },
+    [54] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x538),
+        .timer = 8
+    },
+    [55] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x5CA),
+        .timer = 50
+    },
+    [56] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x5CA),
+        .timer = 12
+    },
+    [57] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x65C),
+        .timer = 12
+    },
+    [58] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x6EE),
+        .timer = 12
+    },
+    [59] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x780),
+        .timer = 100
+    },
+    [60] = FRAME_DATA_TERMINATOR,
+    [61] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xF16),
+        .timer = 6
+    },
+    [62] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xF54),
+        .timer = 6
+    },
+    [63] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xF92),
+        .timer = 6
+    },
+    [64] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0xFD0),
+        .timer = 6
+    },
+    [65] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x100E),
+        .timer = 6
+    },
+    [66] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x104C),
+        .timer = 6
+    },
+    [67] = FRAME_DATA_TERMINATOR,
+    [68] = {
+        .pFrame = (const u16*)((u8*)sBlob_5f6990_middle + 0x108A),
+        .timer = 4
+    },
+    [69] = FRAME_DATA_TERMINATOR
+};
+
+static const u8 sBlob_5f6990_after[0x1234] = INCBIN_U8("data/Blob_5f6990_after.bin");
 
 const u32 sIntroSamusSittingGfx[4818] = INCBIN_U32("data/new_file_intro/samus_sitting.gfx.lz");
 const u16 sIntroSamusSittingPal[16 * PAL_ROW] = INCBIN_U16("data/new_file_intro/samus_sitting.pal");
