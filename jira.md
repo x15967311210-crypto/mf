@@ -56,8 +56,13 @@ input/visual parity) and HACK-001/001a/006
   - OAM diff: normal has 66 populated OAM entries (gNextOamSlot=66); shifted
     has all 66 slots `00FF00FF` and gNextOamSlot=0, while BG map/text and
     `main=3/s2=0` match -> missing UI is the OAM layer, not VRAM/palette
-  - trace why `PauseScreenProcessOam`/MapScreenDrawSpecialOam does not populate
-    gOamData in the shifted state
+  - state diff: normal 66 OAM entries / gNextOamSlot=66; shifted all
+    `00FF00FF` / 0; pause substate and active type bytes are present in both,
+    so the OAM build/update is not running or is cleared before capture
+  - automation: QA-008 adds OAM count/hash checkpoints + `oam-diff`;
+    savestate-based objective-page comparison stays local-only
+  - need a state **before** opening the map (or debug warp) to trace the
+    skipped `PauseScreenInit`/`PauseScreenProcessOam` call
 - [DOING @dev2] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - print OAM count/hash at 300/600/900/1059/4000/30000 in input replay
   - add `oam-diff` normal vs shifted; savestate-based map UI comparison stays
