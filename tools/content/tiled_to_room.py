@@ -48,10 +48,32 @@ MANIFEST_SCHEMA = "mf-hack.room-manifest/v1"
 ROOM_SCHEMA = "mf-hack.room/v1"
 
 PIXEL_PER_BLOCK = 16
-MAX_ROOM_BLOCKS = 6144  # gDecompClipdataMap / gDecompBg*Map regions are 0x3000 bytes
+# include/structs/room.h:
+#   gDecompBg0Map/gDecompBg1Map/gDecompBg2Map are u16[6144] (0x3000 bytes).
+MAX_BG_BLOCKS = 6144
+# include/structs/room.h:
+#   gDecompClipdataMap is u16[1024] (0x800 bytes); it is smaller than the BG
+#   planes, so a room with a clipdata layer is capped separately.
+MAX_CLIPDATA_BLOCKS = 1024
 MAX_TILESET_ENTRIES = 98  # include/data/rooms_data.h: sTilesetEntries[98]
 MAX_CLIPDATA = 176  # include/constants/clipdata.h: CLIPDATA_COUNT
 MAX_SPRITE_ID_FALLBACK = 255
+
+# Sprite record byte 2 (see SpriteLoadRoomSprites/SpriteInitPrimary in
+# src/sprite.c):
+#   bits 7     SSP_HIDDEN_ON_ROOM_LOAD
+#   bits 6..4  SSP property bits (`SSP_PROPERTY_MASK`)
+#   bits 3..0  SPRITESET_IDX(slot) low nibble (`SSP_SLOT_MASK`)
+# `gSpritesetSpriteIds` has MAX_AMOUNT_OF_SPRITE_TYPES (15) entries, so table
+# slots are 0..14.  If bits 6..4 are zero and the masked byte is <= 0x10, the
+# engine treats byte 2 - 1 as a direct sprite ID (0..15) and never consults
+# `gSpritesetSpriteIds`.
+SPRITESET_PROPERTY_MASK = 0xF0  # include/constants/sprite.h: SSP_PROPERTY_MASK
+SPRITESET_SLOT_MASK = 0x0F  # include/constants/sprite.h: SSP_SLOT_MASK
+SPRITESET_TABLE_INDEX_MASK = 0x70  # SSP_UNINFECTED..SSP_UNKNOWN_40, after hidden bit
+SPRITESET_HIDDEN_BIT = 0x80  # include/constants/sprite.h: SSP_HIDDEN_ON_ROOM_LOAD
+MAX_SPRITESET_SLOTS = 15  # include/structs/sprite.h: MAX_AMOUNT_OF_SPRITE_TYPES
+DIRECT_SPRITE_ID_MAX = 15  # byte 2 <= 0x10 decodes as sprite ID byte2 - 1
 
 ROOM_SPRITE_DATA_TERMINATOR = b"\xff\xff\xff"
 
@@ -147,8 +169,10 @@ ROOM_KEYS = {
     "layers",
     "room_entry",
     "tile_mapping",
+    "spritesets",
     "camera",
 }
+SPRITESET_NAMES = ("default", "first", "second")
 TILESET_KEYS = {
     "number",
     "image",
@@ -514,6 +538,62 @@ def decode_rle_u16(data: bytes) -> tuple[int, int, list[int]]:
 # Manifest
 
 
+def parse_spriteset_tables(
+    raw: Any, sprite_ids: dict[str, int]
+) -> dict[str, dict[int, int]]:
+    """Validate the manifest's slot -> sprite-id declaration.
+
+    The manifest table must mirror the engine table that HACK-004a will place
+    in ``gSpritesetSpriteIds``.  The spawn validator uses it to prove that the
+    record byte (SPRITESET_IDX(slot) plus SSP property bits) resolves back to
+    the requested sprite ID.
+    """
+
+    raw = expect_object(raw, "$.room.spritesets")
+    unknown = sorted(set(raw) - set(SPRITESET_NAMES))
+    if unknown:
+        raise ContentError(
+            "$.room.spritesets: unknown spriteset(s): "
+            + ", ".join(unknown)
+            + "; expected default, first or second"
+        )
+    max_sprite_id = max(sprite_ids.values()) if sprite_ids else MAX_SPRITE_ID_FALLBACK
+    tables: dict[str, dict[int, int]] = {}
+    for name in SPRITESET_NAMES:
+        if name not in raw:
+            continue
+        entries = expect_object(raw[name], f"$.room.spritesets.{name}")
+        table: dict[int, int] = {}
+        id_to_slot: dict[int, int] = {}
+        for key, value in entries.items():
+            path = f"$.room.spritesets.{name}[{key!r}]"
+            try:
+                slot = int(key, 0)
+            except (TypeError, ValueError):
+                raise ContentError(f"{path}: slot key is not an integer") from None
+            if not 0 <= slot < MAX_SPRITESET_SLOTS:
+                raise ContentError(
+                    f"{path}: slot {slot} is outside 0..{MAX_SPRITESET_SLOTS - 1} "
+                    "(MAX_AMOUNT_OF_SPRITE_TYPES is 15)"
+                )
+            if slot in table:
+                raise ContentError(f"{path}: duplicate slot {slot}")
+            sprite_id = resolve_symbol(value, sprite_ids, path)
+            if not 0 <= sprite_id <= max_sprite_id:
+                raise ContentError(
+                    f"{path}: sprite ID {sprite_id} is outside 0..{max_sprite_id}"
+                )
+            if sprite_id in id_to_slot:
+                raise ContentError(
+                    f"{path}: sprite ID {sprite_id} is already mapped to slot "
+                    f"{id_to_slot[sprite_id]}; table entries must be unique"
+                )
+            table[slot] = sprite_id
+            id_to_slot[sprite_id] = slot
+        tables[name] = dict(sorted(table.items()))
+    return tables
+
+
 def parse_manifest(path: str | Path) -> dict[str, Any]:
     manifest_path = Path(path)
     manifest = expect_object(load_json(manifest_path, "room manifest"), "$")
@@ -603,6 +683,10 @@ def parse_manifest(path: str | Path) -> dict[str, Any]:
                 )
             resolved[gid] = value
         normalised_mapping[role] = resolved
+
+    spritesets = parse_spriteset_tables(
+        room.get("spritesets", {}), load_sprite_ids()
+    )
 
     entry = expect_object(room["room_entry"], "$.room.room_entry")
     expect_keys(
@@ -730,6 +814,7 @@ def parse_manifest(path: str | Path) -> dict[str, Any]:
         },
         "layers": layers,
         "tile_mapping": normalised_mapping,
+        "spritesets": spritesets,
         "room_entry": room_entry,
         "scrolls": scrolls,
     }
@@ -808,10 +893,17 @@ def parse_tiled_map(
             f"$map: room dimensions {width}x{height} exceed the one-byte "
             "RLE header limit (255x255)"
         )
-    if width * height > MAX_ROOM_BLOCKS:
+    blocks = width * height
+    if blocks > MAX_BG_BLOCKS:
         raise ContentError(
-            f"$map: {width * height} blocks exceed the {MAX_ROOM_BLOCKS}-entry "
-            "decompression buffer"
+            f"$map: {blocks} blocks exceed the {MAX_BG_BLOCKS}-entry BG map "
+            "capacity (gDecompBg0/1/2Map are u16[6144])"
+        )
+    if manifest["layers"].get("clip") is not None and blocks > MAX_CLIPDATA_BLOCKS:
+        raise ContentError(
+            f"$map: {blocks} blocks exceed the {MAX_CLIPDATA_BLOCKS}-entry "
+            "clipdata capacity (gDecompClipdataMap is u16[1024]); reduce the "
+            "room or omit the clip layer"
         )
     block_width, block_height = manifest["tileset"]["block_pixels"]
     if (
@@ -1081,9 +1173,6 @@ def parse_tiled_map(
                 raise ContentError(
                     f"{path}.properties.spriteset: expected default, first or second"
                 )
-            slot = as_int(
-                props.get("slot", 0), path + ".properties.slot", 0, 14
-            )
             properties = resolve_flags(
                 props.get("properties", 0),
                 SPRITESET_PROPERTY_NAMES,
@@ -1091,6 +1180,84 @@ def parse_tiled_map(
             )
             if not 0 <= properties <= 0xFF:
                 raise ContentError(f"{path}.properties.properties: value is outside 0..255")
+            requested_slot = props.get("slot")
+            if requested_slot is not None:
+                requested_slot = as_int(
+                    requested_slot, path + ".properties.slot", 0, DIRECT_SPRITE_ID_MAX
+                )
+            table = manifest["spritesets"].get(spriteset)
+            if properties & SPRITESET_TABLE_INDEX_MASK:
+                # SpriteInitPrimary only consults gSpritesetSpriteIds when the
+                # masked record byte is greater than 0x10; bits 6..4 provide
+                # that offset.  A hidden-only (0x80) record still takes the
+                # direct-ID path, so it cannot address the table.
+                if not table:
+                    raise ContentError(
+                        f"{path}: spriteset {spriteset!r} has no "
+                        f"$.room.spritesets.{spriteset} table; declare the "
+                        "slot -> sprite-ID mapping that the engine will load "
+                        "into gSpritesetSpriteIds"
+                    )
+                if requested_slot is not None:
+                    if requested_slot >= MAX_SPRITESET_SLOTS:
+                        raise ContentError(
+                            f"{path}.properties.slot: slot {requested_slot} "
+                            f"cannot be encoded; MAX_AMOUNT_OF_SPRITE_TYPES is "
+                            f"{MAX_SPRITESET_SLOTS} (slots "
+                            f"0..{MAX_SPRITESET_SLOTS - 1})"
+                        )
+                    if requested_slot not in table:
+                        raise ContentError(
+                            f"{path}.properties.slot: slot {requested_slot} is "
+                            f"not declared in $.room.spritesets.{spriteset}"
+                        )
+                    mapped = table[requested_slot]
+                    if mapped != sprite_id:
+                        raise ContentError(
+                            f"{path}.properties.slot: slot {requested_slot} maps "
+                            f"to sprite ID {mapped} in $.room.spritesets."
+                            f"{spriteset}, not {sprite_id}"
+                        )
+                    slot = requested_slot
+                else:
+                    matches = [
+                        candidate
+                        for candidate, mapped in sorted(table.items())
+                        if mapped == sprite_id
+                    ]
+                    if not matches:
+                        raise ContentError(
+                            f"{path}.properties.sprite_id: sprite ID "
+                            f"{sprite_id} is not mapped in $.room.spritesets."
+                            f"{spriteset}; the engine resolves record byte 2 "
+                            "through gSpritesetSpriteIds[slot]"
+                        )
+                    if len(matches) > 1:
+                        raise ContentError(
+                            f"{path}.properties.sprite_id: sprite ID "
+                            f"{sprite_id} is ambiguous in $.room.spritesets."
+                            f"{spriteset} (slots {matches}); set 'slot'"
+                        )
+                    slot = matches[0]
+            else:
+                # With no property bits the engine ignores the spriteset table
+                # and uses byte 2 - 1 as a direct sprite ID (0..15).
+                if sprite_id > DIRECT_SPRITE_ID_MAX:
+                    raise ContentError(
+                        f"{path}.properties.sprite_id: sprite ID {sprite_id} is "
+                        "not representable without spriteset-table indexing; "
+                        "set an SSP_UNINFECTED_OR_BOSS, SSP_X_* or "
+                        "SSP_UNKNOWN_40 property and declare "
+                        "$.room.spritesets.<set>, or use a direct sprite ID "
+                        f"0..{DIRECT_SPRITE_ID_MAX}"
+                    )
+                slot = sprite_id
+                if requested_slot is not None and requested_slot != slot:
+                    raise ContentError(
+                        f"{path}.properties.slot: direct sprite ID {sprite_id} "
+                        f"is encoded as byte 2 - 1 = slot {slot}; got slot "
+                        f"{requested_slot}"
+                    )
             spawns.append({
                 "id": object_id,
                 "name": raw.get("name", ""),
@@ -1237,11 +1404,61 @@ def pack_door(door: dict[str, Any]) -> bytes:
         raise ContentError(f"internal error: door cannot be packed: {exc}") from exc
 
 
+def spawn_record_byte(spawn: dict[str, Any]) -> int:
+    """Encode byte 2 exactly as SpriteInitPrimary decodes it.
+
+    ``SPRITESET_IDX(slot)`` is ``slot + 1`` (include/constants/sprite.h).  The
+    low nibble is ``SSP_SLOT_MASK``; the high nibble is ``SSP_PROPERTY_MASK``.
+    Slot 15 is not a table slot because ``gSpritesetSpriteIds`` has
+    ``MAX_AMOUNT_OF_SPRITE_TYPES`` (15) entries.
+    """
+
+    slot = spawn["slot"]
+    if not 0 <= slot <= DIRECT_SPRITE_ID_MAX:
+        raise ContentError(f"internal error: sprite slot {slot} is not encodable")
+    byte = (spawn["properties"] & SPRITESET_PROPERTY_MASK) | (slot + 1)
+    if byte > 0xFF:
+        raise ContentError(f"internal error: sprite record byte {byte} is not u8")
+    return byte
+
+
+def decode_spawn_record(
+    byte: int, table: dict[int, int] | None = None
+) -> dict[str, Any]:
+    """Mirror the SpriteInitPrimary record decode for self-checks."""
+
+    if not 0 <= byte <= 0xFF:
+        raise ContentError(f"internal error: sprite record byte {byte} is not u8")
+    hidden = bool(byte & SPRITESET_HIDDEN_BIT)
+    value = byte & 0x7F
+    if value > 0x10:
+        # SpriteInitPrimary does `spritesetSlot--; spritesetSlot %= 16;`.
+        slot = (value - 1) % 16
+        if not 0 <= slot < MAX_SPRITESET_SLOTS:
+            raise ContentError(
+                f"internal error: record byte 0x{byte:02X} decodes to "
+                f"out-of-range spriteset slot {slot}"
+            )
+        if table is None or slot not in table:
+            raise ContentError(
+                f"internal error: record byte 0x{byte:02X} needs "
+                f"gSpritesetSpriteIds[{slot}]"
+            )
+        sprite_id = table[slot]
+    else:
+        slot = value - 1
+        if not 0 <= slot <= DIRECT_SPRITE_ID_MAX:
+            raise ContentError(
+                f"internal error: record byte 0x{byte:02X} has no valid direct ID"
+            )
+        sprite_id = slot
+    return {"hidden": hidden, "slot": slot, "sprite_id": sprite_id}
+
+
 def pack_spriteset(spawns: list[dict[str, Any]]) -> bytes:
     result = bytearray()
     for spawn in spawns:
-        third = (spawn["properties"] & 0xF0) | ((spawn["slot"] + 1) & 0x0F)
-        result.extend((spawn["y"], spawn["x"], third))
+        result.extend((spawn["y"], spawn["x"], spawn_record_byte(spawn)))
     result.extend(ROOM_SPRITE_DATA_TERMINATOR)
     return bytes(result)
 
@@ -1329,6 +1546,7 @@ def write_outputs(
             "file": filename,
             "bytes": len(bytes_for_set),
             "count": len(members),
+            "table": manifest["spritesets"].get(set_name, {}),
             "records": [
                 {
                     "id": spawn["id"],
@@ -1338,6 +1556,7 @@ def write_outputs(
                     "sprite_id": spawn["sprite_id"],
                     "slot": spawn["slot"],
                     "properties": spawn["properties"],
+                    "record_byte": spawn_record_byte(spawn),
                 }
                 for spawn in members
             ],
@@ -1378,6 +1597,7 @@ def write_outputs(
             "records": doors,
         },
         "spritesets": spritesets,
+        "spriteset_tables": manifest["spritesets"],
         "outputs": output_info,
         "warnings": map_data["warnings"],
     }
@@ -1608,6 +1828,19 @@ def self_check() -> int:
                 width, height, values = decode_rle_u16(rle)
                 if (width, height) != (8, 6) or values != layer["values"]:
                     raise AssertionError(f"{role} RLE round-trip failed")
+
+            # Every emitted spawn record must decode back to its sprite ID
+            # through the same table/byte rules SpriteInitPrimary uses.
+            for set_info in result["spritesets"].values():
+                table = {int(k): v for k, v in set_info["table"].items()}
+                for record in set_info["records"]:
+                    decoded = decode_spawn_record(record["record_byte"], table)
+                    if decoded["sprite_id"] != record["sprite_id"]:
+                        raise AssertionError(
+                            "spawn record round-trip failed for "
+                            f"{record['name']}: {decoded['sprite_id']} != "
+                            f"{record['sprite_id']}"
+                        )
 
             map_data = load_json(fixture_map, "fixture map")
             manifest_data = load_json(fixture_manifest, "fixture manifest")

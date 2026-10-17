@@ -35,6 +35,14 @@
         "3": "CLIPDATA_DOOR_TRANSITION"
       }
     },
+    "spritesets": {
+      "default": {
+        "0": 31
+      },
+      "first": {
+        "1": 30
+      }
+    },
     "room_entry": {
       "bg0_prop": "BG_PROP_NONE",
       "bg1_prop": "BG_PROP_RLE_COMPRESSED",

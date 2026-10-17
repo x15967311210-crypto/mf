@@ -205,8 +205,8 @@
             },
             {
               "name": "properties",
-              "type": "int",
-              "value": 0
+              "type": "string",
+              "value": "SSP_UNINFECTED_OR_BOSS"
             }
           ]
         },

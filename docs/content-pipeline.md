@@ -41,30 +41,17 @@ non-empty output directory is an error.
 
 ## Manifest schema
 
-`mf-hack.room-manifest/v1` is a strict JSON object; unknown and missing keys are
-errors.  The current fields are:
+`mf-hack.room-manifest/v1` is a strict JSON object.  The checked-in
+`tools/content/fixtures/fixture_room.room.json` is the canonical example; it
+contains the current `room.tileset`, `room.layers`, `room.tile_mapping`,
+`room.spritesets`, `room.room_entry` and `room.camera.scrolls` sections.  Unknown
+and missing keys are errors.
 
-```json
-{
-  "schema": "mf-hack.room-manifest/v1",
-  "area": "AREA_TEST_1",
-  "room_id": 0,
-  "room_name": "Entry Ledge",
-  "width_blocks": 8,
-  "height_blocks": 6,
-  "tileset": "fixture",
-  "tileset_png": "fixture_tileset.png",
-  "tile_size": 16,
-  "bg0_properties": "BG_PROP_0",
-  "bg1_properties": "BG_PROP_1",
-  "bg2_properties": "BG_PROP_2",
-  "effect": "EFFECT_NONE",
-  "clipdata": "CLIPDATA_AIR",
-  "spriteset_default": "default",
-  "spriteset_first": "first",
-  "spriteset_second": "second"
-}
-```
+The optional `room.spritesets` maps a spriteset name (`default`, `first`,
+`second`) to a slot -> sprite-ID table.  A spawn with a table-indexed property
+(`SSP_UNINFECTED_OR_BOSS`, `SSP_X_*`, `SSP_UNKNOWN_40`) must declare a table and
+a slot that maps to its `sprite_id`.  A spawn without those property bits uses
+the direct-ID encoding and is limited to sprite IDs 0..15.
 
 Tiled JSON requirements:
 
@@ -106,7 +93,8 @@ Engine references checked while implementing:
 
 The RLE encoder emits the same two one-byte planes consumed by
 `RoomRleDecompress`; the self-check decodes both planes and compares the
-round-trip.
+round-trip.  Spawn record byte 2 is encoded with `SPRITESET_IDX(slot)` and
+`sprite_id` is round-tripped through `decode_spawn_record()` in the self-check.
 
 ## HACK-004a integration
 
@@ -124,16 +112,11 @@ The exact room IDs and provisional door indices are in
 
 ## Known gaps
 
-- **Clipdata capacity:** `gDecompClipdataMap` is 1024 u16 entries (`0x800`
-  bytes), while the BG maps are 6144.  The current validator caps room blocks
-  at 6144; it must reject rooms above 1024 blocks or the engine clipdata buffer
-  can overrun.  M1 rooms are expected to be well below this, but fix the
-  validator before arbitrary content.
-- **Sprite encoding:** spawn records currently write the spriteset slot/property
-  byte, while `sprite_id` is metadata only.  Vanilla records interpret byte 2
-  through `SPRITESET_IDX`/`gSpritesetSpriteIds`; arbitrary sprite IDs can be
-  silently dropped.  Either map IDs through the spriteset table or reject
-  unrepresentable IDs before HACK-004a relies on them.
+- **Clipdata capacity:** fixed in HACK-003a; rooms with a clip layer are
+  rejected above 1024 blocks (`gDecompClipdataMap` is 1024 u16).
+- **Sprite encoding:** fixed in HACK-003a; table-indexed records validate the
+  declared slot/table, direct records are limited to IDs 0..15, and the
+  self-check round-trips the encoded record byte.
 - **bg3:** properties/scroll are parsed but no bg3 payload is emitted; the
   engine uses a different LZ77 path for bg3.
 - **Animated tilesets/palettes:** `TilesetEntry`/`RoomEntry` fields exist but
