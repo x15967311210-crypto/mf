@@ -90,6 +90,8 @@ Baseline evidence (2026-10-17):
 - Vanilla static ROM smoke: **PASS** (SHA1 `ca33f434…`).
 - Vanilla dynamic boot smoke: **PASS** — 600 frames, `frame_counter=578`,
   `sub_mode=0x0001`.
+- SHIFT-005: **662/662** ROM literals rewritten to symbols; `make check` still
+  matches SHA1; audit now reports **0 literals**, 697 `ldr` comments.
 - Shifted build (`. += 0x1000` after `intr_main`): static **PASS**, dynamic
-  **FAIL** — `frame_counter=0`, illegal opcode / invalid jump.  This is the
-  expected pre-refactor failure and the target of SHIFT-005/006.
+  **FAIL** — `frame_counter=0`.  This is now the expected SHIFT-006 failure
+  (raw blob pointer tables), not a code-literal failure.

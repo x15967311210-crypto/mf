@@ -13,9 +13,9 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004 (harness, audit, symbol map, blob
-classification) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in
-`git log`.
+Last landed: SHIFT-001/002/003/004/005 (harness, audit, symbol map, blob
+classification, 662 literal rewrites) and HACK-001/001a/006 (GDD, layout,
+Cantor).  Details in `git log`.
 
 ---
 
@@ -26,12 +26,9 @@ classification) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev1] SHIFT-005 (baseline) — rewrite hardcoded ROM literals to symbols
-  - all 662 ROM literals resolve to `symbol+offset`; proposals in
-    `work/shift/rewrite_suggestions.md`
-  - scope: 6 disasm blobs + non-disasm asm; keep asm, do not convert to C
 - [TODO] SHIFT-006 (baseline) — convert blob pointer tables to relocatable C
   - 7 confirmed tables, 3 `possible` struct/mixed cases, 37 data blobs stay raw
+  - this is the remaining boot blocker for the shift test
 - [TODO] SHIFT-007 (baseline) — relocatable linker + `check_relocs` gate
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder  [deps: SHIFT-007]
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]

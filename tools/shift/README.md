@@ -9,7 +9,7 @@ addresses that break when the link moves.
 ```sh
 make -f Makefile.shift audit
 make -f Makefile.shift check-relocs
-make -f Makefile.shift check-relocs-strict   # later gate; fails while refs are open
+make -f Makefile.shift check-relocs-strict   # gate: no open literals / C ROM refs
 make -f Makefile.shift shift-build
 ```
 
@@ -52,19 +52,20 @@ without extracted data (for example a fresh `git worktree`), the audit reports
   as `baseline_classification`; see `docs/blob-classification.md` for the
   per-blob evidence and the 11/7 baseline reconciliation.
 
-The six remaining assembly blobs are the bulk:
+After SHIFT-005, the six remaining assembly blobs still contain only `ldr`
+reference comments, not data literals:
 
-| File | ROM refs |
+| File | `ldr` refs |
 |---|---:|
-| `asm/disasm_0x0808F5C4.s` | 649 |
-| `asm/disasm_0x0809deb4.s` | 238 |
-| `asm/disasm_0x0807e678.s` | 193 |
-| `asm/disasm_0x08079afc.s` | 156 |
-| `asm/disasm_0x080765f8.s` | 86 |
-| `asm/disasm_0x08056140.s` | 30 |
+| `asm/disasm_0x0808F5C4.s` | 335 |
+| `asm/disasm_0x0809deb4.s` | 119 |
+| `asm/disasm_0x0807e678.s` | 102 |
+| `asm/disasm_0x08079afc.s` | 79 |
+| `asm/disasm_0x080765f8.s` | 43 |
+| `asm/disasm_0x08056140.s` | 15 |
 
-Converting those functions to C removes most of them; the audit exists to catch
-the leftovers and to prove the result with the shift test.
+The shifted build still fails at boot because the raw blob pointer tables are
+SHIFT-006, not because of these comments.  The shift test is the proof target.
 
 ## Classification rules
 
