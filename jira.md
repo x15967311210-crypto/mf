@@ -32,13 +32,16 @@ padded and section-reordered boot 578/600, strict gate) and HACK-001/001a/006
   - handoff: `work/playtest/m0-2026-10-17/`
   - normal passes; **shifted black-screens after Start**; reordered passes
   - blocked on BUG-001; M0 is not DONE and M1 does not start
-- [DOING @human] BUG-001 (playtest) — shifted M0 build black screen after
-  pressing Start on the title
-  - headless HLE harness at several Start timings shows normal == shifted
-    state/VRAM/palette/OAM; not reproduced yet
-  - need: emulator/version, BIOS/HLE setting, `.sav` state, and a savestate at
-    the black screen; test with all `.sav` files removed and with normal's
-    `.sav` copied to shifted
+- [DOING @dev1] BUG-001 (playtest) — shifted M0 build black screen after
+  pressing Start; reproduced at frame 778 with the supplied savestates
+  - shifted `gNonGameplayRam` OAM entries are already garbage at frame 778;
+    `gNextOamSlot` reaches 0x17B without a logged CPU store, then
+    `FileSelectDrawOam` overwrites `gVBlankCallback` at `0x030019C4`
+  - root cause likely a DMA/block copy or another raw table in the
+    file-select path; trace first corrupt write and fix
+- [DOING @dev2] QA-001 (emulator) — add a Start/file-select scenario to the
+  headless harness and a `shift-start` gate; current boot smoke does not press
+  Start and falsely passed BUG-001
 
 ## Phase S3a — hack-critical C (106 functions)
 
