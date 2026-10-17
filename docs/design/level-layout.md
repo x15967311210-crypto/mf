@@ -1,7 +1,10 @@
 # Sector Null — First Echo: room layout (draft 1)
 
-Status: **layout proposal; human review pending**.
+Status: **layout signed off**.
 Owned by `game-designer`.  Parent: `GDD.md`, `vertical-slice.md`.
+
+Signed off: Atrium is the vertical set-piece; the Conduit shortcut is two-way;
+one save pad at Entry Ledge; the Cantor arena is 1×2 screens.
 
 Dimensions are in **screens** (about 15×10 blocks each), not exact block numbers.
 The content team converts them to room width/height and clipdata.
@@ -50,8 +53,8 @@ the Atrium, so the player can return for the optional secret before the boss.
 
 - Maintenance shaft; mostly invisible platforms revealed by pulses.
 - One Echo Hunter nests in the middle; pulse can distract it.
-- Optional shortcut door back to the Atrium (one-way or two-way; decide after
-  testing).
+- Two-way shortcut door back to the Atrium, so the player can return for the
+  optional secret before the boss.
 - Exit right to the Choir Nest.
 - One hidden log behind a pulse-only wall.
 
@@ -87,15 +90,13 @@ Target time: 15–20 minutes first play, 8–12 minutes on replay.
 - `EVENT_PULSE_ACQUIRED` — set on pickup; enables pulse and HUD marker.
 - `EVENT_CANTOR_DEFEATED` — set on boss death; unlocks exit and final log.
 - `EVENT_DATA_CORE_RECOVERED` — set on interaction; slice completion marker.
-- Save pad in Entry Ledge; saving after the boss is optional.
+- One save pad in Entry Ledge; no second save room.  Boss death restarts at the
+  Choir Nest entrance with the pre-boss state.
 - New ability bit: one unused/added bit; save-version plan required.
 
-## Open layout questions
+## Resolved layout questions
 
-1. Is the vertical Atrium the right first "wow" room, or should the Conduit be
-   the vertical set-piece?
-2. Should the shortcut be one-way (prevents backtracking) or two-way (supports
-   the optional secret)?
-3. Do we want a second save point before the boss, or is Entry Ledge enough?
-4. Should the Cantor arena be 1×2 or 2×2 screens? 1×2 is cheaper; 2×2 gives
-   more room for the charge/stealth loop.
+- Vertical set-piece: **Silent Atrium**.
+- Conduit shortcut: **two-way**, supports the optional secret.
+- Save points: **one** at Entry Ledge; boss death restarts at the arena entrance.
+- Cantor arena: **1×2 screens**.

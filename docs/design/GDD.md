@@ -150,9 +150,11 @@ Room-by-room layout: `level-layout.md`.
 
 ## 10. Open questions for the human
 
-1. Is the vertical Atrium the right first "wow" room, or should the Conduit be
-   the vertical set-piece?
-2. Should the shortcut be one-way or two-way?
-3. Is one save pad at Entry Ledge enough, or do we need a second before the
-   Cantor?
-4. Should the Cantor arena be 1×2 or 2×2 screens?
+Layout is signed off in `level-layout.md`.  Remaining design questions:
+
+1. Does the Cantor attack set in `boss-cantor.md` feel right (charge, sweep,
+   decoy, core shockwave)?
+2. Should the optional secret be a **missile tank** (power) or a **lore log**
+   (atmosphere), or one of each?
+3. Music direction: low ambient drone, or a sparse melodic motif?
+4. Should the final data core be a **story beat** or just a completion flag?
