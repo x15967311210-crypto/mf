@@ -70,7 +70,13 @@ input/visual parity) and HACK-001/001a/006
     gOamData slot (`gNextOamSlot=1`)
   - the raw `0x08576150/51/58` comments are already `sSecurityUnlockEvents`
     symbol literals; not the cause
-  - next: trace the before→open transition and the MenuOam setup/count path
+  - shifted after leaves gNextOamSlot=1 and only one gOamData slot; normal
+    has 46 queued/27 active and MenuOam 33–36. The pause type/state and the
+    `sSecurityUnlockEvents+0x88/0x89/0x90` bytes are correct, so focus on the
+    `PauseScreenSetupOam`/`MapScreenDrawSpecialOam` branch and OAM id 0x1A/0x1B
+    at entry 18
+  - next: runtime breakpoint trace of the before→open transition; automate
+    OAM-state comparison locally for this pair
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
