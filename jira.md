@@ -13,9 +13,9 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/007
+Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/007
 (harness, audit, symbol map, blob classification, literal/pseudo-literal and
-C-literal planning, all pointer-like blobs, strict gate) and
+1034 C-literal rewrites, all pointer-like blobs, strict gate) and
 HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
@@ -27,11 +27,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev3] SHIFT-006b6 (baseline) — apply the 1034 C ROM literal rewrites
-  - 314 function pointers + 720 data pointers; 816 in `sprite_pointers.c`
-  - use `tools/shift/rewrite_c_refs.py --write`, then fix declarations and gate
-- [TODO] SHIFT-006c (emulator) — shift-check passes after the C rewrites
-  [deps: SHIFT-006b6]
+- [DOING @dev1] SHIFT-006c (emulator) — diagnose shifted boot `frame_counter=3`
+  - static gates all green; see `docs/shift-test-diagnosis.md`
+  - baseline/shifted PC diverges at frame 24; `InitTrack` SWI2 path is skipped
+  - watch `gNonGameplayRam+0x1C`; test data-only reorder vs code padding
+- [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 

@@ -1,0 +1,80 @@
+# Shift-test diagnosis (SHIFT-006c)
+
+Status: **open — shifted boot still fails at `frame_counter=3`**.
+Every static/relocation gate is green; the remaining failure is dynamic.
+
+## Green gates
+
+- `make check` after a full clean build: SHA1 `ca33f4348c2c05dd330d37b97e2c5a69531dfe87`
+- `make -f Makefile.shift audit`: 0 open literals, 0 C ROM refs, 0 unknown
+- `make -f Makefile.shift check-relocs-strict`: PASS
+- `make -f Makefile.shift smoke`: PASS
+- 1034 C ROM literals were rewritten to symbols (314 function / 720 data);
+  816 in `src/data/sprite_pointers.c`. The rewrite is address-equivalent.
+
+## Failure
+
+```
+SHIFT-BUILD: PASS
+SHIFT-LAYOUT: PASS (AgbMain 0x08000230 -> 0x08001230, +0x1000)
+SHIFT-STATIC: PASS
+SHIFT-DYNAMIC: FAIL (frame_counter=3 < 450)
+```
+
+The shifted ROM stops advancing the main frame counter at 3. It is not a
+straight-line crash: the CPU keeps executing ROM/IWRAM code, but the game state
+does not advance.
+
+## Evidence from mGBA tracing (local `/tmp` harnesses, not committed)
+
+1. **PC trace.** Normalizing shifted PCs by `-0x1000`, baseline and shifted
+   agree through frame 23. At frame 24:
+   - baseline: stays in BIOS (`pc=0x1C4`), waiting;
+   - shifted: returns to `CutsceneElevatorMonologueSetupOam` (`0x08099F1C`,
+     baseline `0x08098F1C`) and then to `CutsceneProcessElevatorScrolling`.
+2. **SWI trace.** Baseline calls `SWI 2` (Halt) from `InitTrack+0x86` at frame
+   24; shifted does not take that path. Baseline then does `SWI 31`/`SWI 2`
+   and reaches `SpecialCutsceneDrawAllOam`; shifted enters the cutscene setup
+   without the `InitTrack` halt path.
+3. **OAM corruption.** `gNonGameplayRam` OAM entry at `0x030017E4`:
+   - baseline frame 24: `[+0x1C] = 0x0860AC18` (valid ROM pointer);
+   - shifted frame 24: `[+0x1C] = 0x0860BC18` (correct +0x1000);
+   - shifted frame 25: the cutscene setup writes bytes/halfwords to
+     `0x03001800` (`0x0A`, `0x10A0`, `0x4463`, ...), overwriting the pointer.
+4. **Bad reads.** `0x08099DEE` reads `0x10A00CCA`; `0x08098DBC` reads
+   `0xF7F67D5E`. These are symptoms of the corrupted OAM state, not necessarily
+   the first cause.
+
+## Ruled out
+
+- Interrupt table `sBlob_a5224_a5258`: every pointer is correctly +0x1000 in
+  the padded ROM.
+- Track headers: 660 headers now point at the relocated sound blob.
+- `sound_code.s` bare pseudo-literals: fixed.
+- C literals: 1034 rewritten; SHA1 preserved.
+- Raw pointer-like blobs: 10/10 converted; 37 remain raw by design.
+- Linker fixed ROM addresses: only the hardware header/entry and RAM/MMIO.
+
+## Hypotheses to investigate next
+
+1. **InitTrack/audio path divergence.** Why does shifted skip the `SWI 2`
+   halt path at `InitTrack+0x86`? Compare `InitTrack` inputs/state at frame 24
+   (track pointer, voice table, channel flags) between baseline and shifted.
+2. **Runtime-generated pointer table.** A table built at runtime from a raw
+   data blob or an asm table may still contain a stale/incorrect pointer. Watch
+   the first write to `gNonGameplayRam+0x1C` and the source of the value.
+3. **Data vs code relocation split.** Build a data-only reorder (swap two
+   `.rodata` objects, no padding) and a code-only perturbation to identify
+   which side still has an absolute reference.
+4. **Interrupt/BIOS timing.** The shifted path returns from BIOS earlier than
+   baseline. Check `gVBlankRequestFlag`, `REG_IE`/`REG_IF`, and the
+   `InterruptCode` callback table at the frame-24 boundary.
+5. **Shift-test method.** If data-only reorder passes but padding fails, the
+   remaining issue is code-address-specific (function pointer/code copy), not
+   data relocatability.
+
+## Do not
+
+- Do not weaken the 450/600 liveness gate.
+- Do not claim shiftability or start M0 until `SHIFT-CHECK: PASS`.
+- Do not commit the local trace harnesses or `work/` artifacts.
