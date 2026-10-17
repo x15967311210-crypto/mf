@@ -14,10 +14,10 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
 Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008,
-QA-001/QA-002, BUG-001 (harness, audit, symbol map, blob classification,
-literal and C-literal rewrites, raw FrameData/Sa-X table relocation, padded
-and section-reordered boot, Start/file-select gate, headless TAS input replay,
-578/600) and HACK-001/001a/006
+QA-001/QA-002/QA-003, BUG-001/002 (harness, audit, symbol map, blob
+classification, literal and C-literal rewrites, raw FrameData/Sa-X table
+relocation, padded and section-reordered boot, Start/file-select gate,
+headless TAS input replay, 578/600 and 4k input parity) and HACK-001/001a/006
 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
@@ -28,28 +28,19 @@ and section-reordered boot, Start/file-select gate, headless TAS input replay,
 - [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox
 - [DONE] QA-002/QA-003 (emulator) — headless TAS input replay + shifted gate
   - committed 4k fixture + `INPUT_CHECK` assertions; `make test` runs it
-  - `shift-input` runs the same 4k input against the shifted build; currently
-    FAIL until BUG-002 is fixed
+  - `shift-input` runs the same 4k input against the shifted build; PASS
   - full 259k input stays manual/BizHawk; manual playtest remains extra
+- [TODO] QA-004 (tools) — scan raw blobs for 2-byte-aligned embedded ROM
+  pointer tables and feed them into `audit`/`check_relocs`
 
 ## Phase S2 — relocatable build
 
 - [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - BUG-001 fixed; new handoff: `work/playtest/m0b-2026-10-17/`
-  - normal / shifted / reordered; `SHIFT-CHECK: PASS` and `SHIFT-START: PASS`
-  - external BizHawk `.bk2` smoke in progress on the M0b artifacts; the
-    one-off full baseline stopped at frame 40000 with no done marker
-  - blocked again by BUG-002; do not hand M0b for sign-off yet
+  - BUG-001/002 fixed; new handoff: `work/playtest/m0c-2026-10-17/`
+  - normal / shifted / reordered; `SHIFT-CHECK`, `SHIFT-START`,
+    `SHIFT-INPUT` and `make test` all PASS
+  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
   - M0 is not DONE and M1 does not start until human sign-off
-- [DOING @dev1] BUG-002 (input replay) — shifted 4k TAS input stalls at
-  frame 826
-  - root cause: raw 38-entry animation `FrameData` table embedded at
-    `sBlob_73421e` offset `0xC6FA` / ROM `0x08740918`; its pFrame words are
-    stale, so `FileSelectDrawOam` reads count `0x7BFF` and writes through
-    `gOamData` into `gVBlankCallback`
-  - fix: carve that 38-entry table and the existing 88-entry table into C
-    with a shared `sBlob_73421e_prefix` anchor; add the aligned/unaligned blob
-    scan to tooling afterwards
 
 ## Phase S3a — hack-critical C (106 functions)
 
