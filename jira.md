@@ -4,6 +4,8 @@ Metroid Fusion: shiftable C engine + new hack.
 
 House rules: `AGENTS.md`.  Roadmap and gates: `docs/roadmap.md`.  Settled
 decisions: `docs/decisions.md`.  Relocation report: `docs/shiftability-audit.md`.
+Blob classification: `docs/blob-classification.md`.  Playtest protocol:
+`docs/playtest.md`.
 
 State: `TODO` assignable · `DOING @dev` claimed · `PARK` waiting on the human.
 Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
@@ -11,33 +13,26 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
+Last landed: SHIFT-001/002/003/004 (harness, audit, symbol map, blob
+classification) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in
+`git log`.
+
 ---
 
 ## Phase S0 — behavior harness
 
-- [DONE @mgr] SHIFT-001 (baseline) — mGBA/libmgba harness + vanilla boot smoke
-  - static ROM smoke + headless mGBA harness; vanilla 600-frame boot **PASS**
-    (`frame_counter=578`, `sub_mode=0x0001`)
-- [TODO] SHIFT-001a (baseline) — add title/new-game/pause/save scenarios  [deps: SHIFT-001]
-- [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox  [deps: SHIFT-001]
-
-## Phase S1 — relocation audit
-
-- [DONE @mgr] SHIFT-002 (baseline) — asm/C/blob relocation audit scripts and report
-  - `docs/shiftability-audit.md`: 1359 ROM refs, 662 literals, 388 unique,
-    47 blobs classified (11 pointer tables, 7 possible, 29 data)
-- [DONE @mgr] SHIFT-003 (baseline) — address → symbol mapping and whitelist
-  - map + ELF local symbols merged; all 662 ROM literals now resolve to
-    `symbol+offset`, `unknown=0`; rewrite proposals in
-    `work/shift/rewrite_suggestions.md`
-- [DOING @dev1] SHIFT-004 (REA) — classify blob pointer tables vs graphics/audio  [deps: SHIFT-002]
+- [TODO] SHIFT-001a (baseline) — add title/new-game/pause/save scenarios
+- [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox
 
 ## Phase S2 — relocatable build
 
-- [TODO] SHIFT-005 (baseline) — rewrite hardcoded refs in non-disasm asm  [deps: SHIFT-003]
-- [TODO] SHIFT-006 (baseline) — convert blob pointer tables to relocatable C  [deps: SHIFT-004]
-- [TODO] SHIFT-007 (baseline) — relocatable linker + `check_relocs` gate  [deps: SHIFT-003]
-- [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder  [deps: SHIFT-007, SHIFT-001]
+- [TODO] SHIFT-005 (baseline) — rewrite hardcoded refs in non-disasm asm
+  - all 662 ROM literals resolve to `symbol+offset`; proposals in
+    `work/shift/rewrite_suggestions.md`
+- [TODO] SHIFT-006 (baseline) — convert blob pointer tables to relocatable C
+  - 7 confirmed tables, 3 `possible` struct/mixed cases, 37 data blobs stay raw
+- [TODO] SHIFT-007 (baseline) — relocatable linker + `check_relocs` gate
+- [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder  [deps: SHIFT-007]
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 
 ## Phase S3a — hack-critical C (106 functions)
@@ -55,12 +50,7 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 
 ## Phase S4 — hack
 
-- [DONE @designer] HACK-001 (GDD) — vertical-slice GDD and room brief
-  - GDD v1 closed: Sector Null, Resonance Pulse (cooldown), The Cantor,
-    stand-still stealth, mystery logs, ambient drone
-- [DONE @designer] HACK-001a (GDD) — finalize Atrium/Conduit layout, shortcut,
-  save count, Cantor arena size
-- [TODO] HACK-002 (GDD) — content ID registry and save-version plan  [deps: HACK-001a]
+- [TODO] HACK-002 (GDD) — content ID registry and save-version plan
 - [TODO] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data  [deps: SHIFT-008]
 - [TODO] HACK-004a (content) — blockout: 5 rooms, doors, camera, save pad  [deps: HACK-003]
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a]
@@ -72,13 +62,12 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 - [TODO] PLAYTEST-004 (human) — M4 content-complete slice playtest  [deps: HACK-004d]
 - [TODO] HACK-004e (content/qa) — polish and release candidate  [deps: PLAYTEST-004]
 - [TODO] PLAYTEST-005 (human) — M5 release-candidate playtest  [deps: HACK-004e]
-- [DONE @designer] HACK-006 (GDD) — Cantor boss spec: phases, attacks, event/ID list
-  - `docs/design/boss-cantor.md` signed off; four attacks + data core + reward
-- [TODO] HACK-007 (design/qa) — one-page playtest scripts and feedback rubric per gate  [deps: HACK-001]
+- [TODO] HACK-007 (design/qa) — one-page playtest scripts and feedback rubric per gate
 
 ## Open questions
 
-- HACK-001 needs the creative direction (theme, story, ability set).  Until it
-  exists, the slice uses Test Area slots and placeholder text.
 - Audio timing under the C engine is unverified; treat as a risk until a
   behavior scenario covers it.
+- HACK-002 must decide the new ability bit and save version before content uses
+  them.
+- The 3 `possible` blobs need a data model before SHIFT-006 is complete.
