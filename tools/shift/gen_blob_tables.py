@@ -44,6 +44,29 @@ it is rendered as a struct array instead of a flat word array:
         ...
     };
 
+``Blob_a5710_a8cdc`` (SHIFT-006b3) is a different shape: a contiguous array of
+1135 12-byte voice records followed by 152 raw tail bytes, with no padding
+between them.  It is rendered as one ``const`` struct so the symbol name, the
+byte layout and the address stay identical:
+
+    struct Blob_a5710_a8cdcVoice {
+        u8 instrumentType;
+        ...
+        const u32* pSample;  /* +4: the only relocatable field */
+        ...
+    };
+    struct Blob_a5710_a8cdc {
+        struct Blob_a5710_a8cdcVoice records[1135];
+        u8 tail[152];
+    };
+    static const struct Blob_a5710_a8cdc sBlob_a5710_a8cdc = { ... };
+
+The record layout mirrors ``struct Voice`` in ``include/structs/audio.h``; the
+consumer is ``AudioCommand_Voice`` (``src/audio.c``), which indexes
+``pTrack->pVoice[index]``.  The 152-byte tail is emitted verbatim because its
+``0x02``/``0x03`` patterns are not records and its aligned words are not ROM
+pointers.
+
 Resolution rules
 ----------------
 * The target symbol comes from ``mf_us.map`` merged with local ELF symbols
@@ -109,6 +132,9 @@ FIELD_INFO = {
     "u8": (1, 1),
     "u16": (2, 2),
     "u32": (4, 4),
+    "u32*": (4, 4),
+    "const u32*": (4, 4),
+    "struct Envelope": (4, 1),
     "const u8*": (4, 4),
 }
 
@@ -243,6 +269,50 @@ MIXED_BLOBS = (
             MixedField("offsetsNegX", 24, "u8"),
             MixedField("text", 21, "data"),
         ),
+    ),
+)
+
+
+@dataclass(frozen=True)
+class RecordArrayBlobSpec:
+    """A fixed-size record array followed by raw tail bytes."""
+
+    symbol: str
+    file: str  # extracted bytes, relative to --data-root
+    source: str  # C source that owns the declaration
+    data_bytes: int  # database.json count
+    const: bool
+    struct_name: str  # generated outer struct name, without "struct "
+    record_name: str  # generated record struct name, without "struct "
+    fields: tuple[StructField, ...]
+    record_count: int
+    tail_count: int
+
+
+# SHIFT-006b3: 1135 x 12-byte voice records plus a 152-byte raw tail.  The
+# record layout mirrors struct Voice: instrumentType/pitch/unk_2/unk_3 at +0,
+# pSample at +4, and the four envelope bytes at +8.  Evidence: AudioCommand_Voice
+# indexes pTrack->pVoice[index], and every track header that points into this
+# blob points to a record boundary; the largest absolute index used is 1134.
+RECORD_ARRAY_BLOBS = (
+    RecordArrayBlobSpec(
+        "sBlob_a5710_a8cdc",
+        "Blob_a5710_a8cdc.bin",
+        "src/data/audio.c",
+        0x35CC,
+        True,
+        struct_name="Blob_a5710_a8cdc",
+        record_name="Blob_a5710_a8cdcVoice",
+        fields=(
+            StructField("u8", "instrumentType"),
+            StructField("u8", "pitch"),
+            StructField("u8", "unk_2"),
+            StructField("u8", "unk_3"),
+            StructField("const u32*", "pSample"),
+            StructField("struct Envelope", "envelope"),
+        ),
+        record_count=1135,
+        tail_count=152,
     ),
 )
 
@@ -475,7 +545,9 @@ def struct_layout(fields: tuple[StructField, ...]) -> tuple[list[tuple[StructFie
     return layout, size
 
 
-def blob_bytes(spec: BlobSpec | MixedBlobSpec, data_root: Path) -> bytes:
+def blob_bytes(
+    spec: BlobSpec | MixedBlobSpec | RecordArrayBlobSpec, data_root: Path
+) -> bytes:
     path = data_root / spec.file
     if not path.exists():
         raise GenError(
@@ -488,7 +560,16 @@ def blob_bytes(spec: BlobSpec | MixedBlobSpec, data_root: Path) -> bytes:
             f"{path}: {len(data)} bytes, expected 0x{spec.data_bytes:X} "
             "from database.json"
         )
-    if isinstance(spec, BlobSpec) and spec.fields:
+    if isinstance(spec, RecordArrayBlobSpec):
+        _, record_size = struct_layout(spec.fields)
+        expected = spec.record_count * record_size + spec.tail_count
+        if record_size == 0 or expected != len(data):
+            raise GenError(
+                f"{path}: {spec.record_count} x {record_size} + "
+                f"{spec.tail_count} tail = {expected} bytes, blob has "
+                f"{len(data)}"
+            )
+    elif isinstance(spec, BlobSpec) and spec.fields:
         _, record_size = struct_layout(spec.fields)
         if record_size == 0 or len(data) % record_size != 0:
             raise GenError(
@@ -570,6 +651,123 @@ def render_struct_block(
     return "\n".join(lines)
 
 
+def symbol_objects(sm: SymbolMap) -> dict[str, str]:
+    """Map a symbol name to the object that defines it (first non-empty)."""
+    objects: dict[str, str] = {}
+    for symbol in sm.symbols:
+        if symbol.object and symbol.name not in objects:
+            objects[symbol.name] = symbol.object
+    return objects
+
+
+def render_record_array_block(
+    spec: RecordArrayBlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols
+) -> str:
+    layout, record_size = struct_layout(spec.fields)
+    expected = spec.record_count * record_size + spec.tail_count
+    if expected != len(data):
+        raise GenError(
+            f"{spec.file}: {spec.record_count} x {record_size} + "
+            f"{spec.tail_count} tail = {expected} bytes, blob has {len(data)}"
+        )
+
+    owner_object = Path(spec.source).with_suffix(".o").as_posix()
+    objects = symbol_objects(sm)
+    externs: set[str] = set()
+    record_lines: list[str] = []
+    for index in range(spec.record_count):
+        base = index * record_size
+        values: list[str] = []
+        for field, offset, size in layout:
+            if field.c_type == "struct Envelope":
+                raw = data[base + offset : base + offset + size]
+                values.append(
+                    "{ " + ", ".join(f"0x{byte:02X}" for byte in raw) + " }"
+                )
+                continue
+
+            raw = int.from_bytes(
+                data[base + offset : base + offset + size], "little"
+            )
+            if field.c_type.endswith("*"):
+                # Only ROM words are relocatable pointers.  The same field
+                # holds small immediates (0x0..0x3) in the non-sample voice
+                # records; those stay literal bytes, not symbols.
+                if 0x08000000 <= raw < 0x0A000000:
+                    if raw & 1:
+                        raise GenError(
+                            f"{spec.file}: entry {index} field {field.name} "
+                            f"0x{raw:08X} has the low bit set"
+                        )
+                    expr = resolve_expression(sm, elf, raw)
+                    root = re.match(r"[A-Za-z_.$][\w.$@]*", expr)
+                    if root is not None and objects.get(root.group(0)) != owner_object:
+                        externs.add(root.group(0))
+                    values.append(f"({field.c_type})((u32){expr})")
+                else:
+                    values.append(f"({field.c_type})0x{raw:X}")
+            else:
+                values.append(f"0x{raw:X}")
+        record_lines.append("        { " + ", ".join(values) + " },")
+
+    tail = data[spec.record_count * record_size :]
+    if len(tail) != spec.tail_count:
+        raise GenError(
+            f"{spec.file}: tail is {len(tail)} bytes, expected "
+            f"{spec.tail_count}"
+        )
+
+    qualifier = "const " if spec.const else ""
+    lines = [BEGIN_MARKER.format(name=spec.symbol)]
+    for symbol in sorted(externs):
+        lines.append(f"extern const u8 {symbol}[];")
+    if externs:
+        lines.append("")
+    lines.append(f"struct {spec.record_name} {{")
+    for field in spec.fields:
+        lines.append(f"    {field.c_type} {field.name};")
+    lines.append("};")
+    lines.append("")
+    lines.append(f"struct {spec.struct_name} {{")
+    lines.append(
+        f"    struct {spec.record_name} records[{spec.record_count}];"
+    )
+    lines.append(f"    u8 tail[{spec.tail_count}];")
+    lines.append("};")
+    lines.append("")
+    lines.append(
+        f"static {qualifier}struct {spec.struct_name} {spec.symbol} = {{"
+    )
+    lines.append("    {")
+    lines.extend(record_lines)
+    lines.append("    },")
+    lines.append("    {")
+    for start in range(0, len(tail), 12):
+        chunk = tail[start : start + 12]
+        lines.append("        " + ", ".join(f"0x{byte:02X}" for byte in chunk) + ",")
+    lines.append("    },")
+    lines.append("};")
+    lines.append(
+        f"typedef char {spec.symbol}_record_size_check"
+        f"[sizeof({spec.symbol}.records[0]) == {record_size} ? 1 : -1];"
+    )
+    lines.append(
+        f"typedef char {spec.symbol}_records_size_check"
+        f"[sizeof({spec.symbol}.records) == "
+        f"{spec.record_count * record_size} ? 1 : -1];"
+    )
+    lines.append(
+        f"typedef char {spec.symbol}_tail_size_check"
+        f"[sizeof({spec.symbol}.tail) == {spec.tail_count} ? 1 : -1];"
+    )
+    lines.append(
+        f"typedef char {spec.symbol}_size_check"
+        f"[sizeof({spec.symbol}) == {len(data)} ? 1 : -1];"
+    )
+    lines.append(END_MARKER.format(name=spec.symbol))
+    return "\n".join(lines)
+
+
 def render_block(spec: BlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols) -> str:
     if spec.fields:
         return render_struct_block(spec, data, sm, elf)
@@ -638,7 +836,7 @@ def marker_region(text: str, symbol: str) -> tuple[int, int] | None:
 
 
 def check_source(
-    spec: BlobSpec | MixedBlobSpec, path: Path, block: str
+    spec: BlobSpec | MixedBlobSpec | RecordArrayBlobSpec, path: Path, block: str
 ) -> list[str]:
     errors: list[str] = []
     text = path.read_text()
@@ -660,7 +858,7 @@ def check_source(
 
 
 def write_source(
-    spec: BlobSpec | MixedBlobSpec, path: Path, block: str
+    spec: BlobSpec | MixedBlobSpec | RecordArrayBlobSpec, path: Path, block: str
 ) -> bool:
     text = path.read_text()
     region = marker_region(text, spec.symbol)
@@ -729,8 +927,10 @@ def main() -> int:
 
     errors: list[str] = []
     changed = 0
-    by_source: dict[Path, list[tuple[BlobSpec | MixedBlobSpec, str]]] = {}
-    for spec in (*BLOBS, *MIXED_BLOBS):
+    by_source: dict[
+        Path, list[tuple[BlobSpec | MixedBlobSpec | RecordArrayBlobSpec, str]]
+    ] = {}
+    for spec in (*BLOBS, *MIXED_BLOBS, *RECORD_ARRAY_BLOBS):
         database_size = sizes.get(spec.file)
         if database_size is not None and database_size != spec.data_bytes:
             errors.append(
@@ -742,6 +942,8 @@ def main() -> int:
             data = blob_bytes(spec, Path(args.data_root))
             if isinstance(spec, MixedBlobSpec):
                 block = render_mixed_block(spec, data, sm, elf)
+            elif isinstance(spec, RecordArrayBlobSpec):
+                block = render_record_array_block(spec, data, sm, elf)
             else:
                 block = render_block(spec, data, sm, elf)
         except GenError as exc:
@@ -762,7 +964,8 @@ def main() -> int:
         flat_count = len(BLOBS) - struct_count
         print(
             f"PASS: {flat_count} pointer-table blobs + {len(MIXED_BLOBS)} "
-            f"mixed + {struct_count} struct match the baseline bytes and "
+            f"mixed + {len(RECORD_ARRAY_BLOBS)} record-array + "
+            f"{struct_count} struct match the baseline bytes and "
             f"checked-in C arrays"
         )
         return 0

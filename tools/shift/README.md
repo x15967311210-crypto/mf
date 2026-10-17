@@ -76,20 +76,18 @@ without extracted data (for example a fresh `git worktree`), the audit reports
 The raw/ converted distinction is what lets the gate finish: `audit_blobs.py`
 classifies the **extracted bytes**, and those bytes never change when a blob is
 converted.  `check_relocs.py` therefore checks whether the blob filename is
-still used by `INCBIN`.  The seven SHIFT-006a tables no longer are (they are
-generated `u32[]` arrays), so they show as `converted`.  The remaining
-SHIFT-006b blobs still are, so strict mode lists them and exits 1 until they are
-modelled.
+still used by `INCBIN`.  All ten pointer-like blobs (seven SHIFT-006a tables plus
+the three SHIFT-006b models) are generated C now, so strict mode reports zero
+raw blobs and passes.
 
 Report mode prints the same list but exits 0.  Current expected output:
 
 ```text
-blob scan: 47 blobs, 10 pointer-like (8 converted, 2 still raw)
+blob scan: 47 blobs, 10 pointer-like (10 converted, 0 still raw)
     converted          Blob_a5224_a5258.bin
+    converted          Blob_a5710_a8cdc.bin
     ...
-    REMAINING RAW      Blob_a5710_a8cdc.bin ... included by: src/data/audio.c
-    REMAINING RAW      Blob_74dc48_74e620.bin ... included by: src/data/ending_data.c
-FAIL: 2 pointer-like blob(s) still included raw: ...
+PASS: strict relocation gate (no open literals, no C ROM refs, no raw pointer-like blobs)
 ```
 
 `check_relocs.py --self-check` exercises the INCBIN parser and the
@@ -123,9 +121,9 @@ runs the same audit before linking.
   pointers in struct/audio data), 37 data.  The SHIFT-002 density rule is kept
   as `baseline_classification`; see `docs/blob-classification.md` for the
   per-blob evidence and the 11/7 baseline reconciliation.
-- SHIFT-006a converted the 7 pointer tables to C arrays, so the strict gate
-  reports them as `converted`; SHIFT-006b1 converted `79c170` as well, leaving
-  `74dc48` and `a5710` raw and keeping `check-relocs-strict` red.
+- SHIFT-006a converted the 7 pointer tables to C arrays; SHIFT-006b1/2/3
+  converted `79c170`, `74dc48` and `a5710`.  The strict gate reports all ten
+  pointer-like blobs as `converted` and now passes.
 
 After SHIFT-005, the six remaining assembly blobs still contain only `ldr`
 reference comments, not data literals:
@@ -140,10 +138,13 @@ reference comments, not data literals:
 | `asm/disasm_0x08056140.s` | 15 |
 
 SHIFT-006a converted the seven confirmed blob pointer tables to relocatable C
-arrays.  SHIFT-006b1 converted the first `possible` blob, `79c170`, to a
-relocatable mixed struct.  The padded build still fails early at boot because
-`74dc48` and `a5710` (and other unconverted absolute pointer data) remain raw;
-the shift test is the proof target.
+arrays.  SHIFT-006b1/2/3 converted the three `possible` blobs (`79c170`,
+`74dc48`, `a5710`) to relocatable structs.  The padded build and static checks
+pass, but the boot smoke still stops at `frame_counter=3`, below the 450-frame
+floor; the shift test remains the proof target.  The `sound/tracks/*.s` header
+words that point into `a5710` are still numeric `.word` literals outside
+`audit_asm.py`'s `asm/` scan, so they are a known remaining absolute-reference
+surface even though the blob's internal pointers relocate.
 
 ## Pointer tables (SHIFT-006a)
 
@@ -181,8 +182,21 @@ embedded in a record layout.  `Blob_79c170_79c27c` is emitted as
 | `+0x0B8` | `u32 text[21]` | Pointers into `sBlob_582288_58b3cc`, anchored at global `sUnk_582280`. |
 
 The positional struct initialiser is 268 bytes with no padding; the generated
-block ends with a compile-time `sizeof` check.  `74dc48` and `a5710` remain
-raw until their SHIFT-006b models land, and the 37 `data` blobs stay `INCBIN`.
+block ends with a compile-time `sizeof` check.
+
+`Blob_a5710_a8cdc` is a 1135-record array plus a 152-byte raw tail, emitted as
+one `const` struct in `src/data/audio.c`:
+
+| Offset | Field | Handling |
+|---|---|---|
+| `+0x000` | `records[1135]` of 12 bytes | `instrumentType`, `pitch`, `unk_2`, `unk_3`, `const u32* pSample`, `struct Envelope`. |
+| record `+0x004` | `pSample` | `symbol+offset` for the 880 ROM-valued records (856 `DirectSoundData_*`, 13 `sArray_a548a+0xD6`, 11 self references anchored to `sMusicCommandFunctionPointers`); `(const u32*)0xN` for the 255 small immediates. |
+| `+0x3534` | `u8 tail[152]` | Raw bytes. |
+
+The record count is confirmed by the 660 track headers that point into the
+blob at 12-byte boundaries and by the largest absolute `VOICE` index (1134).
+Compile-time checks cover record 12, records 13620, tail 152 and total 13772
+bytes.  The 37 `data` blobs stay `INCBIN`.
 
 ## Classification rules
 

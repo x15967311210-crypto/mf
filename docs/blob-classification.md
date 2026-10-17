@@ -111,12 +111,14 @@ would likely be wrong about which word is the pointer in each record.
 where real pointers are embedded in a larger record layout.  Everything else
 is either a confirmed flat table or data.
 
-SHIFT-006b1 update: `Blob_79c170_79c27c` is converted.  It is now the
+SHIFT-006b update: all three `possible` blobs are converted.  `79c170` is the
 268-byte struct `sBlob_79c170_79c27c` in `src/text.c` (3 Thumb code pointers,
-counts/glyph/coordinate bytes, and 21 anchored text pointers); see
-`tools/shift/README.md` for the field table and
-`tools/shift/gen_blob_tables.py --check`.  `74dc48` and `a5710` remain
-unconverted.
+counts/glyph/coordinate bytes, and 21 anchored text pointers); `74dc48` is the
+210-entry `EndingImageLine` struct array in `src/data/ending_data.c`; and
+`a5710` is the 1135-record voice array plus 152-byte raw tail
+`sBlob_a5710_a8cdc` in `src/data/audio.c`.  See `tools/shift/README.md` for the
+field tables and `tools/shift/gen_blob_tables.py --check` for the byte-size
+assertions.  No pointer-like blob remains raw; `check-relocs-strict` is green.
 
 ## Data blobs (37)
 
@@ -249,11 +251,10 @@ converting them.
 
 ### Blobs that need a manual model first (3)
 
-- `Blob_74dc48_74e620` — define the 12-byte struct (three words: flags,
-  coordinates, pointer) and convert the pointer field of each entry.
-- `Blob_a5710_a8cdc` — define the sound-entry struct (`[0x3Cxx, ptr,
-  0x00FF00FF]`) or leave the audio blob raw and relocate its pointer fields
-  with an audio-aware pass.
+- `Blob_74dc48_74e620` — **converted by SHIFT-006b2**: the 12-byte
+  `EndingImageLine` records in `src/data/ending_data.c`.
+- `Blob_a5710_a8cdc` — **converted by SHIFT-006b3**: 1135 12-byte voice
+  records (`pSample` at +4) plus a 152-byte raw tail in `src/data/audio.c`.
 - `Blob_79c170_79c27c` — **converted by SHIFT-006b1**: the blob is the
   268-byte struct `sBlob_79c170_79c27c` in `src/text.c` (3 code pointers,
   glyph/coordinate data, 21-entry anchored pointer run).
