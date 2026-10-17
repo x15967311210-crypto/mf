@@ -13,10 +13,10 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/007
+Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c2/007
 (harness, audit, symbol map, blob classification, literal/pseudo-literal and
-1034 C-literal rewrites, all pointer-like blobs, strict gate) and
-HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
+1034 C-literal rewrites, all pointer-like blobs, first raw FrameData carve,
+strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
 
@@ -27,13 +27,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev1] SHIFT-006c (emulator) — diagnose shifted boot `frame_counter=3`
-  - root cause narrowed: raw `struct FrameData` table at
-    `sTitleScreenSpaceBackgroundTilemap+0x19E8` inside
-    `sBlob_6094d0_60b148` has unrelocated pFrame pointers
-  - fix by carving the 9-entry table out of the raw blob; see
-    `docs/shift-test-diagnosis.md`
-- [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
+- [DOING @dev1] SHIFT-006c (emulator) — shifted boot still fails; first raw
+  FrameData table fixed, now stalls at frame 86 / corrupts `gVBlankCallback`
+  at frame 107
+  - `SHIFT-006c2` landed: carved the 9-entry `struct FrameData` table out of
+    `sBlob_6094d0_60b148`; SHA1 unchanged
+  - next: frame-107 text/OAM write to `0x030019C4` from source
+    `0x0860AA36`; identify the next raw table/buffer overflow
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 
