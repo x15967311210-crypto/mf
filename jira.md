@@ -42,6 +42,8 @@ parity) and HACK-001/001a/006
     path is corrupt and Enter/Start black-screens on shifted
   - blocked by BUG-005; M0f after fix
   - M0 is not DONE and M1 does not start until human sign-off
+- [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint;
+  needs a normal same-page savestate or deterministic input path
 - [DOING @dev1] BUG-005 (playtest) — shifted map/dialog tile corruption and
   Enter black screen after the 4k window
   - slot1 frame 7002 `disp=5F00 main=3`: map/dialog box missing
