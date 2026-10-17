@@ -77,11 +77,12 @@ input/visual parity) and HACK-001/001a/006
     at entry 18
   - before→open trace: setup writes MenuOam 33–36 correctly in both
     (normal `pc=08078308`, shifted `pc=08079308`); but `PauseScreenProcessOam`
-    writes gOamData **~26k times normal vs 579 shifted**, leaving shifted
-    gNextOamSlot=1. So setup runs, but the per-frame OAM processing/handler
-    stops after ~one pass in shifted
-  - next: why `PauseScreenHandler`/ProcessOam is not called repeatedly in the
-    shifted map page (main loop/VBlank/pause flag), not a raw table
+    emits ~45 OAM entries/frame normal vs **1/frame shifted**, leaving
+    gNextOamSlot=1. ProcessOam runs every frame in both; the shifted MenuOam
+    entries/types at process time are effectively empty after one entry.
+  - next: dump the 40 MenuOam entries and their type bytes at the first
+    ProcessOam frame; find the writer clearing/omitting them between setup and
+    process (MapScreenUpdateArrowsAndBlinkingSquare or a base/offset issue)
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
