@@ -172,8 +172,8 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S4 — hack
 
-- [DOING @design] HACK-002 (GDD) — content ID registry and save-version plan
-- [DOING @dev1] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
+- [DOING @design1] HACK-002 (GDD) — content ID registry and save-version plan
+- [DOING @dev2] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
 - [TODO] HACK-004a (content) — blockout: 5 rooms, doors, camera, save pad  [deps: HACK-003]
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a]
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
