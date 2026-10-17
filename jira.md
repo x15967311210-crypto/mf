@@ -13,9 +13,9 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/005b/006a/006b1/006b2/006b3/007
-(harness, audit, symbol map, blob classification, literal rewrites, all
-pointer-like blobs, 7-digit audit, strict gate) and HACK-001/001a/006 (GDD,
+Last landed: SHIFT-001/002/003/004/005/005b/006a/006b1/006b2/006b3/006b4/007
+(harness, audit, symbol map, blob classification, literal and track-header
+rewrites, all pointer-like blobs, strict gate) and HACK-001/001a/006 (GDD,
 layout, Cantor).  Details in `git log`.
 
 ---
@@ -27,11 +27,12 @@ layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev3] SHIFT-006b4 (baseline) — rewrite the 660 track-header pointers
-  - all resolve to `sBlob_a5710_a8cdc+offset`; widen `apply_refs.py` numeric
-    matching to 1–8 hex digits and use the local→global-anchor rule
-- [TODO] SHIFT-006c (emulator) — shift-check passes after track headers
-  [deps: SHIFT-006b4]
+- [DOING @dev3] SHIFT-006b5 (baseline) — fix the bare `ldr =0x80a568c` pseudo-literals
+  - `asm/sound_code.s` has `ldr r3, =0x80a568c` and `ldr r12, =0x80a5690`
+  - audit must flag bare `ldr rX, =0x08...`; apply_refs must rewrite it
+  - add the missing `sound/track_data.o: sound/tracks/*.s` dependency
+- [TODO] SHIFT-006c (emulator) — shift-check passes after the last pseudo-literals
+  [deps: SHIFT-006b5]
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 
