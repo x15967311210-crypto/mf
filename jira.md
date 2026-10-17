@@ -44,8 +44,11 @@ input/visual parity) and HACK-001/001a/006
 - [DOING @dev1] BUG-006 (playtest) — shifted fresh map objective UI missing
   - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
     `disp=5F00 main=3 s1=0 s2=0`
-  - text renders; dialog box frame, L1-L4 legend and bottom `3 4 5 6` UI are
-    missing; old M0e slot screenshots are stale VRAM and not evidence
+  - normal screenshot shows top `L SLEEP`/`MAIN DECK`/`STATUS R`, right
+    `L1-L4 LOCK`, bottom `OBJECTIVE`; shifted fresh has the map tiles/icons
+    but those UI overlays are missing
+  - text renders; dialog box body, legend and bottom UI are missing; old M0e
+    slot screenshots are stale VRAM and not evidence
   - compare OAM/BG/OBJ/palette and map UI writers; TAS map frame 1059 is a
     clean reference for the plain map, not the objective text
 - [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint
