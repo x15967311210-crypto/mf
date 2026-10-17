@@ -31,9 +31,9 @@ strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   c3 active: frame-107 `gNonGameplayRam` overflow after early intro code
   - `SHIFT-006c2` landed: carved the 9-entry `struct FrameData` table out of
     `sBlob_6094d0_60b148`; boot advanced from frame 3 to 86
-  - c3: shifted build enters intro/cutscene code around frame 18 instead of
-    frame 24 and overflows a `gNonGameplayRam` buffer at frame 107; trace
-    `InitTrack` / missing `SWI 2` and the first callback setup
+  - c3 corrected the old `InitTrack`/`SWI 2` premise (InitTrack is byte-identical
+    and has no Halt); c4 active: relocate the 159-entry raw `FrameData` tail in
+    `sBlob_6094d0_60b148` that still holds unshifted pFrame pointers
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 
