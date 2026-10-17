@@ -21129,7 +21129,36 @@ const u16 sTitleScreenSpaceBackgroundPal[8 * PAL_ROW] = INCBIN_U16("data/menus/t
 
 const u32 sTitleScreenSpaceBackgroundTilemap[172] = INCBIN_U32("data/menus/title_screen/space_background.tm.lz");
 
-static const u8 sBlob_6094d0_60b148[] = INCBIN_U8("data/Blob_6094d0_60b148.bin");
+static const u8 sBlob_6094d0_before[0x1738] = INCBIN_U8("data/Blob_6094d0_before.bin");
+
+static const struct FrameData sIntroMonologueFrameData[9] = {
+    [0] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x688),
+        .timer = 4
+    },
+    [1] = FRAME_DATA_TERMINATOR,
+    [2] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x690),
+        .timer = 4
+    },
+    [3] = FRAME_DATA_TERMINATOR,
+    [4] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x698),
+        .timer = 4
+    },
+    [5] = FRAME_DATA_TERMINATOR,
+    [6] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x6A0),
+        .timer = 4
+    },
+    [7] = FRAME_DATA_TERMINATOR,
+    [8] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x6A8),
+        .timer = 255
+    }
+};
+
+static const u8 sBlob_6094d0_after[0x4F8] = INCBIN_U8("data/Blob_6094d0_after.bin");
 
 const u8 sIntroSpaceTilemap[1320] = INCBIN_U8("data/new_file_intro/space_bg.tm.lz");
 const u8 sIntroBslTilemap[1586] = INCBIN_U8("data/new_file_intro/bsl_bg.tm.lz");
