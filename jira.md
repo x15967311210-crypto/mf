@@ -61,8 +61,12 @@ input/visual parity) and HACK-001/001a/006
     so the OAM build/update is not running or is cleared before capture
   - automation: QA-008 adds OAM count/hash checkpoints + `oam-diff`;
     savestate-based objective-page comparison stays local-only
-  - need a state **before** opening the map (or debug warp) to trace the
-    skipped `PauseScreenInit`/`PauseScreenProcessOam` call
+  - before/after state pairs now available:
+    normal before 4433 main=1 OAM=30 -> after 4824 main=3 OAM=27
+    shifted before 5266 main=1 OAM=26 -> after 5625 main=3 OAM=0
+  - before OAM is healthy; only the map-open transition fails (44 slots differ
+    in normal after). Trace `PauseScreenInit`/`PauseScreenProcessOam` from the
+    before states with Start, looking for a skipped build/count=0
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
