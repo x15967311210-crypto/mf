@@ -13,10 +13,11 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c2/007
+Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007
 (harness, audit, symbol map, blob classification, literal/pseudo-literal and
-1034 C-literal rewrites, all pointer-like blobs, first raw FrameData carve,
-strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
+1034 C-literal rewrites, all pointer-like blobs, raw FrameData relocation,
+shifted boot 578/600, strict gate) and HACK-001/001a/006 (GDD, layout,
+Cantor).  Details in `git log`.
 
 ---
 
@@ -27,14 +28,9 @@ strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev1] SHIFT-006c (emulator) — shifted boot still fails; c2 landed,
-  c3 active: frame-107 `gNonGameplayRam` overflow after early intro code
-  - `SHIFT-006c2` landed: carved the 9-entry `struct FrameData` table out of
-    `sBlob_6094d0_60b148`; boot advanced from frame 3 to 86
-  - c3 corrected the old `InitTrack`/`SWI 2` premise (InitTrack is byte-identical
-    and has no Halt); c4 active: relocate the 159-entry raw `FrameData` tail in
-    `sBlob_6094d0_60b148` that still holds unshifted pFrame pointers
-- [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
+- [DOING @dev2] SHIFT-008 (emulator) — shift test: padding and section reorder
+  - padding boot is green (`SHIFT-CHECK: PASS`, 578/600); add the
+    section-reorder build and make it a repeatable gate
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 
 ## Phase S3a — hack-critical C (106 functions)
