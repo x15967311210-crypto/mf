@@ -124,15 +124,20 @@ fragments, not a long cutscene.
 - The deck was built to study sound as a containment signal for the X.
 - The researchers tried to "teach" the X a human choir; the Cantor is the
   result.  The final log reveals the deck was sealed from the inside.
-- The slice ends with a data core and a locked door to the rest of the sector.
+- The slice ends with a data core that is both a **story beat** and a
+  **completion flag**; it opens a locked door to the rest of the sector.
 - Text budget: 3–4 short log entries; one optional hidden message; no Adam
   conversation in the slice.
 
 ## 8. Art, audio and reuse budget
 
 - Tilesets: Sector 6 dark/lab tiles, recolored; no new tileset in the slice.
-- Music: one ambient track, reused or a short original loop.
-- Enemies: one Echo Hunter variant using an existing AI.
+- Music: one **low-frequency ambient drone**; Boss uses a slightly denser
+  variation of the same palette.
+- Enemies: one Echo Hunter variant using an existing AI; The Cantor reuses a
+  multi-part boss AI with a reskin.
+- Optional secret: one **missile tank + one lore log** in the Atrium upper
+  alcove.
 - Budget targets: TBD after a content spike.
 
 Room-by-room layout: `level-layout.md`.
@@ -148,13 +153,16 @@ Room-by-room layout: `level-layout.md`.
   unverified; add a behavior scenario.
 - Controls must be checked against the vanilla bindings before implementation.
 
-## 10. Open questions for the human
+## 10. Design v1 status
 
-Layout is signed off in `level-layout.md`.  Remaining design questions:
+**Closed for implementation.**  Signed off:
 
-1. Does the Cantor attack set in `boss-cantor.md` feel right (charge, sweep,
-   decoy, core shockwave)?
-2. Should the optional secret be a **missile tank** (power) or a **lore log**
-   (atmosphere), or one of each?
-3. Music direction: low ambient drone, or a sparse melodic motif?
-4. Should the final data core be a **story beat** or just a completion flag?
+- Layout: Atrium vertical set-piece, two-way Conduit shortcut, one save pad,
+  1×2 Cantor arena.
+- Cantor: four attacks (charge, sonar sweep, echo decoy, core shockwave).
+- Optional secret: missile tank + lore log.
+- Music: low ambient drone.
+- Final data core: story beat + completion flag.
+
+Next design milestone is the first playtest of the slice; new ideas go into
+`docs/design/backlog.md`, not into the frozen slice brief.

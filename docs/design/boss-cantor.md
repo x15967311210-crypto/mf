@@ -1,7 +1,10 @@
 # The Cantor — mini-boss spec (draft 1)
 
-Status: **concept signed off; attack set in review**.
+Status: **signed off for implementation**.
 Owned by `game-designer`.  Parent: `GDD.md`, `level-layout.md`.
+
+Locked: four attacks (charge, sonar sweep, echo decoy, core shockwave), three
+organs + core, 1×2 arena, low ambient drone, data core = story beat + flag.
 
 ## Fantasy
 
@@ -97,8 +100,12 @@ short execution window.
 6. Player death → restart at arena entrance with pre-boss state; no softlock.
 7. No OAM overflow, no new lag frames beyond the agreed budget.
 
-## Open questions
+## Sign-off
 
-1. Is the attack set (charge, sweep, decoy, core shockwave) the right density?
-2. Should the optional secret be a missile tank, a lore log, or both?
-3. Music: ambient drone or sparse melodic motif?
+- Attack set: **charge, sonar sweep, echo decoy, core shockwave**.
+- Optional secret: **missile tank + lore log**.
+- Music: **low ambient drone**; Boss variation uses the same palette.
+- Final data core: **story beat + completion flag**.
+
+Any new boss idea goes to `docs/design/backlog.md`; this file is frozen for the
+first slice.

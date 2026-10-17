@@ -54,18 +54,18 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 
 ## Phase S4 — hack
 
-- [DOING @designer] HACK-001 (GDD) — vertical-slice GDD and room brief
-  - GDD v1, slice brief and `level-layout.md` landed; awaiting layout decisions
-  - locked: Sector Null, Resonance Pulse (cooldown), The Cantor, stealth,
-    mystery logs
+- [DONE @designer] HACK-001 (GDD) — vertical-slice GDD and room brief
+  - GDD v1 closed: Sector Null, Resonance Pulse (cooldown), The Cantor,
+    stand-still stealth, mystery logs, ambient drone
 - [DONE @designer] HACK-001a (GDD) — finalize Atrium/Conduit layout, shortcut,
   save count, Cantor arena size
 - [TODO] HACK-002 (GDD) — content ID registry and save-version plan  [deps: HACK-001a]
 - [TODO] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data  [deps: SHIFT-008]
 - [TODO] HACK-004 (emulator) — vertical slice: 5 rooms + Cantor + pulse
 - [TODO] HACK-005 (playtest) — first playable slice sign-off  [deps: HACK-004]
-- [DOING @designer] HACK-006 (GDD) — Cantor boss spec: phases, attacks, event/ID list
-  - `docs/design/boss-cantor.md` draft 1 landed; attack set in review
+- [DONE @designer] HACK-006 (GDD) — Cantor boss spec: phases, attacks, event/ID list
+  - `docs/design/boss-cantor.md` signed off; four attacks + data core + reward
+- [TODO] HACK-007 (GDD) — playtest script and feedback rubric for First Echo  [deps: HACK-004]
 
 ## Open questions
 

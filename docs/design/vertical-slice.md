@@ -19,8 +19,9 @@ sonar pulse, and escapes a creature that hunts by sound.
 - 1 enemy variant: **Echo Hunter** (reuses an existing AI, reacts to pulses).
 - 1 teaching mini-boss: **The Cantor** (three phases, pulse-revealed organs,
   stand-still stealth).
-- 1 optional secret and 1 save point.
-- 3–4 short archaeology logs; one ambient track.
+- 1 optional secret: **missile tank + lore log** in the Atrium upper alcove.
+- 1 save pad at Entry Ledge.
+- 3–4 short archaeology logs; one **low ambient drone** track.
 
 ## Room flow
 
@@ -37,6 +38,7 @@ sonar pulse, and escapes a creature that hunts by sound.
 - The pulse reveals the hidden route and the optional secret.
 - The Echo Hunter reacts to the pulse as designed.
 - The Cantor completes all three phases; standing still breaks its sound lock.
+- The data core sets both the story event and the slice-completion flag.
 - Save → load preserves ability/event/room state (including mid-boss restart).
 - Vanilla rooms outside the slice behave unchanged (differential smoke).
 - No new lag frames beyond the agreed budget; no OAM overflow.

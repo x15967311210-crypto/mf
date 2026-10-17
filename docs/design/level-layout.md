@@ -81,7 +81,7 @@ Target time: 15–20 minutes first play, 8–12 minutes on replay.
 
 ## Optional secret
 
-- Atrium upper alcove: pulse-only platform, one missile tank, one log.
+- Atrium upper alcove: pulse-only platform, **one missile tank + one log**.
 - Conduit hidden wall: one log that hints at the Cantor's origin.
 - Missing either secret must not block the exit.
 
