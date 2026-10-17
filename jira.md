@@ -45,10 +45,10 @@ parity) and HACK-001/001a/006
 - [DOING @dev1] BUG-004 (input replay) — shifted diverges by 30k frames
   - normal/reordered 30k: `frame_counter=29857`, `main=1`, `s1=3`, `s2=256`
   - shifted 30k: `frame_counter=24469`, `main=7`, `s1=11`, `s2=1`
-  - first divergence at frame 24595: normal in BIOS (`vblank=08091EFD`);
-    shifted runs the elevator-monologue setup (`vblank=0809A941`) one frame
-    ahead; source data 0x085FE1E0 is valid, so not a simple stale pointer
-  - trace the callback/Halt/state divergence before 24595
+  - QA-004 scan found two unrelocated **FrameData** tables in
+    `sBlob_5f6990_60093c`: `0x79E0`/26 entries (abs `0x085FE370`) and
+    `0x8B48`/70 entries (abs `0x085FF4D8`); both referenced from
+    intro/OAM setup. Carve them into C, preserve layout, verify 30k parity.
 - [DONE] QA-006 (emulator) — 30k input fixture + `shift-input-30k` gate
   - normal/reordered 30k PASS; shifted 30k FAIL (`frame_counter=24469`)
   - harness binary must be rebuilt after harness changes; noted
