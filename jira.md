@@ -54,7 +54,8 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 
 ## Phase S4 — hack
 
-- [TODO] HACK-001 (GDD) — vertical-slice GDD and room brief  [deps: SHIFT-011]
+- [DOING @designer] HACK-001 (GDD) — vertical-slice GDD and room brief
+  - draft templates landed in `docs/design/`; waiting on the human's direction
 - [TODO] HACK-002 (GDD) — content ID registry and save-version plan  [deps: HACK-001]
 - [TODO] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data  [deps: SHIFT-008]
 - [TODO] HACK-004 (emulator) — vertical slice: 3 rooms + 1 enemy + 1 event
