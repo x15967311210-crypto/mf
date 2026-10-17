@@ -5,9 +5,30 @@ This file is the contract for every agent and human working in the tree.
 
 ## Current phase
 
-**SHIFT-001 / SHIFT-002 / SHIFT-003** — behavior harness, relocation audit,
-symbol mapping.  Do not start content production or a full C conversion before
-the shiftability gates in `docs/roadmap.md` are green.
+**SHIFT-001 / SHIFT-002 done; SHIFT-003 mapping done.**  Next: SHIFT-004/005/006
+(blob tables, hardcoded-ref rewrites, relocatable linker).  Do not start content
+production or a full C conversion before the shiftability gates in
+`docs/roadmap.md` are green.
+
+## Team
+
+This is a multi-agent project. The **manager** is a primary agent that owns
+`jira.md` and dispatches subagents; it does not write feature code. Available
+project agents live in `.opencode/agents/`: `manager`, `game-designer`,
+`engine-dev`, `tools-dev`, `content-dev`, `qa`.
+
+- The manager dispatches ONE background subagent per task, with a self-contained
+  charter and a worktree/branch (`../mf-devN` / `devN`).
+- Devs work only in their worktree, commit by explicit pathspec, never push.
+- The manager gates a dev branch with `make -f Makefile.shift audit/smoke/test`
+  and `check_relocs.py`, then merges `--ff-only`.
+- The game designer discusses gameplay with the human, writes
+  `docs/design/GDD.md` and `docs/design/vertical-slice.md`, and does not write
+  code or edit `jira.md`.
+- QA files `BUG-*` / `QA-*` tasks; it does not implement features.
+
+The built-in `general` subagent cannot launch more subagents, so orchestration
+must happen in a primary session (the `manager` agent or the human's session).
 
 ## The one rule that prevents lost work
 

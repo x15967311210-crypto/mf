@@ -26,9 +26,10 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 - [DONE @mgr] SHIFT-002 (baseline) — asm/C/blob relocation audit scripts and report
   - `docs/shiftability-audit.md`: 1359 ROM refs, 662 literals, 388 unique,
     47 blobs classified (11 pointer tables, 7 possible, 29 data)
-- [DOING @mgr] SHIFT-003 (baseline) — address → symbol mapping and whitelist
-  - symbols map + nearest-symbol resolution landed; remaining work is reviewing
-    the 662 literal proposals and adding explicit labels for blob offsets
+- [DONE @mgr] SHIFT-003 (baseline) — address → symbol mapping and whitelist
+  - map + ELF local symbols merged; all 662 ROM literals now resolve to
+    `symbol+offset`, `unknown=0`; rewrite proposals in
+    `work/shift/rewrite_suggestions.md`
 - [TODO] SHIFT-004 (REA) — classify blob pointer tables vs graphics/audio  [deps: SHIFT-002]
 
 ## Phase S2 — relocatable build
