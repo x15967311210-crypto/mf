@@ -37,12 +37,20 @@ parity) and HACK-001/001a/006
 
 ## Phase S2 — relocatable build
 
-- [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - final candidate: `work/playtest/m0e-2026-10-17/`
-  - `SHIFT-CHECK`, `SHIFT-START`, `SHIFT-INPUT`, `SHIFT-INPUT-30K`,
-    `SCREEN-DIFF` and `make test` all PASS
-  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
+- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - M0e 4k/30k/screenshot gates pass, but later Navigation Room/map/dialog
+    path is corrupt and Enter/Start black-screens on shifted
+  - blocked by BUG-005; M0f after fix
   - M0 is not DONE and M1 does not start until human sign-off
+- [DOING @dev1] BUG-005 (playtest) — shifted map/dialog tile corruption and
+  Enter black screen after the 4k window
+  - slot1 frame 7002 `disp=5F00 main=3`: map/dialog box missing
+  - slot2 frame 29291 `disp=5F00 main=3`: text but no dialog box
+  - slot3 frame 49609 `disp=5E00 main=1`: tile garbage; Start/Enter ->
+    frame 49647 `disp=0000`, pure black
+  - artifacts: `work/playtest/m0e-2026-10-17/scripts/m0e_shifted_slot*.ss*`,
+    `slot*.png`, `slots23_capture.log`
+  - 4k `screen-diff` cannot cover this; diagnose VRAM/tilemap/dialog source
 - [DONE] QA-006 (emulator) — 30k input fixture + `shift-input-30k` gate
   - normal/reordered 30k PASS; shifted 30k FAIL (`frame_counter=24469`)
   - harness binary must be rebuilt after harness changes; noted
