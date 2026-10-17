@@ -49,7 +49,7 @@ REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
         check-relocs check-relocs-strict check-linker smoke test test-input \
         input-smoke emulator-harness shift-build shift-test shift-check \
         shift-reorder shift-start shift-input shift-input-30k shift-screen \
-        screen-diff oam-diff shift-check-all help
+        screen-diff oam-diff shift-check-all content-check help
 
 all: audit
 
@@ -91,6 +91,12 @@ check-linker:
 
 smoke:
 	$(PYTHON) tests/emulator/run.py --static --rom $(ROM)
+
+# HACK-003: deterministic Tiled/PNG room-pipeline scaffold.  This is
+# emulator-free and ROM-free; it is not part of the S2 relocation gate.
+content-check:
+	$(PYTHON) tools/content/fixtures/generate_fixture.py --check
+	$(PYTHON) tools/content/tiled_to_room.py --self-check
 
 emulator-harness:
 	MGBA_SRC=$(MGBA_SRC) MGBA_BUILD=$(MGBA_BUILD) \
@@ -486,6 +492,7 @@ help:
 	@echo "  check-relocs-strict fail on literals, C ROM refs, or raw pointer-like blobs"
 	@echo "  check-linker        verify linker.ld has no fixed ROM addresses"
 	@echo "  smoke               static ROM/header smoke"
+	@echo "  content-check       synthetic Tiled/PNG room-pipeline check (no ROM)"
 	@echo "  emulator-harness    build tests/emulator/bin/mgba-harness (MGBA_SRC/MGBA_BUILD)"
 	@echo "  test                static + headless boot smoke + 4k input replay (exit 77 if no harness)"
 	@echo "  test-input          normal-ROM 4k input replay + checkpoint assertion"
