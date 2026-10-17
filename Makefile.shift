@@ -44,7 +44,8 @@ REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit \
         check-relocs check-relocs-strict check-linker smoke test test-input \
         input-smoke emulator-harness shift-build shift-test shift-check \
-        shift-reorder shift-start shift-input shift-check-all help
+        shift-reorder shift-start shift-input shift-screen screen-diff \
+        shift-check-all help
 
 all: audit
 
@@ -197,6 +198,104 @@ shift-input:
 	fi; \
 	exit $$status
 
+# QA-005: screenshot parity at the input checkpoints.  Run the committed 4k
+# replay with --screen on the normal, padded-shift and data-reorder builds.
+# The gate compares the framebuffer hashes at frames 600 and 900; the shifted
+# build is expected to diverge there while BUG-003 is open.  State checkpoints
+# stay in test/shift-input; this target fails only on a screen mismatch or a
+# missing checkpoint.  A missing harness is SKIP (77), never a pass.
+shift-screen:
+	@mkdir -p $(SHIFT_WORK); \
+	normal_log=$(SHIFT_WORK)/screen_normal.log; \
+	shift_log=$(SHIFT_WORK)/screen_shift.log; \
+	reorder_log=$(SHIFT_WORK)/screen_reorder.log; \
+	echo "screen: normal 4k replay"; \
+	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario input \
+		--input "$(INPUT)" --frames 4000 --screen > $$normal_log 2>&1; \
+	normal=$$?; \
+	cat $$normal_log; \
+	if [ $$normal -eq 77 ]; then \
+		echo "SCREEN-DIFF: SKIP (77) - no emulator/harness; dynamic behavior did not run"; \
+		echo "               this is not a pass"; \
+		exit 77; \
+	fi; \
+	if [ $$normal -ne 0 ]; then \
+		echo "SCREEN-DIFF: FAIL ($$normal) - normal --screen replay did not pass"; \
+		exit $$normal; \
+	fi; \
+	echo "screen: padded shifted build"; \
+	$(PYTHON) tools/shift/shift_test.py --build --pad-bytes $(PAD_BYTES) \
+		--toolchain "$(TOOLCHAIN)" > $(SHIFT_WORK)/screen_shift_build.log 2>&1; \
+	build=$$?; \
+	cat $(SHIFT_WORK)/screen_shift_build.log; \
+	if [ $$build -ne 0 ]; then \
+		echo "SCREEN-DIFF: FAIL ($$build) - shifted build did not complete"; \
+		exit $$build; \
+	fi; \
+	echo "screen: shifted 4k replay"; \
+	$(PYTHON) tests/emulator/run.py --rom $(SHIFT_WORK)/mf_us_shift.gba \
+		--scenario input --input "$(INPUT)" --frames 4000 --screen \
+		> $$shift_log 2>&1; \
+	shifted=$$?; \
+	cat $$shift_log; \
+	if [ $$shifted -eq 77 ]; then \
+		echo "SCREEN-DIFF: FAIL - harness disappeared after the normal replay"; \
+		exit 1; \
+	fi; \
+	echo "screen: reordered build"; \
+	$(PYTHON) tools/shift/shift_test.py --reorder --build \
+		--pad-bytes $(PAD_BYTES) --toolchain "$(TOOLCHAIN)" \
+		> $(SHIFT_WORK)/screen_reorder_build.log 2>&1; \
+	reorder_build=$$?; \
+	cat $(SHIFT_WORK)/screen_reorder_build.log; \
+	if [ $$reorder_build -ne 0 ]; then \
+		echo "SCREEN-DIFF: FAIL ($$reorder_build) - reordered build did not complete"; \
+		exit $$reorder_build; \
+	fi; \
+	echo "screen: reordered 4k replay"; \
+	$(PYTHON) tests/emulator/run.py --rom $(SHIFT_WORK)/mf_us_reorder.gba \
+		--scenario input --input "$(INPUT)" --frames 4000 --screen \
+		> $$reorder_log 2>&1; \
+	reordered=$$?; \
+	cat $$reorder_log; \
+	hash_at() { \
+		grep -oE "SCREEN frame=$$2 hash=[0-9a-f]+" "$$1" | tail -1 | sed 's/.*hash=//'; \
+	}; \
+	n600=$$(hash_at $$normal_log 600); n900=$$(hash_at $$normal_log 900); \
+	s600=$$(hash_at $$shift_log 600); s900=$$(hash_at $$shift_log 900); \
+	r600=$$(hash_at $$reorder_log 600); r900=$$(hash_at $$reorder_log 900); \
+	echo "SCREEN-DIFF normal 600=$$n600 900=$$n900"; \
+	echo "SCREEN-DIFF shifted 600=$$s600 900=$$s900"; \
+	echo "SCREEN-DIFF reordered 600=$$r600 900=$$r900"; \
+	if [ -z "$$n600" ] || [ -z "$$n900" ] || [ -z "$$s600" ] || [ -z "$$s900" ]; then \
+		echo "SCREEN-DIFF: FAIL - missing SCREEN checkpoint (600/900)"; \
+		exit 1; \
+	fi; \
+	if [ "$$s600" != "$$n600" ] || [ "$$s900" != "$$n900" ]; then \
+		echo "SCREEN-DIFF: FAIL - normal and shifted framebuffer hashes differ"; \
+		exit 1; \
+	fi; \
+	if [ $$shifted -ne 0 ]; then \
+		echo "SCREEN-DIFF: FAIL ($$shifted) - shifted replay did not pass"; \
+		exit $$shifted; \
+	fi; \
+	if [ -z "$$r600" ] || [ -z "$$r900" ]; then \
+		echo "SCREEN-DIFF: FAIL - reordered replay has no 600/900 SCREEN checkpoint"; \
+		exit 1; \
+	fi; \
+	if [ "$$r600" != "$$n600" ] || [ "$$r900" != "$$n900" ]; then \
+		echo "SCREEN-DIFF: FAIL - normal and reordered framebuffer hashes differ"; \
+		exit 1; \
+	fi; \
+	if [ $$reordered -ne 0 ]; then \
+		echo "SCREEN-DIFF: FAIL ($$reordered) - reordered replay did not pass"; \
+		exit $$reordered; \
+	fi; \
+	echo "SCREEN-DIFF: PASS - normal, shifted and reordered match at 600/900"
+
+# Alias used by the QA-005 charter; it is exactly the shift-screen gate.
+screen-diff: shift-screen
+
 # Data-only reorder: swap two .rodata inputs.  Code (AgbMain) must not move,
 # the swapped data symbols must, and the boot smoke must still pass.
 shift-reorder: audit smoke check-linker
@@ -233,6 +332,8 @@ help:
 	@echo "  shift-check         audit + smoke + link check + shift-test (padding)"
 	@echo "  shift-start         padded build + Start/file-select scenario (QA-001)"
 	@echo "  shift-input         padded build + 4k input replay + checkpoint assertion (QA-003)"
+	@echo "  shift-screen        normal/shifted/reordered 4k framebuffer parity at 600/900 (QA-005)"
+	@echo "  screen-diff         alias for shift-screen"
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
 	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, PAD_BYTES, SHIFT_WORK"

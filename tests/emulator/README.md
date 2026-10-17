@@ -142,6 +142,41 @@ normal/shifted/reordered builds of the same harness, which is what makes it a
 fast differential pre-gate before a BizHawk run.  A full 259k-frame input is a
 manual run (the runner allows `--timeout`); only the 4k prefix is automatic.
 
+### Screenshot parity (QA-005)
+
+`harness.c --input FILE --screen` hashes the emulated 240x160 framebuffer at
+the input checkpoints.  The capture buffer is attached with `setVideoBuffer()`
+**before** `core->reset()`; mGBA only wires its software renderer at reset time,
+so attaching later would leave an all-zero buffer.  `--screen` is valid only
+with `--input` and does not change the boot/start/input state semantics.
+
+The harness prints one line per checkpoint:
+
+```text
+SCREEN_START width=240 height=160 stride=240 pixel_bytes=4 hash=fnv1a64
+SCREEN frame=600 hash=1abaa6c524bad2e7 uniform=0 nonblack=1
+SCREEN_GUARD samples=4 varied=4 nonblack=4 status=pass
+```
+
+`hash` is FNV-1a 64 over the native `mColor` pixels in memory order.  `stride`
+is in pixels, not bytes.  The guard fails the replay if no checkpoint produced
+a varied, non-black frame, so a disconnected buffer cannot be mistaken for a
+passing screenshot gate.
+
+Run the normal, padded-shift and data-reorder builds against the committed 4k
+fixture:
+
+```sh
+make -f Makefile.shift shift-screen
+```
+
+It reports `SCREEN-DIFF: PASS|FAIL|SKIP (77)`, comparing frames 600 and 900.
+A missing harness is a skip (77), never a pass.  Reordered data must match the
+normal framebuffer; the padded build currently differs at 600/900, which is
+BUG-003 (the shifted boot still reaches the same state checkpoints).  State
+assertions remain in `test` and `shift-input`; `shift-screen` fails only on a
+missing/mismatched screen checkpoint or a failed replay.
+
 ### Shifted `input` gate (QA-003)
 
 ```sh

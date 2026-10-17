@@ -43,6 +43,7 @@ def harness_command(
     frames: int | None,
     input_path: str | None = None,
     expect_path: str | None = None,
+    screen: bool = False,
 ) -> list[str]:
     """Build the harness argv, preserving the legacy boot-smoke invocation."""
     if scenario == "boot_smoke":
@@ -54,6 +55,8 @@ def harness_command(
         cmd += ["--input", input_path]
         if expect_path:
             cmd += ["--expect", expect_path]
+        if screen:
+            cmd += ["--screen"]
     if frames is not None:
         cmd += ["--frames", str(frames)]
     return cmd
@@ -94,11 +97,12 @@ def run_dynamic(
     input_path: str | None = None,
     expect_path: str | None = None,
     timeout: int | None = None,
+    screen: bool = False,
 ) -> int:
     harness = find_harness()
     if harness:
         cmd = harness_command(
-            harness, rom, scenario, frames, input_path, expect_path
+            harness, rom, scenario, frames, input_path, expect_path, screen
         )
         print("RUN:", " ".join(cmd))
         if timeout is None:
@@ -211,6 +215,11 @@ def main() -> int:
         help="expected `frame disp main s1 s2` checkpoints for --input",
     )
     ap.add_argument(
+        "--screen",
+        action="store_true",
+        help="hash the framebuffer at input checkpoints (requires --input)",
+    )
+    ap.add_argument(
         "--timeout",
         type=int,
         default=None,
@@ -226,6 +235,8 @@ def main() -> int:
                  f"--scenario {args.scenario}")
     if args.expect and not args.input:
         ap.error("--expect requires --input FILE")
+    if args.screen and not args.input:
+        ap.error("--screen requires --input FILE")
     scenario = "input" if args.input else args.scenario
     if scenario == "input" and not args.input:
         ap.error("--scenario input requires --input FILE")
@@ -240,7 +251,13 @@ def main() -> int:
     if static_code != 0 or args.static:
         return static_code
     return run_dynamic(
-        rom, scenario, frames, args.input, args.expect, args.timeout
+        rom,
+        scenario,
+        frames,
+        args.input,
+        args.expect,
+        args.timeout,
+        args.screen,
     )
 
 

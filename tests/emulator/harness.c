@@ -15,7 +15,9 @@
  *                          format is one `frame keys` pair per line; keys is
  *                          the GBA key bitmask (1=A, 2=B, 4=Select, 8=Start,
  *                          16=Right, 32=Left, 64=Up, 128=Down, 256=R, 512=L).
- *                          Lines starting with `#` are comments.
+ *                          Lines starting with `#` are comments.  `--screen`
+ *                          additionally hashes the 240x160 framebuffer at
+ *                          every input checkpoint (QA-005).
  *
  * The legacy form `harness rom.gba [frames]` keeps the boot-smoke output and
  * exit semantics unchanged.
@@ -26,6 +28,7 @@
 #include <mgba/internal/gba/gba.h>
 #include <mgba/internal/gba/input.h>
 #include <mgba/internal/gba/memory.h>
+#include <mgba-util/image.h>
 
 #include <ctype.h>
 #include <errno.h>
@@ -49,6 +52,10 @@
 #define START_HOLD 6
 
 #define INPUT_LINE_MAX 4096
+
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 160
+#define SCREEN_PIXELS (SCREEN_WIDTH * SCREEN_HEIGHT)
 
 typedef struct {
     uint32_t frame;
@@ -83,6 +90,20 @@ typedef struct {
     uint16_t sub2;
 } InputState;
 
+typedef struct {
+    uint64_t hash;
+    int uniform;
+    int nonblack;
+} ScreenSample;
+
+/*
+ * QA-005: optional framebuffer capture.  mGBA renders into this buffer when
+ * the core is reset; the harness hashes the native pixels at input checkpoints.
+ * The buffer is only wired up with --screen, so ordinary replays pay nothing.
+ */
+static int screen_enabled;
+static mColor screen_buffer[SCREEN_PIXELS];
+
 static const size_t INPUT_CHECKPOINTS[] = {300, 600, 900, 4000};
 #define INPUT_CHECKPOINT_COUNT \
     (sizeof(INPUT_CHECKPOINTS) / sizeof(INPUT_CHECKPOINTS[0]))
@@ -92,9 +113,11 @@ static void usage(const char* argv0) {
         stderr,
         "usage: %s rom.gba [frames]\n"
         "       %s rom.gba --scenario boot_smoke|start [--frames N]\n"
-        "       %s rom.gba --input FILE [--frames N] [--expect FILE]\n"
+        "       %s rom.gba --input FILE [--frames N] [--expect FILE] "
+        "[--screen]\n"
         "       %s rom.gba --scenario input --input FILE [--frames N] "
-        "[--expect FILE]\n",
+        "[--expect FILE] [--screen]\n"
+        "       --screen hashes the 240x160 framebuffer at input checkpoints\n",
         argv0, argv0, argv0, argv0
     );
 }
@@ -558,6 +581,53 @@ static int input_is_checkpoint(size_t frame) {
 }
 
 /*
+ * Attach the capture buffer before core->reset(): the GBA core only associates
+ * the software renderer when an output buffer is already configured.
+ */
+static int screen_attach(struct mCore* core) {
+    if (!core->setVideoBuffer) {
+        fprintf(stderr, "FAIL: mGBA core has no setVideoBuffer\n");
+        return -1;
+    }
+    memset(screen_buffer, 0, sizeof(screen_buffer));
+    core->setVideoBuffer(core, screen_buffer, SCREEN_WIDTH);
+    return 0;
+}
+
+static ScreenSample screen_sample(void) {
+    ScreenSample sample;
+    sample.hash = UINT64_C(14695981039346656037);
+    sample.uniform = 1;
+    sample.nonblack = 0;
+
+    const mColor first = screen_buffer[0];
+    for (size_t i = 0; i < SCREEN_PIXELS; ++i) {
+        mColor pixel = screen_buffer[i];
+        if (pixel != first) {
+            sample.uniform = 0;
+        }
+        if (pixel != 0) {
+            sample.nonblack = 1;
+        }
+        for (size_t shift = 0; shift < sizeof(pixel) * 8; shift += 8) {
+            sample.hash ^= (uint8_t)(pixel >> shift);
+            sample.hash *= UINT64_C(1099511628211);
+        }
+    }
+    return sample;
+}
+
+static ScreenSample screen_report(size_t frame) {
+    ScreenSample sample = screen_sample();
+    printf(
+        "SCREEN frame=%zu hash=%016llx uniform=%d nonblack=%d\n",
+        frame, (unsigned long long)sample.hash,
+        sample.uniform, sample.nonblack
+    );
+    return sample;
+}
+
+/*
  * QA-002: replay `frame keys` lines in order.  setKeys is called before
  * runFrame, so line 0 is the first emulated frame.  Checkpoints are reported
  * after 300/600/900/4000 completed frames (matching the BizHawk frame-count
@@ -586,9 +656,19 @@ static int run_input(
         replay->count, replay->header_frames, limit,
         frames_set && limit < replay->count ? " capped" : ""
     );
+    if (screen_enabled) {
+        printf(
+            "SCREEN_START width=%d height=%d stride=%d pixel_bytes=%zu "
+            "hash=fnv1a64\n",
+            SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, sizeof(mColor)
+        );
+    }
 
     size_t expected_checked = 0;
     int expected_failed = 0;
+    size_t screen_samples = 0;
+    size_t screen_varied = 0;
+    size_t screen_nonblack = 0;
     uint16_t last_keys = 0;
     for (size_t i = 0; i < limit; ++i) {
         uint16_t keys = replay->entries[i].keys;
@@ -603,6 +683,16 @@ static int run_input(
                                    &expected_checked)) {
                 expected_failed = 1;
             }
+            if (screen_enabled) {
+                ScreenSample sample = screen_report(completed);
+                ++screen_samples;
+                if (sample.nonblack) {
+                    ++screen_nonblack;
+                }
+                if (!sample.uniform && sample.nonblack) {
+                    ++screen_varied;
+                }
+            }
         }
     }
 
@@ -616,6 +706,22 @@ static int run_input(
     );
 
     int failed = 0;
+    if (screen_enabled) {
+        int screen_ok = screen_samples > 0 && screen_varied > 0;
+        printf(
+            "SCREEN_GUARD samples=%zu varied=%zu nonblack=%zu status=%s\n",
+            screen_samples, screen_varied, screen_nonblack,
+            screen_ok ? "pass" : "fail"
+        );
+        if (!screen_ok) {
+            printf(
+                "FAIL: screen capture produced no varied, non-black "
+                "checkpoint\n"
+            );
+            failed = 1;
+        }
+    }
+
     int min_counter = (int)(limit * 3 / 4);
     if (counter < min_counter) {
         printf(
@@ -661,6 +767,7 @@ int main(int argc, char** argv) {
     int scenario_set = 0;
     int frames = 0;
     int frames_set = 0;
+    int screen = 0;
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--scenario") == 0) {
@@ -690,6 +797,8 @@ int main(int argc, char** argv) {
             }
             frames = atoi(argv[i]);
             frames_set = 1;
+        } else if (strcmp(argv[i], "--screen") == 0) {
+            screen = 1;
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
             usage(argv[0]);
             return 0;
@@ -725,6 +834,11 @@ int main(int argc, char** argv) {
         fprintf(stderr, "FAIL: --expect is only valid with --input FILE\n");
         return 2;
     }
+    if (screen && strcmp(scenario, "input") != 0) {
+        fprintf(stderr, "FAIL: --screen is only valid with --input FILE\n");
+        return 2;
+    }
+    screen_enabled = screen;
     if (!frames_set && strcmp(scenario, "input") != 0) {
         frames = strcmp(scenario, "start") == 0
             ? START_FRAMES
@@ -758,6 +872,17 @@ int main(int argc, char** argv) {
     mCoreConfigSetDefaultIntValue(&core->config, "logToStdout", 0);
     if (!mCoreLoadFile(core, rom)) {
         fprintf(stderr, "FAIL: could not load %s\n", rom);
+        core->deinit(core);
+        input_expectations_free(&expect);
+        input_replay_free(&replay);
+        return 1;
+    }
+    /*
+     * The GBA core only wires its software renderer to the output buffer at
+     * reset time, so the capture buffer must be attached first.
+     */
+    if (screen_enabled && screen_attach(core) != 0) {
+        mCoreConfigDeinit(&core->config);
         core->deinit(core);
         input_expectations_free(&expect);
         input_replay_free(&replay);
