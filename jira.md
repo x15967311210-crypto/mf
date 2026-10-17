@@ -31,6 +31,8 @@ section-reordered boot, Start/file-select gate, 578/600) and HACK-001/001a/006
 - [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
   - BUG-001 fixed; new handoff: `work/playtest/m0b-2026-10-17/`
   - normal / shifted / reordered; `SHIFT-CHECK: PASS` and `SHIFT-START: PASS`
+  - external BizHawk `.bk2` smoke in progress on the M0b artifacts; the
+    one-off full baseline stopped at frame 40000 with no done marker
   - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
   - M0 is not DONE and M1 does not start until human sign-off
 
