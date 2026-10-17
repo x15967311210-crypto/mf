@@ -26,14 +26,16 @@ learns why the deck was sealed.
   room, not just which door opens.
 - **Dread with a small footprint.**  A compact deck, a few rooms, one creature
   that hunts by sound.
+- **Stillness is survival.**  Standing still breaks a sound lock; the pulse is
+  loud and can attract what is listening.
 - **Reuse to ship.**  Vanilla tilesets/music and one enemy AI variant until the
   pipeline is proven.
 
 ## 3. Core loop
 
-Enter a dark room → listen/scan → reveal a hidden route or object → avoid or
-distract the sound-sensitive inhabitant → recover the next piece of the deck →
-escape or descend.
+Enter a dark room → listen → pulse to reveal a route/object (and risk being
+heard) → freeze to break a sound lock → avoid or distract the inhabitant →
+recover the next piece of the deck → escape or descend.
 
 ## 4. Concept candidates
 
@@ -84,19 +86,22 @@ new `AREA_*`.
 
 ## 6. Ability: Resonance Pulse
 
-- **Input:** TBD.  Candidates: `R + A`, `Select`, or a charged-beam alternate.
-  Must not collide with missile/diagonal aim bindings.
+- **Input:** engine team to choose after auditing vanilla bindings; candidates
+  are `R + A`, `Select`, or a charged-beam alternate.  Must not collide with
+  missile/diagonal aim bindings.
 - **Effect:** expanding ring; reveals hidden tiles/objects in radius; brief stun
   or distraction on sound-sensitive enemies; triggers resonance switches.
-- **Cost:** cooldown first; ammo/energy cost only if the slice needs a resource
-  loop.
+- **Noise:** the pulse is loud.  Using it near a listener pulls attention; this
+  is the risk side of the reveal/stillness loop.
+- **Cost:** cooldown only, no ammo/energy cost (signed off).
 - **HUD:** minimal icon in the slice; full pause/status integration later.
 - **Save/event:** one ability bit and one event flag; save version plan required.
 
 ## 6.1 Mini-boss: The Cantor
 
 A blind, sound-hunting X adaptation that anchors the slice's climax.  It should
-teach the pulse, not test execution for five minutes.
+teach the pulse and the stillness loop, not test execution for five minutes.
+Signed off: three phases, pulse-revealed organs, stand-still sound-lock break.
 
 - **Arena:** Choir Nest, mostly dark; three resonance organs/crystals are
   invisible until pulsed.
@@ -130,6 +135,8 @@ fragments, not a long cutscene.
 - Enemies: one Echo Hunter variant using an existing AI.
 - Budget targets: TBD after a content spike.
 
+Room-by-room layout: `level-layout.md`.
+
 ## 9. Technical notes and risks
 
 - A real new sector needs `AREA_END`, room/door/scroll/event arrays, minimap and
@@ -143,11 +150,9 @@ fragments, not a long cutscene.
 
 ## 10. Open questions for the human
 
-1. Does **The Cantor** (pulse-revealed organs, stand-still stealth, three
-   phases) sound like the right mini-boss?
-2. Should the pulse also be the **stealth verb** — standing still breaks the
-   Cantor's sound lock — or should stealth be a separate mechanic?
-3. Control binding: `R + A`, `Select`, or a charged-beam alternate?  The engine
-   team should check vanilla bindings before committing.
-4. Story delivery: 3–4 environment logs is the current plan; do you want any
-   spoken/Adam-style framing, or keep it fully silent?
+1. Is the vertical Atrium the right first "wow" room, or should the Conduit be
+   the vertical set-piece?
+2. Should the shortcut be one-way or two-way?
+3. Is one save pad at Entry Ledge enough, or do we need a second before the
+   Cantor?
+4. Should the Cantor arena be 1×2 or 2×2 screens?

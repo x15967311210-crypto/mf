@@ -4,7 +4,8 @@ Status: **climax and economy signed off; room details in review**.
 Owned by the `game-designer` agent.  Parent: `GDD.md` concept A.
 
 Signed off: **Sector Null**, **The Cantor mini-boss**, **cooldown-only pulse**,
-**mystery/archaeology tone**.
+**stand-still stealth**, **mystery/archaeology tone**, **3–4 silent logs**.
+Control binding is deferred to the engine team after a vanilla-binding audit.
 
 ## Fantasy
 
