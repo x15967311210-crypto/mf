@@ -1,0 +1,65 @@
+# Shiftability and behavior harness targets.
+#
+# The upstream Makefile still builds the vanilla baseline.  This file adds the
+# audit/test surface without changing how `make check` works.
+#
+# Toolchain: put arm-none-eabi-* on PATH, or set TOOLCHAIN to an absolute
+# prefix, e.g.:
+#   make -f Makefile.shift test TOOLCHAIN=/path/to/arm-none-eabi-
+
+PYTHON ?= python3
+MAP ?= mf_us.map
+ROM ?= mf_us.gba
+BASEROM ?= mf_us_baserom.gba
+SCENARIO ?= boot_smoke
+FRAMES ?= 600
+
+.PHONY: all symbols audit-asm audit-blobs rewrite report audit check-relocs \
+        check-relocs-strict smoke test shift-build shift-test
+
+all: audit
+
+symbols:
+	$(PYTHON) tools/shift/map_symbols.py --map $(MAP) --out work/shift/symbols.json
+
+audit-asm:
+	$(PYTHON) tools/shift/audit_asm.py --map $(MAP) --out work/shift/abs_refs.json
+
+audit-blobs:
+	$(PYTHON) tools/shift/audit_blobs.py --map $(MAP) --out work/shift/blob_scan.json
+
+rewrite:
+	$(PYTHON) tools/shift/rewrite_refs.py --out work/shift/rewrite_suggestions.md
+
+report:
+	$(PYTHON) tools/shift/report.py --out docs/shiftability-audit.md
+
+audit: symbols audit-asm audit-blobs rewrite report check-relocs
+
+check-relocs:
+	$(PYTHON) tools/shift/check_relocs.py --refs work/shift/abs_refs.json
+
+check-relocs-strict:
+	$(PYTHON) tools/shift/check_relocs.py --refs work/shift/abs_refs.json --strict
+
+smoke:
+	$(PYTHON) tests/emulator/run.py --static --rom $(ROM)
+
+test:
+	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario $(SCENARIO) --frames $(FRAMES)
+
+shift-build:
+	$(PYTHON) tools/shift/shift_test.py --build --toolchain "$(TOOLCHAIN)"
+
+shift-test:
+	$(PYTHON) tools/shift/shift_test.py --build --run --toolchain "$(TOOLCHAIN)"
+
+help:
+	@echo "Targets:"
+	@echo "  audit               regenerate symbols, relocation audit, blobs, report"
+	@echo "  check-relocs        report remaining hardcoded ROM refs"
+	@echo "  check-relocs-strict fail if any unclassified ROM ref remains"
+	@echo "  smoke               static ROM/header smoke"
+	@echo "  test                static + mGBA behavior scenario (exit 77 if no emulator)"
+	@echo "  shift-build         build with a padded linker layout"
+	@echo "  shift-test          padded build + behavior scenario"

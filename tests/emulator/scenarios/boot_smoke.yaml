@@ -1,0 +1,16 @@
+name: boot_smoke
+description: Boot the ROM for 600 frames and verify the main loop is alive.
+rom: mf_us.gba
+frames: 600
+assertions:
+  - frames_advanced: 600
+  - mem16:
+      symbol: gFrameCounter16Bit
+      addr: "0x03000002"
+      not_equal: 0
+  - mem16:
+      symbol: gWrittenToDispcnt
+      addr: "0x03000008"
+      not_equal: 0
+artifacts:
+  - work/emulator/boot_smoke.log

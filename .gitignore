@@ -21,4 +21,11 @@ tools/*.txt
 tools/agbcc
 .vscode
 
+# Shift/decomp scratch: audit ledgers, Ghidra projects, shifted ROMs, logs.
+/work/
+
 err.log
+
+# Python bytecode
+__pycache__/
+*.pyc
