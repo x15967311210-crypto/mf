@@ -56,8 +56,11 @@ parity) and HACK-001/001a/006
     `slot*.png`, `slots23_capture.log`
   - QA-004 `Blob_5657a8` FrameData runs are **false positives**: pause-screen
     code uses fixed `sMinimapTilesGfx+offset` graphics, not those runs
-  - next: trace slot3 Start/Enter VRAM/palette/DMA writers; the map/dialog/
-    text path needs a normal reference or a state transplant
+  - slot3 trace: `PauseScreenInit+0x2E` writes `DISPCNT=0`; LZ77 load from
+    shifted `0x08576904` is invalid/huge (baseline `0x08575904`, same bytes),
+    with EWRAM overrun and ROM reads past 8 MiB
+  - next: trace the LZ77 caller/table selecting `0x08576904`; likely a wrong
+    offset/index into pause/map graphics, not a simple pointer relocation
   - 4k `screen-diff` cannot cover this; diagnose VRAM/tilemap/dialog source
 - [DONE] QA-006 (emulator) — 30k input fixture + `shift-input-30k` gate
   - normal/reordered 30k PASS; shifted 30k FAIL (`frame_counter=24469`)
