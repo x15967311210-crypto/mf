@@ -63,11 +63,13 @@ input/visual parity) and HACK-001/001a/006
     savestate-based objective-page comparison stays local-only
   - need a state **before** opening the map (or debug warp) to trace the
     skipped `PauseScreenInit`/`PauseScreenProcessOam` call
-- [DOING @dev2] QA-008 (emulator) — OAM parity telemetry at checkpoints
-  - print OAM count/hash at 300/600/900/1059/4000/30000 in input replay
-  - add `oam-diff` normal vs shifted; savestate-based map UI comparison stays
-    local-only because savestates must not be committed
-- [TODO] QA-009 (emulator) — checkpoint memory parity
+- [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
+  - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
+    map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
+    not BUG-007
+  - savestate-based objective-page comparison stays local-only
+- [TODO] QA-009 (emulator) — checkpoint memory parity (OAM/PAL/VRAM/IO exact;
+  IWRAM/EWRAM normalized)
   - exact: OAM/PAL/VRAM-BG/VRAM-OBJ/IO registers
   - normalized: IWRAM/EWRAM 32-bit ROM pointers (+0x1000), excluding the
     known IWRAM code-copy tail; state-based local diff for manual pages
