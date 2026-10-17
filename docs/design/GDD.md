@@ -1,12 +1,16 @@
 # Metroid Fusion hack — GDD (draft 1)
 
-Status: **direction chosen; concept not signed off**.
+Status: **direction signed off; slice details in review**.
 Owned by the `game-designer` agent. The human has selected:
 
 - Core experience: **exploration and atmosphere**
 - First milestone: **15–30 minute vertical slice**
 - Structure: **a new area / new sector**
 - Ability design: **add one new ability**
+- Concept: **Sector Null — The Silent Deck**
+- Slice ending: **a teaching mini-boss**
+- Pulse economy: **cooldown, no ammo/energy cost**
+- Story tone: **mystery / archaeology**
 
 ## 1. High concept
 
@@ -89,11 +93,35 @@ new `AREA_*`.
 - **HUD:** minimal icon in the slice; full pause/status integration later.
 - **Save/event:** one ability bit and one event flag; save version plan required.
 
+## 6.1 Mini-boss: The Cantor
+
+A blind, sound-hunting X adaptation that anchors the slice's climax.  It should
+teach the pulse, not test execution for five minutes.
+
+- **Arena:** Choir Nest, mostly dark; three resonance organs/crystals are
+  invisible until pulsed.
+- **Phase 1 — Listening:** the Cantor patrols; pulse reveals the organs; its
+  sonar scream charges toward the player's last known position.  Standing still
+  breaks the lock; moving while it listens invites a charge.
+- **Phase 2 — Chorus:** it destroys one light/speaker and spawns a decoy echo;
+  the player must pulse to find the real body and hit the exposed organ.
+- **Phase 3 — Core:** all organs destroyed; the core opens for missiles/charge
+  beam; one last scream, then the exit unlocks.
+- **Reward:** data core + event flag; no new permanent upgrade in the slice.
+- **Reuse:** start from an existing multi-part boss AI, reskin one enemy; the
+  exact vanilla base is an engine-team decision.
+
 ## 7. Story and event graph
 
-Minimal, environmental.  The deck was sealed after an acoustic experiment
-failed; the "choir" is an X adaptation.  The slice ends with a data core and a
-locked door to the rest of the sector.  No long cutscenes in the slice.
+Mystery/archaeology, delivered through discoverable logs and environmental
+fragments, not a long cutscene.
+
+- The deck was built to study sound as a containment signal for the X.
+- The researchers tried to "teach" the X a human choir; the Cantor is the
+  result.  The final log reveals the deck was sealed from the inside.
+- The slice ends with a data core and a locked door to the rest of the sector.
+- Text budget: 3–4 short log entries; one optional hidden message; no Adam
+  conversation in the slice.
 
 ## 8. Art, audio and reuse budget
 
@@ -115,9 +143,11 @@ locked door to the rest of the sector.  No long cutscenes in the slice.
 
 ## 10. Open questions for the human
 
-1. Does **Sector Null / Resonance Pulse** fit the atmosphere you want?
-2. Should the slice end with a **mini-boss**, a **chase**, or an **event-only**
-   reveal?
-3. Do you want the pulse to be **free with cooldown** or **cost energy/ammo**?
-4. Any preference for the control binding, or should the designer/engine team
-   choose after checking vanilla bindings?
+1. Does **The Cantor** (pulse-revealed organs, stand-still stealth, three
+   phases) sound like the right mini-boss?
+2. Should the pulse also be the **stealth verb** — standing still breaks the
+   Cantor's sound lock — or should stealth be a separate mechanic?
+3. Control binding: `R + A`, `Select`, or a charged-beam alternate?  The engine
+   team should check vanilla bindings before committing.
+4. Story delivery: 3–4 environment logs is the current plan; do you want any
+   spoken/Adam-style framing, or keep it fully silent?
