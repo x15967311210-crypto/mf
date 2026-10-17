@@ -51,8 +51,13 @@ input/visual parity) and HACK-001/001a/006
     slot screenshots are stale VRAM and not evidence
   - compare OAM/BG/OBJ/palette and map UI writers; TAS map frame 1059 is a
     clean reference for the plain map, not the objective text
-  - blocking artifact: normal same-page state at the Navigation Room
-    objective page (missing; saved shifted fresh state only)
+  - normal same-page state is now available:
+    `m0f_normal_map_26198.state` + shifted `m0f_fresh_map_7806.state`
+  - OAM diff: normal has 66 populated OAM entries (gNextOamSlot=66); shifted
+    has all 66 slots `00FF00FF` and gNextOamSlot=0, while BG map/text and
+    `main=3/s2=0` match -> missing UI is the OAM layer, not VRAM/palette
+  - trace why `PauseScreenProcessOam`/MapScreenDrawSpecialOam does not populate
+    gOamData in the shifted state
 - [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint
   - shifted black-screen reproduction can be automated from
     `m0e_shifted_slot3.ss3` + held Start; map/dialog visual comparison needs a
