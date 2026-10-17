@@ -51,8 +51,11 @@ headless TAS input replay, 578/600 and 4k input parity) and HACK-001/001a/006
     DISPCNT/BGxCNT/BGxOFS all identical
   - `sMessageTextPointers+0x1A9C` (0x0879E890) is correctly relocated; trace
     the FileSelectSetupOam type-7 / FileSelectDrawAllOam writer for slots 26+
-- [DOING @dev2] QA-005 (emulator) — add screenshot-parity checkpoints to the
-  4k input gate (frame 600/900, normal vs shifted)
+- [DONE] QA-005 (emulator) — screenshot-parity gate
+  - `screen-diff` compares framebuffer hashes at 600/900; normal/reordered match,
+    shifted currently FAIL (`a64b...`/`fa91...` vs `1aba...`/`e0fa...`)
+  - normal/reordered/ shifted frame 300 and 4000 hashes match; BUG-003 is
+    display-only at the file-select overlay
 
 ## Phase S3a — hack-critical C (106 functions)
 
