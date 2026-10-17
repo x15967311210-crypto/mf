@@ -172,7 +172,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S4 — hack
 
-- [DOING @design1] HACK-002 (GDD) — content ID registry and save-version plan
+- [DONE] HACK-002 (GDD) — content ID registry and save-version plan
+  - `docs/design/content-ids.md`: Pulse = appended event `0x6F`; event block
+    `0x6E–0x77`, `EVENT_END=0x78`; Test Area 1 rooms 0–4/doors 0–9; save
+    version unchanged; no `Equipment` bit or `SaveFile` resize.
+  - blocking follow-up for HACK-004a: broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED`
+    checks disable the save/navigation/recharge pads after `0x6F`; fix before
+    M1 sign-off.
 - [DOING @dev2] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
 - [TODO] HACK-004a (content) — blockout: 5 rooms, doors, camera, save pad  [deps: HACK-003]
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a]
