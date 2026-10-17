@@ -14,11 +14,11 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
 Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008,
-QA-001/002/003/005/006, BUG-001/002/003/004 (harness, audit, symbol map, blob
-classification, literal and C-literal rewrites, raw FrameData/Sa-X/intro
-table relocation, padded and section-reordered boot, Start/file-select gate,
-headless TAS input 4k/30k, screenshot parity, 578/600 and input/visual
-parity) and HACK-001/001a/006
+QA-001/002/003/005/006, BUG-001/002/003/004/005 (harness, audit, symbol map,
+blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/intro/
+popup descriptor relocation, padded and section-reordered boot, Start/file-
+select gate, headless TAS input 4k/30k, screenshot parity, 578/600 and
+input/visual parity) and HACK-001/001a/006
 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
@@ -46,6 +46,7 @@ parity) and HACK-001/001a/006
   - shifted black-screen reproduction can be automated from
     `m0e_shifted_slot3.ss3` + held Start; map/dialog visual comparison needs a
     normal same-page state or a deterministic normal route
+  - BUG-005 fixed; slot3 local state check passes
 - [DOING @dev1] BUG-005 (playtest) — shifted map/dialog tile corruption and
   Enter black screen after the 4k window
   - slot1 frame 7002 `disp=5F00 main=3`: map/dialog box missing
