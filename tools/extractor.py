@@ -42,6 +42,7 @@ def extract_data(region: str, debug: bool, quiet: bool = False) -> None:
     split_intro_blob()
     split_sa_x_close_up_blob()
     split_new_file_intro_frame_data_blob()
+    split_navigation_pop_up_graphics_blob()
 
 
 def split_blob(path: Path, table_offset: int, table_size: int,
@@ -122,6 +123,27 @@ def split_new_file_intro_frame_data_blob() -> None:
     )
     for start, end, name in spans:
         Path(DATA_PATH, name).write_bytes(blob[start:end])
+
+
+def split_navigation_pop_up_graphics_blob() -> None:
+    """Carve the navigation pop-up graphics descriptor table out of its blob.
+
+    `Blob_5766D4_581510.bin` contains a 0x14-byte preamble followed by four
+    0x18-byte graphics descriptors at offset 0x557C.  Their pGraphics words are
+    raw ROM addresses, so the table must be rebuilt as C data to let the linker
+    relocate them.  Split the blob into the bytes before the table and the
+    bytes after it so the surrounding graphics/palette data stays
+    byte-identical; the table itself is skipped (0x557C + 0x74 + 0x584C =
+    0xAE3C).
+    """
+    blob_path = Path(DATA_PATH, "Blob_5766D4_581510.bin")
+    if not blob_path.exists():
+        return
+    split_blob(
+        blob_path, 0x557C, 0x14 + 4 * 0x18,
+        Path(DATA_PATH, "Blob_5766D4_prefix.bin"),
+        Path(DATA_PATH, "Blob_5766D4_after.bin"),
+    )
 
 
 def sort_by_address(debug: bool, quiet: bool = False) -> None:

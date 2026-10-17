@@ -253,7 +253,64 @@ const u8 sCharacterWidths[] = {
     8, 8, 8, 8, 8, 8, 8, 8
 };
 
-static const u8 sBlob_5766D4_581510[] = INCBIN_U8("data/Blob_5766D4_581510.bin");
+static const u8 sBlob_5766D4_prefix[0x557C] = INCBIN_U8("data/Blob_5766D4_prefix.bin");
+
+// Navigation conversation pop-up graphics descriptors (baseline 0x0857BC50).
+// pGraphics words are relocated through the prefix anchor; the remaining
+// bytes are copied verbatim and stay identical in the shifted build.
+struct NavigationConversationPopUpGraphics {
+    const u8* pGraphics;
+    u8 data[0x14];
+};
+
+struct NavigationConversationPopUpGraphicsTable {
+    u8 preamble[0x14];
+    struct NavigationConversationPopUpGraphics records[4];
+};
+
+const struct NavigationConversationPopUpGraphicsTable sNavigationConversationPopUpGraphics = {
+    .preamble = {
+        0xC4, 0xBB, 0x57, 0x08, 0x06, 0x00, 0x00, 0x00,
+        0x04, 0x68, 0x57, 0x08, 0x24, 0x68, 0x57, 0x08,
+        0x00, 0x06, 0x08, 0x00,
+    },
+    .records = {
+        {
+            .pGraphics = (const u8*)((u8*)sBlob_5766D4_prefix + 0x230),
+            .data = {
+                0xC4, 0xBB, 0x57, 0x08, 0x06, 0x00, 0x00, 0x00,
+                0x04, 0x68, 0x57, 0x08, 0x24, 0x68, 0x57, 0x08,
+                0x00, 0x06, 0x08, 0x00,
+            },
+        },
+        {
+            .pGraphics = (const u8*)((u8*)sBlob_5766D4_prefix + 0x230),
+            .data = {
+                0xD0, 0xBB, 0x57, 0x08, 0x10, 0x00, 0x00, 0x00,
+                0x44, 0x68, 0x57, 0x08, 0x64, 0x68, 0x57, 0x08,
+                0x00, 0x14, 0x24, 0x00,
+            },
+        },
+        {
+            .pGraphics = (const u8*)((u8*)sBlob_5766D4_prefix + 0x950),
+            .data = {
+                0xF0, 0xBB, 0x57, 0x08, 0x30, 0x00, 0x00, 0x00,
+                0x84, 0x68, 0x57, 0x08, 0xA4, 0x68, 0x57, 0x08,
+                0x00, 0x06, 0x08, 0x00,
+            },
+        },
+        {
+            .pGraphics = (const u8*)((u8*)sBlob_5766D4_prefix + 0x207C),
+            .data = {
+                0xD0, 0xBB, 0x57, 0x08, 0x10, 0x00, 0x00, 0x00,
+                0xC4, 0x68, 0x57, 0x08, 0xE4, 0x68, 0x57, 0x08,
+                0x00, 0x14, 0x24, 0x00,
+            },
+        },
+    },
+};
+
+static const u8 sBlob_5766D4_after[0x584C] = INCBIN_U8("data/Blob_5766D4_after.bin");
 
 const u8 sPauseDebugEventNames[EVENT_END][EVENT_NAME_SIZE] = {
     [EVENT_NONE] = SHIFT_JIS("TOHOKANKO   トクベツホカンコヘ ムカエ  "),
