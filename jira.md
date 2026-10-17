@@ -96,6 +96,11 @@ input/visual parity) and HACK-001/001a/006
     1399 both `main=1 active_oam=22`; after frame 1499 normal `main=3
     active_oam=29`, shifted 0; final 1699 normal 51, shifted 0. Normal shows
     the top status bar, L1–L4, OBJECTIVE and dialog body; shifted misses them.
+  - Unpatched shifted controlled states are in
+    `work/playtest/m0f-2026-10-17/scripts/unpatched_shifted/` (state SHA1s:
+    before `53df72ca...`, after `11acde4d...`, final `feb75dc4...`); common
+    save `C34B0F60...`; input A@1410/Start@1470/A@1530. Patched shifted
+    after/final are `controlled_a_m0g_shifted_patched_*` (29/51).
   - ROOT CAUSE: `sBlob_5657a8_575a60` is a raw `INCBIN`, moved +0x1000, but
     its **501 frame-record OAM-data pointers** were not relocated. Example:
     type 71 shifted outer ptr is `0x08569A3C`, frame first word is
