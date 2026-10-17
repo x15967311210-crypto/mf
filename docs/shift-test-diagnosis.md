@@ -111,3 +111,38 @@ Next focus: find where the OAM data pointer (`r10` in the setup loop) and
 values at the instruction that loads the pointer from the OAM table. Check for
 an index/length derived from a ROM address or a raw table entry that was not
 converted. The illegal opcode and `gVBlankCallback` corruption are downstream.
+
+## Update — after the FrameData carve (frame 86)
+
+`SHIFT-006c2` carved the 9-entry table out of `sBlob_6094d0_60b148`; SHA1
+stayed `ca33f434…`.  The shifted build now advances to **frame 86** instead of
+3, so the carve was correct but not sufficient.
+
+New first corruption: at frame 107, `CutsceneElevatorMonologueInit`
+(`PC 0x08099E3E`) again writes through `gVBlankCallback`:
+
+```
+WRITE16 frame=107 pc=08099E3E lr=08099D75 addr=030019C4 value=000041D2
+  r9=030016A0 r10=0860AA36 r12=030019C4 nextslot=0
+```
+
+- `r9` is `gNonGameplayRam + 0x21C` (`0x030016A0`), `r12` is
+  `gVBlankCallback` (`0x030019C4`). The code is copying tilemap/frame words
+  from `0x0860AA36` into a `gNonGameplayRam` buffer and writes one word past
+  the buffer end.
+- `0x0860AA36` is inside the carved `sBlob_6094d0_before`; it is a valid,
+  correctly shifted source. The destination/buffer extent is the problem, not
+  a stale source pointer.
+- Earlier, the shifted build reaches intro code around frame 18 (setting
+  `gVBlankCallback` to `0x0809A941` / `0x0809A8F5`); the baseline does not set
+  those callbacks until frame 24. This suggests the shifted init path runs
+  intro/cutscene code **before** the main loop has completed its Halt/timing
+  setup, then overflows a `gNonGameplayRam` buffer.
+- The missing `SWI 2` / `InitTrack` Halt is still a candidate for the initial
+  timing divergence; fixing individual overflows is whack-a-mole unless that
+  path is understood.
+
+Next focus: trace `InitTrack` and the first callback setup at frames 18–24 in
+both builds, and compare the call stack/state that makes the shifted build
+enter intro code early. Then decide whether the correct fix is the init/Halt
+path or another raw table.
