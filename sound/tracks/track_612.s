@@ -72,7 +72,7 @@ track_612:
 	.byte 0
 	.byte 181
 	.byte 0
-	.word 0x80a7aa4
+	.word sMusicCommandFunctionPointers+0x240C
 	.word track_612_0
 	.word track_612_1
 

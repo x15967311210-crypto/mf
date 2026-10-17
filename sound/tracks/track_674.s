@@ -19,7 +19,7 @@ track_674:
 	.byte 0
 	.byte 198
 	.byte 0
-	.word 0x80a838c
+	.word sMusicCommandFunctionPointers+0x2CF4
 	.word track_674_0
 
 .align 2

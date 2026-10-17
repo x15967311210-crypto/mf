@@ -1343,7 +1343,7 @@ track_27:
 	.byte 27
 	.byte 130
 	.byte 128
-	.word 0x80a8554
+	.word sMusicCommandFunctionPointers+0x2EBC
 	.word track_27_0
 	.word track_27_1
 	.word track_27_2

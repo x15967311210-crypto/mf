@@ -1610,7 +1610,7 @@ track_32:
 	.byte 32
 	.byte 130
 	.byte 128
-	.word 0x80a5e3c
+	.word sMusicCommandFunctionPointers+0x7A4
 	.word track_32_0
 	.word track_32_1
 	.word track_32_2

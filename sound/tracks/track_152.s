@@ -52,7 +52,7 @@ track_152:
 	.byte 0
 	.byte 227
 	.byte 0
-	.word 0x80a682c
+	.word sMusicCommandFunctionPointers+0x1194
 	.word track_152_0
 	.word track_152_1
 

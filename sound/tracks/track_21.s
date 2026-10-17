@@ -743,7 +743,7 @@ track_21:
 	.byte 21
 	.byte 130
 	.byte 128
-	.word 0x80a61fc
+	.word sMusicCommandFunctionPointers+0xB64
 	.word track_21_0
 	.word track_21_1
 	.word track_21_2

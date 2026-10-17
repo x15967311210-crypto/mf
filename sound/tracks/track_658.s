@@ -64,7 +64,7 @@ track_658:
 	.byte 0
 	.byte 251
 	.byte 0
-	.word 0x80a7e10
+	.word sMusicCommandFunctionPointers+0x2778
 	.word track_658_0
 
 .align 2

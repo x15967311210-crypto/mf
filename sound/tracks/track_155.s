@@ -114,7 +114,7 @@ track_155:
 	.byte 0
 	.byte 254
 	.byte 0
-	.word 0x80a808c
+	.word sMusicCommandFunctionPointers+0x29F4
 	.word track_155_0
 	.word track_155_1
 	.word track_155_2

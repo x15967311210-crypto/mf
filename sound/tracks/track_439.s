@@ -41,7 +41,7 @@ track_439:
 	.byte 0
 	.byte 182
 	.byte 0
-	.word 0x80a6d54
+	.word sMusicCommandFunctionPointers+0x16BC
 	.word track_439_0
 	.word track_439_1
 

@@ -29,7 +29,7 @@ track_180:
 	.byte 0
 	.byte 165
 	.byte 0
-	.word 0x80a74c8
+	.word sMusicCommandFunctionPointers+0x1E30
 	.word track_180_0
 
 .align 2

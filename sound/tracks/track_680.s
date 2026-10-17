@@ -243,7 +243,7 @@ track_680:
 	.byte 0
 	.byte 251
 	.byte 0
-	.word 0x80a808c
+	.word sMusicCommandFunctionPointers+0x29F4
 	.word track_680_0
 	.word track_680_1
 	.word track_680_2

@@ -27,7 +27,7 @@ track_122:
 	.byte 0
 	.byte 164
 	.byte 0
-	.word 0x80a682c
+	.word sMusicCommandFunctionPointers+0x1194
 	.word track_122_0
 
 .align 2

@@ -7146,7 +7146,7 @@ track_9:
 	.byte 9
 	.byte 130
 	.byte 128
-	.word 0x80a6544
+	.word sMusicCommandFunctionPointers+0xEAC
 	.word track_9_0
 	.word track_9_1
 	.word track_9_2

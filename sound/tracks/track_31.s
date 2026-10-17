@@ -923,7 +923,7 @@ track_31:
 	.byte 31
 	.byte 130
 	.byte 128
-	.word 0x80a5e3c
+	.word sMusicCommandFunctionPointers+0x7A4
 	.word track_31_0
 	.word track_31_1
 	.word track_31_2

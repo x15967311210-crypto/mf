@@ -19,7 +19,7 @@ track_457:
 	.byte 0
 	.byte 162
 	.byte 128
-	.word 0x80a8554
+	.word sMusicCommandFunctionPointers+0x2EBC
 	.word track_457_0
 
 .align 2

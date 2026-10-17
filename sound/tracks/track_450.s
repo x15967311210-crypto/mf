@@ -90,7 +90,7 @@ track_450:
 	.byte 0
 	.byte 170
 	.byte 128
-	.word 0x80a8554
+	.word sMusicCommandFunctionPointers+0x2EBC
 	.word track_450_0
 	.word track_450_1
 

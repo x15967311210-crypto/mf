@@ -285,7 +285,7 @@ track_17:
 	.byte 17
 	.byte 130
 	.byte 128
-	.word 0x80a6094
+	.word sMusicCommandFunctionPointers+0x9FC
 	.word track_17_0
 	.word track_17_1
 	.word track_17_2

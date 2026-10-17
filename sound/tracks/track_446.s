@@ -41,7 +41,7 @@ track_446:
 	.byte 0
 	.byte 220
 	.byte 0
-	.word 0x80a74c8
+	.word sMusicCommandFunctionPointers+0x1E30
 	.word track_446_0
 	.word track_446_1
 	.word track_446_2

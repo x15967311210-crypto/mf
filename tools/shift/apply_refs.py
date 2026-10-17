@@ -10,7 +10,9 @@ numeric operand to a symbol expression:
 
 It is deliberately conservative: a record is only rewritten when the target is
 known, the line still has the expected label/directive, and the current operand
-still equals the recorded value.  Running it twice is a no-op.
+still equals the recorded value.  Numeric operands may use 1-8 hex digits
+(`0x80a5710` is zero-padded to `0x080A5710` in the ledger), but the parsed value
+must match exactly.  Running it twice is a no-op.
 
 Static (`STB_LOCAL`) symbols from C data files are not visible to the linker
 from another object.  For those targets the tool emits an equivalent global
@@ -50,7 +52,10 @@ LITERAL_RE = re.compile(
     r"(?P<suffix>.*)$"
 )
 LABEL_RE = re.compile(r"^\s*([A-Za-z_.$][\w.$@]*):")
-NUMERIC_RE = re.compile(r"^0x([0-9A-Fa-f]{8})$")
+# 1-8 hex digits: the audio track headers use the 7-digit form 0x80a5710.
+# The parsed value is still compared exactly against the ledger's canonical
+# zero-padded value, so a short operand cannot match a different address.
+NUMERIC_RE = re.compile(r"^0x([0-9A-Fa-f]{1,8})$")
 
 BINDING_LOCAL = 0
 BINDING_GLOBAL = 1

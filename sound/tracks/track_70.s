@@ -23,7 +23,7 @@ track_70:
 	.byte 70
 	.byte 130
 	.byte 128
-	.word 0x80a5d94
+	.word sMusicCommandFunctionPointers+0x6FC
 	.word track_70_0
 
 .align 2

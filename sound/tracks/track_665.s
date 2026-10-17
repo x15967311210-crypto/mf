@@ -71,7 +71,7 @@ track_665:
 	.byte 0
 	.byte 190
 	.byte 0
-	.word 0x80a7f24
+	.word sMusicCommandFunctionPointers+0x288C
 	.word track_665_0
 	.word track_665_1
 	.word track_665_2

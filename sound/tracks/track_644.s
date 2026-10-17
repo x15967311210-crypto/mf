@@ -154,7 +154,7 @@ track_644:
 	.byte 0
 	.byte 251
 	.byte 0
-	.word 0x80a7d14
+	.word sMusicCommandFunctionPointers+0x267C
 	.word track_644_0
 	.word track_644_1
 	.word track_644_2

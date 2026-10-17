@@ -38,7 +38,7 @@ track_333:
 	.byte 0
 	.byte 171
 	.byte 0
-	.word 0x80a6d54
+	.word sMusicCommandFunctionPointers+0x16BC
 	.word track_333_0
 
 .align 2

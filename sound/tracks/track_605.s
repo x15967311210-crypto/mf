@@ -57,7 +57,7 @@ track_605:
 	.byte 0
 	.byte 185
 	.byte 0
-	.word 0x80a7654
+	.word sMusicCommandFunctionPointers+0x1FBC
 	.word track_605_0
 	.word track_605_1
 

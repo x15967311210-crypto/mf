@@ -580,7 +580,7 @@ track_16:
 	.byte 16
 	.byte 130
 	.byte 128
-	.word 0x80a6094
+	.word sMusicCommandFunctionPointers+0x9FC
 	.word track_16_0
 	.word track_16_1
 	.word track_16_2

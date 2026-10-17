@@ -50,7 +50,7 @@ track_314:
 	.byte 0
 	.byte 229
 	.byte 0
-	.word 0x80a808c
+	.word sMusicCommandFunctionPointers+0x29F4
 	.word track_314_0
 	.word track_314_1
 	.word track_314_2

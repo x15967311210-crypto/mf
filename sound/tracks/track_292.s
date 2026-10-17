@@ -733,7 +733,7 @@ track_292:
 	.byte 0
 	.byte 252
 	.byte 0
-	.word 0x80a71ec
+	.word sMusicCommandFunctionPointers+0x1B54
 	.word track_292_0
 	.word track_292_1
 	.word track_292_2

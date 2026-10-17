@@ -52,7 +52,7 @@ track_499:
 	.byte 0
 	.byte 251
 	.byte 0
-	.word 0x80a7798
+	.word sMusicCommandFunctionPointers+0x2100
 	.word track_499_0
 	.word track_499_1
 	.word track_499_2

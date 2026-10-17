@@ -35,7 +35,7 @@ track_577:
 	.byte 0
 	.byte 226
 	.byte 0
-	.word 0x80a7798
+	.word sMusicCommandFunctionPointers+0x2100
 	.word track_577_0
 	.word track_577_1
 

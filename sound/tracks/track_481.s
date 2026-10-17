@@ -74,7 +74,7 @@ track_481:
 	.byte 0
 	.byte 226
 	.byte 0
-	.word 0x80a808c
+	.word sMusicCommandFunctionPointers+0x29F4
 	.word track_481_0
 	.word track_481_1
 

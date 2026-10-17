@@ -28,7 +28,7 @@ track_194:
 	.byte 0
 	.byte 230
 	.byte 0
-	.word 0x80a74c8
+	.word sMusicCommandFunctionPointers+0x1E30
 	.word track_194_0
 	.word track_194_1
 

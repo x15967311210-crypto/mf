@@ -2881,7 +2881,7 @@ track_50:
 	.byte 50
 	.byte 130
 	.byte 128
-	.word 0x80a5bd8
+	.word sMusicCommandFunctionPointers+0x540
 	.word track_50_0
 	.word track_50_1
 	.word track_50_2

@@ -55,7 +55,7 @@ track_542:
 	.byte 0
 	.byte 180
 	.byte 0
-	.word 0x80a826c
+	.word sMusicCommandFunctionPointers+0x2BD4
 	.word track_542_0
 
 .align 2

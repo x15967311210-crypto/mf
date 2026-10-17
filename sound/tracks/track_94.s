@@ -170,7 +170,7 @@ track_94:
 	.byte 94
 	.byte 130
 	.byte 128
-	.word 0x80a64c0
+	.word sMusicCommandFunctionPointers+0xE28
 	.word track_94_0
 	.word track_94_1
 	.word track_94_2

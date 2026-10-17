@@ -42,7 +42,7 @@ track_664:
 	.byte 0
 	.byte 198
 	.byte 0
-	.word 0x80a7f24
+	.word sMusicCommandFunctionPointers+0x288C
 	.word track_664_0
 	.word track_664_1
 

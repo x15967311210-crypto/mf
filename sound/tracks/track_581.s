@@ -1425,7 +1425,7 @@ track_581:
 	.byte 0
 	.byte 254
 	.byte 128
-	.word 0x80a8554
+	.word sMusicCommandFunctionPointers+0x2EBC
 	.word track_581_0
 	.word track_581_1
 	.word track_581_2

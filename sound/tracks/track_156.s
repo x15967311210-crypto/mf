@@ -74,7 +74,7 @@ track_156:
 	.byte 0
 	.byte 228
 	.byte 0
-	.word 0x80a808c
+	.word sMusicCommandFunctionPointers+0x29F4
 	.word track_156_0
 	.word track_156_1
 

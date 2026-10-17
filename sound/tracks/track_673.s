@@ -41,7 +41,7 @@ track_673:
 	.byte 0
 	.byte 180
 	.byte 0
-	.word 0x80a838c
+	.word sMusicCommandFunctionPointers+0x2CF4
 	.word track_673_0
 	.word track_673_1
 

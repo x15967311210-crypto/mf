@@ -120,7 +120,7 @@ track_20:
 	.byte 20
 	.byte 254
 	.byte 128
-	.word 0x80a6094
+	.word sMusicCommandFunctionPointers+0x9FC
 	.word track_20_0
 
 .align 2

@@ -145,7 +145,7 @@ track_536:
 	.byte 0
 	.byte 201
 	.byte 0
-	.word 0x80a808c
+	.word sMusicCommandFunctionPointers+0x29F4
 	.word track_536_0
 	.word track_536_1
 	.word track_536_2

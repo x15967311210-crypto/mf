@@ -352,7 +352,7 @@ track_8:
 	.byte 8
 	.byte 130
 	.byte 128
-	.word 0x80a5ca4
+	.word sMusicCommandFunctionPointers+0x60C
 	.word track_8_0
 	.word track_8_1
 	.word track_8_2

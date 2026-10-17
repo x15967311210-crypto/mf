@@ -73,7 +73,7 @@ track_640:
 	.byte 0
 	.byte 181
 	.byte 0
-	.word 0x80a7d14
+	.word sMusicCommandFunctionPointers+0x267C
 	.word track_640_0
 	.word track_640_1
 

@@ -2212,7 +2212,7 @@ track_44:
 	.byte 44
 	.byte 130
 	.byte 128
-	.word 0x80a62f8
+	.word sMusicCommandFunctionPointers+0xC60
 	.word track_44_0
 	.word track_44_1
 	.word track_44_2

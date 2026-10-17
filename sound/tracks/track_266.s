@@ -325,7 +325,7 @@ track_266:
 	.byte 0
 	.byte 252
 	.byte 0
-	.word 0x80a71ec
+	.word sMusicCommandFunctionPointers+0x1B54
 	.word track_266_0
 	.word track_266_1
 	.word track_266_2

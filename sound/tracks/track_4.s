@@ -3144,7 +3144,7 @@ track_4:
 	.byte 4
 	.byte 130
 	.byte 128
-	.word 0x80a59e0
+	.word sMusicCommandFunctionPointers+0x348
 	.word track_4_0
 	.word track_4_1
 	.word track_4_2

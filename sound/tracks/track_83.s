@@ -420,7 +420,7 @@ track_83:
 	.byte 83
 	.byte 130
 	.byte 128
-	.word 0x80a6718
+	.word sMusicCommandFunctionPointers+0x1080
 	.word track_83_0
 	.word track_83_1
 	.word track_83_2

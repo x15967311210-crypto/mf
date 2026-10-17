@@ -715,7 +715,7 @@ track_3:
 	.byte 3
 	.byte 130
 	.byte 128
-	.word 0x80a62f8
+	.word sMusicCommandFunctionPointers+0xC60
 	.word track_3_0
 
 .align 2

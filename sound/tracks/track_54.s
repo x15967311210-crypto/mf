@@ -373,7 +373,7 @@ track_54:
 	.byte 54
 	.byte 130
 	.byte 128
-	.word 0x80a61fc
+	.word sMusicCommandFunctionPointers+0xB64
 	.word track_54_0
 	.word track_54_1
 	.word track_54_2

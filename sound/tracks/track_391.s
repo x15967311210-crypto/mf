@@ -93,7 +93,7 @@ track_391:
 	.byte 0
 	.byte 164
 	.byte 0
-	.word 0x80a6d54
+	.word sMusicCommandFunctionPointers+0x16BC
 	.word track_391_0
 
 .align 2

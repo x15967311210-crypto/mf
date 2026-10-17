@@ -289,7 +289,7 @@ track_220:
 	.byte 0
 	.byte 199
 	.byte 0
-	.word 0x80a6af0
+	.word sMusicCommandFunctionPointers+0x1458
 	.word track_220_0
 	.word track_220_1
 	.word track_220_2

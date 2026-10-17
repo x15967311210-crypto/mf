@@ -2281,7 +2281,7 @@ track_11:
 	.byte 11
 	.byte 130
 	.byte 128
-	.word 0x80a5f68
+	.word sMusicCommandFunctionPointers+0x8D0
 	.word track_11_0
 	.word track_11_1
 	.word track_11_2

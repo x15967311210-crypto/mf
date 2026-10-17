@@ -58,7 +58,7 @@ track_185:
 	.byte 0
 	.byte 170
 	.byte 0
-	.word 0x80a74c8
+	.word sMusicCommandFunctionPointers+0x1E30
 	.word track_185_0
 	.word track_185_1
 
