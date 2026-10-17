@@ -196,3 +196,40 @@ Regression coverage: QA-001 added `tests/emulator` scenario `start`
 (Start held 6 frames every 60 from frame 600, latched file-select assertion)
 and `make -f Makefile.shift shift-start`.  Both `SHIFT-CHECK` (boot) and
 `SHIFT-START` (title → file select/intro) pass on the shifted build.
+
+## Resolved — BUG-002 (shifted 4k input stall at frame 826)
+
+QA-003's shifted `input` replay still diverged after the BUG-001 fix: the
+normal build finished at `frame_counter=3951`, but the shifted build entered
+`FileSelectDrawOam` and froze around frame 826.  The cause was another raw
+`FrameData` table in the same blob, this time at a 2-byte-aligned offset:
+
+- `FileSelectDrawOam` uses `pAnim = 0x08740918` (shifted `0x08741918`), which
+  is `sBlob_73421e_7478a0` at blob offset `0xC6FA` — a 38-entry animation
+  `FrameData` table immediately before the 88-entry table from BUG-001.
+- The table was still raw inside `sBlob_73421e_before`; its pFrame words kept
+  baseline addresses, so the shifted read produced a bogus frame count
+  (`0x7BFF`), overflowed `gOamData`, and overwrote `gVBlankCallback`.
+
+Fix:
+
+- `tools/extractor.py` carves both tables in one span: the blob is split into
+  `Blob_73421e_prefix.bin` (first `0xC6FA` bytes) and
+  `Blob_73421e_after.bin` (from `0xCAEA`, `0x6B98` bytes).
+- `src/data/sa_x_close_up.c` declares, in order,
+  `sBlob_73421e_prefix[0xC6FA]`, `sSaXCloseUpAnimFrames[38]`,
+  `sSaXCloseUpFrameData[88]`, and `sBlob_73421e_after[0x6B98]`
+  (`0xC6FA + 0x130 + 0x2C0 + 0x6B98 = 0x13682`).  Every pFrame in both tables
+  is now a relocatable `sBlob_73421e_prefix + offset` expression.
+
+Verification:
+
+- `make check` SHA1 is unchanged: `ca33f4348c2c05dd330d37b97e2c5a69531dfe87`.
+- Baseline `0x08740918` is byte-identical to the original 38 entries; the
+  shifted table at `0x08741918` is `38/38` entries `+0x1000` with 0
+  mismatches.  The 88-entry table is `88/88` with 0 mismatches.
+- `make -f Makefile.shift test`: PASS (normal `frame_counter=3951`).
+- `make -f Makefile.shift shift-input`: PASS, `frame_counter=3951`, with
+  checkpoints 300/600/900/4000 matching the normal fixture.
+- `shift-check`, `shift-start`, `audit`, `check-relocs-strict`, and `smoke`
+  are green.
