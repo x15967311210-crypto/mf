@@ -5,8 +5,12 @@ The current baseline is *not* shiftable yet: padding the link breaks the
 hardcoded pointers found by `audit_asm.py`.  This tool exists so the refactor
 has a concrete, repeatable failing test instead of a theoretical promise.
 
-It backs up the normal mf_us.gba/elf/map, builds with a padded linker, copies
+It backs up the normal mf_us.gba/elf/map, builds with a perturbed linker, copies
 the result to work/shift/, and restores the baseline in a finally block.
+
+Padding mode (default) inserts `. += --pad-bytes` after `intr_main` so code
+moves.  `--reorder` swaps two existing `.rodata` input sections instead, so
+data addresses move while code addresses stay fixed.
 
 Statuses are explicit and never conflate a skip with a pass:
 
@@ -14,6 +18,11 @@ Statuses are explicit and never conflate a skip with a pass:
     SHIFT-LAYOUT: PASS|FAIL     (AgbMain moved by at least --pad-bytes)
     SHIFT-STATIC: PASS|FAIL     (static ROM/header smoke on the shifted ROM)
     SHIFT-DYNAMIC: PASS|FAIL|SKIP (77 = no emulator/harness)
+
+    SHIFT-REORDER-BUILD: PASS|FAIL
+    SHIFT-REORDER-LAYOUT: PASS|FAIL  (AgbMain fixed, swapped data moved)
+    SHIFT-REORDER-STATIC: PASS|FAIL
+    SHIFT-REORDER-DYNAMIC: PASS|FAIL|SKIP (77 = no emulator/harness)
 
 `--check-linker` audits `linker.ld` itself: only the hardware MEMORY origins
 (header/entry at 0x08000000/0x080000C0, EWRAM/IWRAM/MMIO) may be fixed.
@@ -54,6 +63,17 @@ EXPECTED_ROM_INPUTS = [
     "asm/crt0.o(.text)",
     "asm/intr_main.o(.text)",
 ]
+
+# Reorder pair: both are existing `.rodata` input sections with different
+# sizes.  Swapping them moves data but leaves the `.text` output section (and
+# therefore AgbMain) at its baseline address.
+GENERIC_DATA_OBJECT = "src/data/generic_data.o"
+AUDIO_OBJECT = "src/data/audio.o"
+GENERIC_DATA_RODATA = f"{GENERIC_DATA_OBJECT}(.rodata);"
+AUDIO_RODATA = f"{AUDIO_OBJECT}(.rodata);"
+REORDER_PAIR = (GENERIC_DATA_RODATA, AUDIO_RODATA)
+SYMBOL_LINE_RE = re.compile(r"^\s+0x([0-9a-fA-F]{8})\s+(\S+)\s*$")
+OBJECT_SECTION_RE = re.compile(r"^\s+\S+\.o\(")
 
 
 def toolchain_paths(arg: str | None) -> tuple[str | None, str | None]:
@@ -120,21 +140,26 @@ def check_linker(path: Path) -> list[str]:
     return errors
 
 
-def generate_padded_linker(pad: int) -> Path:
+def preprocess_linker() -> Path:
+    """Run the same cpp pass the Makefile applies to linker.ld."""
     WORK.mkdir(parents=True, exist_ok=True)
     base = WORK / "linker.base.ld"
     cpp = shutil.which("cpp")
     if not cpp:
-        raise SystemExit("cpp not found")
+        raise RuntimeError("cpp not found")
     subprocess.run(
         [cpp, "-nostdinc", "-Iinclude", "linker.ld", "-o", str(base)],
         cwd=ROOT,
         check=True,
     )
-    text = base.read_text()
+    return base
+
+
+def generate_padded_linker(pad: int) -> Path:
+    text = preprocess_linker().read_text()
     marker = "asm/intr_main.o(.text);"
     if text.count(marker) != 1:
-        raise SystemExit(
+        raise RuntimeError(
             f"expected exactly one {marker!r} in linker.ld, "
             f"found {text.count(marker)}"
         )
@@ -144,6 +169,30 @@ def generate_padded_linker(pad: int) -> Path:
     padded = WORK / "linker.pad.ld"
     padded.write_text(text)
     return padded
+
+
+def generate_reordered_linker() -> Path:
+    """Swap the two proven `.rodata` input sections in a preprocessed linker."""
+    text = preprocess_linker().read_text()
+    for marker in REORDER_PAIR:
+        count = text.count(marker)
+        if count != 1:
+            raise RuntimeError(
+                f"expected exactly one {marker!r} in linker.ld, found {count}; "
+                "cannot reorder sections"
+            )
+
+    first, second = REORDER_PAIR
+    placeholder = "@@SHIFT_REORDER_PLACEHOLDER@@"
+    text = text.replace(first, placeholder, 1)
+    text = text.replace(second, first, 1)
+    text = text.replace(placeholder, second, 1)
+    if text.index(second) > text.index(first):
+        raise RuntimeError("rodata swap did not take effect")
+
+    reordered = WORK / "linker.reorder.ld"
+    reordered.write_text(text)
+    return reordered
 
 
 def backup(paths: list[Path]) -> None:
@@ -199,16 +248,101 @@ def check_layout(pad: int) -> tuple[bool, str]:
     )
 
 
-def build(pad: int, toolchain: str | None, jobs: int) -> int:
-    linker_errors = check_linker(ROOT / "linker.ld")
-    if linker_errors:
-        for error in linker_errors:
-            print(f"FAIL: {error}")
-        print("SHIFT-BUILD: FAIL (linker premise)")
-        return 1
+def map_section_symbols(path: Path, obj: str) -> list[tuple[str, int]]:
+    """Symbols printed under `<obj>(.rodata)` in a GNU ld map."""
+    if not path.exists():
+        return []
+    marker = f"{obj}(.rodata)"
+    lines = path.read_text(errors="replace").splitlines()
+    symbols: list[tuple[str, int]] = []
+    for index, line in enumerate(lines):
+        if line.strip() != marker:
+            continue
+        for following in lines[index + 1 :]:
+            match = SYMBOL_LINE_RE.match(following)
+            if match:
+                symbols.append((match.group(2), int(match.group(1), 16)))
+                continue
+            if symbols or OBJECT_SECTION_RE.match(following):
+                break
+        break
+    return symbols
 
-    padded = generate_padded_linker(pad)
-    print(f"padded linker: {padded}")
+
+def _moved_symbol(
+    baseline: list[tuple[str, int]],
+    reordered: list[tuple[str, int]],
+) -> tuple[str, int, int, int] | None:
+    """First common symbol in map order plus its address delta."""
+    current = dict(reordered)
+    for name, address in baseline:
+        if name in current:
+            return name, address, current[name], current[name] - address
+    return None
+
+
+def check_reorder_layout() -> tuple[bool, str]:
+    """Prove a `.rodata` swap moves data but leaves code at its address."""
+    baseline_map = BASELINE / "mf_us.map"
+    reordered_map = WORK / "mf_us_reorder.map"
+    baseline_agb = map_symbol_address(baseline_map, "AgbMain")
+    reordered_agb = map_symbol_address(reordered_map, "AgbMain")
+    if baseline_agb is None or reordered_agb is None:
+        return False, (
+            "cannot compare AgbMain addresses "
+            f"(baseline={baseline_agb}, reordered={reordered_agb}); "
+            "run --build first"
+        )
+    if baseline_agb != reordered_agb:
+        return False, (
+            f"AgbMain moved 0x{baseline_agb:08X} -> 0x{reordered_agb:08X}; "
+            "a data-only reorder must not move code"
+        )
+
+    moves: list[tuple[str, str, int, int, int]] = []
+    for obj in (GENERIC_DATA_OBJECT, AUDIO_OBJECT):
+        moved = _moved_symbol(
+            map_section_symbols(baseline_map, obj),
+            map_section_symbols(reordered_map, obj),
+        )
+        if moved is None:
+            return False, (
+                f"no common .rodata symbol for {obj} in baseline/reordered "
+                "maps; cannot prove data moved"
+            )
+        name, old, new, delta = moved
+        if delta == 0:
+            return False, (
+                f"{name} ({obj}) did not move (0x{old:08X}); "
+                "section swap had no effect"
+            )
+        moves.append((obj, name, old, new, delta))
+
+    generic_delta = moves[0][4]
+    audio_delta = moves[1][4]
+    if generic_delta < 0 or audio_delta > 0:
+        return False, (
+            "swap direction is wrong: "
+            f"{moves[0][1]} {generic_delta:+#x}, "
+            f"{moves[1][1]} {audio_delta:+#x}"
+        )
+
+    parts = [f"AgbMain 0x{baseline_agb:08X} unchanged"]
+    for obj, name, old, new, delta in moves:
+        parts.append(
+            f"{name} ({obj}) 0x{old:08X} -> 0x{new:08X} ({delta:+#x})"
+        )
+    return True, "; ".join(parts)
+
+
+def build_shifted(
+    linker: Path,
+    label: str,
+    artifact_stem: str,
+    toolchain: str | None,
+    jobs: int,
+) -> int:
+    """Link with *linker*, copy artifacts, and always restore the baseline."""
     prefix, bin_dir = toolchain_paths(toolchain)
     env = os.environ.copy()
     if bin_dir:
@@ -221,24 +355,67 @@ def build(pad: int, toolchain: str | None, jobs: int) -> int:
         cmd = [
             "make",
             f"-j{jobs}",
-            f"LD_SCRIPT={padded.relative_to(ROOT)}",
+            f"LD_SCRIPT={linker.relative_to(ROOT)}",
         ]
         print("build:", " ".join(cmd))
-        proc = subprocess.run(cmd, cwd=ROOT, env=env)
+        proc = subprocess.run(
+            cmd,
+            cwd=ROOT,
+            env=env,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            encoding="utf-8",
+            errors="replace",
+        )
+        if proc.stdout:
+            sys.stdout.write(proc.stdout)
+            if not proc.stdout.endswith("\n"):
+                print()
         if proc.returncode != 0:
-            print(f"SHIFT-BUILD: FAIL (make exit {proc.returncode})")
+            print(f"{label}: FAIL (make exit {proc.returncode})")
             return proc.returncode if proc.returncode > 0 else 1
+        # A missing incbin input silently produces an incomplete ROM.  Never
+        # let that count as a passing shift build, even if it still boots.
+        if "Failed to open" in proc.stdout or "for reading" in proc.stdout:
+            print(
+                f"{label}: FAIL (missing incbin input; "
+                "fix data/ and rebuild)"
+            )
+            return 1
         built = ROOT / "mf_us.gba"
         if not built.exists():
-            print("SHIFT-BUILD: FAIL (no mf_us.gba produced)")
+            print(f"{label}: FAIL (no mf_us.gba produced)")
             return 1
-        artifact = WORK / "mf_us_shift.gba"
+        artifact = WORK / f"{artifact_stem}.gba"
         shutil.copy2(built, artifact)
-        shutil.copy2(ROOT / "mf_us.elf", WORK / "mf_us_shift.elf")
-        shutil.copy2(ROOT / "mf_us.map", WORK / "mf_us_shift.map")
+        shutil.copy2(ROOT / "mf_us.elf", WORK / f"{artifact_stem}.elf")
+        shutil.copy2(ROOT / "mf_us.map", WORK / f"{artifact_stem}.map")
         print(f"artifact: {artifact}")
     finally:
         restore(files)
+    return 0
+
+
+def build(pad: int, toolchain: str | None, jobs: int) -> int:
+    linker_errors = check_linker(ROOT / "linker.ld")
+    if linker_errors:
+        for error in linker_errors:
+            print(f"FAIL: {error}")
+        print("SHIFT-BUILD: FAIL (linker premise)")
+        return 1
+
+    try:
+        padded = generate_padded_linker(pad)
+    except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
+        print(f"SHIFT-BUILD: FAIL ({exc})")
+        return 1
+    print(f"padded linker: {padded}")
+    status = build_shifted(
+        padded, "SHIFT-BUILD", "mf_us_shift", toolchain, jobs
+    )
+    if status != 0:
+        return status
 
     ok, detail = check_layout(pad)
     if not ok:
@@ -249,7 +426,38 @@ def build(pad: int, toolchain: str | None, jobs: int) -> int:
     return 0
 
 
-def run_behavior(artifact: Path, scenario: str, frames: int) -> int:
+def reorder_build(toolchain: str | None, jobs: int) -> int:
+    linker_errors = check_linker(ROOT / "linker.ld")
+    if linker_errors:
+        for error in linker_errors:
+            print(f"FAIL: {error}")
+        print("SHIFT-REORDER-BUILD: FAIL (linker premise)")
+        return 1
+
+    try:
+        reordered = generate_reordered_linker()
+    except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
+        print(f"SHIFT-REORDER-BUILD: FAIL ({exc})")
+        return 1
+    print(f"reordered linker: {reordered}")
+    status = build_shifted(
+        reordered, "SHIFT-REORDER-BUILD", "mf_us_reorder", toolchain, jobs
+    )
+    if status != 0:
+        return status
+
+    ok, detail = check_reorder_layout()
+    if not ok:
+        print(f"SHIFT-REORDER-LAYOUT: FAIL ({detail})")
+        return 1
+    print(f"SHIFT-REORDER-LAYOUT: PASS ({detail})")
+    print("SHIFT-REORDER-BUILD: PASS")
+    return 0
+
+
+def run_behavior(
+    artifact: Path, scenario: str, frames: int, label: str = "SHIFT"
+) -> int:
     cmd = [
         sys.executable,
         "tests/emulator/run.py",
@@ -270,7 +478,7 @@ def run_behavior(artifact: Path, scenario: str, frames: int) -> int:
             stderr=subprocess.STDOUT,
         )
     except OSError as exc:
-        print(f"SHIFT-DYNAMIC: FAIL (cannot start runner: {exc})")
+        print(f"{label}-DYNAMIC: FAIL (cannot start runner: {exc})")
         return 1
     sys.stdout.write(proc.stdout)
     if proc.stdout and not proc.stdout.endswith("\n"):
@@ -281,21 +489,21 @@ def run_behavior(artifact: Path, scenario: str, frames: int) -> int:
 
     if proc.returncode == 77:
         # run.py only skips after static checks pass, but report both.
-        print(f"SHIFT-STATIC: {'PASS' if static_ok else 'FAIL'}")
+        print(f"{label}-STATIC: {'PASS' if static_ok else 'FAIL'}")
         print(
-            "SHIFT-DYNAMIC: SKIP (77) - no emulator/harness; "
+            f"{label}-DYNAMIC: SKIP (77) - no emulator/harness; "
             "this is not a pass"
         )
         return 77
 
-    print(f"SHIFT-STATIC: {'PASS' if static_ok else 'FAIL'}")
+    print(f"{label}-STATIC: {'PASS' if static_ok else 'FAIL'}")
     if proc.returncode != 0 or not dynamic_ok:
         print(
-            f"SHIFT-DYNAMIC: FAIL (runner exit {proc.returncode}, "
+            f"{label}-DYNAMIC: FAIL (runner exit {proc.returncode}, "
             f"PASS marker {'present' if dynamic_ok else 'missing'})"
         )
         return 1
-    print("SHIFT-DYNAMIC: PASS")
+    print(f"{label}-DYNAMIC: PASS")
     return 0
 
 
@@ -303,6 +511,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--build", action="store_true")
     ap.add_argument("--run", action="store_true")
+    ap.add_argument(
+        "--reorder",
+        action="store_true",
+        help="swap two .rodata input sections instead of padding .text",
+    )
     ap.add_argument("--check-linker", action="store_true")
     ap.add_argument("--pad-bytes", default="0x1000")
     ap.add_argument("--frames", type=int, default=600)
@@ -328,6 +541,33 @@ def main() -> int:
     if not args.build and not args.run:
         print("nothing to do: pass --build, --run, or --check-linker")
         return 2
+
+    if args.reorder:
+        artifact = WORK / "mf_us_reorder.gba"
+        if args.build:
+            status = reorder_build(args.toolchain, args.jobs)
+            if status != 0:
+                return status
+        else:
+            ok, detail = check_reorder_layout()
+            print(
+                f"SHIFT-REORDER-LAYOUT: "
+                f"{'PASS' if ok else 'FAIL'} ({detail})"
+            )
+            if not ok:
+                return 1
+
+        if args.run:
+            if not artifact.exists():
+                print(f"FAIL: no artifact at {artifact}; run --build first")
+                return 1
+            return run_behavior(
+                artifact,
+                args.scenario,
+                args.frames,
+                label="SHIFT-REORDER",
+            )
+        return 0
 
     pad = int(args.pad_bytes, 0)
     artifact = WORK / "mf_us_shift.gba"

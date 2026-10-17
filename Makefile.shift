@@ -39,7 +39,8 @@ REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
 
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit \
         check-relocs check-relocs-strict check-linker smoke test \
-        emulator-harness shift-build shift-test shift-check help
+        emulator-harness shift-build shift-test shift-check shift-reorder \
+        shift-check-all help
 
 all: audit
 
@@ -115,6 +116,26 @@ shift-check: audit smoke check-linker
 	fi; \
 	exit $$status
 
+# Data-only reorder: swap two .rodata inputs.  Code (AgbMain) must not move,
+# the swapped data symbols must, and the boot smoke must still pass.
+shift-reorder: audit smoke check-linker
+	@$(PYTHON) tools/shift/shift_test.py --reorder --build --run \
+		--frames $(FRAMES) --toolchain "$(TOOLCHAIN)"; \
+	status=$$?; \
+	if [ $$status -eq 0 ]; then \
+		echo "SHIFT-REORDER: PASS"; \
+	elif [ $$status -eq 77 ]; then \
+		echo "SHIFT-REORDER: SKIP (77) - no emulator/harness; dynamic behavior did not run"; \
+		echo "                  this is not a pass"; \
+	else \
+		echo "SHIFT-REORDER: FAIL ($$status)"; \
+	fi; \
+	exit $$status
+
+# Both halves of the S2 shift gate.  `shift-check` keeps its padding-only
+# meaning; this convenience target runs padding first, then section reorder.
+shift-check-all: shift-check shift-reorder
+
 help:
 	@echo "Targets:"
 	@echo "  audit               regenerate symbols, relocation audit, blobs, report"
@@ -126,5 +147,7 @@ help:
 	@echo "  test                static + headless behavior scenario (exit 77 if no harness)"
 	@echo "  shift-build         build with a padded linker layout"
 	@echo "  shift-test          padded build + behavior scenario"
-	@echo "  shift-check         audit + smoke + link check + shift-test"
+	@echo "  shift-check         audit + smoke + link check + shift-test (padding)"
+	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
+	@echo "  shift-check-all     shift-check then shift-reorder"
 	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, PAD_BYTES, SHIFT_WORK"
