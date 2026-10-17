@@ -21158,7 +21158,587 @@ static const struct FrameData sIntroMonologueFrameData[9] = {
     }
 };
 
-static const u8 sBlob_6094d0_after[0x4F8] = INCBIN_U8("data/Blob_6094d0_after.bin");
+static const struct FrameData sIntroFrameDataAfter[159] = {
+    [0] = FRAME_DATA_TERMINATOR,
+    [1] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x6B0),
+        .timer = 255
+    },
+    [2] = FRAME_DATA_TERMINATOR,
+    [3] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x6B8),
+        .timer = 255
+    },
+    [4] = FRAME_DATA_TERMINATOR,
+    [5] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x6C0),
+        .timer = 255
+    },
+    [6] = FRAME_DATA_TERMINATOR,
+    [7] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x6C8),
+        .timer = 4
+    },
+    [8] = FRAME_DATA_TERMINATOR,
+    [9] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1982),
+        .timer = 1
+    },
+    [10] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x6DE),
+        .timer = 1
+    },
+    [11] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1996),
+        .timer = 1
+    },
+    [12] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1982),
+        .timer = 1
+    },
+    [13] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x6DE),
+        .timer = 1
+    },
+    [14] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x19AA),
+        .timer = 1
+    },
+    [15] = FRAME_DATA_TERMINATOR,
+    [16] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x19B8),
+        .timer = 1
+    },
+    [17] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x19CC),
+        .timer = 1
+    },
+    [18] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x19D4),
+        .timer = 1
+    },
+    [19] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x19CC),
+        .timer = 1
+    },
+    [20] = FRAME_DATA_TERMINATOR,
+    [21] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x724),
+        .timer = 4
+    },
+    [22] = FRAME_DATA_TERMINATOR,
+    [23] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x732),
+        .timer = 4
+    },
+    [24] = FRAME_DATA_TERMINATOR,
+    [25] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x758),
+        .timer = 4
+    },
+    [26] = FRAME_DATA_TERMINATOR,
+    [27] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x772),
+        .timer = 4
+    },
+    [28] = FRAME_DATA_TERMINATOR,
+    [29] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x780),
+        .timer = 4
+    },
+    [30] = FRAME_DATA_TERMINATOR,
+    [31] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xB8A),
+        .timer = 4
+    },
+    [32] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xB92),
+        .timer = 4
+    },
+    [33] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xBB2),
+        .timer = 4
+    },
+    [34] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xBEA),
+        .timer = 4
+    },
+    [35] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xC34),
+        .timer = 4
+    },
+    [36] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xC84),
+        .timer = 4
+    },
+    [37] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xCDA),
+        .timer = 6
+    },
+    [38] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xD24),
+        .timer = 7
+    },
+    [39] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xD5C),
+        .timer = 8
+    },
+    [40] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xD76),
+        .timer = 9
+    },
+    [41] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xD8A),
+        .timer = 10
+    },
+    [42] = FRAME_DATA_TERMINATOR,
+    [43] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xD92),
+        .timer = 1
+    },
+    [44] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDA0),
+        .timer = 1
+    },
+    [45] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDA8),
+        .timer = 1
+    },
+    [46] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDA0),
+        .timer = 1
+    },
+    [47] = FRAME_DATA_TERMINATOR,
+    [48] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDB6),
+        .timer = 1
+    },
+    [49] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDC4),
+        .timer = 1
+    },
+    [50] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDCC),
+        .timer = 1
+    },
+    [51] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDC4),
+        .timer = 1
+    },
+    [52] = FRAME_DATA_TERMINATOR,
+    [53] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDDA),
+        .timer = 140
+    },
+    [54] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xB88),
+        .timer = 140
+    },
+    [55] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xDF4),
+        .timer = 180
+    },
+    [56] = FRAME_DATA_TERMINATOR,
+    [57] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE0E),
+        .timer = 4
+    },
+    [58] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE16),
+        .timer = 4
+    },
+    [59] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE24),
+        .timer = 4
+    },
+    [60] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE38),
+        .timer = 4
+    },
+    [61] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE52),
+        .timer = 4
+    },
+    [62] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE72),
+        .timer = 4
+    },
+    [63] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE98),
+        .timer = 4
+    },
+    [64] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xEC4),
+        .timer = 4
+    },
+    [65] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xEF6),
+        .timer = 4
+    },
+    [66] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xF2E),
+        .timer = 4
+    },
+    [67] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xF6C),
+        .timer = 4
+    },
+    [68] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xFB0),
+        .timer = 4
+    },
+    [69] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xFFA),
+        .timer = 4
+    },
+    [70] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x104A),
+        .timer = 4
+    },
+    [71] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x10A0),
+        .timer = 4
+    },
+    [72] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x10FC),
+        .timer = 100
+    },
+    [73] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xB88),
+        .timer = 100
+    },
+    [74] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x115E),
+        .timer = 6
+    },
+    [75] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1166),
+        .timer = 6
+    },
+    [76] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1174),
+        .timer = 6
+    },
+    [77] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1188),
+        .timer = 6
+    },
+    [78] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x11A2),
+        .timer = 6
+    },
+    [79] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x11C2),
+        .timer = 6
+    },
+    [80] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x11E8),
+        .timer = 6
+    },
+    [81] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1214),
+        .timer = 6
+    },
+    [82] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1246),
+        .timer = 6
+    },
+    [83] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x127E),
+        .timer = 6
+    },
+    [84] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x12BC),
+        .timer = 6
+    },
+    [85] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1300),
+        .timer = 6
+    },
+    [86] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x134A),
+        .timer = 120
+    },
+    [87] = FRAME_DATA_TERMINATOR,
+    [88] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE0E),
+        .timer = 4
+    },
+    [89] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE16),
+        .timer = 4
+    },
+    [90] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE24),
+        .timer = 4
+    },
+    [91] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE38),
+        .timer = 4
+    },
+    [92] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE52),
+        .timer = 4
+    },
+    [93] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE72),
+        .timer = 4
+    },
+    [94] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xE98),
+        .timer = 4
+    },
+    [95] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xEC4),
+        .timer = 4
+    },
+    [96] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xEF6),
+        .timer = 4
+    },
+    [97] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xF2E),
+        .timer = 4
+    },
+    [98] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xF6C),
+        .timer = 4
+    },
+    [99] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xFB0),
+        .timer = 4
+    },
+    [100] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xFFA),
+        .timer = 4
+    },
+    [101] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x104A),
+        .timer = 4
+    },
+    [102] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x10A0),
+        .timer = 4
+    },
+    [103] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x10FC),
+        .timer = 100
+    },
+    [104] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xB88),
+        .timer = 100
+    },
+    [105] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x139A),
+        .timer = 6
+    },
+    [106] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x13A2),
+        .timer = 6
+    },
+    [107] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x13B0),
+        .timer = 6
+    },
+    [108] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x13C4),
+        .timer = 6
+    },
+    [109] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x13DE),
+        .timer = 6
+    },
+    [110] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x13FE),
+        .timer = 6
+    },
+    [111] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1424),
+        .timer = 6
+    },
+    [112] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1450),
+        .timer = 120
+    },
+    [113] = FRAME_DATA_TERMINATOR,
+    [114] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1482),
+        .timer = 3
+    },
+    [115] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x148A),
+        .timer = 3
+    },
+    [116] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1498),
+        .timer = 3
+    },
+    [117] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x14AC),
+        .timer = 3
+    },
+    [118] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x14FC),
+        .timer = 3
+    },
+    [119] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x154C),
+        .timer = 3
+    },
+    [120] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x159C),
+        .timer = 3
+    },
+    [121] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x15F2),
+        .timer = 3
+    },
+    [122] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1630),
+        .timer = 3
+    },
+    [123] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x166E),
+        .timer = 3
+    },
+    [124] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x16AC),
+        .timer = 3
+    },
+    [125] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x16F0),
+        .timer = 3
+    },
+    [126] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1734),
+        .timer = 3
+    },
+    [127] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1778),
+        .timer = 3
+    },
+    [128] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x17B6),
+        .timer = 3
+    },
+    [129] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x17F4),
+        .timer = 3
+    },
+    [130] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x184A),
+        .timer = 3
+    },
+    [131] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x189A),
+        .timer = 3
+    },
+    [132] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x18E4),
+        .timer = 3
+    },
+    [133] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1916),
+        .timer = 3
+    },
+    [134] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x193C),
+        .timer = 3
+    },
+    [135] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xB88),
+        .timer = 200
+    },
+    [136] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1482),
+        .timer = 3
+    },
+    [137] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x148A),
+        .timer = 3
+    },
+    [138] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1498),
+        .timer = 3
+    },
+    [139] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x14AC),
+        .timer = 3
+    },
+    [140] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x14FC),
+        .timer = 3
+    },
+    [141] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x154C),
+        .timer = 3
+    },
+    [142] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x159C),
+        .timer = 3
+    },
+    [143] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x15F2),
+        .timer = 3
+    },
+    [144] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1630),
+        .timer = 3
+    },
+    [145] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x166E),
+        .timer = 3
+    },
+    [146] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x16AC),
+        .timer = 3
+    },
+    [147] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x16F0),
+        .timer = 3
+    },
+    [148] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1734),
+        .timer = 3
+    },
+    [149] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1778),
+        .timer = 3
+    },
+    [150] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x17B6),
+        .timer = 3
+    },
+    [151] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x17F4),
+        .timer = 3
+    },
+    [152] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x184A),
+        .timer = 3
+    },
+    [153] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x189A),
+        .timer = 3
+    },
+    [154] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x18E4),
+        .timer = 3
+    },
+    [155] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x1916),
+        .timer = 3
+    },
+    [156] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0x193C),
+        .timer = 3
+    },
+    [157] = {
+        .pFrame = (const u16*)((u8*)sTitleScreenSpaceBackgroundTilemap + 0xB88),
+        .timer = 126
+    },
+    [158] = FRAME_DATA_TERMINATOR
+};
 
 const u8 sIntroSpaceTilemap[1320] = INCBIN_U8("data/new_file_intro/space_bg.tm.lz");
 const u8 sIntroBslTilemap[1586] = INCBIN_U8("data/new_file_intro/bsl_bg.tm.lz");
