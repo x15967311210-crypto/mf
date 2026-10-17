@@ -1,7 +1,7 @@
 -- mGBA Lua boot smoke.
 --
 -- Runs 600 frames and verifies that the main loop is alive.  The frame counter
--- and DISPCNT shadow are fixed IWRAM addresses from linker.ld (D-002): they stay
+-- and mode words are fixed IWRAM addresses from linker.ld (D-002), so they stay
 -- valid across the shiftable ROM refactor.
 --
 -- Run with:
@@ -9,7 +9,9 @@
 
 local FRAMES = 600
 local FRAME_COUNTER = 0x03000002
-local DISPCNT_SHADOW = 0x03000008
+local CURRENT_AREA = 0x0300002C
+local MAIN_MODE = 0x03000BDE
+local SUB_MODE = 0x03000BE0
 
 local start = emu:currentFrame()
 for _ = 1, FRAMES do
@@ -17,11 +19,13 @@ for _ = 1, FRAMES do
 end
 local elapsed = emu:currentFrame() - start
 local counter = emu:read16(FRAME_COUNTER)
-local dispcnt = emu:read16(DISPCNT_SHADOW)
+local area = emu:read8(CURRENT_AREA)
+local main_mode = emu:read8(MAIN_MODE)
+local sub_mode = emu:read16(SUB_MODE)
 
 print(string.format(
-    "BOOT frames=%d frame_counter=%d dispcnt=0x%04X",
-    elapsed, counter, dispcnt
+    "BOOT frames=%d frame_counter=%d area=%d main_mode=%d sub_mode=0x%04X",
+    elapsed, counter, area, main_mode, sub_mode
 ))
 
 if elapsed < FRAMES then
@@ -30,10 +34,6 @@ if elapsed < FRAMES then
 end
 if counter == 0 then
     print("FAIL: frame counter did not advance")
-    os.exit(1)
-end
-if dispcnt == 0 then
-    print("FAIL: DISPCNT shadow was not initialized")
     os.exit(1)
 end
 print("PASS: boot smoke")

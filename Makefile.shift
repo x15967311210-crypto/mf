@@ -15,7 +15,7 @@ SCENARIO ?= boot_smoke
 FRAMES ?= 600
 
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit check-relocs \
-        check-relocs-strict smoke test shift-build shift-test
+        check-relocs-strict smoke test emulator-harness shift-build shift-test
 
 all: audit
 
@@ -45,6 +45,10 @@ check-relocs-strict:
 smoke:
 	$(PYTHON) tests/emulator/run.py --static --rom $(ROM)
 
+emulator-harness:
+	MGBA_SRC=$(MGBA_SRC) MGBA_BUILD=$(MGBA_BUILD) \
+		tests/emulator/build_harness.sh tests/emulator/bin/mgba-harness
+
 test:
 	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario $(SCENARIO) --frames $(FRAMES)
 
@@ -60,6 +64,7 @@ help:
 	@echo "  check-relocs        report remaining hardcoded ROM refs"
 	@echo "  check-relocs-strict fail if any unclassified ROM ref remains"
 	@echo "  smoke               static ROM/header smoke"
-	@echo "  test                static + mGBA behavior scenario (exit 77 if no emulator)"
+	@echo "  emulator-harness    build tests/emulator/bin/mgba-harness (MGBA_SRC/MGBA_BUILD)"
+	@echo "  test                static + headless behavior scenario (exit 77 if no harness)"
 	@echo "  shift-build         build with a padded linker layout"
 	@echo "  shift-test          padded build + behavior scenario"

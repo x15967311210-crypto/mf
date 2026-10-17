@@ -15,9 +15,9 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 
 ## Phase S0 — behavior harness
 
-- [DOING @mgr] SHIFT-001 (baseline) — mGBA/libmgba harness + vanilla boot smoke
-  - static ROM smoke + dynamic runner landed; dynamic run is blocked on an
-    emulator install (`mgba-sdl` absent, no sudo in this shell)
+- [DONE @mgr] SHIFT-001 (baseline) — mGBA/libmgba harness + vanilla boot smoke
+  - static ROM smoke + headless mGBA harness; vanilla 600-frame boot **PASS**
+    (`frame_counter=578`, `sub_mode=0x0001`)
 - [TODO] SHIFT-001a (baseline) — add title/new-game/pause/save scenarios  [deps: SHIFT-001]
 - [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox  [deps: SHIFT-001]
 

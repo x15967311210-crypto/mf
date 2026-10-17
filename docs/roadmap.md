@@ -76,3 +76,12 @@ Gate **S4**: playable slice sign-off, then content production.
 ## Current status
 
 `SHIFT-001` / `SHIFT-002` / `SHIFT-003` are the active work.  See `jira.md`.
+
+Baseline evidence (2026-10-17):
+
+- Vanilla static ROM smoke: **PASS** (SHA1 `ca33f434…`).
+- Vanilla dynamic boot smoke: **PASS** — 600 frames, `frame_counter=578`,
+  `sub_mode=0x0001`.
+- Shifted build (`. += 0x1000` after `intr_main`): static **PASS**, dynamic
+  **FAIL** — `frame_counter=0`, illegal opcode / invalid jump.  This is the
+  expected pre-refactor failure and the target of SHIFT-005/006.

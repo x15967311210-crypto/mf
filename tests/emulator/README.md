@@ -12,7 +12,31 @@ make -f Makefile.shift smoke
 This runs `rom_smoke.py`: GBA header, entry branch, checksum, title/game code,
 size and optional SHA1.  It is enough to catch a broken build.
 
-## With mGBA
+## With the headless harness (preferred)
+
+Build mGBA's shared library once, then build the tiny harness:
+
+```sh
+git clone --depth 1 https://github.com/mgba-emu/mgba.git
+cmake -S mgba -B mgba-build -DBUILD_QT=OFF -DBUILD_SDL=OFF \
+  -DBUILD_LIBRETRO=OFF -DBUILD_GL=OFF -DENABLE_SCRIPTING=OFF \
+  -DUSE_LIBZIP=OFF -DUSE_LUA=OFF -DCMAKE_BUILD_TYPE=Release
+cmake --build mgba-build -j4 --target mgba
+
+MGBA_SRC=$PWD/mgba MGBA_BUILD=$PWD/mgba-build \
+  tests/emulator/build_harness.sh tests/emulator/bin/mgba-harness
+```
+
+Then:
+
+```sh
+make -f Makefile.shift test
+```
+
+`run.py` prefers `tests/emulator/bin/mgba-harness` (or `MF_MGBA_HARNESS`);
+it runs the ROM without a window and reports the fixed IWRAM values.
+
+## With the mGBA frontend
 
 Install the SDL frontend (Ubuntu):
 

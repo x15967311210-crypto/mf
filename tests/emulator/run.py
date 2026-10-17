@@ -29,6 +29,16 @@ def find_mgba() -> str | None:
     return None
 
 
+def find_harness() -> str | None:
+    env = os.environ.get("MF_MGBA_HARNESS")
+    if env:
+        return env
+    local = SCENARIO_DIR / "bin" / "mgba-harness"
+    if local.exists():
+        return str(local)
+    return None
+
+
 def run_static(rom: Path, expect_sha1: str | None) -> int:
     cmd = [sys.executable, str(SCENARIO_DIR / "rom_smoke.py"), "--rom", str(rom)]
     if expect_sha1:
@@ -37,9 +47,45 @@ def run_static(rom: Path, expect_sha1: str | None) -> int:
 
 
 def run_dynamic(rom: Path, scenario: str, frames: int) -> int:
+    harness = find_harness()
+    if harness:
+        cmd = [harness, str(rom), str(frames)]
+        print("RUN:", " ".join(cmd))
+        try:
+            proc = subprocess.run(
+                cmd,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                timeout=180,
+            )
+        except subprocess.TimeoutExpired:
+            print("FAIL: harness timed out")
+            return 1
+        output = proc.stdout
+        # mGBA's default logger is noisy; keep only the harness's own lines.
+        lines = [
+            line
+            for line in output.splitlines()
+            if not line.startswith(("GBA ", "GBA:", "GBA BIOS", "GBA DMA", "GBA Memory"))
+        ]
+        for line in lines[-12:]:
+            print(line)
+        if proc.returncode != 0:
+            print(f"FAIL: harness exited {proc.returncode}")
+            return 1
+        if "PASS:" not in output:
+            print("FAIL: harness did not print PASS")
+            return 1
+        print(f"PASS: {scenario}")
+        return 0
+
     mgba = find_mgba()
     if not mgba:
-        print("SKIP: mGBA not installed (set MGBA_BIN or install mgba-sdl)")
+        print(
+            "SKIP: no headless harness and no mGBA "
+            "(install mgba-sdl or build tests/emulator/bin/mgba-harness)"
+        )
         return 77
 
     source = SCENARIO_DIR / f"{scenario}.lua"
