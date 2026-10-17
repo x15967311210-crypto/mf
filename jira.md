@@ -38,6 +38,7 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 - [TODO] SHIFT-006 (baseline) — convert blob pointer tables to relocatable C  [deps: SHIFT-004]
 - [TODO] SHIFT-007 (baseline) — relocatable linker + `check_relocs` gate  [deps: SHIFT-003]
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder  [deps: SHIFT-007, SHIFT-001]
+- [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 
 ## Phase S3a — hack-critical C (106 functions)
 
@@ -61,11 +62,19 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
   save count, Cantor arena size
 - [TODO] HACK-002 (GDD) — content ID registry and save-version plan  [deps: HACK-001a]
 - [TODO] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data  [deps: SHIFT-008]
-- [TODO] HACK-004 (emulator) — vertical slice: 5 rooms + Cantor + pulse
-- [TODO] HACK-005 (playtest) — first playable slice sign-off  [deps: HACK-004]
+- [TODO] HACK-004a (content) — blockout: 5 rooms, doors, camera, save pad  [deps: HACK-003]
+- [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a]
+- [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
+- [TODO] PLAYTEST-002 (human) — M2 pulse playtest  [deps: HACK-004b]
+- [TODO] HACK-004c (engine/content) — The Cantor prototype  [deps: PLAYTEST-002]
+- [TODO] PLAYTEST-003 (human) — M3 Cantor playtest  [deps: HACK-004c]
+- [TODO] HACK-004d (content) — content-complete slice: logs, secret, data core  [deps: PLAYTEST-003]
+- [TODO] PLAYTEST-004 (human) — M4 content-complete slice playtest  [deps: HACK-004d]
+- [TODO] HACK-004e (content/qa) — polish and release candidate  [deps: PLAYTEST-004]
+- [TODO] PLAYTEST-005 (human) — M5 release-candidate playtest  [deps: HACK-004e]
 - [DONE @designer] HACK-006 (GDD) — Cantor boss spec: phases, attacks, event/ID list
   - `docs/design/boss-cantor.md` signed off; four attacks + data core + reward
-- [TODO] HACK-007 (GDD) — playtest script and feedback rubric for First Echo  [deps: HACK-004]
+- [TODO] HACK-007 (design/qa) — one-page playtest scripts and feedback rubric per gate  [deps: HACK-001]
 
 ## Open questions
 

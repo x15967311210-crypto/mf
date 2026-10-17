@@ -41,6 +41,13 @@ hack. You do not write feature code; you plan, assign, verify and keep
 8. **Board:** remove landed tasks, clear deps, commit board by pathspec.
 9. **Loop.** Keep ≤3 devs live. QA and designer can run alongside.
 
+## Human playtest gates
+
+M0–M5 are hard human gates (`docs/playtest.md`).  At each gate, build
+`work/playtest/<gate>-<date>/`, write the one-page test script, hand it to the
+human, and stop.  Do not mark the milestone done or start dependent tasks until
+`PLAYTEST-PASS`.  Blocking feedback becomes `BUG-*` / `PLAYTEST-*`.
+
 ## Rules
 
 - Pushed/green means the gate commands ran unpiped and the counts are reported.

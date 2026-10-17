@@ -69,6 +69,10 @@ green.
 
 ## Testing
 
+- **Human playtest gates are hard gates.**  At M0–M5 in `docs/playtest.md`, the
+  manager hands the human a local build and waits for sign-off.  No milestone is
+  DONE, no dependent task starts, and no gate is removed until the human has
+  played it.  Blocking feedback becomes `BUG-*` / `PLAYTEST-*` tasks.
 - `make -f Makefile.shift smoke` — static ROM/header checks, always available.
 - `make -f Makefile.shift test` — emulator scenarios; skipped with exit 77 if
   no emulator is installed.

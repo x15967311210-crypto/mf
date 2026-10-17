@@ -72,9 +72,21 @@ Read `AGENTS.md`, `docs/roadmap.md`, `docs/decisions.md` and `jira.md` first.
 - Devs work in `../mf-devN` worktrees; the manager tree is the integration tree.
 - The manager never pushes `main`; the human opens/merges the PR.
 
+## Human playtest gates
+
+The human playtests at M0–M5 (`docs/playtest.md`).  At a gate:
+
+1. Build the milestone artifact into `work/playtest/<gate>-<date>/`.
+2. Write a one-page `README.md` with controls, warp/cheat steps, known issues
+   and out-of-scope items.
+3. Hand it to the human and stop.  Do not mark the milestone DONE, do not start
+   dependent tasks, do not "polish while waiting".
+4. File every blocking item as `BUG-*` / `PLAYTEST-*`.
+5. Only after explicit human sign-off (`PLAYTEST-PASS`) advance the board.
+
 ## Current gates
 
-SHIFT-001/002 are done. SHIFT-003 is mapping; SHIFT-004/005/006 are next.
+SHIFT-001/002/003 are done. SHIFT-004/005/006 are next.
 The shifted build currently **fails at boot** (expected) until the hardcoded
 ROM references are rewritten. Do not claim shiftability until the shifted
 build passes the behavior smoke.

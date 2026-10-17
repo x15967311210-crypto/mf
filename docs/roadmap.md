@@ -6,6 +6,14 @@ A shiftable C engine that behaves like Metroid Fusion, then a new hack built on
 top of it.  "Shiftable" means code and ROM data can change size and order while
 the game still boots and behaves correctly.
 
+## Human playtest gates
+
+The human playtests every major milestone before the next one starts.  See
+`docs/playtest.md`.  The gates are **M0** shiftable boot, **M1** blockout,
+**M2** pulse, **M3** Cantor, **M4** content-complete slice, **M5** release
+candidate.  A gate only passes with human sign-off; blocking feedback becomes
+`BUG-*` / `PLAYTEST-*` tasks.
+
 ## Phase S0 — behavior harness
 
 Deliverables:
