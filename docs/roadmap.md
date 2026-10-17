@@ -92,6 +92,10 @@ Baseline evidence (2026-10-17):
   `sub_mode=0x0001`.
 - SHIFT-005: **662/662** ROM literals rewritten to symbols; `make check` still
   matches SHA1; audit now reports **0 literals**, 697 `ldr` comments.
+- SHIFT-006a: **7 pointer-table blobs** converted to relocatable C arrays;
+  SHA1 preserved, audit still 7/3/37.
 - Shifted build (`. += 0x1000` after `intr_main`): static **PASS**, dynamic
-  **FAIL** — `frame_counter=0`.  This is now the expected SHIFT-006 failure
-  (raw blob pointer tables), not a code-literal failure.
+  **FAIL** — `frame_counter=0`.  This is now the expected SHIFT-006b failure
+  (the 3 `possible` struct/mixed blobs remain raw).
+- Boot smoke now requires **450/600** frames, not just nonzero, so an early
+  crash cannot pass.

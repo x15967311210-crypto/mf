@@ -58,8 +58,12 @@ int main(int argc, char** argv) {
     );
 
     int rc = 0;
-    if (counter == 0) {
-        printf("FAIL: frame counter did not advance\n");
+    int min_counter = frames * 3 / 4;
+    if (counter < min_counter) {
+        printf(
+            "FAIL: frame counter %u is below the %d-frame liveness floor\n",
+            counter, min_counter
+        );
         rc = 1;
     }
     if (!rc) {

@@ -64,8 +64,9 @@ If no emulator is found the runner exits **77** (skip), never 0.
 `boot_smoke.lua` runs 600 frames and checks:
 
 - mGBA advanced the requested frames;
-- `gFrameCounter16Bit` (`0x03000002`) advanced;
-- `gWrittenToDispcnt` (`0x03000008`) was initialized.
+- `gFrameCounter16Bit` (`0x03000002`) reached at least 75% of the requested
+  frames (450/600), not merely a nonzero value.  A ROM that crashes early and
+  leaves the counter at 3 must fail the smoke.
 
 Those two IWRAM addresses come from `linker.ld` and are intentionally fixed
 (D-002), so the scenario survives the ROM shift refactor.

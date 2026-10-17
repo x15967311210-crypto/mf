@@ -13,9 +13,9 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005 (harness, audit, symbol map, blob
-classification, 662 literal rewrites) and HACK-001/001a/006 (GDD, layout,
-Cantor).  Details in `git log`.
+Last landed: SHIFT-001/002/003/004/005/006a (harness, audit, symbol map, blob
+classification, 662 literal rewrites, 7 pointer tables) and
+HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
 
@@ -26,13 +26,10 @@ Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev1] SHIFT-006a (baseline) — convert the 7 confirmed pointer tables to C
-  - `a5224`, `79bec0`, `79c394`, `79c448`, `79c5c0`, `79ce10`, `79e868`
-  - keep byte size/layout identical; use `symbol+offset`, never `0x08...`
 - [TODO] SHIFT-006b (baseline) — model the 3 `possible` blobs
   - `74dc48` 12-byte struct, `a5710` sound entries, `79c170` mixed regions
 - [TODO] SHIFT-006c (emulator) — shift test passes with all tables relocated
-  [deps: SHIFT-006a, SHIFT-006b, SHIFT-007]
+  [deps: SHIFT-006b, SHIFT-007]
 - [TODO] SHIFT-007 (baseline) — relocatable linker + `check_relocs` gate
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder  [deps: SHIFT-007]
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]

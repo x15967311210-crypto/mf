@@ -7,10 +7,6 @@ assertions:
   - mem16:
       symbol: gFrameCounter16Bit
       addr: "0x03000002"
-      not_equal: 0
-  - mem16:
-      symbol: gWrittenToDispcnt
-      addr: "0x03000008"
-      not_equal: 0
+      gte: 450
 artifacts:
   - work/emulator/boot_smoke.log

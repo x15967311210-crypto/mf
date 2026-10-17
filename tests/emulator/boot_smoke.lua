@@ -32,8 +32,8 @@ if elapsed < FRAMES then
     print("FAIL: emulator did not advance the requested frames")
     os.exit(1)
 end
-if counter == 0 then
-    print("FAIL: frame counter did not advance")
+if counter < math.floor(FRAMES * 3 / 4) then
+    print("FAIL: frame counter is below the liveness floor")
     os.exit(1)
 end
 print("PASS: boot smoke")
