@@ -8,10 +8,31 @@ addresses that break when the link moves.
 
 ```sh
 make -f Makefile.shift audit
-make -f Makefile.shift check-relocs
-make -f Makefile.shift check-relocs-strict   # gate: no open literals / C ROM refs
+make -f Makefile.shift check-relocs          # report: literals, C refs, blob status
+make -f Makefile.shift check-relocs-strict   # gate: fails on any of the above
+make -f Makefile.shift check-linker          # gate premise: linker has no fixed ROM addr
 make -f Makefile.shift shift-build
+make -f Makefile.shift shift-test            # padded build + dynamic behavior
+make -f Makefile.shift shift-check           # audit + smoke + link check + shift-test
 ```
+
+`audit` and `check-relocs` are **report mode**: open literals, C ROM refs, and
+raw blobs are printed but do not fail the command.  A missing build map or
+ledger still fails, because there is nothing to report.  The gates are
+`check-relocs-strict` and `shift-check`; they exit nonzero on any finding.  A
+shift test skipped for lack of an emulator prints `SKIP (77)` and is never
+reported as a pass (GNU make itself reports a failed recipe as exit 2, but the
+77 is visible in the message and in `shift_test.py`'s exit status).
+
+`audit-blobs` needs extracted bytes.  In a fresh `git worktree` there is no
+`data/`, so point `DATA_ROOT` at the main tree before running the strict gate:
+
+```sh
+make -f Makefile.shift check-relocs-strict DATA_ROOT=/path/to/mf/data
+```
+
+The toolchain is discovered on `PATH`, or set `TOOLCHAIN` to an absolute
+prefix (`/path/to/arm-none-eabi-`) for `shift-build`/`shift-test`/`shift-check`.
 
 Or run the scripts directly:
 
@@ -38,8 +59,59 @@ rebuilt ROM must not change.
 
 `audit_blobs.py` reads extracted bytes from `data/` by default.  In a worktree
 without extracted data (for example a fresh `git worktree`), the audit reports
-`missing: 47` and exits 0; pass
-`--data-root /home/x1596/proj/mf/data` to classify the blobs.
+`missing: 47` and exits 0; pass `--data-root /path/to/mf/data` (or set
+`DATA_ROOT`) to classify the blobs.
+
+## Strict relocation gate
+
+`check_relocs.py --strict` fails on **all** of these:
+
+1. an `open` or `unknown` ROM record in `abs_refs.json`;
+2. a hardcoded `0x08xxxxxx` literal in `src/`, `include/`, or `hack/` C;
+3. a `pointer_table` or `possible_pointer_table` blob that is still included
+   raw, i.e. still named by an `INCBIN` macro in C;
+4. an unreadable blob scan, or a scan with `missing` blobs: the gate fails
+   closed instead of passing without evidence.
+
+The raw/ converted distinction is what lets the gate finish: `audit_blobs.py`
+classifies the **extracted bytes**, and those bytes never change when a blob is
+converted.  `check_relocs.py` therefore checks whether the blob filename is
+still used by `INCBIN`.  The seven SHIFT-006a tables no longer are (they are
+generated `u32[]` arrays), so they show as `converted`.  The remaining
+SHIFT-006b blobs still are, so strict mode lists them and exits 1 until they are
+modelled.
+
+Report mode prints the same list but exits 0.  Current expected output:
+
+```text
+blob scan: 47 blobs, 10 pointer-like (8 converted, 2 still raw)
+    converted          Blob_a5224_a5258.bin
+    ...
+    REMAINING RAW      Blob_a5710_a8cdc.bin ... included by: src/data/audio.c
+    REMAINING RAW      Blob_74dc48_74e620.bin ... included by: src/data/ending_data.c
+FAIL: 2 pointer-like blob(s) still included raw: ...
+```
+
+`check_relocs.py --self-check` exercises the INCBIN parser and the
+converted/raw grouping without touching the tree; `check-relocs-strict` runs it
+before the gate.
+
+## Linker layout audit
+
+`linker.ld` checked (SHIFT-007): the only fixed ROM address is the `rom` MEMORY
+origin (`0x08000000`), which is the hardware contract, not a layout choice.  The
+header/entry ordering (`asm/romheader.o(.text)`, `asm/crt0.o(.text)`,
+`asm/intr_main.o(.text)`) keeps `0x08000000`/`0x080000C0` fixed through section
+order, and every other ROM placement is section-relative (`ALIGN`, sequential
+input sections, `>rom`).  The `. = 0x...` assignments are all inside `ewram` and
+`iwram`, where fixed addresses are required by D-002.  Names such as
+`asm/disasm_0x0808F5C4.o` are object filenames, not addresses.
+
+`make -f Makefile.shift check-linker` (or
+`python3 tools/shift/shift_test.py --check-linker`) enforces this: it checks the
+three MEMORY origins, rejects any remaining `0x08xxxxxx` literal outside object
+filenames, and verifies the first three ROM inputs.  `shift_test.py --build`
+runs the same audit before linking.
 
 ## Current baseline counts
 
@@ -51,6 +123,9 @@ without extracted data (for example a fresh `git worktree`), the audit reports
   pointers in struct/audio data), 37 data.  The SHIFT-002 density rule is kept
   as `baseline_classification`; see `docs/blob-classification.md` for the
   per-blob evidence and the 11/7 baseline reconciliation.
+- SHIFT-006a converted the 7 pointer tables to C arrays, so the strict gate
+  reports them as `converted`; SHIFT-006b1 converted `79c170` as well, leaving
+  `74dc48` and `a5710` raw and keeping `check-relocs-strict` red.
 
 After SHIFT-005, the six remaining assembly blobs still contain only `ldr`
 reference comments, not data literals:
@@ -134,6 +209,23 @@ raw until their SHIFT-006b models land, and the 37 `data` blobs stay `INCBIN`.
 `shift_test.py --build` moves the normal `mf_us.gba/.elf/.map` into
 `work/shift/baseline/`, builds with `. += 0x1000` after `intr_main`, copies the
 result to `work/shift/mf_us_shift.gba`, and restores the baseline in a `finally`
-block.  It builds today; the dynamic behavior test still fails at boot until
-SHIFT-006 converts the raw blob pointer tables.  That failing run is the
+block.  It verifies the link actually moved: `AgbMain` must end up at least
+`--pad-bytes` above its baseline address (`SHIFT-LAYOUT`), so a no-op padded
+link cannot pass silently.
+
+Status lines are explicit and are never inferred from a zero exit alone:
+
+| Status | Meaning |
+|---|---|
+| `SHIFT-BUILD: PASS/FAIL` | padded link and artifact copy |
+| `SHIFT-LAYOUT: PASS/FAIL` | `AgbMain` moved by the requested pad |
+| `SHIFT-STATIC: PASS/FAIL` | static ROM/header smoke on the shifted ROM |
+| `SHIFT-DYNAMIC: PASS/FAIL` | emulator boot smoke reached 75% of frames |
+| `SHIFT-DYNAMIC: SKIP (77)` | no emulator/harness; **not** a pass |
+
+A dynamic run must return 0 **and** contain both the static and dynamic `PASS:`
+markers; a crash, timeout, missing marker, or a 75% frame-counter shortfall is a
+failure.  The current tree builds and statically passes but dynamically fails at
+boot (`frame_counter=3`, below the 450/600 floor) because the two remaining
+SHIFT-006b blobs (`74dc48`, `a5710`) are still raw.  That failing run is the
 refactor's acceptance target.
