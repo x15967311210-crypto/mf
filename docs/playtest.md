@@ -90,3 +90,9 @@ does not advance the gate until the human signs off.
 - `PLAYTEST-FEEDBACK` — human played; issues filed.
 - `PLAYTEST-PASS` — human signs off; next milestone may start.
 - `PLAYTEST-FAIL` — blocking issues; fix and re-hand.
+
+## Recorded sign-offs
+
+| Gate | Date | Build | Result |
+|---|---|---|---|
+| M0 | 2026-10-18 | fixed shifted `a822b2d8...` | `PLAYTEST-PASS` — map objective UI restored; after/final screenshots byte-identical to normal |

@@ -83,7 +83,9 @@ Gate **S4**: playable slice sign-off, then content production.
 
 ## Current status
 
-`SHIFT-001` / `SHIFT-002` / `SHIFT-003` are the active work.  See `jira.md`.
+**M0 shiftable-boot gate: PASS** (`PLAYTEST-PASS`, 2026-10-18; fixed shifted
+candidate `a822b2d8...`).  M1 blockout design/content pipeline is the active
+work.  See `jira.md`.
 
 Baseline evidence (2026-10-17):
 

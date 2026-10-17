@@ -14,12 +14,12 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
 Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008,
-QA-001/002/003/005/006, BUG-001/002/003/004/005 (harness, audit, symbol map,
-blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/intro/
-popup descriptor relocation, padded and section-reordered boot, Start/file-
-select gate, headless TAS input 4k/30k, screenshot parity, 578/600 and
-input/visual parity) and HACK-001/001a/006
-(GDD, layout, Cantor).  Details in `git log`.
+QA-001/002/003/005/006, BUG-001/002/003/004/005/006 (harness, audit, symbol
+map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
+intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
+Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
+578/600 and input/visual parity), PLAYTEST-000 (M0 `PLAYTEST-PASS`), and
+HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
 
@@ -37,12 +37,15 @@ input/visual parity) and HACK-001/001a/006
 
 ## Phase S2 — relocatable build
 
-- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - M0f source fix landed (`462d803`); fixed shifted candidate is
+- [DONE] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - `PLAYTEST-PASS` received 2026-10-18 for the fixed shifted candidate
     `work/playtest/m0f-2026-10-17/fixed/mf_us_m0f_shifted_fixed.gba`
-    (`a822b2d8...`), with normal/reordered original artifacts unchanged.
-  - M0f human retest is pending; M0 is not DONE and M1 does not start until
-    `PLAYTEST-PASS`.
+    (`a822b2d8...`); normal/reordered original artifacts unchanged.
+  - Retest evidence: `work/playtest/m0f-2026-10-17/fixed/RETEST.md` and
+    `fixed/retest/`; common save restored to pristine `C34B0F60...`.
+  - before/after/final `active_oam=22/29/51`; after/final screenshots
+    byte-identical to normal (`97EFFB81...` / `1E6535B7...`).
+  - M0 is DONE; M1 blockout is next.
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
   - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
     `disp=5F00 main=3 s1=0 s2=0`
@@ -169,8 +172,8 @@ input/visual parity) and HACK-001/001a/006
 
 ## Phase S4 — hack
 
-- [TODO] HACK-002 (GDD) — content ID registry and save-version plan
-- [TODO] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data  [deps: SHIFT-008]
+- [DOING @design] HACK-002 (GDD) — content ID registry and save-version plan
+- [DOING @dev1] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
 - [TODO] HACK-004a (content) — blockout: 5 rooms, doors, camera, save pad  [deps: HACK-003]
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a]
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
