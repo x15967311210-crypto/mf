@@ -27,13 +27,13 @@ strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev1] SHIFT-006c (emulator) — shifted boot still fails; first raw
-  FrameData table fixed, now stalls at frame 86 / corrupts `gVBlankCallback`
-  at frame 107
+- [DOING @dev1] SHIFT-006c (emulator) — shifted boot still fails; c2 landed,
+  c3 active: frame-107 `gNonGameplayRam` overflow after early intro code
   - `SHIFT-006c2` landed: carved the 9-entry `struct FrameData` table out of
-    `sBlob_6094d0_60b148`; SHA1 unchanged
-  - next: frame-107 text/OAM write to `0x030019C4` from source
-    `0x0860AA36`; identify the next raw table/buffer overflow
+    `sBlob_6094d0_60b148`; boot advanced from frame 3 to 86
+  - c3: shifted build enters intro/cutscene code around frame 18 instead of
+    frame 24 and overflows a `gNonGameplayRam` buffer at frame 107; trace
+    `InitTrack` / missing `SWI 2` and the first callback setup
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 
