@@ -35,12 +35,21 @@ headless TAS input replay, 578/600 and 4k input parity) and HACK-001/001a/006
 
 ## Phase S2 — relocatable build
 
-- [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - BUG-001/002 fixed; new handoff: `work/playtest/m0c-2026-10-17/`
-  - normal / shifted / reordered; `SHIFT-CHECK`, `SHIFT-START`,
-    `SHIFT-INPUT` and `make test` all PASS
-  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
+- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - M0c handoff `work/playtest/m0c-2026-10-17/`: functional PASS, visual
+    **BLOCKED** at file-select frames 600/900
+  - normal/reordered screenshots identical; shifted has OAM/Samus-sprite
+    corruption at 600/900, byte-identical from 1200 onward
+  - blocked by BUG-003; M0d after the fix
   - M0 is not DONE and M1 does not start until human sign-off
+- [DOING @dev1] BUG-003 (playtest) — shifted file-select OAM/sprites corrupt
+  at frames 600/900
+  - normal screenshots: 600 `a9e636...`, 900 `efda7a...`
+  - shifted: 600 `13d764...`, 900 `0c6af3...`; reordered == normal
+  - no stall; frame 1200+ identical; likely another raw pointer/table in the
+    file-select OAM animation path
+- [DOING @dev2] QA-005 (emulator) — add screenshot-parity checkpoints to the
+  4k input gate (frame 600/900, normal vs shifted)
 
 ## Phase S3a — hack-critical C (106 functions)
 
