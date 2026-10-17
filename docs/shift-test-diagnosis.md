@@ -78,3 +78,36 @@ does not advance.
 - Do not weaken the 450/600 liveness gate.
 - Do not claim shiftability or start M0 until `SHIFT-CHECK: PASS`.
 - Do not commit the local trace harnesses or `work/` artifacts.
+
+## Update — frame-25 OAM overflow (local mGBA hooks)
+
+The first corrupt state is a **cutscene/intro OAM overflow**, not the illegal
+opcode itself:
+
+- At frame 25 the shifted build runs `CutsceneElevatorMonologueInit` (PC
+  `0x0809A766`, baseline `0x08099766`) and writes **`gNextOamSlot = 0x96`**
+  (150) from the byte at source pointer `0x0860A22E` (baseline path uses
+  `0x086098B0` and writes 1..8).
+- `gNextOamSlot` is at IWRAM `0x030011EE`; the normal `SpecialCutsceneDrawOam`
+  path increments it 1..8 then resets it. A value of 150 makes the OAM writes
+  run past the 20-entry array and overwrite `gVBlankCallback` at
+  `0x030019C4` (`gHBlankCallback` becomes `0x5B454D34`, ASCII `M4EU`).
+- `CallbackCallVblank` then `bl`-indirects through the corrupted
+  `gVBlankCallback`, lands mid-instruction in ARM state, and the main loop
+  stops (`frame_counter=3`).
+- `gCurrentCutscene`, `gMainGameMode`, `gSubGameMode1/2`, `gCurrentDemo`,
+  `gDemoPlaying`, `gEventCounter` are identical between baseline and shifted at
+  frames 23–25, so the divergence is inside the OAM/pointer setup, not the
+  mode state.
+- The source pointer `0x0860A22E` is a valid shifted address inside
+  `sBlob_6094d0_60b148`; it is not a stale unshifted pointer. The code is
+  selecting the **wrong data entry** (or interpreting a tilemap/graphics byte
+  as an OAM count).
+- `0x100` padding is a false pass: it corrupts state but happens to let the
+  frame counter advance; `gCurrentArea` becomes 39.
+
+Next focus: find where the OAM data pointer (`r10` in the setup loop) and
+`gNextOamSlot` count are selected. Compare the baseline and shifted register
+values at the instruction that loads the pointer from the OAM table. Check for
+an index/length derived from a ROM address or a raw table entry that was not
+converted. The illegal opcode and `gVBlankCallback` corruption are downstream.
