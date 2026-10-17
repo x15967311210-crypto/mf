@@ -233,3 +233,45 @@ Verification:
   checkpoints 300/600/900/4000 matching the normal fixture.
 - `shift-check`, `shift-start`, `audit`, `check-relocs-strict`, and `smoke`
   are green.
+
+## Resolved — BUG-003 (shifted file-select OAM at frames 600/900)
+
+QA-005's screenshot parity gate found shifted-only corruption in the
+file-select/audio-logos overlay.  The normal build draws 6 sprites in OAM slots
+26–31; the shifted build followed a stale `pFrame`, read a bogus count and wrote
+garbage through slot 125.
+
+The type-6 overlay (`FileSelectSetupOam`) uses `pOam = 0x087407E0`, a 39-entry
+`struct FrameData` table at blob offset `0xC5C2` of
+`sBlob_73421e_7478a0`, immediately before the 38-entry animation table from
+BUG-002.  The pointer to the table itself relocated correctly, but its `pFrame`
+words were still raw inside `sBlob_73421e_prefix`.
+
+Fix:
+
+- `tools/extractor.py` now splits the blob before the 39-entry table
+  (`0xC5C2`) while keeping the 38-entry table (`0xC6FA`) and 88-entry table
+  (`0xC82A`) in the skipped span; `Blob_73421e_after.bin` still starts at
+  `0xCAEA` and is `0x6B98` bytes.
+- `src/data/sa_x_close_up.c` declares, in order,
+  `sBlob_73421e_prefix[0xC5C2]`, `sSaXCloseUpFileSelectFrames[39]`,
+  `sSaXCloseUpAnimFrames[38]`, `sSaXCloseUpFrameData[88]`, and
+  `sBlob_73421e_after[0x6B98]`
+  (`0xC5C2 + 0x138 + 0x130 + 0x2C0 + 0x6B98 = 0x13682`).  Every pFrame in all
+  three tables is a relocatable `sBlob_73421e_prefix + offset` expression.
+
+Verification:
+
+- `make check` SHA1 is unchanged: `ca33f4348c2c05dd330d37b97e2c5a69531dfe87`.
+- Baseline bytes at `0x087407E0` are exactly the original 39 entries
+  (`0x138` bytes); the shifted table at `0x087417E0` is `39/39` entries
+  `+0x1000` with 0 mismatches.
+- The existing 38-entry table (`0x08740918`/`0x08741918`) and 88-entry table
+  (`0x08740A48`/`0x08741A48`) remain byte-correct with 0 mismatches.
+- `make -f Makefile.shift test`: PASS (normal `frame_counter=3951`).
+- `make -f Makefile.shift shift-input`: PASS, `frame_counter=3951`.
+- `make -f Makefile.shift screen-diff`: PASS; normal, shifted and reordered
+  framebuffer hashes match at frame 600 (`1abaa6c524bad2e7`) and frame 900
+  (`e0fa16f4798c03e4`).
+- `shift-check`, `shift-start`, `audit`, `check-relocs-strict`, and `smoke`
+  are green.

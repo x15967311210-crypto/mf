@@ -10,7 +10,127 @@ const u32 sSaXCloseUpTileTable2[305] = INCBIN_U32("data/sa_x_close_up/second.tt.
 
 const u8 sSaXCloseUpDurations[2] = { 25, 60 };
 
-static const u8 sBlob_73421e_prefix[0xC6FA] = INCBIN_U8("data/Blob_73421e_prefix.bin");
+static const u8 sBlob_73421e_prefix[0xC5C2] = INCBIN_U8("data/Blob_73421e_prefix.bin");
+
+static const struct FrameData sSaXCloseUpFileSelectFrames[39] = {
+    [0] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB1EC),
+        .timer = 4
+    },
+    [1] = FRAME_DATA_TERMINATOR,
+    [2] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB212),
+        .timer = 4
+    },
+    [3] = FRAME_DATA_TERMINATOR,
+    [4] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB7C2),
+        .timer = 8
+    },
+    [5] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB866),
+        .timer = 8
+    },
+    [6] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB90A),
+        .timer = 8
+    },
+    [7] = FRAME_DATA_TERMINATOR,
+    [8] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB9AE),
+        .timer = 8
+    },
+    [9] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xBA52),
+        .timer = 8
+    },
+    [10] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xBAF6),
+        .timer = 8
+    },
+    [11] = FRAME_DATA_TERMINATOR,
+    [12] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xBB9A),
+        .timer = 8
+    },
+    [13] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xBC3E),
+        .timer = 8
+    },
+    [14] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xBCE2),
+        .timer = 8
+    },
+    [15] = FRAME_DATA_TERMINATOR,
+    [16] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB256),
+        .timer = 4
+    },
+    [17] = FRAME_DATA_TERMINATOR,
+    [18] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB26A),
+        .timer = 4
+    },
+    [19] = FRAME_DATA_TERMINATOR,
+    [20] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB27E),
+        .timer = 8
+    },
+    [21] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB286),
+        .timer = 8
+    },
+    [22] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB28E),
+        .timer = 8
+    },
+    [23] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB286),
+        .timer = 4
+    },
+    [24] = FRAME_DATA_TERMINATOR,
+    [25] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB296),
+        .timer = 4
+    },
+    [26] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB29E),
+        .timer = 20
+    },
+    [27] = FRAME_DATA_TERMINATOR,
+    [28] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB2A6),
+        .timer = 16
+    },
+    [29] = FRAME_DATA_TERMINATOR,
+    [30] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB344),
+        .timer = 4
+    },
+    [31] = FRAME_DATA_TERMINATOR,
+    [32] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB370),
+        .timer = 4
+    },
+    [33] = FRAME_DATA_TERMINATOR,
+    [34] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB192),
+        .timer = 10
+    },
+    [35] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB766),
+        .timer = 10
+    },
+    [36] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB780),
+        .timer = 10
+    },
+    [37] = {
+        .pFrame = (const u16*)((u8*)sBlob_73421e_prefix + 0xB766),
+        .timer = 10
+    },
+    [38] = FRAME_DATA_TERMINATOR
+};
 
 static const struct FrameData sSaXCloseUpAnimFrames[38] = {
     [0] = {

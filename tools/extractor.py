@@ -75,21 +75,22 @@ def split_intro_blob() -> None:
 
 
 def split_sa_x_close_up_blob() -> None:
-    """Carve the two raw FrameData tables out of the Sa-X close-up blob.
+    """Carve the three raw FrameData tables out of the Sa-X close-up blob.
 
-    `Blob_73421e_7478a0.bin` contains a 38-entry animation `struct FrameData`
-    table at offset 0xC6FA followed immediately by an 88-entry `struct
-    FrameData` table at offset 0xC82A.  Their pFrame pointers are raw ROM
-    addresses, so both tables must be rebuilt as C data to let the linker
-    relocate them.  Split the blob into the bytes before the first table and
-    after the second table so the surrounding data stays byte-identical; the
-    tables themselves are skipped.
+    `Blob_73421e_7478a0.bin` contains a 39-entry file-select `struct
+    FrameData` table at offset 0xC5C2, a 38-entry animation `struct
+    FrameData` table at offset 0xC6FA, and an 88-entry `struct FrameData`
+    table at offset 0xC82A.  Their pFrame pointers are raw ROM addresses, so
+    all three tables must be rebuilt as C data to let the linker relocate
+    them.  Split the blob into the bytes before the first table and after the
+    last table so the surrounding data stays byte-identical; the tables
+    themselves are skipped.
     """
     blob_path = Path(DATA_PATH, "Blob_73421e_7478a0.bin")
     if not blob_path.exists():
         return
     split_blob(
-        blob_path, 0xC6FA, 0x130 + 0x2C0,
+        blob_path, 0xC5C2, 0x138 + 0x130 + 0x2C0,
         Path(DATA_PATH, "Blob_73421e_prefix.bin"),
         Path(DATA_PATH, "Blob_73421e_after.bin"),
     )
