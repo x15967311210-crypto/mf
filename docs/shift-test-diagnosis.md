@@ -175,3 +175,24 @@ Final fixes:
 `ca33f4348c2c05dd330d37b97e2c5a69531dfe87`; the audit, strict relocation gate,
 smoke, and headless behavior test are green.  Next: `SHIFT-008` section-reorder
 build, then the M0 human playtest.
+
+## Resolved — BUG-001 (Start/file-select black screen)
+
+The human M0 playtest found a shifted-only black screen after pressing Start on
+the title.  Root cause was the same class as SHIFT-006c, in the file-select
+path:
+
+- `FileSelectSetupOam` points slot 19 at the raw `FrameData` table at
+  `0x08740A48` (shifted `0x08741A48`) inside `sBlob_73421e_7478a0`.
+- Its internal pFrame words were unrelocated; `FileSelectDrawOam` read a huge
+  `partCount` (`0x10F9`/`0x4366`) and walked the OAM destination through
+  `gNonGameplayRam` into `gVBlankCallback`/`gHBlankCallback`.
+- The first carve started at `0x08740AB8`, missing the 14 entries at
+  `0x08740A48`; extending it to the true 88-entry table fixed the path.
+- `SHIFT-006c4`/BUG-001 now keep baselines byte-identical (`ca33f434…`) while
+  shifted `0x08741A48` is exactly `+0x1000` for all 88 entries.
+
+Regression coverage: QA-001 added `tests/emulator` scenario `start`
+(Start held 6 frames every 60 from frame 600, latched file-select assertion)
+and `make -f Makefile.shift shift-start`.  Both `SHIFT-CHECK` (boot) and
+`SHIFT-START` (title → file select/intro) pass on the shifted build.
