@@ -14,9 +14,10 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
 Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008,
-QA-001, BUG-001 (harness, audit, symbol map, blob classification, literal and
-C-literal rewrites, raw FrameData/Са-X table relocation, padded and
-section-reordered boot, Start/file-select gate, 578/600) and HACK-001/001a/006
+QA-001/QA-002, BUG-001 (harness, audit, symbol map, blob classification,
+literal and C-literal rewrites, raw FrameData/Sa-X table relocation, padded
+and section-reordered boot, Start/file-select gate, headless TAS input replay,
+578/600) and HACK-001/001a/006
 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
@@ -25,10 +26,9 @@ section-reordered boot, Start/file-select gate, 578/600) and HACK-001/001a/006
 
 - [TODO] SHIFT-001a (baseline) — add title/new-game/pause/save scenarios
 - [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox
-- [DOING @dev2] QA-002 (emulator) — headless TAS input replay
-  - feed a committed 4k `frame keys` fixture through `core->setKeys` + `runFrame`
-  - make it an automatic smoke target; full 259k input stays manual/BizHawk
-  - manual playtest (`PLAYTEST-000`) remains the extra human check, not removed
+- [DONE] QA-002 (emulator) — headless TAS input replay
+  - committed 4k fixture + `INPUT_CHECK` assertions; `make test` now runs it
+  - full 259k input stays manual/BizHawk; manual playtest remains extra
 
 ## Phase S2 — relocatable build
 
@@ -37,8 +37,15 @@ section-reordered boot, Start/file-select gate, 578/600) and HACK-001/001a/006
   - normal / shifted / reordered; `SHIFT-CHECK: PASS` and `SHIFT-START: PASS`
   - external BizHawk `.bk2` smoke in progress on the M0b artifacts; the
     one-off full baseline stopped at frame 40000 with no done marker
-  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
+  - blocked again by BUG-002; do not hand M0b for sign-off yet
   - M0 is not DONE and M1 does not start until human sign-off
+- [DOING @dev1] BUG-002 (input replay) — shifted 4k TAS input stalls after
+  frame 900
+  - normal: `frame_counter=3951`, checkpoints 300/600/900/4000 match fixture
+  - shifted: 300/600 match, frame 900 `disp=1C00 main=7 s1=3 s2=0`, final
+    `frame_counter=792` (below 3000 liveness floor)
+  - reordered matches normal; this is shifted-only, likely another raw table
+    in the intro/file-select path
 
 ## Phase S3a — hack-critical C (106 functions)
 
