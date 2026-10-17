@@ -37,41 +37,25 @@ input/visual parity) and HACK-001/001a/006
 
 ## Phase S2 — relocatable build
 
-- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - M0e 4k/30k/screenshot gates pass, but later Navigation Room/map/dialog
-    path is corrupt and Enter/Start black-screens on shifted
-  - blocked by BUG-005; M0f after fix
+- [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - BUG-005 fixed; new handoff: `work/playtest/m0f-2026-10-17/`
+  - 4k/30k/screen gates green; slot3 savestate Start/Enter now `disp=0x7E00`
+    (non-black)
+  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
   - M0 is not DONE and M1 does not start until human sign-off
 - [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint
   - shifted black-screen reproduction can be automated from
     `m0e_shifted_slot3.ss3` + held Start; map/dialog visual comparison needs a
     normal same-page state or a deterministic normal route
   - BUG-005 fixed; slot3 local state check passes
-- [DOING @dev1] BUG-005 (playtest) — shifted map/dialog tile corruption and
-  Enter black screen after the 4k window
-  - slot1 frame 7002 `disp=5F00 main=3`: map/dialog box missing
-  - slot2 frame 29291 `disp=5F00 main=3`: text but no dialog box
-  - slot3 frame 49609 `disp=5E00 main=1`: tile garbage; Start/Enter ->
-    frame 49647 `disp=0000`, pure black
-  - artifacts: `work/playtest/m0e-2026-10-17/scripts/m0e_shifted_slot*.ss*`,
-    `slot*.png`, `slots23_capture.log`
-  - QA-004 `Blob_5657a8` FrameData runs are **false positives**: pause-screen
-    code uses fixed `sMinimapTilesGfx+offset` graphics, not those runs
-  - root cause: `NavigationConversationLoadPopUpGraphics` reads a 4×0x18
-    descriptor table inside raw `sBlob_5766D4_581510` at offset `0x557C`;
-    pGraphics words are still baseline (`0x08576904`, `0x08577024`,
-    `0x08578750`) instead of +0x1000, causing invalid LZ77/black screen
-  - fix: carve the 0x14 preamble + 4 records into C, pGraphics anchored to
-    prefix; preserve table at `0x0857BC50` and blob size `0xAE3C`
-  - 4k `screen-diff` cannot cover this; diagnose VRAM/tilemap/dialog source
 - [DONE] QA-006 (emulator) — 30k input fixture + `shift-input-30k` gate
-  - normal/reordered 30k PASS; shifted 30k FAIL (`frame_counter=24469`)
-  - harness binary must be rebuilt after harness changes; noted
+  - normal/reordered/shifted 30k PASS after BUG-004
 - [DONE] QA-005 (emulator) — screenshot-parity gate
-  - `screen-diff` compares framebuffer hashes at 600/900; normal/reordered match,
-    shifted currently FAIL (`a64b...`/`fa91...` vs `1aba...`/`e0fa...`)
-  - normal/reordered/ shifted frame 300 and 4000 hashes match; BUG-003 is
-    display-only at the file-select overlay
+  - `screen-diff` passes after BUG-003; normal/shifted/reordered match at
+    600/900
+- [TODO] QA-004 (tools) — scanner for 2-byte-aligned embedded
+  `FrameData`/pointer tables; prototype found the BUG-003/004/005 tables but
+  the tool/report is not committed yet
 
 ## Phase S3a — hack-critical C (106 functions)
 
