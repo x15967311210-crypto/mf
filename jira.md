@@ -13,10 +13,10 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008
-(harness, audit, symbol map, blob classification, literal/pseudo-literal and
-1034 C-literal rewrites, all pointer-like blobs, raw FrameData relocation,
-padded and section-reordered boot 578/600, strict gate) and HACK-001/001a/006
+Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008,
+QA-001, BUG-001 (harness, audit, symbol map, blob classification, literal and
+C-literal rewrites, raw FrameData/Са-X table relocation, padded and
+section-reordered boot, Start/file-select gate, 578/600) and HACK-001/001a/006
 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
@@ -29,19 +29,10 @@ padded and section-reordered boot 578/600, strict gate) and HACK-001/001a/006
 ## Phase S2 — relocatable build
 
 - [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - handoff: `work/playtest/m0-2026-10-17/`
-  - normal passes; **shifted black-screens after Start**; reordered passes
-  - blocked on BUG-001; M0 is not DONE and M1 does not start
-- [DOING @dev1] BUG-001 (playtest) — shifted M0 black screen after Start
-  - root cause confirmed: `FileSelectDrawOam` selects the raw 74-entry
-    `FrameData` table at `0x08740AB8` (shifted `0x08741AB8`) inside
-    `sBlob_73421e_7478a0`; its internal pFrame pointers are unrelocated, so
-    the draw loop reads 4345 bogus parts and overwrites `gVBlankCallback`
-  - fix: carve that table out of the blob into relocatable C, same pattern as
-    SHIFT-006c4; then add the Start/file-select gate
-- [DOING @dev2] QA-001 (emulator) — add a Start/file-select scenario to the
-  headless harness and a `shift-start` gate; current boot smoke does not press
-  Start and falsely passed BUG-001
+  - BUG-001 fixed; new handoff: `work/playtest/m0b-2026-10-17/`
+  - normal / shifted / reordered; `SHIFT-CHECK: PASS` and `SHIFT-START: PASS`
+  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
+  - M0 is not DONE and M1 does not start until human sign-off
 
 ## Phase S3a — hack-critical C (106 functions)
 
