@@ -23,13 +23,20 @@ python3 tools/shift/rewrite_refs.py --out work/shift/rewrite_suggestions.md
 python3 tools/shift/report.py --out docs/shiftability-audit.md
 ```
 
+`audit_blobs.py` reads extracted bytes from `data/` by default.  In a worktree
+without extracted data (for example a fresh `git worktree`), the audit reports
+`missing: 47` and exits 0; pass
+`--data-root /home/x1596/proj/mf/data` to classify the blobs.
+
 ## Current baseline counts
 
 - 662 ROM literals in `.4byte`/`.word`; 697 `ldr =0x08...` reference comments.
 - 388 unique ROM values.
 - Literal targets: 580 in `.rodata`, 82 in `.data`.
-- 47 extracted blobs: 11 pointer-table candidates, 7 possible, 29 data
-  (graphics/audio false-positive candidates are kept in the report).
+- 47 extracted blobs: 7 confirmed pointer tables, 3 possible (embedded
+  pointers in struct/audio data), 37 data.  The SHIFT-002 density rule is kept
+  as `baseline_classification`; see `docs/blob-classification.md` for the
+  per-blob evidence and the 11/7 baseline reconciliation.
 
 The six remaining assembly blobs are the bulk:
 
@@ -51,9 +58,19 @@ the leftovers and to prove the result with the shift test.
 - EWRAM/IWRAM/MMIO/palette/VRAM/OAM: fixed by D-002; not rewritten.
 - `.4byte`/`.word` records are the actual data word; `ldr` comments are references
   to that word.  A rewrite fixes the `.4byte` line, not the `ldr` comment.
-- A blob is a pointer-table candidate when at least 15% of its aligned words
-  land in a ROM/RAM address range and at least four distinct targets appear.
-  Graphics/audio can pass that test by accident; review the samples.
+- A blob is pointer-like when an aligned word lands in a ROM/RAM address range.
+  Density alone is not enough: 16-bit palettes, tilemaps and sprite data can
+  form `0x08xxxxxx`/`0x03xxxxxx` values from two adjacent samples.
+- SHIFT-004 rule (`audit_blobs.py`): a **pointer table** needs at least 8 hits,
+  15% density, 90% of targets in mapped sections, 50% of words being pointers,
+  a run of 8 adjacent pointers, and 50% of hits inside such runs.  A blob that
+  passes the density/target tests but is mixed (a pointer run inside other
+  data, or pointers on a regular struct stride) is **possible** and needs
+  manual review.  Everything else is **data**.
+- The old SHIFT-002 density rule is still emitted as
+  `baseline_classification` for before/after comparison.
+- Current result: 7 pointer tables, 3 possible, 37 data.  Per-blob evidence:
+  `docs/blob-classification.md`.
 
 ## Shift test
 
