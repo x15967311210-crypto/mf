@@ -298,3 +298,39 @@ SHIFT-INPUT-30K: PASS
 
 `SCREEN-DIFF` at 600/900 also passes for normal/shifted/reordered.  M0e is the
 human retest candidate.
+
+## Resolved — BUG-006 (shifted map objective OAM)
+
+The controlled map-open pair used the common save
+`C34B0F60CB80BD5D75EF4C57F23B198B696169D9` and the same input
+(`A@1410`, `Start@1470`, `A@1530`).  Normal reached `active_oam=29` after and
+`51` final; shifted stayed at `0`.  The outer map OAM table
+`sBlob_79bec0_79c128` was already relocated correctly.
+
+The frame records inside raw `sBlob_5657a8_575a60` were not.  Of its 16558
+little-endian words, 501 point inside the blob (the frame-record OAM-data
+pointers); the raw `INCBIN` left them at baseline addresses after the blob
+moved `+0x1000`.  Example: the type-71 record's first word stayed
+`0x08567920`; the shifted value must be `0x08568920`.
+
+`tools/shift/gen_map_oam_blob.py` now generates the blob as a `u32[16558]`
+initializer.  Each self-pointer is emitted as
+`sBlob_5657a8_575a60 + <target offset>`; all other words are verbatim.  Raw
+data words that happen to fall in the ROM window are decimal constants to avoid
+false `check_relocs` findings.  The generated block replaces the `INCBIN` in
+`src/data/menus/pause_screen_map_data.c` in place, after `sMinimapTilesGfx`.
+
+Verification:
+
+- Normal `make -j20 check` SHA1 is unchanged:
+  `ca33f4348c2c05dd330d37b97e2c5a69531dfe87`.
+- Shifted build SHA1 is `a822b2d82a6501b7d6caa74211f3b7079c7be885`, the same
+  as the previously validated temporary pointer patch.
+- 501/501 frame words are `baseline + 0x1000`; 0 stale baseline pointers,
+  0 outside the shifted blob, and all 16057 non-pointer words unchanged.
+- `check-relocs-strict` reports 0 open literals, 0 C ROM refs, 10 converted /
+  0 raw pointer-like blobs; this blob is no longer raw `INCBIN`.
+- Normal and shifted automatic gates are rerun by the manager before landing.
+
+Secondary cleanup (outer-table spelling in `asm/disasm_0x080765f8.s`) remains
+optional and was not changed.
