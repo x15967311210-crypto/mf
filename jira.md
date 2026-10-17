@@ -67,6 +67,10 @@ input/visual parity) and HACK-001/001a/006
   - print OAM count/hash at 300/600/900/1059/4000/30000 in input replay
   - add `oam-diff` normal vs shifted; savestate-based map UI comparison stays
     local-only because savestates must not be committed
+- [TODO] QA-009 (emulator) — checkpoint memory parity
+  - exact: OAM/PAL/VRAM-BG/VRAM-OBJ/IO registers
+  - normalized: IWRAM/EWRAM 32-bit ROM pointers (+0x1000), excluding the
+    known IWRAM code-copy tail; state-based local diff for manual pages
 - [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint
   - shifted black-screen reproduction can be automated from
     `m0e_shifted_slot3.ss3` + held Start; map/dialog visual comparison needs a
