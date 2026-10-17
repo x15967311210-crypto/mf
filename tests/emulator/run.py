@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -16,6 +17,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCENARIO_DIR = Path(__file__).resolve().parent
+
+# The harness prints one of these only when its own assertions passed.  A
+# stale harness (one built before the scenario existed) cannot fake the marker.
+PASS_MARKERS = {
+    "boot_smoke": "PASS: boot smoke",
+    "start": "PASS: start/file-select",
+}
+DEFAULT_FRAMES = {
+    "boot_smoke": 600,
+    "start": 1200,
+}
+
+
+def harness_command(harness: str, rom: Path, scenario: str, frames: int) -> list[str]:
+    """Build the harness argv, preserving the legacy boot-smoke invocation."""
+    if scenario == "boot_smoke":
+        return [harness, str(rom), str(frames)]
+    return [harness, str(rom), "--scenario", scenario, "--frames", str(frames)]
 
 
 def find_mgba() -> str | None:
@@ -49,7 +68,7 @@ def run_static(rom: Path, expect_sha1: str | None) -> int:
 def run_dynamic(rom: Path, scenario: str, frames: int) -> int:
     harness = find_harness()
     if harness:
-        cmd = [harness, str(rom), str(frames)]
+        cmd = harness_command(harness, rom, scenario, frames)
         print("RUN:", " ".join(cmd))
         try:
             proc = subprocess.run(
@@ -74,8 +93,9 @@ def run_dynamic(rom: Path, scenario: str, frames: int) -> int:
         if proc.returncode != 0:
             print(f"FAIL: harness exited {proc.returncode}")
             return 1
-        if "PASS:" not in output:
-            print("FAIL: harness did not print PASS")
+        marker = PASS_MARKERS.get(scenario, "PASS:")
+        if marker not in output:
+            print(f"FAIL: harness did not print {marker!r}")
             return 1
         print(f"PASS: {scenario}")
         return 0
@@ -97,8 +117,9 @@ def run_dynamic(rom: Path, scenario: str, frames: int) -> int:
     work.mkdir(parents=True, exist_ok=True)
     generated = work / f"{scenario}.generated.lua"
     text = source.read_text()
-    if "local FRAMES =" in text:
-        text = text.replace("local FRAMES = 600", f"local FRAMES = {frames}")
+    text = re.sub(
+        r"local FRAMES = \d+", f"local FRAMES = {frames}", text, count=1
+    )
     generated.write_text(text)
 
     env = os.environ.copy()
@@ -122,8 +143,9 @@ def run_dynamic(rom: Path, scenario: str, frames: int) -> int:
     if proc.returncode != 0:
         print(f"FAIL: emulator exited {proc.returncode}")
         return 1
-    if "PASS:" not in proc.stdout:
-        print("FAIL: scenario did not print PASS")
+    marker = PASS_MARKERS.get(scenario, "PASS:")
+    if marker not in proc.stdout:
+        print(f"FAIL: scenario did not print {marker!r}")
         return 1
     print(f"PASS: {scenario}")
     return 0
@@ -134,7 +156,7 @@ def main() -> int:
     ap.add_argument("--rom", default="mf_us.gba")
     ap.add_argument("--baserom", default="mf_us_baserom.gba")
     ap.add_argument("--scenario", default="boot_smoke")
-    ap.add_argument("--frames", type=int, default=600)
+    ap.add_argument("--frames", type=int, default=None)
     ap.add_argument("--static", action="store_true", help="only static ROM checks")
     ap.add_argument("--expect-sha1", default=None)
     args = ap.parse_args()
@@ -142,10 +164,13 @@ def main() -> int:
     rom = Path(args.rom)
     if not rom.is_absolute():
         rom = ROOT / rom
+    frames = args.frames
+    if frames is None:
+        frames = DEFAULT_FRAMES.get(args.scenario, 600)
     static_code = run_static(rom, args.expect_sha1)
     if static_code != 0 or args.static:
         return static_code
-    return run_dynamic(rom, args.scenario, args.frames)
+    return run_dynamic(rom, args.scenario, frames)
 
 
 if __name__ == "__main__":

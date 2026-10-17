@@ -26,6 +26,7 @@ ROM ?= mf_us.gba
 BASEROM ?= mf_us_baserom.gba
 SCENARIO ?= boot_smoke
 FRAMES ?= 600
+START_FRAMES ?= 1200
 PAD_BYTES ?= 0x1000
 DATA_ROOT ?= data
 DATABASE ?= database.json
@@ -40,7 +41,7 @@ REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit \
         check-relocs check-relocs-strict check-linker smoke test \
         emulator-harness shift-build shift-test shift-check shift-reorder \
-        shift-check-all help
+        shift-start shift-check-all help
 
 all: audit
 
@@ -116,6 +117,25 @@ shift-check: audit smoke check-linker
 	fi; \
 	exit $$status
 
+# QA-001: the boot smoke never presses Start, so it cannot see BUG-001 (the
+# shifted build blanks the screen after the title).  Build the padded ROM with
+# the existing shift_test path and press Start.  Deliberately separate from
+# shift-check until BUG-001 lands and this gate is green.
+shift-start:
+	@$(PYTHON) tools/shift/shift_test.py --build --run \
+		--pad-bytes $(PAD_BYTES) --scenario start --frames $(START_FRAMES) \
+		--toolchain "$(TOOLCHAIN)"; \
+	status=$$?; \
+	if [ $$status -eq 0 ]; then \
+		echo "SHIFT-START: PASS"; \
+	elif [ $$status -eq 77 ]; then \
+		echo "SHIFT-START: SKIP (77) - no emulator/harness; dynamic behavior did not run"; \
+		echo "              this is not a pass"; \
+	else \
+		echo "SHIFT-START: FAIL ($$status)"; \
+	fi; \
+	exit $$status
+
 # Data-only reorder: swap two .rodata inputs.  Code (AgbMain) must not move,
 # the swapped data symbols must, and the boot smoke must still pass.
 shift-reorder: audit smoke check-linker
@@ -148,6 +168,7 @@ help:
 	@echo "  shift-build         build with a padded linker layout"
 	@echo "  shift-test          padded build + behavior scenario"
 	@echo "  shift-check         audit + smoke + link check + shift-test (padding)"
+	@echo "  shift-start         padded build + Start/file-select scenario (QA-001)"
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
-	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, PAD_BYTES, SHIFT_WORK"
+	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, PAD_BYTES, SHIFT_WORK"

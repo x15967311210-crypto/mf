@@ -59,7 +59,9 @@ mgba -l work/emulator/boot_smoke.generated.lua mf_us.gba
 
 If no emulator is found the runner exits **77** (skip), never 0.
 
-## Current scenario
+## Scenarios
+
+### `boot_smoke`
 
 `boot_smoke.lua` runs 600 frames and checks:
 
@@ -71,9 +73,37 @@ If no emulator is found the runner exits **77** (skip), never 0.
 Those two IWRAM addresses come from `linker.ld` and are intentionally fixed
 (D-002), so the scenario survives the ROM shift refactor.
 
+### `start` (QA-001)
+
+`start.lua` / `harness.c --scenario start` drives the title -> file-select
+transition:
+
+- hold Start for 6 frames every 60 frames starting at frame 600;
+- run to 1200 frames (the harness and runner default to 1200 for this
+  scenario);
+- latch success at the first frame after the first Start where
+  `DISPCNT` (`0x04000000`) is nonzero, `gMainGameMode` (`0x03000BDE`) is 7 and
+  `gSubGameMode1` (`0x03000BE0`) is at least 1;
+- print the final `DISPCNT`/mode values even when the verdict is a failure.
+
+The verdict latches because a healthy run has a transient `DISPCNT=0000`
+during a later mode change (frame 1020 in the reference); requiring the final
+frame to be lit would falsely fail it.  The shifted build never latches:
+`DISPCNT` stays `0000` with `main=7` and `sub1=0` (BUG-001).
+
+Run the shifted gate with:
+
+```sh
+make -f Makefile.shift shift-start
+```
+
+It builds the padded ROM through the same `shift_test.py --build` path as
+`shift-check` and reports `SHIFT-START: PASS|FAIL|SKIP (77)`.  It is not folded
+into `shift-check` while BUG-001 is open, so a shifted boot regression is
+visible without breaking the existing padding gate.
+
 ## Next scenarios
 
-- title/file-select input path;
 - new game → first room → pause/status;
 - save → load → state equality;
 - navigation conversation;

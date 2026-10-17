@@ -1,0 +1,24 @@
+name: start
+description: >-
+  Press Start on the title screen and verify the file-select/intro transition
+  turns the display back on.  The verdict latches; a later transient
+  DISPCNT=0000 during a mode change must not fail a healthy run.
+rom: mf_us.gba
+frames: 1200
+input:
+  - name: start
+    first_frame: 600
+    hold_frames: 6
+    period_frames: 60
+assertions:
+  - latch_after_start:  # any frame after the first Start, not just the last
+      - mem16: {addr: "0x04000000", ne: 0}                 # DISPCNT
+      - mem16: {symbol: gMainGameMode, addr: "0x03000BDE", eq: 7}
+      - mem16: {symbol: gSubGameMode1, addr: "0x03000BE0", gte: 1}
+  - report_final:
+      - DISPCNT 0x04000000
+      - gMainGameMode 0x03000BDE
+      - gSubGameMode1 0x03000BE0
+      - gSubGameMode2 0x03000BE2
+artifacts:
+  - work/emulator/start.log
