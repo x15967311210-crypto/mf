@@ -64,8 +64,32 @@ reference comments, not data literals:
 | `asm/disasm_0x080765f8.s` | 43 |
 | `asm/disasm_0x08056140.s` | 15 |
 
-The shifted build still fails at boot because the raw blob pointer tables are
-SHIFT-006, not because of these comments.  The shift test is the proof target.
+SHIFT-006a converted the seven confirmed blob pointer tables to relocatable C
+arrays.  The padded build still fails early at boot because the three
+`possible` blobs (and other unconverted absolute pointer data) remain raw
+until SHIFT-006b; the shift test is the proof target.
+
+## Pointer tables (SHIFT-006a)
+
+`gen_blob_tables.py` reads each extracted blob, resolves every aligned 32-bit
+word to a `symbol+offset` expression (using a same-section global anchor for
+`STB_LOCAL` targets, exactly like `apply_refs.py`), and renders an equivalent
+`u32[]` initialiser plus a compile-time byte-size check.  `Blob_a5224_a5258`
+keeps the ELF-verified Thumb bit on its callback pointers.
+
+```sh
+python3 tools/shift/gen_blob_tables.py --check   # fail if a generated block is stale
+python3 tools/shift/gen_blob_tables.py --write   # regenerate after reviewing the diff
+```
+
+Converted tables: `sBlob_a5224_a5258`, `sBlob_79bec0_79c128`,
+`sBlob_79c394_79c3c8`, `sBlob_79c448_79c5a4`, `sBlob_79c5c0_79cdd8`,
+`sBlob_79ce10_79e6a0`, `sBlob_79e868_79eca0`.  The generated blocks live
+between `BEGIN GENERATED` / `END GENERATED` markers in
+`src/data/generic_data.c`, `src/menus/pause_screen_map.c`, and
+`src/new_file_intro.c`; do not hand-edit them.  The three `possible` blobs
+(`74dc48`, `a5710`, `79c170`) and the 37 `data` blobs stay raw until
+SHIFT-006b models them.
 
 ## Classification rules
 
