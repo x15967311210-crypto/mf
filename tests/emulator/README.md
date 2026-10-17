@@ -142,6 +142,23 @@ normal/shifted/reordered builds of the same harness, which is what makes it a
 fast differential pre-gate before a BizHawk run.  A full 259k-frame input is a
 manual run (the runner allows `--timeout`); only the 4k prefix is automatic.
 
+### Shifted `input` gate (QA-003)
+
+```sh
+make -f Makefile.shift shift-input
+```
+
+builds the padded shifted ROM through the same `shift_test.py --build` path as
+`shift-check`, then replays the committed 4k fixture against
+`work/shift/mf_us_shift.gba` with the same `--expect` checkpoint file.  It
+reports `SHIFT-INPUT: PASS|FAIL|SKIP (77)`; a missing harness is a skip, never
+a pass.  The shifted build must match the normal headless checkpoints and the
+same `gFrameCounter16Bit` liveness floor.  A shifted-only stall fails at the
+checkpoint and liveness assertions (BUG-002: divergence at frame 900, final
+`frame_counter=792` against the 3,000-frame floor).  The target stays separate
+from `shift-check` so the behavior regression is visible without changing the
+padding/boot gate.
+
 ### `start` (QA-001)
 
 `start.lua` / `harness.c --scenario start` drives the title -> file-select

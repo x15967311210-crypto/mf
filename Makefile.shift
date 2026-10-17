@@ -44,7 +44,7 @@ REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit \
         check-relocs check-relocs-strict check-linker smoke test test-input \
         input-smoke emulator-harness shift-build shift-test shift-check \
-        shift-reorder shift-start shift-check-all help
+        shift-reorder shift-start shift-input shift-check-all help
 
 all: audit
 
@@ -170,6 +170,33 @@ shift-start:
 	fi; \
 	exit $$status
 
+# QA-003: the shifted build must survive the same committed 4k TAS replay as
+# the normal build.  Build through the existing shift_test.py path, then run
+# the input scenario on the shifted artifact with the normal-fixture checkpoint
+# assertion.  A shifted-only intro stall (BUG-002: counter=792) fails here.
+shift-input:
+	@$(PYTHON) tools/shift/shift_test.py --build --pad-bytes $(PAD_BYTES) \
+		--toolchain "$(TOOLCHAIN)"; \
+	build=$$?; \
+	if [ $$build -ne 0 ]; then \
+		echo "SHIFT-INPUT: FAIL ($$build) - shifted build did not complete"; \
+		exit $$build; \
+	fi; \
+	$(PYTHON) tests/emulator/run.py --rom $(SHIFT_WORK)/mf_us_shift.gba \
+		--scenario input --input "$(INPUT)" \
+		$(if $(INPUT_EXPECT),--expect "$(INPUT_EXPECT)") \
+		--frames 4000; \
+	status=$$?; \
+	if [ $$status -eq 0 ]; then \
+		echo "SHIFT-INPUT: PASS"; \
+	elif [ $$status -eq 77 ]; then \
+		echo "SHIFT-INPUT: SKIP (77) - no emulator/harness; dynamic behavior did not run"; \
+		echo "              this is not a pass"; \
+	else \
+		echo "SHIFT-INPUT: FAIL ($$status)"; \
+	fi; \
+	exit $$status
+
 # Data-only reorder: swap two .rodata inputs.  Code (AgbMain) must not move,
 # the swapped data symbols must, and the boot smoke must still pass.
 shift-reorder: audit smoke check-linker
@@ -205,6 +232,7 @@ help:
 	@echo "  shift-test          padded build + behavior scenario"
 	@echo "  shift-check         audit + smoke + link check + shift-test (padding)"
 	@echo "  shift-start         padded build + Start/file-select scenario (QA-001)"
+	@echo "  shift-input         padded build + 4k input replay + checkpoint assertion (QA-003)"
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
 	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, PAD_BYTES, SHIFT_WORK"
