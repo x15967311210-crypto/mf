@@ -92,14 +92,25 @@ input/visual parity) and HACK-001/001a/006
     emits one entry/frame in shifted. Save data, minimap data, equipment,
     securityHatchLevel and current area are identical between the pair, so this
     is not exploration/save progress.
-  - The normal/shifted before states are from different in-game animation
-    frames (4433 vs 5266); the map-screen runtime entries that are missing are
-    animation-flag/pFrame entries, not a relocated ROM table. The pair is not a
-    controlled same-state comparison.
-  - next: produce a same-save, same-frame before pair (normal and shifted from
-    one .sav, identical input) and diff the map-screen OAM builder
-    (`MapScreenUpdateArrowsAndBlinkingSquare`/type-0 entries) before touching
-    code; do not mark BUG-006 DONE on the current pair.
+  - CONTROLLED PAIR (same `mf_us_m0f_normal.sav`, same input): before frame
+    1399 both `main=1 active_oam=22`; after frame 1499 normal `main=3
+    active_oam=29`, shifted 0; final 1699 normal 51, shifted 0. Normal shows
+    the top status bar, L1–L4, OBJECTIVE and dialog body; shifted misses them.
+  - ROOT CAUSE: `sBlob_5657a8_575a60` is a raw `INCBIN`, moved +0x1000, but
+    its **501 frame-record OAM-data pointers** were not relocated. Example:
+    type 71 shifted outer ptr is `0x08569A3C`, frame first word is
+    `0x08567920` (normal) but must be `0x08568920`. Patching all 501 pointers
+    +0x1000 yields byte-identical normal/shifted after+final screenshots and
+    restores `active_oam=29/51`.
+  - The outer table `sBlob_79bec0_79c128` is correctly relocated; this is only
+    the frame-record data inside the raw blob.
+  - Formal fix: model the 501 frame-record pointer words as a generated,
+    relocatable C table/symbol expressions (or equivalent generated frame
+    table); keep the normal/reordered builds unchanged. Secondary cleanup:
+    direct `sBlob_79bec0_79c128` reference in `asm/disasm_0x080765f8.s`.
+  - next: implement the source relocation, verify the controlled pair, then
+    rebuild M0f shifted artifact for human retest; do not mark BUG-006 DONE
+    until the controlled pair matches byte-for-byte.
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
