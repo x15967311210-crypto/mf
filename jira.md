@@ -43,11 +43,13 @@ and section-reordered boot, Start/file-select gate, headless TAS input replay,
   - M0 is not DONE and M1 does not start until human sign-off
 - [DOING @dev1] BUG-002 (input replay) — shifted 4k TAS input stalls at
   frame 826
-  - normal: `frame_counter=3951`, checkpoints 300/600/900/4000 match fixture
-  - shifted: 300/600 match, then PC in `FileSelectDrawOam`, frame counter
-    freezes at 792; `gVBlankCallback=080918CA`, `gHBlankCallback=F3E3F395`
-  - reordered matches normal; likely another raw table in the
-    intro/file-select OAM path; BUG-002a tracing first corrupt write
+  - root cause: raw 38-entry animation `FrameData` table embedded at
+    `sBlob_73421e` offset `0xC6FA` / ROM `0x08740918`; its pFrame words are
+    stale, so `FileSelectDrawOam` reads count `0x7BFF` and writes through
+    `gOamData` into `gVBlankCallback`
+  - fix: carve that 38-entry table and the existing 88-entry table into C
+    with a shared `sBlob_73421e_prefix` anchor; add the aligned/unaligned blob
+    scan to tooling afterwards
 
 ## Phase S3a — hack-critical C (106 functions)
 
