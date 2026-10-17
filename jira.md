@@ -13,9 +13,9 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/006a/006b1/006b2/007 (harness, audit,
-symbol map, blob classification, 662 literal rewrites, 7 flat tables, 79c170,
-74dc48, strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in
+Last landed: SHIFT-001/002/003/004/005/006a/006b1/006b2/006b3/007 (harness,
+audit, symbol map, blob classification, 662 literal rewrites, all pointer-like
+blobs, strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in
 `git log`.
 
 ---
@@ -27,11 +27,14 @@ symbol map, blob classification, 662 literal rewrites, 7 flat tables, 79c170,
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev1] SHIFT-006b3 (baseline) — model `Blob_a5710_a8cdc`
-  - working model: 1135 × 12-byte sound records (pointer at +4) + 152-byte raw tail
-  - confirm the record count against the audio consumer before generating
-- [TODO] SHIFT-006c (emulator) — shift test passes with all tables relocated
-  [deps: SHIFT-006b3]
+- [DOING @dev2] SHIFT-005b (baseline) — audit 7-digit `.word 0x80a....`
+  - `sound/tracks/*.s` headers use `0x80a5710`-style addresses; the current
+    literal regex requires 8 hex digits and misses them
+  - regenerate `abs_refs.json`, verify the new refs resolve
+- [TODO] SHIFT-006b4 (baseline) — rewrite track-header pointers to symbols
+  [deps: SHIFT-005b]
+- [TODO] SHIFT-006c (emulator) — shift-check passes after track headers
+  [deps: SHIFT-006b4]
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
 
