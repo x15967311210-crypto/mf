@@ -77,8 +77,8 @@ def split_intro_blob() -> None:
 def split_sa_x_close_up_blob() -> None:
     """Carve the raw FrameData table out of the Sa-X close-up blob.
 
-    `Blob_73421e_7478a0.bin` contains a 74-entry `struct FrameData` table at
-    offset 0xC89A.  Its pFrame pointers are raw ROM addresses, so the table
+    `Blob_73421e_7478a0.bin` contains an 88-entry `struct FrameData` table at
+    offset 0xC82A.  Its pFrame pointers are raw ROM addresses, so the table
     must be rebuilt as C data to let the linker relocate it.  Split the blob
     into the bytes before and after the table so the surrounding data stays
     byte-identical; the table itself is skipped.
@@ -87,7 +87,7 @@ def split_sa_x_close_up_blob() -> None:
     if not blob_path.exists():
         return
     split_blob(
-        blob_path, 0xC89A, 0x250,
+        blob_path, 0xC82A, 0x2C0,
         Path(DATA_PATH, "Blob_73421e_before.bin"),
         Path(DATA_PATH, "Blob_73421e_after.bin"),
     )
