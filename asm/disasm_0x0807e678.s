@@ -170,9 +170,9 @@ _0807E7AC:
 	beq _0807E7E4
 	b _0807E7F6
 	.align 2, 0
-_0807E7D0: .4byte 0x0858217C
+_0807E7D0: .4byte sDebugSectionInfo+0x60
 _0807E7D4: .4byte 0x0600C800
-_0807E7D8: .4byte 0x08576180
+_0807E7D8: .4byte sPauseDebugNumbersIncrementValues
 _0807E7DC:
 	movs r2, #0x80
 	b _0807E7E8
@@ -387,11 +387,11 @@ _0807E954:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807E964: .4byte 0x0857617A
-_0807E968: .4byte 0x0858217C
-_0807E96C: .4byte 0x085821B3
-_0807E970: .4byte 0x0879BEA8
-_0807E974: .4byte 0x0858217F
+_0807E964: .4byte sStatusScreenSectionSizes
+_0807E968: .4byte sDebugSectionInfo+0x60
+_0807E96C: .4byte sDebugSectionInfo+0x97
+_0807E970: .4byte sExploredMinimapBitFlags+0xCC
+_0807E974: .4byte sDebugSectionInfo+0x63
 _0807E978: .4byte 0x0600C800
 
 	thumb_func_start StatusScreenDrawMissileOrBomb
@@ -489,11 +489,11 @@ _0807EA20:
 	bne _0807EA20
 	b _0807EA4C
 	.align 2, 0
-_0807EA30: .4byte 0x0857617A
-_0807EA34: .4byte 0x0858217C
-_0807EA38: .4byte 0x085821B3
-_0807EA3C: .4byte 0x0879BEA8
-_0807EA40: .4byte 0x0858217F
+_0807EA30: .4byte sStatusScreenSectionSizes
+_0807EA34: .4byte sDebugSectionInfo+0x60
+_0807EA38: .4byte sDebugSectionInfo+0x97
+_0807EA3C: .4byte sExploredMinimapBitFlags+0xCC
+_0807EA40: .4byte sDebugSectionInfo+0x63
 _0807EA44: .4byte 0x0600C800
 _0807EA48:
 	cmp r2, #0
@@ -565,9 +565,9 @@ _0807EAB8:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807EAC8: .4byte 0x0857617A
-_0807EACC: .4byte 0x0858217C
-_0807EAD0: .4byte 0x085821B3
+_0807EAC8: .4byte sStatusScreenSectionSizes
+_0807EACC: .4byte sDebugSectionInfo+0x60
+_0807EAD0: .4byte sDebugSectionInfo+0x97
 _0807EAD4: .4byte 0x0600C800
 
 	thumb_func_start StatusScreenDrawMisc
@@ -721,11 +721,11 @@ _0807EBD0:
 	adds r3, r0, r1
 	b _0807EC2A
 	.align 2, 0
-_0807EBF8: .4byte 0x0857617A
-_0807EBFC: .4byte 0x0858217C
-_0807EC00: .4byte 0x085821B3
-_0807EC04: .4byte 0x0879BEA8
-_0807EC08: .4byte 0x0858217F
+_0807EBF8: .4byte sStatusScreenSectionSizes
+_0807EBFC: .4byte sDebugSectionInfo+0x60
+_0807EC00: .4byte sDebugSectionInfo+0x97
+_0807EC04: .4byte sExploredMinimapBitFlags+0xCC
+_0807EC08: .4byte sDebugSectionInfo+0x63
 _0807EC0C: .4byte 0x0600C800
 _0807EC10:
 	mov r2, sb
@@ -787,9 +787,9 @@ _0807EC6C:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807EC7C: .4byte 0x085821B3
-_0807EC80: .4byte 0x0858217F
-_0807EC84: .4byte 0x0858217E
+_0807EC7C: .4byte sDebugSectionInfo+0x97
+_0807EC80: .4byte sDebugSectionInfo+0x63
+_0807EC84: .4byte sDebugSectionInfo+0x62
 _0807EC88: .4byte 0x0600C800
 
 	thumb_func_start StatusScreenRemoveAmmoHeader
@@ -872,7 +872,7 @@ _0807ED0A:
 	bx r0
 	.align 2, 0
 _0807ED18: .4byte 0x0600C800
-_0807ED1C: .4byte 0x085821D6
+_0807ED1C: .4byte sDebugSectionInfo+0xBA
 
 	thumb_func_start EasySleepMenuHandler
 EasySleepMenuHandler: @ 0x0807ED20
@@ -1130,7 +1130,7 @@ _0807EEF6:
 	.align 2, 0
 _0807EF1C: .4byte 0x02038000
 _0807EF20: .4byte 0x03000010
-_0807EF24: .4byte 0x08582248
+_0807EF24: .4byte sDebugSectionInfo+0x12C
 
 	thumb_func_start Sram_ReadHeader
 Sram_ReadHeader: @ 0x0807EF28
@@ -1350,7 +1350,7 @@ _0807F0E2:
 	.align 2, 0
 _0807F0EC: .4byte 0x0203F100
 _0807F0F0: .4byte 0x02038000
-_0807F0F4: .4byte 0x08582248
+_0807F0F4: .4byte sDebugSectionInfo+0x12C
 
 	thumb_func_start Sram_ProcessIntroSave
 Sram_ProcessIntroSave: @ 0x0807F0F8
@@ -1417,8 +1417,8 @@ _0807F158:
 	bl DmaTransfer
 	b _0807F21C
 	.align 2, 0
-_0807F174: .4byte 0x0858225C
-_0807F178: .4byte 0x08582268
+_0807F174: .4byte sSaveDataEwramPointers
+_0807F178: .4byte sSaveDataEwramBackupPointers
 _0807F17C:
 	cmp r1, #1
 	beq _0807F1E4
@@ -1469,7 +1469,7 @@ _0807F194:
 	.align 2, 0
 _0807F1D8: .4byte gDisableSoftReset
 _0807F1DC: .4byte 0x03000014
-_0807F1E0: .4byte 0x0858225C
+_0807F1E0: .4byte sSaveDataEwramPointers
 _0807F1E4:
 	bl Sram_WriteHeaderAndGameInfo
 	b _0807F222
@@ -1493,8 +1493,8 @@ _0807F1F0:
 	strb r5, [r0]
 	b _0807F222
 	.align 2, 0
-_0807F210: .4byte 0x0858225C
-_0807F214: .4byte 0x08582268
+_0807F210: .4byte sSaveDataEwramPointers
+_0807F214: .4byte sSaveDataEwramBackupPointers
 _0807F218: .4byte gDisableSoftReset
 _0807F21C:
 	ldr r1, _0807F22C @ =gDisableSoftReset
@@ -1566,11 +1566,11 @@ _0807F26E:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807F2A0: .4byte 0x0858225C
+_0807F2A0: .4byte sSaveDataEwramPointers
 _0807F2A4: .4byte 0x03000B8D
-_0807F2A8: .4byte 0x08582200
+_0807F2A8: .4byte sDebugSectionInfo+0xE4
 _0807F2AC: .4byte 0x03000014
-_0807F2B0: .4byte 0x085821F8
+_0807F2B0: .4byte sDebugSectionInfo+0xDC
 
 	thumb_func_start Sram_ProcessEndingSave
 Sram_ProcessEndingSave: @ 0x0807F2B4
@@ -1639,9 +1639,9 @@ _0807F330:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807F338: .4byte 0x0858225C
+_0807F338: .4byte sSaveDataEwramPointers
 _0807F33C: .4byte 0x03000B8D
-_0807F340: .4byte 0x08582268
+_0807F340: .4byte sSaveDataEwramBackupPointers
 
 	thumb_func_start Sram_CopyGameCompletion
 Sram_CopyGameCompletion: @ 0x0807F344
@@ -1692,7 +1692,7 @@ _0807F36C:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807F3A0: .4byte 0x0858225C
+_0807F3A0: .4byte sSaveDataEwramPointers
 _0807F3A4: .4byte 0x03000B8D
 _0807F3A8: .4byte 0x03000014
 
@@ -1771,9 +1771,9 @@ _0807F43A:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807F440: .4byte 0x0858225C
+_0807F440: .4byte sSaveDataEwramPointers
 _0807F444: .4byte 0x03000B8D
-_0807F448: .4byte 0x08582268
+_0807F448: .4byte sSaveDataEwramBackupPointers
 _0807F44C: .4byte gDisableSoftReset
 
 	thumb_func_start SramWrite_ToEwram
@@ -2124,9 +2124,9 @@ _0807F6FC: .4byte 0xFFFF0000
 _0807F700: .4byte 0x0000FFFF
 _0807F704: .4byte 0xFFFFFF00
 _0807F708: .4byte 0xFFFF00FF
-_0807F70C: .4byte 0x0858225C
+_0807F70C: .4byte sSaveDataEwramPointers
 _0807F710: .4byte 0x03000B8D
-_0807F714: .4byte 0x08582200
+_0807F714: .4byte sDebugSectionInfo+0xE4
 _0807F718: .4byte 0x03000014
 _0807F71C: .4byte 0x03000B90
 _0807F720: .4byte gCurrentArea
@@ -2168,7 +2168,7 @@ _0807F7AC: .4byte gGadorasDestroyed
 _0807F7B0: .4byte gMissileHatchDestroyed
 _0807F7B4: .4byte gWaterLowered
 _0807F7B8: .4byte gInGameTimer
-_0807F7BC: .4byte 0x085821F8
+_0807F7BC: .4byte sDebugSectionInfo+0xDC
 
 	thumb_func_start SramRead_FromEwram
 SramRead_FromEwram: @ 0x0807F7C0
@@ -2459,7 +2459,7 @@ _0807F920:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807F9F8: .4byte 0x0858225C
+_0807F9F8: .4byte sSaveDataEwramPointers
 _0807F9FC: .4byte 0x03000B8D
 _0807FA00: .4byte 0x03000014
 _0807FA04: .4byte 0x03000B90
@@ -2589,7 +2589,7 @@ _0807FB2A:
 	bx r0
 	.align 2, 0
 _0807FB3C: .4byte 0x03000B8E
-_0807FB40: .4byte 0x085821E8
+_0807FB40: .4byte sDebugSectionInfo+0xCC
 _0807FB44: .4byte 0x0E007FE0
 
 	thumb_func_start Sram_BackupCurrentFile_Unused
@@ -2616,9 +2616,9 @@ Sram_BackupCurrentFile_Unused: @ 0x0807FB48
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807FB78: .4byte 0x0858225C
+_0807FB78: .4byte sSaveDataEwramPointers
 _0807FB7C: .4byte 0x03000B8D
-_0807FB80: .4byte 0x08582268
+_0807FB80: .4byte sSaveDataEwramBackupPointers
 
 	thumb_func_start unk_7fb84
 unk_7fb84: @ 0x0807FB84
@@ -2701,9 +2701,9 @@ _0807FC1C: .4byte 0x03000B94
 _0807FC20: .4byte 0x03000B8D
 _0807FC24: .4byte gIsLoadingFile
 _0807FC28: .4byte 0x03000B8E
-_0807FC2C: .4byte 0x0858225C
+_0807FC2C: .4byte sSaveDataEwramPointers
 _0807FC30: .4byte 0x0000FFFF
-_0807FC34: .4byte 0x08582268
+_0807FC34: .4byte sSaveDataEwramBackupPointers
 _0807FC38:
 	cmp r4, #1
 	bne _0807FC60
@@ -2722,7 +2722,7 @@ _0807FC38:
 	strb r4, [r0]
 	b _0807FCE6
 	.align 2, 0
-_0807FC5C: .4byte 0x08582268
+_0807FC5C: .4byte sSaveDataEwramBackupPointers
 _0807FC60:
 	cmp r4, #2
 	bne _0807FC94
@@ -2746,7 +2746,7 @@ _0807FC60:
 	bl BitFill
 	b _0807FCE6
 	.align 2, 0
-_0807FC90: .4byte 0x08582268
+_0807FC90: .4byte sSaveDataEwramBackupPointers
 _0807FC94:
 	cmp r4, #3
 	bne _0807FCE4
@@ -2780,7 +2780,7 @@ _0807FC94:
 	strb r1, [r0, #1]
 	b _0807FCE6
 	.align 2, 0
-_0807FCDC: .4byte 0x08582268
+_0807FCDC: .4byte sSaveDataEwramBackupPointers
 _0807FCE0: .4byte 0x03000B94
 _0807FCE4:
 	b _0807FCE4
@@ -2903,7 +2903,7 @@ unk_7fdb0: @ 0x0807FDB0
 	ldr r1, _0807FDC4 @ =0x0858225C
 	b _0807FDCA
 	.align 2, 0
-_0807FDC4: .4byte 0x0858225C
+_0807FDC4: .4byte sSaveDataEwramPointers
 _0807FDC8:
 	ldr r1, _0807FE50 @ =0x08582268
 _0807FDCA:
@@ -2980,9 +2980,9 @@ _0807FE46:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_0807FE50: .4byte 0x08582268
+_0807FE50: .4byte sSaveDataEwramBackupPointers
 _0807FE54: .4byte 0x03000B8D
-_0807FE58: .4byte 0x08582200
+_0807FE58: .4byte sDebugSectionInfo+0xE4
 _0807FE5C: .4byte 0x0000FFFF
 
 	thumb_func_start SramLoad_CurrentSave
@@ -3119,7 +3119,7 @@ _0807FF48:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0807FF5C: .4byte 0x08582274
+_0807FF5C: .4byte sUnk_582274
 _0807FF60: .4byte 0x03000B8D
 _0807FF64: .4byte 0x02037C00
 _0807FF68: .4byte 0x03000033
@@ -3233,7 +3233,7 @@ _08080030:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08080044: .4byte 0x08582274
+_08080044: .4byte sUnk_582274
 _08080048: .4byte 0x03000B8D
 _0808004C: .4byte 0x02037C00
 _08080050: .4byte 0x0000FFFF
@@ -3312,7 +3312,7 @@ _080800A2:
 _080800E4: .4byte 0x0203F000
 _080800E8: .4byte 0x0000FFFF
 _080800EC: .4byte 0x03000B8D
-_080800F0: .4byte 0x08582288
+_080800F0: .4byte sUnk_582280+0x8
 
 	thumb_func_start SramRead_MostRecentSaveFile
 SramRead_MostRecentSaveFile: @ 0x080800F4
@@ -3403,7 +3403,7 @@ _0808018A:
 	.align 2, 0
 _08080194: .4byte 0x0203F000
 _08080198: .4byte 0x03000B8D
-_0808019C: .4byte 0x08582288
+_0808019C: .4byte sUnk_582280+0x8
 _080801A0:
 	mov r1, sp
 	ldr r2, _080801C4 @ =0x0000FFFF
@@ -3500,7 +3500,7 @@ _0808020E:
 _08080254: .4byte 0x0203F040
 _08080258: .4byte 0x0000FFFF
 _0808025C: .4byte 0x03000011
-_08080260: .4byte 0x085822A8
+_08080260: .4byte sUnk_582280+0x28
 
 	thumb_func_start SramRead_Language
 SramRead_Language: @ 0x08080264
@@ -3573,10 +3573,10 @@ _080802D2:
 	beq _080802FC
 	b _08080324
 	.align 2, 0
-_080802E8: .4byte 0x08582280
+_080802E8: .4byte sUnk_582280
 _080802EC: .4byte 0x040000D4
 _080802F0: .4byte 0x81000020
-_080802F4: .4byte 0x085822A8
+_080802F4: .4byte sUnk_582280+0x28
 _080802F8:
 	movs r4, #4
 	b _08080326
@@ -3679,7 +3679,7 @@ _080803A0:
 	b _08080390
 	.align 2, 0
 _080803BC: .4byte 0x040000D4
-_080803C0: .4byte 0x08582280
+_080803C0: .4byte sUnk_582280
 _080803C4: .4byte 0x80000020
 _080803C8:
 	ldr r1, _080803E0 @ =0x03000011
@@ -3816,7 +3816,7 @@ _080804D4: .4byte 0x02037200
 _080804D8: .4byte 0x03000033
 _080804DC: .4byte 0x0300003B
 _080804E0: .4byte gInGameTimer
-_080804E4: .4byte 0x085822D4
+_080804E4: .4byte sUnk_582280+0x54
 _080804E8: .4byte gDisableDrawingSamusAndScrollingFlag
 _080804EC: .4byte gPreviousNavigationConversation
 _080804F0: .4byte gPreviousSoundEvent
@@ -3830,7 +3830,7 @@ _0808050C: .4byte gCurrentRoom
 _08080510: .4byte gLastDoorUsed
 _08080514: .4byte 0x0300004C
 _08080518: .4byte 0x0300004D
-_0808051C: .4byte 0x0879B894
+_0808051C: .4byte sAreaDoorPointers
 _08080520: .4byte gPreviousXPosition
 _08080524: .4byte gSamusData
 _08080528: .4byte gPreviousYPosition
@@ -3934,9 +3934,9 @@ _08080584:
 	bx r0
 	.align 2, 0
 _080805F0: .4byte gBootDebugOptions
-_080805F4: .4byte 0x085822E4
+_080805F4: .4byte sUnk_582280+0x64
 _080805F8: .4byte gButtonAssignments
-_080805FC: .4byte 0x085822C8
+_080805FC: .4byte sUnk_582280+0x48
 _08080600: .4byte 0x0000FFFF
 _08080604: .4byte 0x02037C00
 _08080608: .4byte 0x02036000
@@ -3944,7 +3944,7 @@ _0808060C: .4byte 0x02037200
 _08080610: .4byte 0x03000033
 _08080614: .4byte 0x0300003B
 _08080618: .4byte gInGameTimer
-_0808061C: .4byte 0x085822D4
+_0808061C: .4byte sUnk_582280+0x54
 _08080620: .4byte gDisableDrawingSamusAndScrollingFlag
 _08080624: .4byte gPreviousNavigationConversation
 _08080628: .4byte gPreviousSoundEvent
@@ -4010,9 +4010,9 @@ Sram_CheckLoadSaveFile: @ 0x08080664
 	b _080806E0
 	.align 2, 0
 _080806BC: .4byte gButtonAssignments
-_080806C0: .4byte 0x085822C8
+_080806C0: .4byte sUnk_582280+0x48
 _080806C4: .4byte gBootDebugOptions
-_080806C8: .4byte 0x085822E4
+_080806C8: .4byte sUnk_582280+0x64
 _080806CC: .4byte gIsLoadingFile
 _080806D0: .4byte 0x03000B94
 _080806D4: .4byte 0x03000B8D
@@ -4097,7 +4097,7 @@ _08080784: .4byte gDisableSoftReset
 _08080788: .4byte 0x03000B94
 _0808078C: .4byte 0x03000B8D
 _08080790: .4byte 0x0000FFFF
-_08080794: .4byte 0x0858225C
+_08080794: .4byte sSaveDataEwramPointers
 _08080798:
 	cmp r4, #1
 	bne _080807A2
@@ -4123,7 +4123,7 @@ _080807AE:
 	b _080807DE
 	.align 2, 0
 _080807C4: .4byte 0x0000FFFF
-_080807C8: .4byte 0x08582268
+_080807C8: .4byte sSaveDataEwramBackupPointers
 _080807CC: .4byte 0x03000B8D
 _080807D0:
 	cmp r5, #3
@@ -4183,7 +4183,7 @@ Sram_CopyFile: @ 0x080807EC
 _08080834: .4byte gDisableSoftReset
 _08080838: .4byte 0x03000B94
 _0808083C: .4byte 0x03000B8D
-_08080840: .4byte 0x0858225C
+_08080840: .4byte sSaveDataEwramPointers
 _08080844:
 	cmp r1, #1
 	bne _0808085C
@@ -4216,7 +4216,7 @@ _08080872:
 	bl DmaTransfer
 	b _080808A2
 	.align 2, 0
-_08080884: .4byte 0x08582268
+_08080884: .4byte sSaveDataEwramBackupPointers
 _08080888: .4byte 0x03000B8D
 _0808088C:
 	cmp r0, #3
@@ -4321,7 +4321,7 @@ _0808093A:
 	bx r0
 	.align 2, 0
 _08080948: .4byte 0x03000B94
-_0808094C: .4byte 0x0858225C
+_0808094C: .4byte sSaveDataEwramPointers
 
 	thumb_func_start Sram_LoadingfileVblank
 Sram_LoadingfileVblank: @ 0x08080950
@@ -4624,7 +4624,7 @@ _08080B92:
 	ldr r0, _08080B98 @ =0x0858B3B0
 	b _08080B9E
 	.align 2, 0
-_08080B98: .4byte 0x0858B3B0
+_08080B98: .4byte sUnk_582280+0x9130
 _08080B9C:
 	ldr r0, _08080BB0 @ =0x0858B3B1
 _08080B9E:
@@ -4637,12 +4637,12 @@ _08080B9E:
 	strb r3, [r0]
 	b _08080BC6
 	.align 2, 0
-_08080BB0: .4byte 0x0858B3B1
+_08080BB0: .4byte sUnk_582280+0x9131
 _08080BB4:
 	ldr r0, _08080BB8 @ =0x0858B3B2
 	b _08080BBE
 	.align 2, 0
-_08080BB8: .4byte 0x0858B3B2
+_08080BB8: .4byte sUnk_582280+0x9132
 _08080BBC:
 	ldr r0, _08080BE8 @ =0x0858B3B3
 _08080BBE:
@@ -4669,7 +4669,7 @@ _08080BE2:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08080BE8: .4byte 0x0858B3B3
+_08080BE8: .4byte sUnk_582280+0x9133
 
 	thumb_func_start EraseSramCheckForInput
 EraseSramCheckForInput: @ 0x08080BEC
@@ -4815,7 +4815,7 @@ _08080CEA:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_08080CF4: .4byte 0x0858B3B4
+_08080CF4: .4byte sUnk_582280+0x9134
 
 	thumb_func_start EraseSramMenuInit
 EraseSramMenuInit: @ 0x08080CF8
@@ -4995,21 +4995,21 @@ _08080E78: .4byte 0x85000150
 _08080E7C: .4byte gNextOamSlot
 _08080E80: .4byte 0x03000011
 _08080E84: .4byte 0x04000006
-_08080E88: .4byte 0x085823D0
-_08080E8C: .4byte 0x085822F0
-_08080E90: .4byte 0x0858340C
+_08080E88: .4byte sUnk_582280+0x150
+_08080E8C: .4byte sUnk_582280+0x70
+_08080E90: .4byte sUnk_582280+0x118C
 _08080E94: .4byte 0x80000100
 _08080E98: .4byte 0x05000200
 _08080E9C: .4byte 0x80000070
 _08080EA0: .4byte 0x06001000
-_08080EA4: .4byte 0x08582BBC
+_08080EA4: .4byte sUnk_582280+0x93C
 _08080EA8: .4byte 0x06012000
-_08080EAC: .4byte 0x0879C228
+_08080EAC: .4byte sExploredMinimapBitFlags+0x44C
 _08080EB0: .4byte 0x06011000
 _08080EB4: .4byte 0x06010000
-_08080EB8: .4byte 0x0858ABE4
+_08080EB8: .4byte sUnk_582280+0x8964
 _08080EBC: .4byte 0x0600D000
-_08080EC0: .4byte 0x0858ADF0
+_08080EC0: .4byte sUnk_582280+0x8B70
 _08080EC4: .4byte 0x0600F000
 _08080EC8: .4byte 0x04000008
 _08080ECC: .4byte 0x0400000A
@@ -5067,8 +5067,8 @@ EraseSramResetOam: @ 0x08080EF8
 	bx r0
 	.align 2, 0
 _08080F48: .4byte gNonGameplayRam
-_08080F4C: .4byte 0x0858B3B0
-_08080F50: .4byte 0x0858B3BE
+_08080F4C: .4byte sUnk_582280+0x9130
+_08080F50: .4byte sUnk_582280+0x913E
 
 	thumb_func_start EraseSramUpdateCursorPosition
 EraseSramUpdateCursorPosition: @ 0x08080F54
@@ -5106,8 +5106,8 @@ EraseSramUpdateCursorPosition: @ 0x08080F54
 	bx r0
 	.align 2, 0
 _08080F94: .4byte gNonGameplayRam
-_08080F98: .4byte 0x0858B3BE
-_08080F9C: .4byte 0x0858B3C2
+_08080F98: .4byte sUnk_582280+0x913E
+_08080F9C: .4byte sUnk_582280+0x9142
 
 	thumb_func_start EraseSramVBlank
 EraseSramVBlank: @ 0x08080FA0
@@ -5329,7 +5329,7 @@ _0808112C:
 _0808114C: .4byte gNextOamSlot
 _08081150: .4byte gOamData
 _08081154: .4byte gNonGameplayRam
-_08081158: .4byte 0x0879C260
+_08081158: .4byte sExploredMinimapBitFlags+0x484
 _0808115C: .4byte gBg1YPosition
 _08081160: .4byte gBg1XPosition
 _08081164: .4byte 0x000001FF

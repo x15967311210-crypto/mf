@@ -176,19 +176,19 @@ _08090ED4: .4byte unk_99940
 _08090ED8: .4byte 0x040000D4
 _08090EDC: .4byte gNonGameplayRam
 _08090EE0: .4byte 0x85000150
-_08090EE4: .4byte 0x085FAB54
+_08090EE4: .4byte sIntroTilemap_5f65d8+0x457C
 _08090EE8: .4byte 0x06010000
-_08090EEC: .4byte 0x085FFD08
+_08090EEC: .4byte sIntroTilemap_5f65d8+0x9730
 _08090EF0: .4byte 0x05000200
 _08090EF4: .4byte 0x84000080
-_08090EF8: .4byte 0x085F7190
-_08090EFC: .4byte 0x0860030C
+_08090EF8: .4byte sIntroTilemap_5f65d8+0xBB8
+_08090EFC: .4byte sIntroTilemap_5f65d8+0x9D34
 _08090F00: .4byte 0x0600F000
-_08090F04: .4byte 0x085FFF08
+_08090F04: .4byte sIntroTilemap_5f65d8+0x9930
 _08090F08: .4byte 0x0600F800
-_08090F0C: .4byte 0x08598898
+_08090F0C: .4byte sIntroSamusShipFlyingTextTilemap
 _08090F10: .4byte 0x0600E000
-_08090F14: .4byte 0x085FF708
+_08090F14: .4byte sIntroTilemap_5f65d8+0x9130
 _08090F18: .4byte 0x0300122C
 _08090F1C: .4byte 0x0300122E
 _08090F20: .4byte 0x03001230
@@ -200,7 +200,7 @@ _08090F34: .4byte 0x00001E01
 _08090F38: .4byte 0x00001F03
 _08090F3C: .4byte gWrittenToBldy
 _08090F40: .4byte 0x04000054
-_08090F44: .4byte 0x0863A19C
+_08090F44: .4byte sCutsceneTextNone
 _08090F48: .4byte 0x0600D000
 _08090F4C: .4byte 0x85000400
 _08090F50: .4byte NewFileIntroLandingOnBslVblank
@@ -512,7 +512,7 @@ NewFileIntroProcessBslDoor: @ 0x08091178
 	strb r0, [r4, #0x14]
 	b _080911FE
 	.align 2, 0
-_080911A4: .4byte 0x085FE370
+_080911A4: .4byte sIntroTilemap_5f65d8+0x7D98
 _080911A8: .4byte 0x00000246
 _080911AC:
 	cmp r5, #1
@@ -1064,7 +1064,7 @@ _080915A6:
 	adds r1, r6, r0
 	b _08091612
 	.align 2, 0
-_080915BC: .4byte 0x085FF628
+_080915BC: .4byte sIntroTilemap_5f65d8+0x9050
 _080915C0:
 	cmp r0, #8
 	bne _080915EE
@@ -1166,7 +1166,7 @@ _0809166E:
 	strh r0, [r5, #0xe]
 	b _080917C8
 	.align 2, 0
-_08091674: .4byte 0x085FF638
+_08091674: .4byte sIntroTilemap_5f65d8+0x9060
 _08091678:
 	cmp r6, #3
 	bne _0809169E
@@ -1219,7 +1219,7 @@ _080916B6:
 	movs r0, #5
 	b _080917C6
 	.align 2, 0
-_080916D8: .4byte 0x085FF540
+_080916D8: .4byte sIntroTilemap_5f65d8+0x8F68
 _080916DC:
 	cmp r6, #5
 	bne _0809171C
@@ -1250,7 +1250,7 @@ _080916DC:
 	b _080917C6
 	.align 2, 0
 _08091714: .4byte 0x00FFFF00
-_08091718: .4byte 0x085FF4D8
+_08091718: .4byte sIntroTilemap_5f65d8+0x8F00
 _0809171C:
 	cmp r6, #6
 	bne _0809175C
@@ -1282,7 +1282,7 @@ _0809171C:
 	movs r0, #7
 	b _080917C6
 	.align 2, 0
-_08091758: .4byte 0x085FF5A8
+_08091758: .4byte sIntroTilemap_5f65d8+0x8FD0
 _0809175C:
 	cmp r6, #7
 	bne _0809178C
@@ -1307,7 +1307,7 @@ _0809175C:
 	movs r0, #8
 	b _080917C6
 	.align 2, 0
-_08091788: .4byte 0x085FF580
+_08091788: .4byte sIntroTilemap_5f65d8+0x8FA8
 _0809178C:
 	cmp r6, #8
 	bne _080917C8
@@ -1348,7 +1348,7 @@ _080917C8:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_080917D4: .4byte 0x085FF5A8
+_080917D4: .4byte sIntroTilemap_5f65d8+0x8FD0
 _080917D8: .4byte gNonGameplayRam
 
 	thumb_func_start NewFileIntroProcessShipLandingSmoke
@@ -1395,7 +1395,7 @@ NewFileIntroProcessShipLandingSmoke: @ 0x080917DC
 	strb r0, [r5, #0x14]
 	b _080918A0
 	.align 2, 0
-_08091830: .4byte 0x085FF5E8
+_08091830: .4byte sIntroTilemap_5f65d8+0x9010
 _08091834:
 	cmp r6, #1
 	bne _0809187A
@@ -1483,7 +1483,7 @@ unk_918a8: @ 0x080918A8
 	strb r0, [r2, #0x14]
 	b _080918E4
 	.align 2, 0
-_080918D8: .4byte 0x085FE430
+_080918D8: .4byte sIntroTilemap_5f65d8+0x7E58
 _080918DC:
 	cmp r3, #1
 	bne _080918E4
@@ -1666,7 +1666,7 @@ _08091A16:
 	strb r0, [r4, #0x14]
 	b _08091B50
 	.align 2, 0
-_08091A24: .4byte 0x085FF530
+_08091A24: .4byte sIntroTilemap_5f65d8+0x8F58
 _08091A28:
 	cmp r1, #3
 	bne _08091A58
@@ -1691,7 +1691,7 @@ _08091A36:
 	bl NewFileIntroLandingOnBslSetupOam
 	b _08091B50
 	.align 2, 0
-_08091A54: .4byte 0x085FF540
+_08091A54: .4byte sIntroTilemap_5f65d8+0x8F68
 _08091A58:
 	cmp r1, #4
 	bne _08091A78
@@ -1707,7 +1707,7 @@ _08091A58:
 	strb r0, [r4, #0x14]
 	b _08091B50
 	.align 2, 0
-_08091A74: .4byte 0x085FF530
+_08091A74: .4byte sIntroTilemap_5f65d8+0x8F58
 _08091A78:
 	cmp r1, #5
 	bne _08091A98
@@ -1749,7 +1749,7 @@ _08091A98:
 	strb r0, [r4, #0x14]
 	b _08091B50
 	.align 2, 0
-_08091AC4: .4byte 0x085FF4D8
+_08091AC4: .4byte sIntroTilemap_5f65d8+0x8F00
 _08091AC8:
 	cmp r1, #7
 	bne _08091B14
@@ -1789,7 +1789,7 @@ _08091AE4:
 	strb r0, [r4, #0x14]
 	b _08091B50
 	.align 2, 0
-_08091B10: .4byte 0x085FF580
+_08091B10: .4byte sIntroTilemap_5f65d8+0x8FA8
 _08091B14:
 	cmp r1, #8
 	bne _08091B50
@@ -1834,7 +1834,7 @@ _08091B50:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08091B68: .4byte 0x085FF5A8
+_08091B68: .4byte sIntroTilemap_5f65d8+0x8FD0
 _08091B6C: .4byte gNonGameplayRam
 _08091B70: .4byte 0x00000217
 
@@ -2015,7 +2015,7 @@ _08091C9C:
 	b _08091EDA
 	.align 2, 0
 _08091CC8: .4byte 0x00000236
-_08091CCC: .4byte 0x085FE430
+_08091CCC: .4byte sIntroTilemap_5f65d8+0x7E58
 _08091CD0: .4byte NewFileIntroProcessBslDoor
 _08091CD4:
 	cmp r6, #3
@@ -2057,7 +2057,7 @@ _08091CF0:
 	b _08091EDA
 	.align 2, 0
 _08091D1C: .4byte 0x00000236
-_08091D20: .4byte 0x085FE410
+_08091D20: .4byte sIntroTilemap_5f65d8+0x7E38
 _08091D24: .4byte NewFileIntroProcessBslDoorTop
 _08091D28:
 	cmp r6, #5
@@ -2084,7 +2084,7 @@ _08091D28:
 	b _08091EDA
 	.align 2, 0
 _08091D54: .4byte 0x00000236
-_08091D58: .4byte 0x085FE420
+_08091D58: .4byte sIntroTilemap_5f65d8+0x7E48
 _08091D5C: .4byte NewFileIntroProcessBslDoorBottom
 _08091D60:
 	cmp r6, #6
@@ -2136,7 +2136,7 @@ _08091D7C:
 	.align 2, 0
 _08091DBC: .4byte 0x00000222
 _08091DC0: .4byte 0x00000236
-_08091DC4: .4byte 0x085FF618
+_08091DC4: .4byte sIntroTilemap_5f65d8+0x9040
 _08091DC8: .4byte unk_914a8
 _08091DCC:
 	cmp r6, #8
@@ -2153,7 +2153,7 @@ _08091DCC:
 	str r1, [r0]
 	b _08091EDA
 	.align 2, 0
-_08091DE8: .4byte 0x085FF5B8
+_08091DE8: .4byte sIntroTilemap_5f65d8+0x8FE0
 _08091DEC: .4byte NewFileIntroProcessShipLandingSmoke
 _08091DF0:
 	cmp r6, #9
@@ -2180,7 +2180,7 @@ _08091DF0:
 	b _08091EDA
 	.align 2, 0
 _08091E1C: .4byte 0x00000236
-_08091E20: .4byte 0x085FE3C0
+_08091E20: .4byte sIntroTilemap_5f65d8+0x7DE8
 _08091E24: .4byte unk_918a8
 _08091E28:
 	cmp r6, #0xa
@@ -2229,7 +2229,7 @@ _08091E44:
 	b _08091ED8
 	.align 2, 0
 _08091E80: .4byte 0x00000236
-_08091E84: .4byte 0x085FF6C0
+_08091E84: .4byte sIntroTilemap_5f65d8+0x90E8
 _08091E88: .4byte NewFileIntroProcessLandingLights
 _08091E8C:
 	cmp r6, #0xc
@@ -2285,7 +2285,7 @@ _08091EDC:
 	.align 2, 0
 _08091EEC: .4byte 0x00000222
 _08091EF0: .4byte 0x00000236
-_08091EF4: .4byte 0x085FF638
+_08091EF4: .4byte sIntroTilemap_5f65d8+0x9060
 _08091EF8: .4byte NewFileIntroProcessShipLanding
 
 	thumb_func_start NewFileIntroLandingOnBslVblank
@@ -2420,11 +2420,11 @@ _08092004: .4byte 0x03001230
 _08092008: .4byte 0x03001232
 _0809200C: .4byte gNonGameplayRam
 _08092010: .4byte 0x00000111
-_08092014: .4byte 0x085FFB08
+_08092014: .4byte sIntroTilemap_5f65d8+0x9530
 _08092018: .4byte 0x05000340
 _0809201C: .4byte 0x84000008
 _08092020: .4byte 0x0000012D
-_08092024: .4byte 0x085FF908
+_08092024: .4byte sIntroTilemap_5f65d8+0x9330
 _08092028: .4byte 0x05000300
 _0809202C: .4byte 0x00000149
 _08092030: .4byte 0x05000320
@@ -2633,13 +2633,13 @@ _080921C8: .4byte unk_99940
 _080921CC: .4byte 0x040000D4
 _080921D0: .4byte gNonGameplayRam
 _080921D4: .4byte 0x85000150
-_080921D8: .4byte 0x0879C41C
+_080921D8: .4byte sData_79C2CC+0x150
 _080921DC: .4byte 0x06008000
-_080921E0: .4byte 0x08658BE0
+_080921E0: .4byte sIntroSamusHelmetCloseupBgGfx5+0xADBC
 _080921E4: .4byte 0x0600E800
-_080921E8: .4byte 0x08598898
+_080921E8: .4byte sIntroSamusShipFlyingTextTilemap
 _080921EC: .4byte 0x0600E000
-_080921F0: .4byte 0x086591E4
+_080921F0: .4byte sIntroSamusHelmetCloseupBgGfx5+0xB3C0
 _080921F4: .4byte 0x84000080
 _080921F8: .4byte 0x04000010
 _080921FC: .4byte 0x0300122C
@@ -2654,7 +2654,7 @@ _0809221C: .4byte 0x04000054
 _08092220: .4byte gWrittenToBldalpha_Eva
 _08092224: .4byte gWrittenToBldalpha_Evb
 _08092228: .4byte 0x04000052
-_0809222C: .4byte 0x0863A19C
+_0809222C: .4byte sCutsceneTextNone
 _08092230: .4byte 0x0600D000
 _08092234: .4byte 0x85000400
 _08092238: .4byte unk_93884
@@ -2715,7 +2715,7 @@ _08092290:
 	bl LZ77UncompVram
 	b _08092480
 	.align 2, 0
-_080922B4: .4byte 0x0879C41C
+_080922B4: .4byte sData_79C2CC+0x150
 _080922B8: .4byte 0x06008000
 _080922BC:
 	cmp r0, #6
@@ -2748,10 +2748,10 @@ _080922BC:
 	strh r0, [r1]
 	b _08092480
 	.align 2, 0
-_080922F8: .4byte 0x08658BE0
+_080922F8: .4byte sIntroSamusHelmetCloseupBgGfx5+0xADBC
 _080922FC: .4byte 0x0600E800
 _08092300: .4byte 0x040000D4
-_08092304: .4byte 0x086591E4
+_08092304: .4byte sIntroSamusHelmetCloseupBgGfx5+0xB3C0
 _08092308: .4byte 0x84000040
 _0809230C: .4byte gWrittenToBldalpha_Eva
 _08092310: .4byte gWrittenToBldalpha_Evb
@@ -2831,8 +2831,8 @@ _080923A2:
 	b _08092480
 	.align 2, 0
 _080923AC: .4byte gWrittenToBldalpha_Evb
-_080923B0: .4byte 0x080A8CDC
-_080923B4: .4byte 0x080A8D3C
+_080923B0: .4byte sMusicTrackDataRom
+_080923B4: .4byte sSoundDataEntries
 _080923B8: .4byte 0x00000F64
 _080923BC: .4byte 0x00000F6C
 _080923C0:
@@ -3201,17 +3201,17 @@ _080926B4: .4byte unk_99940
 _080926B8: .4byte 0x040000D4
 _080926BC: .4byte 0x030016A0
 _080926C0: .4byte 0x850000B4
-_080926C4: .4byte 0x0879C45C
+_080926C4: .4byte sData_79C2CC+0x190
 _080926C8: .4byte 0x06010000
-_080926CC: .4byte 0x0865C268
+_080926CC: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE444
 _080926D0: .4byte 0x05000200
 _080926D4: .4byte 0x84000080
-_080926D8: .4byte 0x0879C448
-_080926DC: .4byte 0x086593E4
+_080926D8: .4byte sData_79C2CC+0x17C
+_080926DC: .4byte sIntroSamusHelmetCloseupBgGfx5+0xB5C0
 _080926E0: .4byte 0x0600F000
-_080926E4: .4byte 0x08598898
+_080926E4: .4byte sIntroSamusShipFlyingTextTilemap
 _080926E8: .4byte 0x0600E000
-_080926EC: .4byte 0x086599A4
+_080926EC: .4byte sIntroSamusHelmetCloseupBgGfx5+0xBB80
 _080926F0: .4byte 0x84000040
 _080926F4: .4byte 0x04000010
 _080926F8: .4byte 0x0300122C
@@ -3228,7 +3228,7 @@ _08092720: .4byte gWrittenToBldalpha_Eva
 _08092724: .4byte gWrittenToBldalpha_Evb
 _08092728: .4byte 0x04000052
 _0809272C: .4byte gNonGameplayRam
-_08092730: .4byte 0x0863A19C
+_08092730: .4byte sCutsceneTextNone
 _08092734: .4byte 0x0600D000
 _08092738: .4byte 0x85000400
 _0809273C: .4byte IntroShipAlertAndDraftingVblank
@@ -3338,8 +3338,8 @@ _080927FA:
 	b _0809281C
 	.align 2, 0
 _08092804: .4byte gWrittenToBldy
-_08092808: .4byte 0x080A8CDC
-_0809280C: .4byte 0x080A8D3C
+_08092808: .4byte sMusicTrackDataRom
+_0809280C: .4byte sSoundDataEntries
 _08092810: .4byte 0x00000F5C
 _08092814:
 	movs r0, #0
@@ -3513,17 +3513,17 @@ _0809297C: .4byte unk_99940
 _08092980: .4byte 0x040000D4
 _08092984: .4byte 0x030016A0
 _08092988: .4byte 0x850000B4
-_0809298C: .4byte 0x086101B8
+_0809298C: .4byte sIntroBslSpaceBgGfx+0x4514
 _08092990: .4byte 0x06010000
-_08092994: .4byte 0x08612F48
+_08092994: .4byte sPal_612f48
 _08092998: .4byte 0x05000200
 _0809299C: .4byte 0x84000080
-_080929A0: .4byte 0x08605D08
-_080929A4: .4byte 0x08609220
+_080929A0: .4byte sTitleScreenSpaceBackgroundGfx
+_080929A4: .4byte sTitleScreenSpaceBackgroundTilemap
 _080929A8: .4byte 0x0600F800
-_080929AC: .4byte 0x08598898
+_080929AC: .4byte sIntroSamusShipFlyingTextTilemap
 _080929B0: .4byte 0x0600E000
-_080929B4: .4byte 0x08609020
+_080929B4: .4byte sPal_609020
 _080929B8: .4byte 0x04000010
 _080929BC: .4byte 0x0300122C
 _080929C0: .4byte 0x0300122E
@@ -3538,7 +3538,7 @@ _080929E0: .4byte gWrittenToBldalpha_Eva
 _080929E4: .4byte gWrittenToBldalpha_Evb
 _080929E8: .4byte 0x04000052
 _080929EC: .4byte 0xFFFFFDE4
-_080929F0: .4byte 0x0863A19C
+_080929F0: .4byte sCutsceneTextNone
 _080929F4: .4byte 0x0600D000
 _080929F8: .4byte 0x85000400
 _080929FC: .4byte IntroShipAlertAndDraftingVblank
@@ -3754,8 +3754,8 @@ _08092BB2:
 	b _08092BDE
 	.align 2, 0
 _08092BBC: .4byte gWrittenToBldy
-_08092BC0: .4byte 0x080A8CDC
-_08092BC4: .4byte 0x080A8D3C
+_08092BC0: .4byte sMusicTrackDataRom
+_08092BC4: .4byte sSoundDataEntries
 _08092BC8: .4byte 0x00000F64
 _08092BCC:
 	movs r0, #0x84
@@ -4168,7 +4168,7 @@ _08092EDA:
 	bl SoundPlay
 	b _080930BA
 	.align 2, 0
-_08092EFC: .4byte 0x080A4FA4
+_08092EFC: .4byte sSineTable
 _08092F00:
 	cmp r0, #2
 	bne _08092F7C
@@ -4233,7 +4233,7 @@ _08092F60:
 	strb r0, [r3, #0x14]
 	b _080930BA
 	.align 2, 0
-_08092F78: .4byte 0x080A4FA4
+_08092F78: .4byte sSineTable
 _08092F7C:
 	cmp r0, #3
 	bne _08092FE4
@@ -4377,7 +4377,7 @@ _0809304A:
 	strb r0, [r1]
 	b _080930BA
 	.align 2, 0
-_08093088: .4byte 0x0860AD48
+_08093088: .4byte sTitleScreenSpaceBackgroundTilemap+0x1B28
 _0809308C: .4byte 0x000001F3
 _08093090: .4byte gNonGameplayRam
 _08093094:
@@ -4607,14 +4607,14 @@ _08093222:
 	ldr r0, _08093234 @ =0x0860AC18
 	b _0809324A
 	.align 2, 0
-_08093234: .4byte 0x0860AC18
+_08093234: .4byte sTitleScreenSpaceBackgroundTilemap+0x19F8
 _08093238:
 	cmp r0, #0x32
 	bne _08093244
 	ldr r0, _08093240 @ =0x0860AC28
 	b _0809324A
 	.align 2, 0
-_08093240: .4byte 0x0860AC28
+_08093240: .4byte sTitleScreenSpaceBackgroundTilemap+0x1A08
 _08093244:
 	cmp r0, #0x46
 	bne _0809324C
@@ -4661,7 +4661,7 @@ _08093290:
 	subs r0, #2
 	b _080932AA
 	.align 2, 0
-_0809329C: .4byte 0x0860AC38
+_0809329C: .4byte sTitleScreenSpaceBackgroundTilemap+0x1A18
 _080932A0:
 	movs r0, #0
 	strb r0, [r6, #0x10]
@@ -5006,7 +5006,7 @@ _080934D8:
 	.align 2, 0
 _0809351C: .4byte 0x0000021E
 _08093520: .4byte 0x00000222
-_08093524: .4byte 0x0860ACD0
+_08093524: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AB0
 _08093528: .4byte IntroProcessDriftingShip
 _0809352C:
 	cmp r5, #0xb
@@ -5027,7 +5027,7 @@ _0809352C:
 	str r1, [r0]
 	b _0809382A
 	.align 2, 0
-_08093550: .4byte 0x0860ACD0
+_08093550: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AB0
 _08093554: .4byte IntroProcessBslShipSpawning
 _08093558:
 	cmp r5, #0xc
@@ -5044,7 +5044,7 @@ _08093558:
 	b _080935CE
 	.align 2, 0
 _08093570: .4byte 0x0000FFD8
-_08093574: .4byte 0x0860AD28
+_08093574: .4byte sTitleScreenSpaceBackgroundTilemap+0x1B08
 _08093578:
 	cmp r5, #0xd
 	bne _08093598
@@ -5060,7 +5060,7 @@ _08093578:
 	b _080935CE
 	.align 2, 0
 _08093590: .4byte 0x0000FFE2
-_08093594: .4byte 0x0860AD18
+_08093594: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AF8
 _08093598:
 	cmp r5, #0xe
 	bne _080935B8
@@ -5076,7 +5076,7 @@ _08093598:
 	b _080935CE
 	.align 2, 0
 _080935B0: .4byte 0x0000FFEC
-_080935B4: .4byte 0x0860AD08
+_080935B4: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AE8
 _080935B8:
 	cmp r5, #0xf
 	bne _080935E8
@@ -5099,7 +5099,7 @@ _080935CE:
 	b _0809382A
 	.align 2, 0
 _080935DC: .4byte 0x0000FFF6
-_080935E0: .4byte 0x0860ACF8
+_080935E0: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AD8
 _080935E4: .4byte IntroProcessBslShipBack
 _080935E8:
 	cmp r5, #0x10
@@ -5116,7 +5116,7 @@ _080935E8:
 	str r1, [r0]
 	b _0809382A
 	.align 2, 0
-_08093604: .4byte 0x0860AC08
+_08093604: .4byte sTitleScreenSpaceBackgroundTilemap+0x19E8
 _08093608: .4byte IntroProcessDepthParticle
 _0809360C:
 	cmp r5, #0x13
@@ -5133,7 +5133,7 @@ _0809360C:
 	str r1, [r0]
 	b _0809382A
 	.align 2, 0
-_08093628: .4byte 0x0865BB38
+_08093628: .4byte sIntroSamusHelmetCloseupBgGfx5+0xDD14
 _0809362C: .4byte IntroProcessTimeAndDistanceOam
 _08093630:
 	cmp r5, #0x14
@@ -5148,7 +5148,7 @@ _08093630:
 	adds r0, r4, r0
 	b _0809366E
 	.align 2, 0
-_08093648: .4byte 0x0865BD00
+_08093648: .4byte sIntroSamusHelmetCloseupBgGfx5+0xDEDC
 _0809364C:
 	cmp r5, #0x15
 	bne _0809367C
@@ -5172,7 +5172,7 @@ _0809366E:
 	str r1, [r0]
 	b _0809382A
 	.align 2, 0
-_08093674: .4byte 0x0865BD48
+_08093674: .4byte sIntroSamusHelmetCloseupBgGfx5+0xDF24
 _08093678: .4byte unk_9397c
 _0809367C:
 	cmp r5, #0x16
@@ -5196,7 +5196,7 @@ _0809367C:
 	str r1, [r0]
 	b _0809382A
 	.align 2, 0
-_080936A4: .4byte 0x0865BD60
+_080936A4: .4byte sIntroSamusHelmetCloseupBgGfx5+0xDF3C
 _080936A8: .4byte IntroProcessAsteroidsPopUp
 _080936AC:
 	cmp r5, #0x17
@@ -5220,7 +5220,7 @@ _080936AC:
 	str r1, [r0]
 	b _0809382A
 	.align 2, 0
-_080936D4: .4byte 0x0865BE00
+_080936D4: .4byte sIntroSamusHelmetCloseupBgGfx5+0xDFDC
 _080936D8: .4byte unk_93334
 _080936DC:
 	cmp r5, #0x18
@@ -5247,7 +5247,7 @@ _080936DC:
 	ldr r1, _0809370C @ =0x0865BF10
 	b _0809381C
 	.align 2, 0
-_0809370C: .4byte 0x0865BF10
+_0809370C: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE0EC
 _08093710:
 	cmp r5, #0x19
 	bne _08093754
@@ -5279,7 +5279,7 @@ _08093710:
 	ldr r0, _08093750 @ =unk_93300
 	b _08093828
 	.align 2, 0
-_0809374C: .4byte 0x0865C0D0
+_0809374C: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE2AC
 _08093750: .4byte unk_93300
 _08093754:
 	cmp r5, #0x1a
@@ -5306,7 +5306,7 @@ _08093754:
 	ldr r1, _08093784 @ =0x0865C128
 	b _0809381C
 	.align 2, 0
-_08093784: .4byte 0x0865C128
+_08093784: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE304
 _08093788:
 	cmp r5, #0x1b
 	bne _080937BC
@@ -5332,7 +5332,7 @@ _08093788:
 	ldr r1, _080937B8 @ =0x0865C180
 	b _0809381C
 	.align 2, 0
-_080937B8: .4byte 0x0865C180
+_080937B8: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE35C
 _080937BC:
 	cmp r5, #0x1c
 	bne _080937F0
@@ -5358,7 +5358,7 @@ _080937BC:
 	ldr r1, _080937EC @ =0x0865C1D8
 	b _0809381C
 	.align 2, 0
-_080937EC: .4byte 0x0865C1D8
+_080937EC: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE3B4
 _080937F0:
 	cmp r5, #0x1d
 	bne _0809382A
@@ -5404,7 +5404,7 @@ _0809382E:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_08093840: .4byte 0x0865C230
+_08093840: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE40C
 _08093844: .4byte IntroOamProcessBigChangingNumber
 
 	thumb_func_start IntroSetupBigNumberOam
@@ -5746,25 +5746,25 @@ _08093B24: .4byte unk_99940
 _08093B28: .4byte 0x040000D4
 _08093B2C: .4byte gNonGameplayRam
 _08093B30: .4byte 0x85000150
-_08093B34: .4byte 0x086101B8
+_08093B34: .4byte sIntroBslSpaceBgGfx+0x4514
 _08093B38: .4byte 0x06010000
-_08093B3C: .4byte 0x08612F48
+_08093B3C: .4byte sPal_612f48
 _08093B40: .4byte 0x05000200
 _08093B44: .4byte 0x84000080
-_08093B48: .4byte 0x0860BCA4
-_08093B4C: .4byte 0x0860B670
+_08093B48: .4byte sIntroBslSpaceBgGfx
+_08093B4C: .4byte sIntroBslTilemap
 _08093B50: .4byte 0x02010000
 _08093B54: .4byte 0x0600E800
 _08093B58: .4byte 0x84000200
 _08093B5C: .4byte 0x000001FF
 _08093B60: .4byte 0x0600F000
 _08093B64: .4byte 0x81000400
-_08093B68: .4byte 0x0860B148
+_08093B68: .4byte sIntroSpaceTilemap
 _08093B6C: .4byte 0x0600F800
-_08093B70: .4byte 0x08612E48
+_08093B70: .4byte sIntroBslSpaceBgPal
 _08093B74: .4byte 0x05000100
 _08093B78: .4byte 0x84000040
-_08093B7C: .4byte 0x08598898
+_08093B7C: .4byte sIntroSamusShipFlyingTextTilemap
 _08093B80: .4byte 0x0600E000
 _08093B84: .4byte 0x04000010
 _08093B88: .4byte gBg1XPosition
@@ -5777,7 +5777,7 @@ _08093BA0: .4byte 0x04000008
 _08093BA4: .4byte 0x00001C08
 _08093BA8: .4byte 0x00005D02
 _08093BAC: .4byte 0x00001F03
-_08093BB0: .4byte 0x0863A19C
+_08093BB0: .4byte sCutsceneTextNone
 _08093BB4: .4byte 0x0600D000
 _08093BB8: .4byte 0x85000400
 _08093BBC: .4byte IntroSpaceViewVblank
@@ -6008,8 +6008,8 @@ _08093D7A:
 	b _08093F00
 	.align 2, 0
 _08093D84: .4byte gWrittenToBldy
-_08093D88: .4byte 0x080A8CDC
-_08093D8C: .4byte 0x080A8D3C
+_08093D88: .4byte sMusicTrackDataRom
+_08093D8C: .4byte sSoundDataEntries
 _08093D90: .4byte 0x00000F5C
 _08093D94:
 	movs r7, #1
@@ -6033,7 +6033,7 @@ _08093D98:
 	bl LZ77UncompVram
 	b _08093F00
 	.align 2, 0
-_08093DBC: .4byte 0x0879C41C
+_08093DBC: .4byte sData_79C2CC+0x150
 _08093DC0: .4byte 0x06008000
 _08093DC4:
 	cmp r0, #6
@@ -6066,10 +6066,10 @@ _08093DC4:
 	strh r0, [r1]
 	b _08093F00
 	.align 2, 0
-_08093E00: .4byte 0x08658BE0
+_08093E00: .4byte sIntroSamusHelmetCloseupBgGfx5+0xADBC
 _08093E04: .4byte 0x0600E000
 _08093E08: .4byte 0x040000D4
-_08093E0C: .4byte 0x086591E4
+_08093E0C: .4byte sIntroSamusHelmetCloseupBgGfx5+0xB3C0
 _08093E10: .4byte 0x84000040
 _08093E14: .4byte gWrittenToBldalpha_Eva
 _08093E18: .4byte gWrittenToBldalpha_Evb
@@ -6153,8 +6153,8 @@ _08093EB0:
 	b _08093F00
 	.align 2, 0
 _08093EC0: .4byte gWrittenToBldalpha_Eva
-_08093EC4: .4byte 0x080A8CDC
-_08093EC8: .4byte 0x080A8D3C
+_08093EC4: .4byte sMusicTrackDataRom
+_08093EC8: .4byte sSoundDataEntries
 _08093ECC: .4byte 0x00000F4C
 _08093ED0: .4byte 0x00000F54
 _08093ED4: .4byte 0x000001EB
@@ -6367,18 +6367,18 @@ _08094090: .4byte unk_99940
 _08094094: .4byte 0x040000D4
 _08094098: .4byte 0x030016A0
 _0809409C: .4byte 0x850000B4
-_080940A0: .4byte 0x086101B8
+_080940A0: .4byte sIntroBslSpaceBgGfx+0x4514
 _080940A4: .4byte 0x06010000
-_080940A8: .4byte 0x08612F48
+_080940A8: .4byte sPal_612f48
 _080940AC: .4byte 0x05000200
 _080940B0: .4byte 0x84000080
-_080940B4: .4byte 0x08605D08
-_080940B8: .4byte 0x08609220
+_080940B4: .4byte sTitleScreenSpaceBackgroundGfx
+_080940B8: .4byte sTitleScreenSpaceBackgroundTilemap
 _080940BC: .4byte 0x0600F800
-_080940C0: .4byte 0x08598898
+_080940C0: .4byte sIntroSamusShipFlyingTextTilemap
 _080940C4: .4byte 0x0600E000
-_080940C8: .4byte 0x08609020
-_080940CC: .4byte 0x08598A8C
+_080940C8: .4byte sPal_609020
+_080940CC: .4byte sPal_598a8c
 _080940D0: .4byte 0x050001E0
 _080940D4: .4byte 0x84000008
 _080940D8: .4byte 0x04000010
@@ -6392,7 +6392,7 @@ _080940F4: .4byte 0x04000008
 _080940F8: .4byte 0x00001C08
 _080940FC: .4byte 0x00001F03
 _08094100: .4byte 0xFFFFFDE4
-_08094104: .4byte 0x0863A19C
+_08094104: .4byte sCutsceneTextNone
 _08094108: .4byte 0x0600D000
 _0809410C: .4byte 0x85000400
 _08094110: .4byte IntroSpaceViewVblank
@@ -6833,7 +6833,7 @@ _08094408:
 	movs r0, #4
 	b _080944D4
 	.align 2, 0
-_08094478: .4byte 0x080A4FA4
+_08094478: .4byte sSineTable
 _0809447C: .4byte 0x00007530
 _08094480:
 	cmp r0, #4
@@ -7143,7 +7143,7 @@ _08094676:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_080946D4: .4byte 0x080A4FA4
+_080946D4: .4byte sSineTable
 
 	thumb_func_start IntroProcessSplashText
 IntroProcessSplashText: @ 0x080946D8
@@ -7200,7 +7200,7 @@ IntroProcessSpaceViewParticle: @ 0x08094704
 	strb r0, [r4, #0x14]
 	b _08094792
 	.align 2, 0
-_0809473C: .4byte 0x0879C394
+_0809473C: .4byte sData_79C2CC+0xC8
 _08094740:
 	cmp r0, #1
 	bne _08094792
@@ -7266,7 +7266,7 @@ _080947AE:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_080947B4: .4byte 0x0879C394
+_080947B4: .4byte sData_79C2CC+0xC8
 
 	thumb_func_start IntroProcessIdleShipBackview
 IntroProcessIdleShipBackview: @ 0x080947B8
@@ -7303,7 +7303,7 @@ _080947F0:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_080947F4: .4byte 0x080A4FA4
+_080947F4: .4byte sSineTable
 
 	thumb_func_start IntroProcessBslShipSpawning_2
 IntroProcessBslShipSpawning_2: @ 0x080947F8
@@ -7509,14 +7509,14 @@ _0809495E:
 	ldr r0, _08094970 @ =0x0860AC18
 	b _08094986
 	.align 2, 0
-_08094970: .4byte 0x0860AC18
+_08094970: .4byte sTitleScreenSpaceBackgroundTilemap+0x19F8
 _08094974:
 	cmp r0, #0x32
 	bne _08094980
 	ldr r0, _0809497C @ =0x0860AC28
 	b _08094986
 	.align 2, 0
-_0809497C: .4byte 0x0860AC28
+_0809497C: .4byte sTitleScreenSpaceBackgroundTilemap+0x1A08
 _08094980:
 	cmp r0, #0x46
 	bne _08094988
@@ -7563,7 +7563,7 @@ _080949CC:
 	subs r0, #2
 	b _080949E6
 	.align 2, 0
-_080949D8: .4byte 0x0860AC38
+_080949D8: .4byte sTitleScreenSpaceBackgroundTilemap+0x1A18
 _080949DC:
 	movs r0, #0
 	strb r0, [r6, #0x10]
@@ -7786,7 +7786,7 @@ _08094B44:
 	.align 2, 0
 _08094B80: .4byte 0x00000222
 _08094B84: .4byte 0x00000236
-_08094B88: .4byte 0x0860AC98
+_08094B88: .4byte sTitleScreenSpaceBackgroundTilemap+0x1A78
 _08094B8C: .4byte IntroProcessSamusSHipEntering
 _08094B90:
 	cmp r6, #4
@@ -7803,7 +7803,7 @@ _08094B90:
 	str r1, [r0]
 	b _08094DCC
 	.align 2, 0
-_08094BAC: .4byte 0x0860AF10
+_08094BAC: .4byte sTitleScreenSpaceBackgroundTilemap+0x1CF0
 _08094BB0: .4byte IntroProcessSplashText
 _08094BB4:
 	cmp r6, #5
@@ -7827,7 +7827,7 @@ _08094BB4:
 	b _08094DCC
 	.align 2, 0
 _08094BDC: .4byte 0x00000236
-_08094BE0: .4byte 0x0860AC38
+_08094BE0: .4byte sTitleScreenSpaceBackgroundTilemap+0x1A18
 _08094BE4: .4byte IntroProcessSpaceViewParticle
 _08094BE8:
 	cmp r6, #0xa
@@ -7877,7 +7877,7 @@ _08094BE8:
 _08094C40: .4byte 0x0000021E
 _08094C44: .4byte 0x00000222
 _08094C48: .4byte 0x00000236
-_08094C4C: .4byte 0x0860ACD0
+_08094C4C: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AB0
 _08094C50: .4byte IntroProcessIdleShipBackview
 _08094C54:
 	cmp r6, #0xb
@@ -7898,7 +7898,7 @@ _08094C54:
 	str r1, [r0]
 	b _08094DCC
 	.align 2, 0
-_08094C78: .4byte 0x0860ACD0
+_08094C78: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AB0
 _08094C7C: .4byte IntroProcessBslShipSpawning_2
 _08094C80:
 	cmp r6, #0xc
@@ -7925,7 +7925,7 @@ _08094C80:
 	.align 2, 0
 _08094CAC: .4byte 0x0000FFD8
 _08094CB0: .4byte 0x00000236
-_08094CB4: .4byte 0x0860AD28
+_08094CB4: .4byte sTitleScreenSpaceBackgroundTilemap+0x1B08
 _08094CB8:
 	cmp r6, #0xd
 	bne _08094CF0
@@ -7951,7 +7951,7 @@ _08094CB8:
 	.align 2, 0
 _08094CE4: .4byte 0x0000FFE2
 _08094CE8: .4byte 0x00000236
-_08094CEC: .4byte 0x0860AD18
+_08094CEC: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AF8
 _08094CF0:
 	cmp r6, #0xe
 	bne _08094D38
@@ -7984,7 +7984,7 @@ _08094D18:
 	.align 2, 0
 _08094D28: .4byte 0x0000FFEC
 _08094D2C: .4byte 0x00000236
-_08094D30: .4byte 0x0860AD08
+_08094D30: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AE8
 _08094D34: .4byte IntroProcessBslShipBackview
 _08094D38:
 	cmp r6, #0xf
@@ -8025,7 +8025,7 @@ _08094D38:
 	.align 2, 0
 _08094D80: .4byte 0x0000FFF6
 _08094D84: .4byte 0x00000236
-_08094D88: .4byte 0x0860ACF8
+_08094D88: .4byte sTitleScreenSpaceBackgroundTilemap+0x1AD8
 _08094D8C: .4byte IntroProcessBslShipBackview
 _08094D90:
 	cmp r6, #0x10
@@ -8073,7 +8073,7 @@ _08094DD0:
 	bx r1
 	.align 2, 0
 _08094DE0: .4byte 0x00000236
-_08094DE4: .4byte 0x0860AC08
+_08094DE4: .4byte sTitleScreenSpaceBackgroundTilemap+0x19E8
 _08094DE8: .4byte IntroProcessIdleDepthParticle
 
 	thumb_func_start IntroSpaceViewVblank
@@ -8443,17 +8443,17 @@ _080950F0: .4byte unk_99940
 _080950F4: .4byte 0x040000D4
 _080950F8: .4byte gNonGameplayRam
 _080950FC: .4byte 0x85000150
-_08095100: .4byte 0x086238F4
+_08095100: .4byte sNextPageArrowPal+0x1074C
 _08095104: .4byte 0x06010000
-_08095108: .4byte 0x08636C38
+_08095108: .4byte sNextPageArrowPal+0x23A90
 _0809510C: .4byte 0x05000200
 _08095110: .4byte 0x84000080
-_08095114: .4byte 0x0862B5F4
-_08095118: .4byte 0x08638C14
+_08095114: .4byte sNextPageArrowPal+0x1844C
+_08095118: .4byte sNextPageArrowPal+0x25A6C
 _0809511C: .4byte 0x0600F000
-_08095120: .4byte 0x08639BC4
+_08095120: .4byte sNextPageArrowPal+0x26A1C
 _08095124: .4byte 0x0600F800
-_08095128: .4byte 0x08637038
+_08095128: .4byte sNextPageArrowPal+0x23E90
 _0809512C: .4byte gBg1XPosition
 _08095130: .4byte gBg1YPosition
 _08095134: .4byte 0x0300122C
@@ -8469,7 +8469,7 @@ _08095158: .4byte gWrittenToBldy
 _0809515C: .4byte 0x04000054
 _08095160: .4byte gWrittenToBldalpha_Eva
 _08095164: .4byte gWrittenToBldalpha_Evb
-_08095168: .4byte 0x0863A19C
+_08095168: .4byte sCutsceneTextNone
 _0809516C: .4byte 0x0600D000
 _08095170: .4byte 0x85000400
 _08095174: .4byte EndingBslCrashingVblank
@@ -8652,12 +8652,12 @@ _080952F4: .4byte 0x850000B4
 _080952F8: .4byte 0xFFFFFDF8
 _080952FC: .4byte 0x8100007E
 _08095300: .4byte 0xFFFFFEF4
-_08095304: .4byte 0x08626738
-_08095308: .4byte 0x0863929C
+_08095304: .4byte sNextPageArrowPal+0x13590
+_08095308: .4byte sNextPageArrowPal+0x260F4
 _0809530C: .4byte 0x0600F000
-_08095310: .4byte 0x086395B8
+_08095310: .4byte sNextPageArrowPal+0x26410
 _08095314: .4byte 0x0600F800
-_08095318: .4byte 0x08636E38
+_08095318: .4byte sNextPageArrowPal+0x23C90
 _0809531C: .4byte 0x84000080
 _08095320: .4byte gBg1XPosition
 _08095324: .4byte gBg1YPosition
@@ -8677,7 +8677,7 @@ _08095358: .4byte gWrittenToBldalpha_Eva
 _0809535C: .4byte gWrittenToBldalpha_Evb
 _08095360: .4byte 0x04000052
 _08095364: .4byte 0xFFFFFDE4
-_08095368: .4byte 0x0863A19C
+_08095368: .4byte sCutsceneTextNone
 _0809536C: .4byte 0x0600D000
 _08095370: .4byte 0x85000400
 _08095374: .4byte EndingShipFrontViewVblank
@@ -9195,7 +9195,7 @@ _08095744:
 	strb r1, [r0]
 	b _08095796
 	.align 2, 0
-_08095768: .4byte 0x086362B8
+_08095768: .4byte sNextPageArrowPal+0x23110
 _0809576C: .4byte gNonGameplayRam
 _08095770:
 	cmp r1, #3
@@ -9433,7 +9433,7 @@ _080958EA:
 	strh r4, [r3, #0xa]
 	b _08095944
 	.align 2, 0
-_08095918: .4byte 0x080A4FA4
+_08095918: .4byte sSineTable
 _0809591C:
 	cmp r1, #2
 	bne _08095944
@@ -9464,7 +9464,7 @@ _08095944:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08095950: .4byte 0x080A4FA4
+_08095950: .4byte sSineTable
 _08095954: .4byte 0x0300122E
 
 	thumb_func_start EndingBslCrashingSetupOam
@@ -9638,7 +9638,7 @@ _08095A9C: .4byte 0x85000009
 _08095AA0: .4byte 0xFFFFFDE4
 _08095AA4: .4byte 0x00000222
 _08095AA8: .4byte 0x00000236
-_08095AAC: .4byte 0x08636020
+_08095AAC: .4byte sNextPageArrowPal+0x22E78
 _08095AB0: .4byte EndingProcessFallingBsl
 _08095AB4:
 	cmp r6, #2
@@ -9683,7 +9683,7 @@ _08095AB4:
 	.align 2, 0
 _08095B04: .4byte 0x00000222
 _08095B08: .4byte 0x00000236
-_08095B0C: .4byte 0x08636038
+_08095B0C: .4byte sNextPageArrowPal+0x22E90
 _08095B10: .4byte EndingProcessFallingBsl
 _08095B14:
 	cmp r6, #3
@@ -9709,7 +9709,7 @@ _08095B14:
 	b _08095C3A
 	.align 2, 0
 _08095B40: .4byte 0x00000236
-_08095B44: .4byte 0x08636050
+_08095B44: .4byte sNextPageArrowPal+0x22EA8
 _08095B48: .4byte unk_9579c
 _08095B4C:
 	cmp r6, #4
@@ -9738,7 +9738,7 @@ _08095B4C:
 	b _08095C3A
 	.align 2, 0
 _08095B7C: .4byte 0x00000236
-_08095B80: .4byte 0x08636288
+_08095B80: .4byte sNextPageArrowPal+0x230E0
 _08095B84: .4byte EndingProcessLeavingSmallShip
 _08095B88:
 	cmp r6, #5
@@ -9758,7 +9758,7 @@ _08095B88:
 	ldr r1, _08095BAC @ =EndingProcessLeavingBigShip
 	b _08095C3A
 	.align 2, 0
-_08095BA8: .4byte 0x086362A0
+_08095BA8: .4byte sNextPageArrowPal+0x230F8
 _08095BAC: .4byte EndingProcessLeavingBigShip
 _08095BB0:
 	cmp r6, #0xa
@@ -9787,7 +9787,7 @@ _08095BB0:
 	b _08095C3A
 	.align 2, 0
 _08095BE0: .4byte 0x00000236
-_08095BE4: .4byte 0x086363A0
+_08095BE4: .4byte sNextPageArrowPal+0x231F8
 _08095BE8: .4byte unk_95e20
 _08095BEC:
 	cmp r6, #0xb
@@ -9810,7 +9810,7 @@ _08095BEC:
 	b _08095C3A
 	.align 2, 0
 _08095C10: .4byte 0x00000236
-_08095C14: .4byte 0x086363B8
+_08095C14: .4byte sNextPageArrowPal+0x23210
 _08095C18: .4byte EndingProcessFrontFacingShipThrusters
 _08095C1C:
 	cmp r6, #0xc
@@ -9841,7 +9841,7 @@ _08095C3E:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_08095C4C: .4byte 0x086363A0
+_08095C4C: .4byte sNextPageArrowPal+0x231F8
 _08095C50: .4byte EndingProcessFrontFacingShip
 
 	thumb_func_start EndingBslCrashingVblank
@@ -9933,7 +9933,7 @@ _08095D10: .4byte 0x03001230
 _08095D14: .4byte 0x03001232
 _08095D18: .4byte gNonGameplayRam
 _08095D1C: .4byte 0x00000111
-_08095D20: .4byte 0x08636A38
+_08095D20: .4byte sNextPageArrowPal+0x23890
 _08095D24: .4byte 0x05000120
 _08095D28: .4byte 0x84000008
 
@@ -10231,21 +10231,21 @@ _08095F8C: .4byte unk_99940
 _08095F90: .4byte 0x040000D4
 _08095F94: .4byte gNonGameplayRam
 _08095F98: .4byte 0x85000150
-_08095F9C: .4byte 0x086150E8
+_08095F9C: .4byte sNextPageArrowPal+0x1F40
 _08095FA0: .4byte 0x06010000
-_08095FA4: .4byte 0x08636638
+_08095FA4: .4byte sNextPageArrowPal+0x23490
 _08095FA8: .4byte 0x05000200
 _08095FAC: .4byte 0x84000080
-_08095FB0: .4byte 0x086186A4
+_08095FB0: .4byte sNextPageArrowPal+0x54FC
 _08095FB4: .4byte 0x06008000
-_08095FB8: .4byte 0x086377F8
+_08095FB8: .4byte sNextPageArrowPal+0x24650
 _08095FBC: .4byte 0x0600F800
-_08095FC0: .4byte 0x08636438
-_08095FC4: .4byte 0x08662804
+_08095FC0: .4byte sNextPageArrowPal+0x23290
+_08095FC4: .4byte sIntroTilemap_662804
 _08095FC8: .4byte 0x06004800
 _08095FCC: .4byte 0x84000200
 _08095FD0: .4byte 0x85001200
-_08095FD4: .4byte 0x08663820
+_08095FD4: .4byte sIntroPal_663820
 _08095FD8: .4byte 0x05000180
 _08095FDC: .4byte 0x84000020
 _08095FE0: .4byte gBg1XPosition
@@ -10263,7 +10263,7 @@ _0809600C: .4byte gWrittenToBldy
 _08096010: .4byte 0x04000054
 _08096014: .4byte gWrittenToBldalpha_Eva
 _08096018: .4byte gWrittenToBldalpha_Evb
-_0809601C: .4byte 0x0863A19C
+_0809601C: .4byte sCutsceneTextNone
 _08096020: .4byte EndingMonologueVblank
 
 	thumb_func_start EndingAdamConversationInit
@@ -10443,13 +10443,13 @@ _0809619C: .4byte 0x850000B4
 _080961A0: .4byte 0xFFFFFDF8
 _080961A4: .4byte 0x8100007E
 _080961A8: .4byte 0xFFFFFEF4
-_080961AC: .4byte 0x086131C8
+_080961AC: .4byte sNextPageArrowPal+0x20
 _080961B0: .4byte 0x06008000
-_080961B4: .4byte 0x08637238
+_080961B4: .4byte sNextPageArrowPal+0x24090
 _080961B8: .4byte 0x0600F800
-_080961BC: .4byte 0x08598898
+_080961BC: .4byte sIntroSamusShipFlyingTextTilemap
 _080961C0: .4byte 0x0600E000
-_080961C4: .4byte 0x08636438
+_080961C4: .4byte sNextPageArrowPal+0x23290
 _080961C8: .4byte 0x84000080
 _080961CC: .4byte 0x03001224
 _080961D0: .4byte 0x0000FFF8
@@ -10470,7 +10470,7 @@ _08096208: .4byte gWrittenToBldalpha_Eva
 _0809620C: .4byte gWrittenToBldalpha_Evb
 _08096210: .4byte 0x04000052
 _08096214: .4byte 0xFFFFFDE4
-_08096218: .4byte 0x0863A19C
+_08096218: .4byte sCutsceneTextNone
 _0809621C: .4byte 0x0600D000
 _08096220: .4byte 0x85000400
 _08096224: .4byte EndingConversationAndAnimalsVblank
@@ -10661,14 +10661,14 @@ _080963B0: .4byte 0x850000B4
 _080963B4: .4byte 0xFFFFFDF8
 _080963B8: .4byte 0x8100007E
 _080963BC: .4byte 0xFFFFFEF4
-_080963C0: .4byte 0x0861B89C
-_080963C4: .4byte 0x086217A8
+_080963C0: .4byte sNextPageArrowPal+0x86F4
+_080963C4: .4byte sNextPageArrowPal+0xE600
 _080963C8: .4byte 0x06008000
-_080963CC: .4byte 0x08638654
+_080963CC: .4byte sNextPageArrowPal+0x254AC
 _080963D0: .4byte 0x0600F000
-_080963D4: .4byte 0x08637DB8
+_080963D4: .4byte sNextPageArrowPal+0x24C10
 _080963D8: .4byte 0x0600F800
-_080963DC: .4byte 0x08636838
+_080963DC: .4byte sNextPageArrowPal+0x23690
 _080963E0: .4byte 0x84000080
 _080963E4: .4byte 0x000002FF
 _080963E8: .4byte 0x0600F500
@@ -10691,7 +10691,7 @@ _08096428: .4byte gWrittenToBldalpha_Eva
 _0809642C: .4byte gWrittenToBldalpha_Evb
 _08096430: .4byte 0x04000052
 _08096434: .4byte 0xFFFFFDE4
-_08096438: .4byte 0x0863A19C
+_08096438: .4byte sCutsceneTextNone
 _0809643C: .4byte 0x0600D000
 _08096440: .4byte 0x85000400
 _08096444: .4byte EndingConversationAndAnimalsVblank
@@ -10814,7 +10814,7 @@ _08096500:
 	b _080968D6
 	.align 2, 0
 _08096544: .4byte 0x00000212
-_08096548: .4byte 0x0879C5A4
+_08096548: .4byte sData_79C2CC+0x2D8
 _0809654C: .4byte 0x03000011
 _08096550:
 	ldr r0, [r5]
@@ -11206,8 +11206,8 @@ _08096828:
 	bl ApplyMusicSoundFading
 	b _080968D8
 	.align 2, 0
-_08096850: .4byte 0x080A8CDC
-_08096854: .4byte 0x080A8D3C
+_08096850: .4byte sMusicTrackDataRom
+_08096854: .4byte sSoundDataEntries
 _08096858: .4byte 0x00001264
 _0809685C:
 	cmp r0, #0xa
@@ -11466,7 +11466,7 @@ _08096A34:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08096A38: .4byte 0x08633EC4
+_08096A38: .4byte sNextPageArrowPal+0x20D1C
 
 	thumb_func_start EndingProcessSamusViewRadarView
 EndingProcessSamusViewRadarView: @ 0x08096A3C
@@ -11496,7 +11496,7 @@ _08096A68:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08096A6C: .4byte 0x08633F0C
+_08096A6C: .4byte sNextPageArrowPal+0x20D64
 
 	thumb_func_start unk_96a70
 unk_96a70: @ 0x08096A70
@@ -11555,7 +11555,7 @@ _08096AB4:
 	b _08096B06
 	.align 2, 0
 _08096ADC: .4byte gNonGameplayRam
-_08096AE0: .4byte 0x08633244
+_08096AE0: .4byte sNextPageArrowPal+0x2009C
 _08096AE4: .4byte 0x0000011D
 _08096AE8:
 	cmp r5, #2
@@ -11614,7 +11614,7 @@ _08096B2C:
 	str r0, [r2, #0x1c]
 	b _08096B8E
 	.align 2, 0
-_08096B50: .4byte 0x08633E8C
+_08096B50: .4byte sNextPageArrowPal+0x20CE4
 _08096B54:
 	movs r0, #0xfc
 	lsls r0, r0, #8
@@ -11628,7 +11628,7 @@ _08096B54:
 	str r0, [r2, #0x1c]
 	b _08096B8E
 	.align 2, 0
-_08096B6C: .4byte 0x08633E64
+_08096B6C: .4byte sNextPageArrowPal+0x20CBC
 _08096B70:
 	ldrh r0, [r3, #0xc]
 	ldr r4, _08096B94 @ =0x00000212
@@ -11757,7 +11757,7 @@ _08096C2A:
 	.align 2, 0
 _08096C54: .4byte gNonGameplayRam
 _08096C58: .4byte 0x00000212
-_08096C5C: .4byte 0x0879C3AC
+_08096C5C: .4byte sData_79C2CC+0xE0
 _08096C60: .4byte 0x03000011
 _08096C64:
 	cmp r0, #2
@@ -11798,7 +11798,7 @@ _08096C82:
 	b _08096CC0
 	.align 2, 0
 _08096CAC: .4byte gNonGameplayRam
-_08096CB0: .4byte 0x086332FC
+_08096CB0: .4byte sNextPageArrowPal+0x20154
 _08096CB4: .4byte 0x0000020B
 _08096CB8:
 	cmp r0, #9
@@ -11810,7 +11810,7 @@ _08096CC0:
 	strb r0, [r4, #0x14]
 	b _08096D34
 	.align 2, 0
-_08096CC8: .4byte 0x086333CC
+_08096CC8: .4byte sNextPageArrowPal+0x20224
 _08096CCC:
 	cmp r0, #4
 	bne _08096CFC
@@ -11903,7 +11903,7 @@ _08096D62:
 	strb r1, [r2, #0x11]
 	b _08096D98
 	.align 2, 0
-_08096D78: .4byte 0x086338A4
+_08096D78: .4byte sNextPageArrowPal+0x206FC
 _08096D7C: .4byte gNonGameplayRam
 _08096D80:
 	cmp r1, #1
@@ -11926,7 +11926,7 @@ _08096D98:
 	b _08096DC0
 	.align 2, 0
 _08096DA4: .4byte gNonGameplayRam
-_08096DA8: .4byte 0x0863345C
+_08096DA8: .4byte sNextPageArrowPal+0x202B4
 _08096DAC:
 	cmp r1, #2
 	bne _08096DC0
@@ -12254,7 +12254,7 @@ _08097014: .4byte 0x040000D4
 _08097018: .4byte 0x030016A0
 _0809701C: .4byte 0x85000009
 _08097020: .4byte 0xFFFFFDE4
-_08097024: .4byte 0x08633E64
+_08097024: .4byte sNextPageArrowPal+0x20CBC
 _08097028: .4byte EndingProcessMonologueCursor
 _0809702C:
 	cmp r5, #2
@@ -12281,7 +12281,7 @@ _0809702C:
 	b _08097270
 	.align 2, 0
 _08097058: .4byte 0x00000236
-_0809705C: .4byte 0x086338D4
+_0809705C: .4byte sNextPageArrowPal+0x2072C
 _08097060: .4byte unk_969e0
 _08097064:
 	cmp r5, #3
@@ -12308,7 +12308,7 @@ _08097064:
 	b _08097270
 	.align 2, 0
 _08097090: .4byte 0x00000236
-_08097094: .4byte 0x086339D4
+_08097094: .4byte sNextPageArrowPal+0x2082C
 _08097098: .4byte EndingProcessSr388RadarView
 _0809709C:
 	cmp r5, #4
@@ -12335,7 +12335,7 @@ _0809709C:
 	b _08097270
 	.align 2, 0
 _080970C8: .4byte 0x00000236
-_080970CC: .4byte 0x08633C4C
+_080970CC: .4byte sNextPageArrowPal+0x20AA4
 _080970D0: .4byte EndingProcessSamusViewRadarView
 _080970D4:
 	cmp r5, #5
@@ -12362,7 +12362,7 @@ _080970D4:
 	b _08097270
 	.align 2, 0
 _08097100: .4byte 0x00000236
-_08097104: .4byte 0x086331EC
+_08097104: .4byte sNextPageArrowPal+0x20044
 _08097108: .4byte unk_96a70
 _0809710C:
 	cmp r5, #6
@@ -12379,7 +12379,7 @@ _0809710C:
 	str r1, [r0]
 	b _08097270
 	.align 2, 0
-_08097128: .4byte 0x08633E8C
+_08097128: .4byte sNextPageArrowPal+0x20CE4
 _0809712C: .4byte EndingProcessAdamTextCursor
 _08097130:
 	cmp r5, #7
@@ -12400,7 +12400,7 @@ _08097130:
 	b _080971AE
 	.align 2, 0
 _08097150: .4byte 0x00000236
-_08097154: .4byte 0x08633294
+_08097154: .4byte sNextPageArrowPal+0x200EC
 _08097158:
 	cmp r5, #8
 	bne _08097190
@@ -12426,7 +12426,7 @@ _08097158:
 	b _08097270
 	.align 2, 0
 _08097184: .4byte 0x00000236
-_08097188: .4byte 0x08633434
+_08097188: .4byte sNextPageArrowPal+0x2028C
 _0809718C: .4byte EndingProcessAdamIcon
 _08097190:
 	cmp r5, #9
@@ -12454,7 +12454,7 @@ _080971AE:
 	b _08097270
 	.align 2, 0
 _080971BC: .4byte 0x00000236
-_080971C0: .4byte 0x08633364
+_080971C0: .4byte sNextPageArrowPal+0x201BC
 _080971C4: .4byte EndingProcessAdamPanel
 _080971C8:
 	cmp r5, #0x14
@@ -12507,7 +12507,7 @@ _080971E4:
 _08097224: .4byte 0x0000012D
 _08097228: .4byte gNonGameplayRam
 _0809722C: .4byte 0x00000236
-_08097230: .4byte 0x08633F24
+_08097230: .4byte sNextPageArrowPal+0x20D7C
 _08097234: .4byte unk_97418
 _08097238:
 	cmp r5, #0xff
@@ -12549,7 +12549,7 @@ _08097272:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_08097280: .4byte 0x086331EC
+_08097280: .4byte sNextPageArrowPal+0x20044
 _08097284: .4byte unk_96f00
 
 	thumb_func_start EndingMonologueVblank
@@ -12995,17 +12995,17 @@ _0809762C: .4byte unk_99940
 _08097630: .4byte 0x040000D4
 _08097634: .4byte gNonGameplayRam
 _08097638: .4byte 0x85000150
-_0809763C: .4byte 0x086238F4
+_0809763C: .4byte sNextPageArrowPal+0x1074C
 _08097640: .4byte 0x06010000
-_08097644: .4byte 0x08636C38
+_08097644: .4byte sNextPageArrowPal+0x23A90
 _08097648: .4byte 0x05000200
 _0809764C: .4byte 0x84000080
-_08097650: .4byte 0x0862B5F4
-_08097654: .4byte 0x08638C14
+_08097650: .4byte sNextPageArrowPal+0x1844C
+_08097654: .4byte sNextPageArrowPal+0x25A6C
 _08097658: .4byte 0x0600F000
-_0809765C: .4byte 0x08639BC4
+_0809765C: .4byte sNextPageArrowPal+0x26A1C
 _08097660: .4byte 0x0600F800
-_08097664: .4byte 0x08637038
+_08097664: .4byte sNextPageArrowPal+0x23E90
 _08097668: .4byte gBg1XPosition
 _0809766C: .4byte gBg1YPosition
 _08097670: .4byte 0x0300122C
@@ -13022,7 +13022,7 @@ _08097698: .4byte 0x04000054
 _0809769C: .4byte gWrittenToBldalpha_Eva
 _080976A0: .4byte gWrittenToBldalpha_Evb
 _080976A4: .4byte 0x0000024D
-_080976A8: .4byte 0x0863A19C
+_080976A8: .4byte sCutsceneTextNone
 _080976AC: .4byte 0x0600D000
 _080976B0: .4byte 0x85000400
 _080976B4: .4byte DiedOnSr388CollisionVblank
@@ -13405,7 +13405,7 @@ _08097978:
 	strb r1, [r0]
 	b _080979CA
 	.align 2, 0
-_0809799C: .4byte 0x086362B8
+_0809799C: .4byte sNextPageArrowPal+0x23110
 _080979A0: .4byte gNonGameplayRam
 _080979A4:
 	cmp r1, #3
@@ -13631,7 +13631,7 @@ _08097B40: .4byte 0x030016A0
 _08097B44: .4byte 0x85000009
 _08097B48: .4byte 0xFFFFFDE4
 _08097B4C: .4byte 0x00000236
-_08097B50: .4byte 0x08636020
+_08097B50: .4byte sNextPageArrowPal+0x22E78
 _08097B54: .4byte DiedOnSr388CollisionProcessFallingBsl
 _08097B58:
 	cmp r7, #2
@@ -13676,7 +13676,7 @@ _08097B58:
 	.align 2, 0
 _08097BA8: .4byte 0x00000222
 _08097BAC: .4byte 0x00000236
-_08097BB0: .4byte 0x08636038
+_08097BB0: .4byte sNextPageArrowPal+0x22E90
 _08097BB4: .4byte DiedOnSr388CollisionProcessFallingBsl
 _08097BB8:
 	cmp r7, #3
@@ -13714,7 +13714,7 @@ _08097BE6:
 	bx r1
 	.align 2, 0
 _08097BF4: .4byte 0x00000236
-_08097BF8: .4byte 0x08636050
+_08097BF8: .4byte sNextPageArrowPal+0x22EA8
 _08097BFC: .4byte unk_979d0
 
 	thumb_func_start DiedOnSr388CollisionVblank
@@ -13806,7 +13806,7 @@ _08097CBC: .4byte 0x03001230
 _08097CC0: .4byte 0x03001232
 _08097CC4: .4byte gNonGameplayRam
 _08097CC8: .4byte 0x00000111
-_08097CCC: .4byte 0x08636A38
+_08097CCC: .4byte sNextPageArrowPal+0x23890
 _08097CD0: .4byte 0x05000120
 _08097CD4: .4byte 0x84000008
 
@@ -15790,7 +15790,7 @@ _08098BB2:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08098BBC: .4byte 0x083E3294
+_08098BBC: .4byte sHaze_PowerBomb_WindowValuesPointers
 _08098BC0: .4byte 0x000001F3
 _08098BC4: .4byte 0x02001000
 _08098BC8: .4byte 0x03001678
@@ -16188,7 +16188,7 @@ _08098E18:
 _08098E9C: .4byte gNextOamSlot
 _08098EA0: .4byte gOamData
 _08098EA4: .4byte 0x000001FF
-_08098EA8: .4byte 0x0863A184
+_08098EA8: .4byte sNextPageArrowPal+0x26FDC
 _08098EAC:
 	mov r4, sb
 	ldrh r0, [r4, #0xe]
@@ -16443,8 +16443,8 @@ _08098FDC:
 	.align 2, 0
 _08099098: .4byte gNextOamSlot
 _0809909C: .4byte gOamData
-_080990A0: .4byte 0x0863A184
-_080990A4: .4byte 0x0863A190
+_080990A0: .4byte sNextPageArrowPal+0x26FDC
+_080990A4: .4byte sNextPageArrowPal+0x26FE8
 _080990A8: .4byte 0x000001FF
 _080990AC:
 	movs r5, #0
@@ -16852,7 +16852,7 @@ _08099328:
 	b _0809975A
 	.align 2, 0
 _080993E4: .4byte gOamData
-_080993E8: .4byte 0x080A4FA4
+_080993E8: .4byte sSineTable
 _080993EC: .4byte 0x000001FF
 _080993F0: .4byte 0xFFFFFE00
 _080993F4: .4byte 0x03001238
@@ -17312,10 +17312,10 @@ _0809975A:
 	.align 2, 0
 _0809977C: .4byte gNextOamSlot
 _08099780: .4byte gOamData
-_08099784: .4byte 0x0863A184
-_08099788: .4byte 0x0863A190
+_08099784: .4byte sNextPageArrowPal+0x26FDC
+_08099788: .4byte sNextPageArrowPal+0x26FE8
 _0809978C: .4byte 0x000001FF
-_08099790: .4byte 0x080A4FA4
+_08099790: .4byte sSineTable
 _08099794: .4byte 0xFFFFFE00
 _08099798: .4byte 0x03001238
 _0809979C: .4byte 0x000003FF
@@ -18038,29 +18038,29 @@ _08099D8C: .4byte 0x0000FFEF
 _08099D90: .4byte 0x04000200
 _08099D94: .4byte 0x0000FFFD
 _08099D98: .4byte unk_9a31c
-_08099D9C: .4byte 0x0879C514
+_08099D9C: .4byte sData_79C2CC+0x248
 _08099DA0: .4byte gCurrentCutscene
 _08099DA4: .4byte 0x06012000
-_08099DA8: .4byte 0x0865FB5C
+_08099DA8: .4byte sIntroSamusHelmetCloseupBgGfx5+0x11D38
 _08099DAC: .4byte 0x06017C00
 _08099DB0: .4byte 0x040000D4
-_08099DB4: .4byte 0x086638A0
+_08099DB4: .4byte sIntroPal_663820+0x80
 _08099DB8: .4byte 0x050003E0
 _08099DBC: .4byte 0x84000008
-_08099DC0: .4byte 0x0879C4CC
+_08099DC0: .4byte sData_79C2CC+0x200
 _08099DC4: .4byte 0x05000200
 _08099DC8: .4byte 0x84000030
-_08099DCC: .4byte 0x0879C4F0
-_08099DD0: .4byte 0x0879C538
+_08099DCC: .4byte sData_79C2CC+0x224
+_08099DD0: .4byte sData_79C2CC+0x26C
 _08099DD4: .4byte 0x0600D000
-_08099DD8: .4byte 0x08662804
-_08099DDC: .4byte 0x08663598
+_08099DD8: .4byte sIntroTilemap_662804
+_08099DDC: .4byte sIntroTilemap_662804+0xD94
 _08099DE0: .4byte 0x0600D800
 _08099DE4: .4byte 0x0600C800
 _08099DE8: .4byte 0x84000200
-_08099DEC: .4byte 0x086636A0
+_08099DEC: .4byte sIntroTilemap_662804+0xE9C
 _08099DF0: .4byte 0x84000080
-_08099DF4: .4byte 0x0879C4A8
+_08099DF4: .4byte sData_79C2CC+0x1DC
 _08099DF8: .4byte 0x84000058
 _08099DFC: .4byte 0x04000012
 _08099E00: .4byte 0x00001908
@@ -18102,7 +18102,7 @@ _08099E16:
 	.align 2, 0
 _08099E50: .4byte gNonGameplayRam
 _08099E54: .4byte gCurrentCutscene
-_08099E58: .4byte 0x0879C5A4
+_08099E58: .4byte sData_79C2CC+0x2D8
 _08099E5C: .4byte 0x03000011
 _08099E60: .4byte CutsceneElevatorMonologueVblank
 
@@ -18233,7 +18233,7 @@ _08099F50: .4byte gNonGameplayRam
 _08099F54: .4byte 0x00000219
 _08099F58: .4byte 0x00000221
 _08099F5C: .4byte 0x00000222
-_08099F60: .4byte 0x08663E5C
+_08099F60: .4byte sIntroPal_663820+0x63C
 _08099F64: .4byte CutsceneMonologueProcessCursor
 _08099F68:
 	cmp r4, #2
@@ -18262,7 +18262,7 @@ _08099F68:
 	b _0809A068
 	.align 2, 0
 _08099F98: .4byte 0x0000021F
-_08099F9C: .4byte 0x0879C55C
+_08099F9C: .4byte sData_79C2CC+0x290
 _08099FA0: .4byte gCurrentCutscene
 _08099FA4: .4byte unk_9d09c
 _08099FA8:
@@ -18296,7 +18296,7 @@ _08099FA8:
 	.align 2, 0
 _08099FE0: .4byte 0x0000021E
 _08099FE4: .4byte 0x0000021F
-_08099FE8: .4byte 0x0879C55C
+_08099FE8: .4byte sData_79C2CC+0x290
 _08099FEC: .4byte gCurrentCutscene
 _08099FF0: .4byte unk_9d09c
 _08099FF4:
@@ -18327,7 +18327,7 @@ _08099FF4:
 	b _0809A068
 	.align 2, 0
 _0809A028: .4byte 0x0000021F
-_0809A02C: .4byte 0x0879C55C
+_0809A02C: .4byte sData_79C2CC+0x290
 _0809A030: .4byte gCurrentCutscene
 _0809A034: .4byte CutsceneProcessElevatorScrolling
 _0809A038:
@@ -18367,7 +18367,7 @@ _0809A06C:
 	bx r1
 	.align 2, 0
 _0809A078: .4byte 0x0000021F
-_0809A07C: .4byte 0x0879C55C
+_0809A07C: .4byte sData_79C2CC+0x290
 _0809A080: .4byte gCurrentCutscene
 _0809A084: .4byte unk_9a1a8
 
@@ -18882,23 +18882,23 @@ _0809A48C: .4byte 0x0000FFEF
 _0809A490: .4byte 0x04000200
 _0809A494: .4byte 0x0000FFFD
 _0809A498: .4byte unk_9a63c
-_0809A49C: .4byte 0x0865FB5C
+_0809A49C: .4byte sIntroSamusHelmetCloseupBgGfx5+0x11D38
 _0809A4A0: .4byte 0x06017C00
 _0809A4A4: .4byte 0x040000D4
-_0809A4A8: .4byte 0x086638A0
+_0809A4A8: .4byte sIntroPal_663820+0x80
 _0809A4AC: .4byte 0x050003E0
 _0809A4B0: .4byte 0x84000008
-_0809A4B4: .4byte 0x08662804
+_0809A4B4: .4byte sIntroTilemap_662804
 _0809A4B8: .4byte 0x0600C800
 _0809A4BC: .4byte 0x84000200
-_0809A4C0: .4byte 0x086636A0
+_0809A4C0: .4byte sIntroTilemap_662804+0xE9C
 _0809A4C4: .4byte 0x84000080
 _0809A4C8: .4byte 0x04000012
 _0809A4CC: .4byte 0x00001908
 _0809A4D0: .4byte gWrittenToBldy
 _0809A4D4: .4byte gNonGameplayRam
 _0809A4D8: .4byte gCurrentCutscene
-_0809A4DC: .4byte 0x0879C5A4
+_0809A4DC: .4byte sData_79C2CC+0x2D8
 _0809A4E0: .4byte 0x03000011
 _0809A4E4: .4byte CutsceneInternalMonologueVblank
 
@@ -19042,7 +19042,7 @@ _0809A5EC: .4byte 0x00000219
 _0809A5F0: .4byte 0x0000021F
 _0809A5F4: .4byte 0x00000221
 _0809A5F8: .4byte 0x00000222
-_0809A5FC: .4byte 0x08663E5C
+_0809A5FC: .4byte sIntroPal_663820+0x63C
 _0809A600: .4byte CutsceneMonologueProcessCursor
 
 	thumb_func_start CutsceneInternalMonologueVblank
@@ -19275,21 +19275,21 @@ _0809A7D4: .4byte 0x0000FFEF
 _0809A7D8: .4byte 0x04000200
 _0809A7DC: .4byte 0x0000FFFD
 _0809A7E0: .4byte unk_9a99c
-_0809A7E4: .4byte 0x0865FB5C
+_0809A7E4: .4byte sIntroSamusHelmetCloseupBgGfx5+0x11D38
 _0809A7E8: .4byte 0x06017C00
 _0809A7EC: .4byte 0x040000D4
-_0809A7F0: .4byte 0x086638A0
+_0809A7F0: .4byte sIntroPal_663820+0x80
 _0809A7F4: .4byte 0x050003E0
 _0809A7F8: .4byte 0x84000008
-_0809A7FC: .4byte 0x086724C0
-_0809A800: .4byte 0x08674AD8
+_0809A7FC: .4byte sIntroPal_663820+0xECA0
+_0809A800: .4byte sIntroPal_663820+0x112B8
 _0809A804: .4byte 0x0600D000
-_0809A808: .4byte 0x08662804
+_0809A808: .4byte sIntroTilemap_662804
 _0809A80C: .4byte 0x0600C800
 _0809A810: .4byte 0x84000200
-_0809A814: .4byte 0x08674958
+_0809A814: .4byte sIntroPal_663820+0x11138
 _0809A818: .4byte 0x84000060
-_0809A81C: .4byte 0x08663820
+_0809A81C: .4byte sIntroPal_663820
 _0809A820: .4byte 0x05000180
 _0809A824: .4byte 0x84000020
 _0809A828: .4byte 0x04000012
@@ -19297,7 +19297,7 @@ _0809A82C: .4byte 0x00001908
 _0809A830: .4byte gWrittenToBldy
 _0809A834: .4byte gNonGameplayRam
 _0809A838: .4byte gCurrentCutscene
-_0809A83C: .4byte 0x0879C5A4
+_0809A83C: .4byte sData_79C2CC+0x2D8
 _0809A840: .4byte 0x03000011
 _0809A844: .4byte CutsceneFederationMonologueVblank
 
@@ -19441,7 +19441,7 @@ _0809A94C: .4byte 0x00000219
 _0809A950: .4byte 0x0000021F
 _0809A954: .4byte 0x00000221
 _0809A958: .4byte 0x00000222
-_0809A95C: .4byte 0x08663E5C
+_0809A95C: .4byte sIntroPal_663820+0x63C
 _0809A960: .4byte CutsceneMonologueProcessCursor
 
 	thumb_func_start CutsceneFederationMonologueVblank
@@ -19648,21 +19648,21 @@ _0809AAFC: .4byte 0x0000FFEF
 _0809AB00: .4byte 0x04000200
 _0809AB04: .4byte 0x0000FFFD
 _0809AB08: .4byte unk_9ae0c
-_0809AB0C: .4byte 0x0867815C
+_0809AB0C: .4byte sIntroPal_663820+0x1493C
 _0809AB10: .4byte 0x06014000
 _0809AB14: .4byte 0x040000D4
-_0809AB18: .4byte 0x086788A8
+_0809AB18: .4byte sIntroPal_663820+0x15088
 _0809AB1C: .4byte 0x05000300
 _0809AB20: .4byte 0x84000010
-_0809AB24: .4byte 0x08675098
+_0809AB24: .4byte sIntroPal_663820+0x11878
 _0809AB28: .4byte 0x06000800
-_0809AB2C: .4byte 0x08677914
+_0809AB2C: .4byte sIntroPal_663820+0x140F4
 _0809AB30: .4byte 0x0600C000
-_0809AB34: .4byte 0x08677C90
+_0809AB34: .4byte sIntroPal_663820+0x14470
 _0809AB38: .4byte 0x0600C800
-_0809AB3C: .4byte 0x08677874
+_0809AB3C: .4byte sIntroPal_663820+0x14054
 _0809AB40: .4byte 0x84000028
-_0809AB44: .4byte 0x08677C10
+_0809AB44: .4byte sIntroPal_663820+0x143F0
 _0809AB48: .4byte 0x050001E0
 _0809AB4C: .4byte 0x84000008
 _0809AB50: .4byte 0x0400000A
@@ -19803,7 +19803,7 @@ _0809AC06:
 _0809AC54: .4byte 0x040000D4
 _0809AC58: .4byte 0x0300149C
 _0809AC5C: .4byte 0x85000009
-_0809AC60: .4byte 0x086793B0
+_0809AC60: .4byte sIntroPal_663820+0x15B90
 _0809AC64: .4byte unk_9db70
 _0809AC68:
 	cmp r6, #2
@@ -19819,7 +19819,7 @@ _0809AC68:
 	ldr r1, _0809AC84 @ =CutsceneSecretConversationProcessNavigationPanel
 	b _0809ACBE
 	.align 2, 0
-_0809AC80: .4byte 0x08679280
+_0809AC80: .4byte sIntroPal_663820+0x15A60
 _0809AC84: .4byte CutsceneSecretConversationProcessNavigationPanel
 _0809AC88:
 	cmp r6, #3
@@ -19835,7 +19835,7 @@ _0809AC88:
 	ldr r1, _0809ACA4 @ =unk_9db70
 	b _0809ACBE
 	.align 2, 0
-_0809ACA0: .4byte 0x086793A0
+_0809ACA0: .4byte sIntroPal_663820+0x15B80
 _0809ACA4: .4byte unk_9db70
 _0809ACA8:
 	cmp r6, #4
@@ -19859,7 +19859,7 @@ _0809ACC2:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_0809ACCC: .4byte 0x086792D0
+_0809ACCC: .4byte sIntroPal_663820+0x15AB0
 _0809ACD0: .4byte CutsceneSecretConversationProcessIncomingDispatch
 
 	thumb_func_start CutsceneSecretConversationProcessNavigationPanel
@@ -19879,7 +19879,7 @@ _0809ACEA:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0809ACF0: .4byte 0x086792A8
+_0809ACF0: .4byte sIntroPal_663820+0x15A88
 
 	thumb_func_start CutsceneSecretConversationProcessIncomingDispatch
 CutsceneSecretConversationProcessIncomingDispatch: @ 0x0809ACF4
@@ -19917,7 +19917,7 @@ _0809AD16:
 	b _0809AD5A
 	.align 2, 0
 _0809AD34: .4byte 0x0000022F
-_0809AD38: .4byte 0x08679350
+_0809AD38: .4byte sIntroPal_663820+0x15B30
 _0809AD3C:
 	cmp r5, #1
 	bne _0809AD5A
@@ -19986,12 +19986,12 @@ _0809ADBA:
 	ldr r0, _0809ADC0 @ =0x08677C30
 	b _0809ADCE
 	.align 2, 0
-_0809ADC0: .4byte 0x08677C30
+_0809ADC0: .4byte sIntroPal_663820+0x14410
 _0809ADC4:
 	ldr r0, _0809ADC8 @ =0x08677C50
 	b _0809ADCE
 	.align 2, 0
-_0809ADC8: .4byte 0x08677C50
+_0809ADC8: .4byte sIntroPal_663820+0x14430
 _0809ADCC:
 	ldr r0, _0809ADDC @ =0x08677C70
 _0809ADCE:
@@ -20003,7 +20003,7 @@ _0809ADCE:
 	ldr r0, [r2, #8]
 	b _0809ADFA
 	.align 2, 0
-_0809ADDC: .4byte 0x08677C70
+_0809ADDC: .4byte sIntroPal_663820+0x14450
 _0809ADE0: .4byte 0x050001E0
 _0809ADE4: .4byte 0x84000008
 _0809ADE8:
@@ -20020,7 +20020,7 @@ _0809ADFA:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0809AE00: .4byte 0x08677C10
+_0809AE00: .4byte sIntroPal_663820+0x143F0
 _0809AE04: .4byte 0x050001E0
 _0809AE08: .4byte 0x84000008
 
@@ -20224,22 +20224,22 @@ _0809AFA4: .4byte 0x0000FFEF
 _0809AFA8: .4byte 0x04000200
 _0809AFAC: .4byte 0x0000FFFD
 _0809AFB0: .4byte unk_9c1bc
-_0809AFB4: .4byte 0x0867D7CC
+_0809AFB4: .4byte sIntroPal_663820+0x19FAC
 _0809AFB8: .4byte 0x06010000
 _0809AFBC: .4byte 0x040000D4
-_0809AFC0: .4byte 0x0868121C
+_0809AFC0: .4byte sIntroPal_663820+0x1D9FC
 _0809AFC4: .4byte 0x05000200
 _0809AFC8: .4byte 0x84000080
-_0809AFCC: .4byte 0x08679420
-_0809AFD0: .4byte 0x086820A4
+_0809AFCC: .4byte sIntroPal_663820+0x15C00
+_0809AFD0: .4byte sIntroPal_663820+0x1E884
 _0809AFD4: .4byte 0x0600E000
-_0809AFD8: .4byte 0x08681A1C
+_0809AFD8: .4byte sIntroPal_663820+0x1E1FC
 _0809AFDC: .4byte 0x0600E800
-_0809AFE0: .4byte 0x0868259C
+_0809AFE0: .4byte sIntroPal_663820+0x1ED7C
 _0809AFE4: .4byte 0x0400000A
 _0809AFE8: .4byte gWrittenToBldy
 _0809AFEC: .4byte gNonGameplayRam
-_0809AFF0: .4byte 0x0868101C
+_0809AFF0: .4byte sIntroPal_663820+0x1D7FC
 _0809AFF4: .4byte 0x05000120
 _0809AFF8: .4byte 0x84000008
 _0809AFFC: .4byte CutsceneRestrictedLabDetachingVblank
@@ -20894,7 +20894,7 @@ _0809B494:
 _0809B500: .4byte 0x040000D4
 _0809B504: .4byte 0x0300149C
 _0809B508: .4byte 0x85000009
-_0809B50C: .4byte 0x08680D54
+_0809B50C: .4byte sIntroPal_663820+0x1D534
 _0809B510:
 	cmp r4, #2
 	bne _0809B544
@@ -20920,7 +20920,7 @@ _0809B510:
 	ldr r1, _0809B540 @ =0x08680D64
 	b _0809B570
 	.align 2, 0
-_0809B540: .4byte 0x08680D64
+_0809B540: .4byte sIntroPal_663820+0x1D544
 _0809B544:
 	cmp r4, #3
 	bne _0809B588
@@ -20953,7 +20953,7 @@ _0809B570:
 	str r1, [r0]
 	b _0809B894
 	.align 2, 0
-_0809B580: .4byte 0x08680D74
+_0809B580: .4byte sIntroPal_663820+0x1D554
 _0809B584: .4byte CutsceneRestrictedLabDetachingProcessBslPart
 _0809B588:
 	cmp r4, #4
@@ -20979,7 +20979,7 @@ _0809B5A4:
 	ldr r1, _0809B5B4 @ =0x08680E2C
 	b _0809B5D6
 	.align 2, 0
-_0809B5B4: .4byte 0x08680E2C
+_0809B5B4: .4byte sIntroPal_663820+0x1D60C
 _0809B5B8:
 	cmp r4, #6
 	bne _0809B5EC
@@ -21005,7 +21005,7 @@ _0809B5D6:
 	str r1, [r0]
 	b _0809B894
 	.align 2, 0
-_0809B5E4: .4byte 0x08680E3C
+_0809B5E4: .4byte sIntroPal_663820+0x1D61C
 _0809B5E8: .4byte unk_9ba50
 _0809B5EC:
 	cmp r4, #7
@@ -21031,7 +21031,7 @@ _0809B5EC:
 	str r1, [r0]
 	b _0809B894
 	.align 2, 0
-_0809B618: .4byte 0x08680DA4
+_0809B618: .4byte sIntroPal_663820+0x1D584
 _0809B61C: .4byte unk_9bac0
 _0809B620:
 	cmp r4, #8
@@ -21057,7 +21057,7 @@ _0809B620:
 	str r1, [r0]
 	b _0809B894
 	.align 2, 0
-_0809B64C: .4byte 0x08680D94
+_0809B64C: .4byte sIntroPal_663820+0x1D574
 _0809B650: .4byte unk_9bb30
 _0809B654:
 	cmp r4, #9
@@ -21093,7 +21093,7 @@ _0809B654:
 	str r1, [r0]
 	b _0809B894
 	.align 2, 0
-_0809B694: .4byte 0x08680D84
+_0809B694: .4byte sIntroPal_663820+0x1D564
 _0809B698: .4byte unk_9bc04
 _0809B69C:
 	cmp r4, #0xa
@@ -21126,7 +21126,7 @@ _0809B6B8:
 	ldr r0, _0809B6D8 @ =unk_9bac0
 	b _0809B892
 	.align 2, 0
-_0809B6D4: .4byte 0x08680DCC
+_0809B6D4: .4byte sIntroPal_663820+0x1D5AC
 _0809B6D8: .4byte unk_9bac0
 _0809B6DC:
 	cmp r4, #0xc
@@ -21165,7 +21165,7 @@ _0809B6DC:
 	ldr r0, _0809B728 @ =unk_9bd24
 	b _0809B892
 	.align 2, 0
-_0809B724: .4byte 0x08680FEC
+_0809B724: .4byte sIntroPal_663820+0x1D7CC
 _0809B728: .4byte unk_9bd24
 _0809B72C:
 	cmp r4, #0xd
@@ -21204,7 +21204,7 @@ _0809B72C:
 	ldr r0, _0809B778 @ =unk_9bdf8
 	b _0809B892
 	.align 2, 0
-_0809B774: .4byte 0x08680FC4
+_0809B774: .4byte sIntroPal_663820+0x1D7A4
 _0809B778: .4byte unk_9bdf8
 _0809B77C:
 	cmp r4, #0xe
@@ -21278,7 +21278,7 @@ _0809B7C4:
 	ldr r0, _0809B808 @ =unk_9bfb8
 	b _0809B892
 	.align 2, 0
-_0809B804: .4byte 0x08680F9C
+_0809B804: .4byte sIntroPal_663820+0x1D77C
 _0809B808: .4byte unk_9bfb8
 _0809B80C:
 	cmp r4, #0x11
@@ -21296,7 +21296,7 @@ _0809B80C:
 	ldr r0, _0809B82C @ =unk_9bfb8
 	b _0809B892
 	.align 2, 0
-_0809B828: .4byte 0x08680F74
+_0809B828: .4byte sIntroPal_663820+0x1D754
 _0809B82C: .4byte unk_9bfb8
 _0809B830:
 	cmp r4, #0x12
@@ -21362,7 +21362,7 @@ _0809B896:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_0809B8A4: .4byte 0x08680F2C
+_0809B8A4: .4byte sIntroPal_663820+0x1D70C
 _0809B8A8: .4byte CutsceneRestrictedLabDetachingProcessFallingLab
 
 	thumb_func_start CutsceneRestrictedLabDetachingProcessBslPart
@@ -21828,7 +21828,7 @@ _0809BBF0:
 	bx r0
 	.align 2, 0
 _0809BBF4: .4byte 0x040000D4
-_0809BBF8: .4byte 0x0868161C
+_0809BBF8: .4byte sIntroPal_663820+0x1DDFC
 _0809BBFC: .4byte 0x05000220
 _0809BC00: .4byte 0x84000008
 
@@ -21943,7 +21943,7 @@ _0809BCC8:
 	bx r0
 	.align 2, 0
 _0809BCCC: .4byte 0x040000D4
-_0809BCD0: .4byte 0x0868141C
+_0809BCD0: .4byte sIntroPal_663820+0x1DBFC
 _0809BCD4: .4byte 0x05000200
 _0809BCD8: .4byte 0x84000008
 
@@ -22095,7 +22095,7 @@ _0809BDE2:
 	bx r0
 	.align 2, 0
 _0809BDE8: .4byte 0x040000D4
-_0809BDEC: .4byte 0x0868181C
+_0809BDEC: .4byte sIntroPal_663820+0x1DFFC
 _0809BDF0: .4byte 0x05000260
 _0809BDF4: .4byte 0x84000008
 
@@ -22201,7 +22201,7 @@ unk_9be8c: @ 0x0809BE8C
 	b _0809BF46
 	.align 2, 0
 _0809BEAC: .4byte 0x040000D4
-_0809BEB0: .4byte 0x0868101C
+_0809BEB0: .4byte sIntroPal_663820+0x1D7FC
 _0809BEB4: .4byte 0x05000120
 _0809BEB8: .4byte 0x84000008
 _0809BEBC:
@@ -22243,7 +22243,7 @@ _0809BEE8:
 	b _0809BF46
 	.align 2, 0
 _0809BF04: .4byte 0x040000D4
-_0809BF08: .4byte 0x0868101C
+_0809BF08: .4byte sIntroPal_663820+0x1D7FC
 _0809BF0C: .4byte 0x05000120
 _0809BF10: .4byte 0x84000008
 _0809BF14:
@@ -22596,7 +22596,7 @@ _0809C1A0: .4byte gWrittenToBldalpha_Eva
 _0809C1A4: .4byte 0x04000054
 _0809C1A8: .4byte gWrittenToBldy
 _0809C1AC: .4byte gNonGameplayRam
-_0809C1B0: .4byte 0x0868101C
+_0809C1B0: .4byte sIntroPal_663820+0x1D7FC
 _0809C1B4: .4byte 0x05000120
 _0809C1B8: .4byte 0x84000008
 
@@ -22811,22 +22811,22 @@ _0809C368: .4byte 0x0000FFEF
 _0809C36C: .4byte 0x04000200
 _0809C370: .4byte 0x0000FFFD
 _0809C374: .4byte unk_9c92c
-_0809C378: .4byte 0x0867D7CC
+_0809C378: .4byte sIntroPal_663820+0x19FAC
 _0809C37C: .4byte 0x06010000
 _0809C380: .4byte 0x040000D4
-_0809C384: .4byte 0x0868121C
+_0809C384: .4byte sIntroPal_663820+0x1D9FC
 _0809C388: .4byte 0x05000200
 _0809C38C: .4byte 0x84000080
-_0809C390: .4byte 0x08679420
-_0809C394: .4byte 0x08681A1C
+_0809C390: .4byte sIntroPal_663820+0x15C00
+_0809C394: .4byte sIntroPal_663820+0x1E1FC
 _0809C398: .4byte 0x0600E000
-_0809C39C: .4byte 0x086820A4
+_0809C39C: .4byte sIntroPal_663820+0x1E884
 _0809C3A0: .4byte 0x0600E800
-_0809C3A4: .4byte 0x086827A8
+_0809C3A4: .4byte sIntroPal_663820+0x1EF88
 _0809C3A8: .4byte 0x0600F000
-_0809C3AC: .4byte 0x08682BFC
+_0809C3AC: .4byte sIntroPal_663820+0x1F3DC
 _0809C3B0: .4byte 0x0600F800
-_0809C3B4: .4byte 0x0868259C
+_0809C3B4: .4byte sIntroPal_663820+0x1ED7C
 _0809C3B8: .4byte 0x04000008
 _0809C3BC: .4byte 0x00001D03
 _0809C3C0: .4byte 0x00001F03
@@ -22834,7 +22834,7 @@ _0809C3C4: .4byte gWrittenToBldy
 _0809C3C8: .4byte gWrittenToBldalpha_Eva
 _0809C3CC: .4byte gWrittenToBldalpha_Evb
 _0809C3D0: .4byte gNonGameplayRam
-_0809C3D4: .4byte 0x0868101C
+_0809C3D4: .4byte sIntroPal_663820+0x1D7FC
 _0809C3D8: .4byte 0x05000120
 _0809C3DC: .4byte 0x84000008
 _0809C3E0: .4byte CutsceneBslExplodingVblank
@@ -23151,7 +23151,7 @@ CutsceneBslExplodingProcessBslFar: @ 0x0809C624
 	b _0809C67A
 	.align 2, 0
 _0809C64C: .4byte gNonGameplayRam
-_0809C650: .4byte 0x08680ECC
+_0809C650: .4byte sIntroPal_663820+0x1D6AC
 _0809C654:
 	cmp r1, #1
 	bne _0809C67A
@@ -23360,7 +23360,7 @@ _0809C7B0:
 	ldr r1, _0809C7DC @ =unk_9db70
 	b _0809C836
 	.align 2, 0
-_0809C7D8: .4byte 0x08680FFC
+_0809C7D8: .4byte sIntroPal_663820+0x1D7DC
 _0809C7DC: .4byte unk_9db70
 _0809C7E0:
 	cmp r5, #0x15
@@ -23384,7 +23384,7 @@ _0809C7E0:
 	ldr r1, _0809C80C @ =CutsceneBslExplodingProcessBslFar
 	b _0809C836
 	.align 2, 0
-_0809C808: .4byte 0x0868100C
+_0809C808: .4byte sIntroPal_663820+0x1D7EC
 _0809C80C: .4byte CutsceneBslExplodingProcessBslFar
 _0809C810:
 	cmp r5, #0x16
@@ -23418,7 +23418,7 @@ _0809C83A:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_0809C848: .4byte 0x08680ECC
+_0809C848: .4byte sIntroPal_663820+0x1D6AC
 _0809C84C: .4byte CutsceneBslExplodingProcessExplosions
 
 	thumb_func_start CutsceneBslExplodingGetOamInfoByType
@@ -23526,7 +23526,7 @@ _0809C910: .4byte gWrittenToBldalpha_Eva
 _0809C914: .4byte 0x04000054
 _0809C918: .4byte gWrittenToBldy
 _0809C91C: .4byte gNonGameplayRam
-_0809C920: .4byte 0x0868101C
+_0809C920: .4byte sIntroPal_663820+0x1D7FC
 _0809C924: .4byte 0x05000120
 _0809C928: .4byte 0x84000008
 
@@ -23602,7 +23602,7 @@ _0809C994:
 	strb r0, [r2, #9]
 	b _0809C9F4
 	.align 2, 0
-_0809C9B0: .4byte 0x08663E74
+_0809C9B0: .4byte sIntroPal_663820+0x654
 _0809C9B4:
 	cmp r1, #1
 	bne _0809C9F4
@@ -23624,7 +23624,7 @@ _0809C9C2:
 	b _0809C9F4
 	.align 2, 0
 _0809C9D8: .4byte gChangedInput
-_0809C9DC: .4byte 0x08663E5C
+_0809C9DC: .4byte sIntroPal_663820+0x63C
 _0809C9E0:
 	ldrh r0, [r3]
 	lsls r0, r0, #3
@@ -24388,7 +24388,7 @@ _0809CF10:
 	.align 2, 0
 _0809CF80: .4byte gNextOamSlot
 _0809CF84: .4byte gOamData
-_0809CF88: .4byte 0x0868279C
+_0809CF88: .4byte sIntroPal_663820+0x1EF7C
 _0809CF8C: .4byte 0x000001FF
 _0809CF90:
 	ldrh r0, [r5, #2]
@@ -24676,7 +24676,7 @@ _0809D1AC:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0809D1B8: .4byte 0x083E3294
+_0809D1B8: .4byte sHaze_PowerBomb_WindowValuesPointers
 _0809D1BC: .4byte 0x02001000
 _0809D1C0: .4byte gNonGameplayRam
 
@@ -25024,7 +25024,7 @@ _0809D3B6:
 _0809D438: .4byte gNextOamSlot
 _0809D43C: .4byte gOamData
 _0809D440: .4byte 0x000001FF
-_0809D444: .4byte 0x0863A184
+_0809D444: .4byte sNextPageArrowPal+0x26FDC
 _0809D448:
 	mov r4, r8
 	ldrh r0, [r4, #2]
@@ -25474,10 +25474,10 @@ _0809D78C:
 	.align 2, 0
 _0809D7AC: .4byte gNextOamSlot
 _0809D7B0: .4byte gOamData
-_0809D7B4: .4byte 0x0863A184
-_0809D7B8: .4byte 0x0863A190
+_0809D7B4: .4byte sNextPageArrowPal+0x26FDC
+_0809D7B8: .4byte sNextPageArrowPal+0x26FE8
 _0809D7BC: .4byte 0x000001FF
-_0809D7C0: .4byte 0x080A4FA4
+_0809D7C0: .4byte sSineTable
 _0809D7C4: .4byte 0xFFFFFE00
 _0809D7C8: .4byte 0x03001238
 _0809D7CC: .4byte 0x000003FF
@@ -25933,10 +25933,10 @@ _0809DB26:
 	.align 2, 0
 _0809DB48: .4byte gNextOamSlot
 _0809DB4C: .4byte gOamData
-_0809DB50: .4byte 0x0863A184
-_0809DB54: .4byte 0x0863A190
+_0809DB50: .4byte sNextPageArrowPal+0x26FDC
+_0809DB54: .4byte sNextPageArrowPal+0x26FE8
 _0809DB58: .4byte 0x000001FF
-_0809DB5C: .4byte 0x080A4FA4
+_0809DB5C: .4byte sSineTable
 _0809DB60: .4byte 0xFFFFFE00
 _0809DB64: .4byte 0x03001238
 _0809DB68: .4byte 0x000003FF

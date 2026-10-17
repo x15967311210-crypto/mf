@@ -213,7 +213,7 @@ GunshipEndInit: @ 0x08056278
 _080562F4: .4byte gCurrentSprite
 _080562F8: .4byte 0x0000FFFB
 _080562FC: .4byte 0x0000FFFC
-_08056300: .4byte 0x0839EC68
+_08056300: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x4264
 
 	thumb_func_start GunshipEndWaiting
 GunshipEndWaiting: @ 0x08056304
@@ -384,7 +384,7 @@ _08056432:
 	bx r0
 	.align 2, 0
 _08056438: .4byte gCurrentSprite
-_0805643C: .4byte 0x0839AAE0
+_0805643C: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0xDC
 _08056440: .4byte 0x00007FFF
 
 	thumb_func_start GunshipEndEntering
@@ -445,9 +445,9 @@ _0805646E:
 	b _08056576
 	.align 2, 0
 _080564B0: .4byte gCurrentSprite
-_080564B4: .4byte 0x0839AAE0
+_080564B4: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0xDC
 _080564B8: .4byte 0x00007FFF
-_080564BC: .4byte 0x0839AC90
+_080564BC: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x28C
 _080564C0:
 	mov r3, ip
 	ldrh r1, [r3]
@@ -548,10 +548,10 @@ _08056576:
 	bx r0
 	.align 2, 0
 _08056584: .4byte 0x0000FFF7
-_08056588: .4byte 0x0839EB48
+_08056588: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x4144
 _0805658C: .4byte gSpriteData
 _08056590: .4byte 0x0000FFFB
-_08056594: .4byte 0x0839EC30
+_08056594: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x422C
 _08056598: .4byte 0x0000FFFC
 
 	thumb_func_start GunshipEndWaitingForSamus
@@ -753,9 +753,9 @@ _08056712:
 	bx r0
 	.align 2, 0
 _08056718: .4byte gCurrentSprite
-_0805671C: .4byte 0x0839EC68
+_0805671C: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x4264
 _08056720: .4byte gSpriteData
-_08056724: .4byte 0x082F474E
+_08056724: .4byte sGunshipFlashingPal+0x16
 _08056728: .4byte 0x040000D4
 _0805672C: .4byte 0x05000336
 _08056730: .4byte 0x80000005
@@ -812,9 +812,9 @@ _0805675A:
 	b _080567FE
 	.align 2, 0
 _08056794: .4byte gCurrentSprite
-_08056798: .4byte 0x0839ABC4
+_08056798: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x1C0
 _0805679C: .4byte 0x00007FFF
-_080567A0: .4byte 0x0839EC08
+_080567A0: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x4204
 _080567A4:
 	cmp r1, #1
 	bne _080567D0
@@ -837,7 +837,7 @@ _080567A4:
 	strb r0, [r5]
 	b _080567FE
 	.align 2, 0
-_080567CC: .4byte 0x0839EC78
+_080567CC: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x4274
 _080567D0:
 	adds r3, r2, #0
 	adds r3, #0x2e
@@ -943,8 +943,8 @@ _08056886:
 	bx r0
 	.align 2, 0
 _0805688C: .4byte gCurrentSprite
-_08056890: .4byte 0x0839ACD0
-_08056894: .4byte 0x0839AC84
+_08056890: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x2CC
+_08056894: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x280
 
 	thumb_func_start GunshipEndDone
 GunshipEndDone: @ 0x08056898
@@ -989,7 +989,7 @@ GunshipEndBottomIdle: @ 0x0805689C
 	b _0805690A
 	.align 2, 0
 _080568E0: .4byte gCurrentSprite
-_080568E4: .4byte 0x082F474E
+_080568E4: .4byte sGunshipFlashingPal+0x16
 _080568E8: .4byte 0x040000D4
 _080568EC: .4byte 0x05000336
 _080568F0: .4byte 0x80000005
@@ -1069,7 +1069,7 @@ GunshiEndpBeamInit: @ 0x08056910
 _08056974: .4byte gCurrentSprite
 _08056978: .4byte 0x0000FFFB
 _0805697C: .4byte 0x0000FFFC
-_08056980: .4byte 0x0839EBB8
+_08056980: .4byte sOmegaMetroidPartOam_LeftLeg_Swiping+0x41B4
 
 	thumb_func_start GunshipEndBeamMovingDown
 GunshipEndBeamMovingDown: @ 0x08056984

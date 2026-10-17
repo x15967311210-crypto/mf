@@ -614,18 +614,18 @@ _08076AA8:
 	b _08076BAA
 	.align 2, 0
 _08076B04: .4byte 0x040000D4
-_08076B08: .4byte 0x085657A8
+_08076B08: .4byte sMinimapTilesGfx+0x3800
 _08076B0C: .4byte 0x80000030
-_08076B10: .4byte 0x0856F71C
+_08076B10: .4byte sMinimapTilesGfx+0xD774
 _08076B14: .4byte 0x06010000
-_08076B18: .4byte 0x08561FA8
+_08076B18: .4byte sMinimapTilesGfx
 _08076B1C: .4byte 0x06008000
-_08076B20: .4byte 0x08565B48
+_08076B20: .4byte sMinimapTilesGfx+0x3BA0
 _08076B24: .4byte 0x05000200
 _08076B28: .4byte 0x80000100
 _08076B2C: .4byte gNonGameplayRam
-_08076B30: .4byte 0x0856A254
-_08076B34: .4byte 0x08565808
+_08076B30: .4byte sMinimapTilesGfx+0x82AC
+_08076B34: .4byte sMinimapTilesGfx+0x3860
 _08076B38: .4byte 0x05000060
 _08076B3C: .4byte 0x800000D0
 _08076B40:
@@ -644,7 +644,7 @@ _08076B40:
 	movs r3, #2
 	b _08076B78
 	.align 2, 0
-_08076B60: .4byte 0x0856C868
+_08076B60: .4byte sMinimapTilesGfx+0xA8C0
 _08076B64: .4byte gEquipment
 _08076B68:
 	adds r0, r5, #0
@@ -669,7 +669,7 @@ _08076B78:
 	b _08076BAA
 	.align 2, 0
 _08076B90: .4byte 0x040000D4
-_08076B94: .4byte 0x08565D48
+_08076B94: .4byte sMinimapTilesGfx+0x3DA0
 _08076B98: .4byte 0x05000200
 _08076B9C: .4byte 0x80000010
 _08076BA0:
@@ -753,13 +753,13 @@ _08076BD2:
 	bl CallLZ77UncompVram
 	b _08076CA0
 	.align 2, 0
-_08076C44: .4byte 0x0856DE80
+_08076C44: .4byte sMinimapTilesGfx+0xBED8
 _08076C48: .4byte gNonGameplayRam
 _08076C4C: .4byte 0x040000D4
 _08076C50: .4byte 0x06009800
 _08076C54: .4byte 0x06009400
 _08076C58: .4byte 0x80000200
-_08076C5C: .4byte 0x085659A8
+_08076C5C: .4byte sMinimapTilesGfx+0x3A00
 _08076C60: .4byte 0x05000060
 _08076C64: .4byte 0x800000D0
 _08076C68: .4byte 0x02034800
@@ -770,10 +770,10 @@ _08076C78: .4byte 0x0600F800
 _08076C7C: .4byte gCurrentArea
 _08076C80: .4byte 0x02034000
 _08076C84: .4byte 0x0600E000
-_08076C88: .4byte 0x085742E8
+_08076C88: .4byte sMinimapTilesGfx+0x12340
 _08076C8C: .4byte 0x0200F800
 _08076C90: .4byte 0x0600C000
-_08076C94: .4byte 0x08573EA0
+_08076C94: .4byte sMinimapTilesGfx+0x11EF8
 _08076C98:
 	ldr r0, _08076CB4 @ =0x085748AC
 	adds r1, r6, #0
@@ -789,7 +789,7 @@ _08076CA0:
 	ldr r0, [r1, #8]
 	b _08076CE6
 	.align 2, 0
-_08076CB4: .4byte 0x085748AC
+_08076CB4: .4byte sMinimapTilesGfx+0x12904
 _08076CB8: .4byte 0x040000D4
 _08076CBC: .4byte 0x02034800
 _08076CC0: .4byte 0x0600C800
@@ -800,7 +800,7 @@ _08076CC8:
 	ldr r0, _08076CD0 @ =0x08574D48
 	b _08076CD6
 	.align 2, 0
-_08076CD0: .4byte 0x08574D48
+_08076CD0: .4byte sMinimapTilesGfx+0x12DA0
 _08076CD4:
 	ldr r0, _08076D10 @ =0x085753E8
 _08076CD6:
@@ -832,15 +832,15 @@ _08076CE6:
 	bl CallLZ77UncompVram
 	b _08076D74
 	.align 2, 0
-_08076D10: .4byte 0x085753E8
+_08076D10: .4byte sMinimapTilesGfx+0x13440
 _08076D14: .4byte 0x0600D800
 _08076D18: .4byte gNonGameplayRam
-_08076D1C: .4byte 0x085740FC
+_08076D1C: .4byte sMinimapTilesGfx+0x12154
 _08076D20: .4byte 0x02034800
 _08076D24: .4byte 0x040000D4
 _08076D28: .4byte 0x0600D000
 _08076D2C: .4byte 0x80000400
-_08076D30: .4byte 0x085745A8
+_08076D30: .4byte sMinimapTilesGfx+0x12600
 _08076D34: .4byte 0x02010000
 _08076D38:
 	ldr r0, _08076D50 @ =gPauseScreenFlag
@@ -855,7 +855,7 @@ _08076D38:
 	b _08076D64
 	.align 2, 0
 _08076D50: .4byte gPauseScreenFlag
-_08076D54: .4byte 0x08573DA4
+_08076D54: .4byte sMinimapTilesGfx+0x11DFC
 _08076D58: .4byte 0x02034800
 _08076D5C:
 	ldr r0, _08076DBC @ =0x08573DA4
@@ -907,7 +907,7 @@ _08076D86:
 	movs r0, #1
 	b _08076DF6
 	.align 2, 0
-_08076DBC: .4byte 0x08573DA4
+_08076DBC: .4byte sMinimapTilesGfx+0x11DFC
 _08076DC0: .4byte 0x02034800
 _08076DC4: .4byte 0x040000D4
 _08076DC8: .4byte 0x0600D000
@@ -915,7 +915,7 @@ _08076DCC: .4byte 0x80000400
 _08076DD0: .4byte gCurrentArea
 _08076DD4: .4byte gBackgroundPositions
 _08076DD8: .4byte gNonGameplayRam
-_08076DDC: .4byte 0x0879BE88
+_08076DDC: .4byte sExploredMinimapBitFlags+0xAC
 _08076DE0:
 	ldr r0, _08076DF0 @ =gPauseScreenFlag
 	ldrb r0, [r0]
@@ -1248,7 +1248,7 @@ _0807709A:
 	bx r0
 	.align 2, 0
 _080770AC: .4byte gEventCounter
-_080770B0: .4byte 0x0879BE5C
+_080770B0: .4byte sExploredMinimapBitFlags+0x80
 
 	thumb_func_start PauseScreenCallCurrentHandler
 PauseScreenCallCurrentHandler: @ 0x080770B4
@@ -2854,7 +2854,7 @@ _08077D50: .4byte gBackgroundPositions
 _08077D54: .4byte 0x00000211
 _08077D58: .4byte 0x0000020D
 _08077D5C: .4byte gPauseScreenFlag
-_08077D60: .4byte 0x08576158
+_08077D60: .4byte sSecurityUnlockEvents+0x90
 _08077D64:
 	ldr r2, _08077D8C @ =0x08576158
 	ldrb r1, [r2]
@@ -2877,7 +2877,7 @@ _08077D64:
 	ldrb r0, [r2, #2]
 	b _08077D9A
 	.align 2, 0
-_08077D8C: .4byte 0x08576158
+_08077D8C: .4byte sSecurityUnlockEvents+0x90
 _08077D90: .4byte 0x0000025A
 _08077D94:
 	movs r1, #0x80
@@ -3064,8 +3064,8 @@ _08077EA6:
 	.align 2, 0
 _08077EE0: .4byte gNonGameplayRam
 _08077EE4: .4byte gEquipment
-_08077EE8: .4byte 0x08576150
-_08077EEC: .4byte 0x08576151
+_08077EE8: .4byte sSecurityUnlockEvents+0x88
+_08077EEC: .4byte sSecurityUnlockEvents+0x89
 _08077EF0:
 	movs r4, #0
 	ldr r7, _08077F30 @ =gEquipment
@@ -3103,7 +3103,7 @@ _08077F0E:
 	.align 2, 0
 _08077F30: .4byte gEquipment
 _08077F34: .4byte gNonGameplayRam
-_08077F38: .4byte 0x08576150
+_08077F38: .4byte sSecurityUnlockEvents+0x88
 _08077F3C:
 	movs r4, #0
 	ldr r5, _08077F84 @ =gNonGameplayRam
@@ -3146,7 +3146,7 @@ _08077F72:
 	b _080780DE
 	.align 2, 0
 _08077F84: .4byte gNonGameplayRam
-_08077F88: .4byte 0x08576150
+_08077F88: .4byte sSecurityUnlockEvents+0x88
 _08077F8C: .4byte 0x03000014
 _08077F90:
 	mov r1, r8
@@ -3332,8 +3332,8 @@ _080780E0:
 	bx r0
 	.align 2, 0
 _080780F0: .4byte gNonGameplayRam
-_080780F4: .4byte 0x0879BE8C
-_080780F8: .4byte 0x0879BE9C
+_080780F4: .4byte sExploredMinimapBitFlags+0xB0
+_080780F8: .4byte sExploredMinimapBitFlags+0xC0
 _080780FC: .4byte 0x00000275
 _08078100: .4byte 0x00000277
 _08078104: .4byte 0x00000279
@@ -3520,7 +3520,7 @@ _080781FC:
 _08078270: .4byte gNonGameplayRam
 _08078274: .4byte 0x00000103
 _08078278: .4byte gCurrentArea
-_0807827C: .4byte 0x08576142
+_0807827C: .4byte sSecurityUnlockEvents+0x7A
 _08078280:
 	movs r0, #0x12
 	movs r1, #0
@@ -3698,7 +3698,7 @@ _080783C6:
 	.align 2, 0
 _080783D4: .4byte gNonGameplayRam
 _080783D8: .4byte 0x0000010F
-_080783DC: .4byte 0x08576158
+_080783DC: .4byte sSecurityUnlockEvents+0x90
 _080783E0: .4byte gPauseScreenFlag
 _080783E4: .4byte 0x000001FF
 _080783E8: .4byte 0x00000202
@@ -3919,7 +3919,7 @@ _0807868C:
 	strb r0, [r1]
 	b _08078962
 	.align 2, 0
-_080786AC: .4byte 0x0879BEC0
+_080786AC: .4byte sExploredMinimapBitFlags+0xE4
 _080786B0: .4byte gNonGameplayRam
 _080786B4:
 	ldr r2, _08078700 @ =0x0879BEC0
@@ -3963,7 +3963,7 @@ _080786FC:
 	strb r0, [r2]
 	b _08078962
 	.align 2, 0
-_08078700: .4byte 0x0879BEC0
+_08078700: .4byte sExploredMinimapBitFlags+0xE4
 _08078704: .4byte gNonGameplayRam
 _08078708:
 	ldr r1, _0807876C @ =0x0879BEC0
@@ -4019,7 +4019,7 @@ _0807875C:
 	bl SoundPlay
 	b _08078962
 	.align 2, 0
-_0807876C: .4byte 0x0879BEC0
+_0807876C: .4byte sExploredMinimapBitFlags+0xE4
 _08078770: .4byte gNonGameplayRam
 _08078774:
 	ldr r0, _0807877C @ =0x0000012B
@@ -4083,7 +4083,7 @@ _080787E0:
 	strb r0, [r4]
 	b _08078962
 	.align 2, 0
-_080787E8: .4byte 0x0879BEC0
+_080787E8: .4byte sExploredMinimapBitFlags+0xE4
 _080787EC: .4byte gNonGameplayRam
 _080787F0:
 	ldr r1, _0807883C @ =0x0879BEC0
@@ -4127,7 +4127,7 @@ _08078836:
 	strb r0, [r2]
 	b _08078A36
 	.align 2, 0
-_0807883C: .4byte 0x0879BEC0
+_0807883C: .4byte sExploredMinimapBitFlags+0xE4
 _08078840: .4byte gNonGameplayRam
 _08078844:
 	ldr r6, _08078890 @ =0x0879BEC0
@@ -4168,7 +4168,7 @@ _08078844:
 	adds r0, #1
 	b _08078954
 	.align 2, 0
-_08078890: .4byte 0x0879BEC0
+_08078890: .4byte sExploredMinimapBitFlags+0xE4
 _08078894: .4byte gNonGameplayRam
 _08078898:
 	ldr r3, _08078904 @ =0x0879BEC0
@@ -4226,7 +4226,7 @@ _08078898:
 	strb r1, [r0]
 	b _08078962
 	.align 2, 0
-_08078904: .4byte 0x0879BEC0
+_08078904: .4byte sExploredMinimapBitFlags+0xE4
 _08078908: .4byte gNonGameplayRam
 _0807890C:
 	ldr r6, _08078A5C @ =0x0879BEC0
@@ -4402,7 +4402,7 @@ _08078A42:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08078A5C: .4byte 0x0879BEC0
+_08078A5C: .4byte sExploredMinimapBitFlags+0xE4
 _08078A60: .4byte gNonGameplayRam
 _08078A64: .4byte gOamData
 _08078A68: .4byte 0x000001FF
@@ -4430,7 +4430,7 @@ CheckForMaintainedInput: @ 0x08078A74
 	adds r3, r1, #0
 	b _08078AB0
 	.align 2, 0
-_08078A9C: .4byte 0x08576210
+_08078A9C: .4byte sMaintainedInputDelays
 _08078AA0: .4byte gButtonInput
 _08078AA4: .4byte 0x03005400
 _08078AA8:
@@ -4560,7 +4560,7 @@ _08078B7A:
 	.align 2, 0
 _08078B98: .4byte 0x0000020B
 _08078B9C: .4byte gNonGameplayRam
-_08078BA0: .4byte 0x085767F0
+_08078BA0: .4byte sCharacterWidths+0x5BC
 
 	thumb_func_start PauseScreenSetNavigationTextPanelOam
 PauseScreenSetNavigationTextPanelOam: @ 0x08078BA4
@@ -4816,7 +4816,7 @@ _08078D5E:
 	.align 2, 0
 _08078D9C: .4byte gNonGameplayRam
 _08078DA0: .4byte 0x0000023D
-_08078DA4: .4byte 0x085766E0
+_08078DA4: .4byte sCharacterWidths+0x4AC
 _08078DA8:
 	ldr r3, _08078DC8 @ =gNonGameplayRam
 	ldrh r1, [r3, #4]
@@ -5096,7 +5096,7 @@ _08078FCC:
 	strb r1, [r0]
 	b _080790DE
 	.align 2, 0
-_08078FDC: .4byte 0x085766E0
+_08078FDC: .4byte sCharacterWidths+0x4AC
 _08078FE0:
 	ldr r2, _08079004 @ =gNonGameplayRam
 	ldrh r1, [r2, #4]

@@ -268,18 +268,18 @@ _0809E0D8: .4byte 0x84002000
 _0809E0DC: .4byte gNextOamSlot
 _0809E0E0: .4byte 0x0400000E
 _0809E0E4: .4byte 0x0400000A
-_0809E0E8: .4byte 0x08739A78
-_0809E0EC: .4byte 0x0873C4E4
+_0809E0E8: .4byte sSaXCloseUpDurations+0x585C
+_0809E0EC: .4byte sSaXCloseUpDurations+0x82C8
 _0809E0F0: .4byte 0x05000200
 _0809E0F4: .4byte 0x84000080
-_0809E0F8: .4byte 0x0873422C
+_0809E0F8: .4byte sSaXCloseUpDurations+0x10
 _0809E0FC: .4byte 0x03000011
-_0809E100: .4byte 0x0879E874
-_0809E104: .4byte 0x0873C6E4
+_0809E100: .4byte sMessageTextPointers+0x1A80
+_0809E104: .4byte sSaXCloseUpDurations+0x84C8
 _0809E108: .4byte 0x0600F800
-_0809E10C: .4byte 0x0873CCA8
+_0809E10C: .4byte sSaXCloseUpDurations+0x8A8C
 _0809E110: .4byte 0x0600F000
-_0809E114: .4byte 0x0873C2E4
+_0809E114: .4byte sSaXCloseUpDurations+0x80C8
 _0809E118: .4byte 0x00001E02
 _0809E11C: .4byte 0x00001F03
 _0809E120: .4byte GameOverVblank
@@ -376,7 +376,7 @@ _0809E194:
 	b _0809E1F2
 	.align 2, 0
 _0809E1CC: .4byte gNonGameplayRam
-_0809E1D0: .4byte 0x0879E868
+_0809E1D0: .4byte sMessageTextPointers+0x1A74
 _0809E1D4: .4byte GameOverProcessCursor
 _0809E1D8:
 	cmp r5, #2
@@ -401,7 +401,7 @@ _0809E1F6:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_0809E1FC: .4byte 0x0873C274
+_0809E1FC: .4byte sSaXCloseUpDurations+0x8058
 _0809E200: .4byte unk_9e2cc
 
 	thumb_func_start GameOverProcessCursor
@@ -467,7 +467,7 @@ _0809E252:
 	.align 2, 0
 _0809E280: .4byte 0x000001F9
 _0809E284: .4byte gChangedInput
-_0809E288: .4byte 0x0879E868
+_0809E288: .4byte sMessageTextPointers+0x1A74
 _0809E28C: .4byte gNonGameplayRam
 _0809E290:
 	cmp r0, #0x88
@@ -497,7 +497,7 @@ _0809E2BC:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_0809E2C4: .4byte 0x0879E868
+_0809E2C4: .4byte sMessageTextPointers+0x1A74
 _0809E2C8: .4byte gNonGameplayRam
 
 	thumb_func_start unk_9e2cc
@@ -714,7 +714,7 @@ _0809E3E4:
 	.align 2, 0
 _0809E454: .4byte gNextOamSlot
 _0809E458: .4byte gOamData
-_0809E45C: .4byte 0x08734220
+_0809E45C: .4byte sSaXCloseUpDurations+0x4
 _0809E460: .4byte 0x000001FF
 _0809E464:
 	ldrh r0, [r5, #2]
@@ -1322,32 +1322,32 @@ _0809E954: .4byte 0x0400000E
 _0809E958: .4byte 0x04000016
 _0809E95C: .4byte 0x0000FFFA
 _0809E960: .4byte 0x04000018
-_0809E964: .4byte 0x08742FB4
-_0809E968: .4byte 0x087470E0
+_0809E964: .4byte sSaXCloseUpDurations+0xED98
+_0809E968: .4byte sSaXCloseUpDurations+0x12EC4
 _0809E96C: .4byte 0x0600F800
-_0809E970: .4byte 0x087476A0
+_0809E970: .4byte sSaXCloseUpDurations+0x13484
 _0809E974: .4byte 0x84000080
-_0809E978: .4byte 0x0873CFAC
+_0809E978: .4byte sSaXCloseUpDurations+0x8D90
 _0809E97C: .4byte 0x0600E000
-_0809E980: .4byte 0x0873D380
+_0809E980: .4byte sSaXCloseUpDurations+0x9164
 _0809E984: .4byte 0x0600E800
 _0809E988: .4byte 0x84000200
-_0809E98C: .4byte 0x0873D5EC
+_0809E98C: .4byte sSaXCloseUpDurations+0x93D0
 _0809E990: .4byte 0x0600F000
-_0809E994: .4byte 0x0873DB84
+_0809E994: .4byte sSaXCloseUpDurations+0x9968
 _0809E998: .4byte 0x84000008
-_0809E99C: .4byte 0x0873DAC4
+_0809E99C: .4byte sSaXCloseUpDurations+0x98A8
 _0809E9A0: .4byte 0x84000002
 _0809E9A4: .4byte 0x0500001C
 _0809E9A8: .4byte 0x84000001
 _0809E9AC: .4byte 0x02000800
 _0809E9B0: .4byte 0x02000340
 _0809E9B4: .4byte 0x00000FFF
-_0809E9B8: .4byte 0x0873DC20
+_0809E9B8: .4byte sSaXCloseUpDurations+0x9A04
 _0809E9BC: .4byte 0x06010000
-_0809E9C0: .4byte 0x08740D08
+_0809E9C0: .4byte sSaXCloseUpDurations+0xCAEC
 _0809E9C4: .4byte 0x05000200
-_0809E9C8: .4byte 0x0879EC68
+_0809E9C8: .4byte sMessageTextPointers+0x1E74
 _0809E9CC: .4byte 0x03000011
 _0809E9D0: .4byte 0x03000B8D
 _0809E9D4: .4byte 0x00001F03
@@ -1580,7 +1580,7 @@ _0809EBB0:
 	b _0809F2FC
 	.align 2, 0
 _0809EBE8: .4byte gNonGameplayRam
-_0809EBEC: .4byte 0x0879EC68
+_0809EBEC: .4byte sMessageTextPointers+0x1E74
 _0809EBF0: .4byte 0x03000011
 _0809EBF4:
 	cmp r0, #0xc
@@ -1856,7 +1856,7 @@ _0809EDFE:
 	str r0, [r4, #4]
 	b _0809F32C
 	.align 2, 0
-_0809EE1C: .4byte 0x0879EC68
+_0809EE1C: .4byte sMessageTextPointers+0x1E74
 _0809EE20: .4byte 0x03000011
 _0809EE24:
 	cmp r0, #0xc
@@ -2054,7 +2054,7 @@ _0809EF7A:
 	str r0, [r2, #4]
 	b _0809F32C
 	.align 2, 0
-_0809EF98: .4byte 0x0879EC68
+_0809EF98: .4byte sMessageTextPointers+0x1E74
 _0809EF9C: .4byte 0x03000011
 _0809EFA0:
 	cmp r0, #0xc
@@ -2195,7 +2195,7 @@ _0809F088:
 	str r0, [r2, #4]
 	b _0809F32C
 	.align 2, 0
-_0809F0A8: .4byte 0x0879EC68
+_0809F0A8: .4byte sMessageTextPointers+0x1E74
 _0809F0AC: .4byte 0x03000011
 _0809F0B0:
 	cmp r0, #4
@@ -2221,7 +2221,7 @@ _0809F0B6:
 	movs r2, #0x91
 	b _0809F2FC
 	.align 2, 0
-_0809F0DC: .4byte 0x0873DBB0
+_0809F0DC: .4byte sSaXCloseUpDurations+0x9994
 _0809F0E0: .4byte 0x03000011
 _0809F0E4:
 	ldr r2, _0809F120 @ =gNonGameplayRam
@@ -2364,7 +2364,7 @@ _0809F1C6:
 	str r0, [r4, #4]
 	b _0809F32C
 	.align 2, 0
-_0809F1E4: .4byte 0x0879EC68
+_0809F1E4: .4byte sMessageTextPointers+0x1E74
 _0809F1E8: .4byte 0x03000011
 _0809F1EC:
 	ldr r4, _0809F200 @ =gNonGameplayRam
@@ -2402,7 +2402,7 @@ _0809F20E:
 	str r0, [r4, #4]
 	b _0809F32C
 	.align 2, 0
-_0809F22C: .4byte 0x0879EC68
+_0809F22C: .4byte sMessageTextPointers+0x1E74
 _0809F230: .4byte 0x03000011
 _0809F234:
 	cmp r0, #0xc
@@ -2545,7 +2545,7 @@ _0809F32C:
 	bl FileSelectDrawText
 	b _0809F50A
 	.align 2, 0
-_0809F334: .4byte 0x0879EC68
+_0809F334: .4byte sMessageTextPointers+0x1E74
 _0809F338: .4byte 0x03000011
 _0809F33C:
 	cmp r0, #0xc
@@ -2573,7 +2573,7 @@ _0809F342:
 	strh r0, [r5, #0xa]
 	b _0809F50A
 	.align 2, 0
-_0809F36C: .4byte 0x0873DBBE
+_0809F36C: .4byte sSaXCloseUpDurations+0x99A2
 _0809F370: .4byte 0x03000011
 _0809F374:
 	ldr r0, _0809F388 @ =gChangedInput
@@ -2895,7 +2895,7 @@ _0809F578:
 _0809F5C4: .4byte 0x040000D4
 _0809F5C8: .4byte 0x0300149C
 _0809F5CC: .4byte 0x85000007
-_0809F5D0: .4byte 0x08740A48
+_0809F5D0: .4byte sSaXCloseUpDurations+0xC82C
 _0809F5D4: .4byte FileSelectProcessSamusHead
 _0809F5D8:
 	cmp r3, #2
@@ -2911,7 +2911,7 @@ _0809F5D8:
 	ldr r1, _0809F5F4 @ =FileSelectProcessCursor
 	b _0809F916
 	.align 2, 0
-_0809F5F0: .4byte 0x08740B48
+_0809F5F0: .4byte sSaXCloseUpDurations+0xC92C
 _0809F5F4: .4byte FileSelectProcessCursor
 _0809F5F8:
 	cmp r3, #3
@@ -2931,7 +2931,7 @@ _0809F5F8:
 	ldr r1, _0809F61C @ =FileSelectProcessDeleteArrow
 	b _0809F916
 	.align 2, 0
-_0809F618: .4byte 0x08740AB8
+_0809F618: .4byte sSaXCloseUpDurations+0xC89C
 _0809F61C: .4byte FileSelectProcessDeleteArrow
 _0809F620:
 	cmp r3, #4
@@ -2947,7 +2947,7 @@ _0809F620:
 	ldr r1, _0809F63C @ =unk_9fddc
 	b _0809F916
 	.align 2, 0
-_0809F638: .4byte 0x08740B48
+_0809F638: .4byte sSaXCloseUpDurations+0xC92C
 _0809F63C: .4byte unk_9fddc
 _0809F640:
 	cmp r3, #5
@@ -2963,7 +2963,7 @@ _0809F640:
 	ldr r1, _0809F65C @ =unk_9ff00
 	b _0809F916
 	.align 2, 0
-_0809F658: .4byte 0x08740B48
+_0809F658: .4byte sSaXCloseUpDurations+0xC92C
 _0809F65C: .4byte unk_9ff00
 _0809F660:
 	cmp r3, #6
@@ -2982,7 +2982,7 @@ _0809F660:
 	ldr r1, _0809F684 @ =FileSelectProcessAudioLogos
 	b _0809F916
 	.align 2, 0
-_0809F680: .4byte 0x087407E0
+_0809F680: .4byte sSaXCloseUpDurations+0xC5C4
 _0809F684: .4byte FileSelectProcessAudioLogos
 _0809F688:
 	cmp r3, #7
@@ -3006,7 +3006,7 @@ _0809F688:
 	ldr r1, _0809F6B8 @ =FileSelectProcessFileOverlay
 	b _0809F916
 	.align 2, 0
-_0809F6B0: .4byte 0x0879E890
+_0809F6B0: .4byte sMessageTextPointers+0x1A9C
 _0809F6B4: .4byte 0x03000B8D
 _0809F6B8: .4byte FileSelectProcessFileOverlay
 _0809F6BC:
@@ -3026,7 +3026,7 @@ _0809F6BC:
 	ldr r1, _0809F6E0 @ =unk_a016c
 	b _0809F916
 	.align 2, 0
-_0809F6DC: .4byte 0x087408E0
+_0809F6DC: .4byte sSaXCloseUpDurations+0xC6C4
 _0809F6E0: .4byte unk_a016c
 _0809F6E4:
 	cmp r3, #9
@@ -3046,7 +3046,7 @@ _0809F6E4:
 	ldr r1, _0809F708 @ =FileSelectProcessAudioSelect
 	b _0809F916
 	.align 2, 0
-_0809F704: .4byte 0x087408F0
+_0809F704: .4byte sSaXCloseUpDurations+0xC6D4
 _0809F708: .4byte FileSelectProcessAudioSelect
 _0809F70C:
 	cmp r3, #0xa
@@ -3062,7 +3062,7 @@ _0809F70C:
 	ldr r1, _0809F728 @ =unk_a01cc
 	b _0809F916
 	.align 2, 0
-_0809F724: .4byte 0x08740880
+_0809F724: .4byte sSaXCloseUpDurations+0xC664
 _0809F728: .4byte unk_a01cc
 _0809F72C:
 	cmp r3, #0xb
@@ -3091,7 +3091,7 @@ _0809F72C:
 	b _0809F918
 	.align 2, 0
 _0809F760: .4byte gNonGameplayRam
-_0809F764: .4byte 0x08740918
+_0809F764: .4byte sSaXCloseUpDurations+0xC6FC
 _0809F768: .4byte FileSelectProcessFileActionPanel
 _0809F76C:
 	cmp r3, #0xc
@@ -3120,7 +3120,7 @@ _0809F76C:
 	b _0809F918
 	.align 2, 0
 _0809F7A0: .4byte gNonGameplayRam
-_0809F7A4: .4byte 0x08740978
+_0809F7A4: .4byte sSaXCloseUpDurations+0xC75C
 _0809F7A8: .4byte FileSelectProcessCopyFilePanel
 _0809F7AC:
 	cmp r3, #0xd
@@ -3149,7 +3149,7 @@ _0809F7AC:
 	b _0809F918
 	.align 2, 0
 _0809F7E0: .4byte gNonGameplayRam
-_0809F7E4: .4byte 0x08740978
+_0809F7E4: .4byte sSaXCloseUpDurations+0xC75C
 _0809F7E8: .4byte FileSelectProcessEraseFilePanel
 _0809F7EC:
 	cmp r3, #0xe
@@ -3222,7 +3222,7 @@ _0809F858:
 	ldr r2, _0809F878 @ =0x087409A0
 	b _0809F8A0
 	.align 2, 0
-_0809F878: .4byte 0x087409A0
+_0809F878: .4byte sSaXCloseUpDurations+0xC784
 _0809F87C:
 	cmp r3, #0x14
 	beq _0809F888
@@ -3252,7 +3252,7 @@ _0809F8A0:
 	str r0, [r1]
 	b _0809F918
 	.align 2, 0
-_0809F8B0: .4byte 0x08740B98
+_0809F8B0: .4byte sSaXCloseUpDurations+0xC97C
 _0809F8B4: .4byte unk_a0518
 _0809F8B8:
 	cmp r3, #0x17
@@ -3281,7 +3281,7 @@ _0809F8B8:
 	b _0809F918
 	.align 2, 0
 _0809F8EC: .4byte gNonGameplayRam
-_0809F8F0: .4byte 0x08740978
+_0809F8F0: .4byte sSaXCloseUpDurations+0xC75C
 _0809F8F4: .4byte unk_a039c
 _0809F8F8:
 	cmp r3, #0x18
@@ -3312,7 +3312,7 @@ _0809F91A:
 	pop {r1}
 	bx r1
 	.align 2, 0
-_0809F928: .4byte 0x08740B48
+_0809F928: .4byte sSaXCloseUpDurations+0xC92C
 _0809F92C: .4byte unk_a0424
 
 	thumb_func_start FileSelectProcessSamusHead
@@ -3493,7 +3493,7 @@ _0809FA60:
 	b _0809FACC
 	.align 2, 0
 _0809FA88: .4byte gNonGameplayRam
-_0809FA8C: .4byte 0x08740A48
+_0809FA8C: .4byte sSaXCloseUpDurations+0xC82C
 _0809FA90:
 	cmp r1, #5
 	beq _0809FAA0
@@ -3513,7 +3513,7 @@ _0809FAA0:
 	strb r0, [r4, #9]
 	b _0809FACC
 	.align 2, 0
-_0809FAB0: .4byte 0x08740A70
+_0809FAB0: .4byte sSaXCloseUpDurations+0xC854
 _0809FAB4:
 	ldrb r0, [r4, #6]
 	lsls r0, r0, #3
@@ -3594,7 +3594,7 @@ _0809FB38:
 	b _0809FC48
 	.align 2, 0
 _0809FB48: .4byte gNonGameplayRam
-_0809FB4C: .4byte 0x08740B70
+_0809FB4C: .4byte sSaXCloseUpDurations+0xC954
 _0809FB50:
 	cmp r1, #3
 	beq _0809FB56
@@ -3675,7 +3675,7 @@ _0809FBA2:
 	.align 2, 0
 _0809FBEC: .4byte 0x000001F9
 _0809FBF0: .4byte gChangedInput
-_0809FBF4: .4byte 0x08740B70
+_0809FBF4: .4byte sSaXCloseUpDurations+0xC954
 _0809FBF8: .4byte gNonGameplayRam
 _0809FBFC: .4byte 0x03000B94
 _0809FC00: .4byte 0x000001FB
@@ -3751,7 +3751,7 @@ _0809FC82:
 	bx r0
 	.align 2, 0
 _0809FC88: .4byte gNonGameplayRam
-_0809FC8C: .4byte 0x08740B48
+_0809FC8C: .4byte sSaXCloseUpDurations+0xC92C
 
 	thumb_func_start FileSelectProcessDeleteArrow
 FileSelectProcessDeleteArrow: @ 0x0809FC90
@@ -3874,7 +3874,7 @@ _0809FD6A:
 	movs r7, #1
 	b _0809FDA4
 	.align 2, 0
-_0809FD70: .4byte 0x0879E8A4
+_0809FD70: .4byte sMessageTextPointers+0x1AB0
 _0809FD74: .4byte 0x03000B94
 _0809FD78:
 	movs r7, #2
@@ -3964,7 +3964,7 @@ unk_9fddc: @ 0x0809FDDC
 	.align 2, 0
 _0809FE1C: .4byte gNonGameplayRam
 _0809FE20: .4byte gChangedInput
-_0809FE24: .4byte 0x0873DBB0
+_0809FE24: .4byte sSaXCloseUpDurations+0x9994
 _0809FE28: .4byte 0x03000011
 _0809FE2C:
 	cmp r0, #1
@@ -4011,7 +4011,7 @@ _0809FE58:
 	b _0809FE96
 	.align 2, 0
 _0809FE80: .4byte gChangedInput
-_0809FE84: .4byte 0x0873DBB0
+_0809FE84: .4byte sSaXCloseUpDurations+0x9994
 _0809FE88: .4byte 0x03000011
 _0809FE8C: .4byte gNonGameplayRam
 _0809FE90: .4byte 0x00000207
@@ -4026,7 +4026,7 @@ _0809FE96:
 	b _0809FEF8
 	.align 2, 0
 _0809FEA4: .4byte 0x000001FB
-_0809FEA8: .4byte 0x08740B70
+_0809FEA8: .4byte sSaXCloseUpDurations+0xC954
 _0809FEAC:
 	cmp r2, #1
 	bne _0809FEE0
@@ -4111,7 +4111,7 @@ unk_9ff00: @ 0x0809FF00
 	.align 2, 0
 _0809FF40: .4byte gNonGameplayRam
 _0809FF44: .4byte gChangedInput
-_0809FF48: .4byte 0x0873DBBE
+_0809FF48: .4byte sSaXCloseUpDurations+0x99A2
 _0809FF4C: .4byte 0x03000011
 _0809FF50:
 	cmp r0, #1
@@ -4159,7 +4159,7 @@ _0809FF7C:
 	b _0809FFBA
 	.align 2, 0
 _0809FFA8: .4byte gChangedInput
-_0809FFAC: .4byte 0x0873DBBE
+_0809FFAC: .4byte sSaXCloseUpDurations+0x99A2
 _0809FFB0: .4byte 0x03000011
 _0809FFB4: .4byte gNonGameplayRam
 _0809FFB8:
@@ -4173,7 +4173,7 @@ _0809FFBA:
 	b _080A001C
 	.align 2, 0
 _0809FFC8: .4byte 0x000001FB
-_0809FFCC: .4byte 0x08740B70
+_0809FFCC: .4byte sSaXCloseUpDurations+0xC954
 _0809FFD0:
 	cmp r2, #1
 	bne _080A0004
@@ -4255,9 +4255,9 @@ FileSelectProcessAudioLogos: @ 0x080A0024
 	b _080A00DA
 	.align 2, 0
 _080A0064: .4byte gNonGameplayRam
-_080A0068: .4byte 0x087407C0
+_080A0068: .4byte sSaXCloseUpDurations+0xC5A4
 _080A006C: .4byte gChangedInput
-_080A0070: .4byte 0x087407D0
+_080A0070: .4byte sSaXCloseUpDurations+0xC5B4
 _080A0074: .4byte 0x00000206
 _080A0078:
 	cmp r3, #1
@@ -4284,9 +4284,9 @@ _080A0078:
 	bl SoundPlay
 	b _080A00DA
 	.align 2, 0
-_080A00AC: .4byte 0x087407D0
+_080A00AC: .4byte sSaXCloseUpDurations+0xC5B4
 _080A00B0: .4byte gChangedInput
-_080A00B4: .4byte 0x087407C0
+_080A00B4: .4byte sSaXCloseUpDurations+0xC5A4
 _080A00B8:
 	ldrb r1, [r2, #9]
 	cmp r1, #0
@@ -4297,7 +4297,7 @@ _080A00B8:
 	strb r1, [r2, #6]
 	b _080A00DA
 	.align 2, 0
-_080A00C8: .4byte 0x087407E0
+_080A00C8: .4byte sSaXCloseUpDurations+0xC5C4
 _080A00CC:
 	cmp r1, #1
 	bne _080A00DA
@@ -4310,7 +4310,7 @@ _080A00DA:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_080A00E0: .4byte 0x087407F0
+_080A00E0: .4byte sSaXCloseUpDurations+0xC5D4
 
 	thumb_func_start FileSelectProcessAudioSelect
 FileSelectProcessAudioSelect: @ 0x080A00E4
@@ -4383,7 +4383,7 @@ _080A015E:
 	bx r0
 	.align 2, 0
 _080A0164: .4byte gNonGameplayRam
-_080A0168: .4byte 0x0879E890
+_080A0168: .4byte sMessageTextPointers+0x1A9C
 
 	thumb_func_start unk_a016c
 unk_a016c: @ 0x080A016C
@@ -4407,7 +4407,7 @@ unk_a016c: @ 0x080A016C
 	b _080A01A6
 	.align 2, 0
 _080A0190: .4byte gNonGameplayRam
-_080A0194: .4byte 0x087408E0
+_080A0194: .4byte sSaXCloseUpDurations+0xC6C4
 _080A0198:
 	cmp r1, #1
 	bne _080A01A0
@@ -4431,7 +4431,7 @@ _080A01A8:
 	b _080A01C6
 	.align 2, 0
 _080A01BC: .4byte gChangedInput
-_080A01C0: .4byte 0x087408D0
+_080A01C0: .4byte sSaXCloseUpDurations+0xC6B4
 _080A01C4:
 	strb r3, [r2, #5]
 _080A01C6:
@@ -4470,7 +4470,7 @@ FileSelectProcessFileActionPanel: @ 0x080A01D0
 	strb r0, [r4, #9]
 	b _080A0266
 	.align 2, 0
-_080A0200: .4byte 0x08740940
+_080A0200: .4byte sSaXCloseUpDurations+0xC724
 _080A0204:
 	cmp r2, #1
 	bne _080A0248
@@ -4504,7 +4504,7 @@ _080A0228:
 	b _080A0266
 	.align 2, 0
 _080A0240: .4byte 0x000001FD
-_080A0244: .4byte 0x08740950
+_080A0244: .4byte sSaXCloseUpDurations+0xC734
 _080A0248:
 	cmp r2, #2
 	bne _080A0266
@@ -4552,7 +4552,7 @@ FileSelectProcessCopyFilePanel: @ 0x080A026C
 	strb r0, [r4, #9]
 	b _080A02FE
 	.align 2, 0
-_080A029C: .4byte 0x087409A0
+_080A029C: .4byte sSaXCloseUpDurations+0xC784
 _080A02A0:
 	cmp r2, #1
 	bne _080A02E0
@@ -4584,7 +4584,7 @@ _080A02C0:
 	b _080A02FE
 	.align 2, 0
 _080A02D8: .4byte 0x000001FD
-_080A02DC: .4byte 0x087409B0
+_080A02DC: .4byte sSaXCloseUpDurations+0xC794
 _080A02E0:
 	cmp r2, #2
 	bne _080A02FE
@@ -4632,7 +4632,7 @@ FileSelectProcessEraseFilePanel: @ 0x080A0304
 	strb r0, [r4, #9]
 	b _080A0396
 	.align 2, 0
-_080A0334: .4byte 0x087409A0
+_080A0334: .4byte sSaXCloseUpDurations+0xC784
 _080A0338:
 	cmp r2, #1
 	bne _080A0378
@@ -4664,7 +4664,7 @@ _080A0358:
 	b _080A0396
 	.align 2, 0
 _080A0370: .4byte 0x000001FD
-_080A0374: .4byte 0x087409B0
+_080A0374: .4byte sSaXCloseUpDurations+0xC794
 _080A0378:
 	cmp r2, #2
 	bne _080A0396
@@ -4712,7 +4712,7 @@ unk_a039c: @ 0x080A039C
 	strb r0, [r4, #9]
 	b _080A041E
 	.align 2, 0
-_080A03CC: .4byte 0x087409A0
+_080A03CC: .4byte sSaXCloseUpDurations+0xC784
 _080A03D0:
 	cmp r2, #1
 	bne _080A0400
@@ -4734,7 +4734,7 @@ _080A03D0:
 	.align 2, 0
 _080A03F4: .4byte gNonGameplayRam
 _080A03F8: .4byte 0x000001FD
-_080A03FC: .4byte 0x087409B0
+_080A03FC: .4byte sSaXCloseUpDurations+0xC794
 _080A0400:
 	cmp r2, #2
 	bne _080A041E
@@ -4827,13 +4827,13 @@ _080A047A:
 	.align 2, 0
 _080A04AC: .4byte gChangedInput
 _080A04B0: .4byte gNonGameplayRam
-_080A04B4: .4byte 0x08740B70
+_080A04B4: .4byte sSaXCloseUpDurations+0xC954
 _080A04B8:
 	ldr r0, _080A04C0 @ =0x08740B70
 	str r0, [r4, #0x14]
 	b _080A04EE
 	.align 2, 0
-_080A04C0: .4byte 0x08740B70
+_080A04C0: .4byte sSaXCloseUpDurations+0xC954
 _080A04C4:
 	cmp r2, #1
 	bne _080A04F8
@@ -5021,7 +5021,7 @@ _080A060E:
 	.align 2, 0
 _080A061C: .4byte 0x040000D4
 _080A0620: .4byte 0x850000C0
-_080A0624: .4byte 0x0879EC84
+_080A0624: .4byte sMessageTextPointers+0x1E90
 _080A0628: .4byte 0x03000011
 _080A062C:
 	cmp r0, #0x40
@@ -5254,11 +5254,11 @@ _080A07E2:
 _080A07F4: .4byte 0x03000011
 _080A07F8: .4byte 0x040000D4
 _080A07FC: .4byte 0x84000008
-_080A0800: .4byte 0x08682FAC
+_080A0800: .4byte sCharactersGfx
 _080A0804: .4byte 0x85000080
-_080A0808: .4byte 0x0873DB64
+_080A0808: .4byte sSaXCloseUpDurations+0x9948
 _080A080C: .4byte 0xFFFFFB60
-_080A0810: .4byte 0x0873DB04
+_080A0810: .4byte sSaXCloseUpDurations+0x98E8
 _080A0814:
 	ldr r1, _080A0A18 @ =0x040000D4
 	ldr r0, _080A0A1C @ =0x0873DB44
@@ -5521,12 +5521,12 @@ _080A0A08:
 	bx r0
 	.align 2, 0
 _080A0A18: .4byte 0x040000D4
-_080A0A1C: .4byte 0x0873DB44
+_080A0A1C: .4byte sSaXCloseUpDurations+0x9928
 _080A0A20: .4byte 0x84000008
 _080A0A24: .4byte 0xFFFFFB60
-_080A0A28: .4byte 0x0873DB24
-_080A0A2C: .4byte 0x0873DAE4
-_080A0A30: .4byte 0x08682FAC
+_080A0A28: .4byte sSaXCloseUpDurations+0x9908
+_080A0A2C: .4byte sSaXCloseUpDurations+0x98C8
+_080A0A30: .4byte sCharactersGfx
 _080A0A34: .4byte gNonGameplayRam
 _080A0A38: .4byte 0x03000B94
 
@@ -5562,7 +5562,7 @@ FileSelectDrawText: @ 0x080A0A3C
 	b _080A0A98
 	.align 2, 0
 _080A0A74: .4byte gNonGameplayRam
-_080A0A78: .4byte 0x0879E928
+_080A0A78: .4byte sMessageTextPointers+0x1B34
 _080A0A7C: .4byte 0x03000011
 _080A0A80:
 	ldr r1, _080A0AA4 @ =0x0879E928
@@ -5585,7 +5585,7 @@ _080A0A98:
 	movs r4, #6
 	b _080A0AC6
 	.align 2, 0
-_080A0AA4: .4byte 0x0879E928
+_080A0AA4: .4byte sMessageTextPointers+0x1B34
 _080A0AA8: .4byte 0x03000011
 _080A0AAC: .4byte 0x06008000
 _080A0AB0:
@@ -5934,7 +5934,7 @@ _080A0D20:
 	strb r0, [r4, #0x14]
 	b _080A0DF0
 	.align 2, 0
-_080A0D58: .4byte 0x0879EC68
+_080A0D58: .4byte sMessageTextPointers+0x1E74
 _080A0D5C: .4byte 0x03000011
 _080A0D60:
 	ldr r0, _080A0D98 @ =gChangedInput
@@ -6088,7 +6088,7 @@ _080A0E90: .4byte 0x060098C0
 _080A0E94: .4byte gNonGameplayRam
 _080A0E98: .4byte 0x040000D4
 _080A0E9C: .4byte 0x850000C0
-_080A0EA0: .4byte 0x0879EC84
+_080A0EA0: .4byte sMessageTextPointers+0x1E90
 _080A0EA4: .4byte 0x03000011
 _080A0EA8:
 	cmp r0, #0x40
@@ -6364,7 +6364,7 @@ _080A1090:
 	b _080A11B2
 	.align 2, 0
 _080A10B0: .4byte gNonGameplayRam
-_080A10B4: .4byte 0x0879E944
+_080A10B4: .4byte sMessageTextPointers+0x1B50
 _080A10B8: .4byte 0x03000011
 _080A10BC:
 	ldr r0, _080A10DC @ =gNonGameplayRam
@@ -6384,7 +6384,7 @@ _080A10BC:
 	b _080A11B2
 	.align 2, 0
 _080A10DC: .4byte gNonGameplayRam
-_080A10E0: .4byte 0x0879E944
+_080A10E0: .4byte sMessageTextPointers+0x1B50
 _080A10E4: .4byte 0x03000011
 _080A10E8:
 	ldr r0, _080A1108 @ =gNonGameplayRam
@@ -6404,7 +6404,7 @@ _080A10E8:
 	b _080A11B2
 	.align 2, 0
 _080A1108: .4byte gNonGameplayRam
-_080A110C: .4byte 0x0879E944
+_080A110C: .4byte sMessageTextPointers+0x1B50
 _080A1110: .4byte 0x03000011
 _080A1114:
 	ldr r0, _080A1134 @ =gNonGameplayRam
@@ -6424,7 +6424,7 @@ _080A1114:
 	b _080A11B2
 	.align 2, 0
 _080A1134: .4byte gNonGameplayRam
-_080A1138: .4byte 0x0879E944
+_080A1138: .4byte sMessageTextPointers+0x1B50
 _080A113C: .4byte 0x03000011
 _080A1140:
 	ldr r0, _080A1160 @ =gNonGameplayRam
@@ -6444,7 +6444,7 @@ _080A1140:
 	b _080A11B2
 	.align 2, 0
 _080A1160: .4byte gNonGameplayRam
-_080A1164: .4byte 0x0879E944
+_080A1164: .4byte sMessageTextPointers+0x1B50
 _080A1168: .4byte 0x03000011
 _080A116C:
 	ldr r0, _080A118C @ =gNonGameplayRam
@@ -6464,7 +6464,7 @@ _080A116C:
 	b _080A11B2
 	.align 2, 0
 _080A118C: .4byte gNonGameplayRam
-_080A1190: .4byte 0x0879E944
+_080A1190: .4byte sMessageTextPointers+0x1B50
 _080A1194: .4byte 0x03000011
 _080A1198:
 	ldr r0, _080A11C0 @ =gNonGameplayRam
@@ -6489,7 +6489,7 @@ _080A11B2:
 	bx r0
 	.align 2, 0
 _080A11C0: .4byte gNonGameplayRam
-_080A11C4: .4byte 0x0879E944
+_080A11C4: .4byte sMessageTextPointers+0x1B50
 _080A11C8: .4byte 0x03000011
 
 	thumb_func_start FileSelectProcessOam
@@ -6663,7 +6663,7 @@ _080A1298:
 	.align 2, 0
 _080A1308: .4byte gNextOamSlot
 _080A130C: .4byte gOamData
-_080A1310: .4byte 0x0873DBA4
+_080A1310: .4byte sSaXCloseUpDurations+0x9988
 _080A1314: .4byte 0x000001FF
 _080A1318:
 	ldrh r0, [r5, #2]
@@ -6956,8 +6956,8 @@ _080A153E:
 	b _080A1584
 	.align 2, 0
 _080A1548: .4byte gInGameTimer
-_080A154C: .4byte 0x0874E650
-_080A1550: .4byte 0x0874E8D0
+_080A154C: .4byte sPreResultsSamusBgTilemapPointers+0x10
+_080A1550: .4byte sPreResultsSamusBgTilemapPointers+0x290
 _080A1554: .4byte gNonGameplayRam
 _080A1558: .4byte 0x040000D4
 _080A155C: .4byte 0x06010000
@@ -7162,7 +7162,7 @@ _080A16BA:
 	b _080A1B50
 	.align 2, 0
 _080A16F0: .4byte gNonGameplayRam
-_080A16F4: .4byte 0x0874DE94
+_080A16F4: .4byte sCredits+0x2DE4
 _080A16F8:
 	ldr r1, _080A1754 @ =gNonGameplayRam
 	adds r2, r1, #0
@@ -7212,7 +7212,7 @@ _080A171C:
 	b _080A1B50
 	.align 2, 0
 _080A1754: .4byte gNonGameplayRam
-_080A1758: .4byte 0x0874DF30
+_080A1758: .4byte sCredits+0x2E80
 _080A175C:
 	cmp r1, #0
 	bne _080A17C4
@@ -7264,7 +7264,7 @@ _080A1784:
 	b _080A1B50
 	.align 2, 0
 _080A17BC: .4byte gNonGameplayRam
-_080A17C0: .4byte 0x0874E020
+_080A17C0: .4byte sCredits+0x2F70
 _080A17C4:
 	ldr r1, _080A1820 @ =gNonGameplayRam
 	adds r2, r1, #0
@@ -7314,7 +7314,7 @@ _080A17E8:
 	b _080A1B50
 	.align 2, 0
 _080A1820: .4byte gNonGameplayRam
-_080A1824: .4byte 0x0874E0E0
+_080A1824: .4byte sCredits+0x3030
 _080A1828:
 	cmp r1, #0
 	bne _080A1890
@@ -7366,7 +7366,7 @@ _080A1850:
 	b _080A1B50
 	.align 2, 0
 _080A1888: .4byte gNonGameplayRam
-_080A188C: .4byte 0x0874E218
+_080A188C: .4byte sCredits+0x3168
 _080A1890:
 	cmp r1, #1
 	bne _080A18F8
@@ -7418,7 +7418,7 @@ _080A18B8:
 	b _080A1B50
 	.align 2, 0
 _080A18F0: .4byte gNonGameplayRam
-_080A18F4: .4byte 0x0874E2F0
+_080A18F4: .4byte sCredits+0x3240
 _080A18F8:
 	ldr r1, _080A1954 @ =gNonGameplayRam
 	adds r2, r1, #0
@@ -7468,7 +7468,7 @@ _080A191C:
 	b _080A1B50
 	.align 2, 0
 _080A1954: .4byte gNonGameplayRam
-_080A1958: .4byte 0x0874E374
+_080A1958: .4byte sCredits+0x32C4
 _080A195C:
 	cmp r1, #0
 	bne _080A19C4
@@ -7520,7 +7520,7 @@ _080A1984:
 	b _080A1B50
 	.align 2, 0
 _080A19BC: .4byte gNonGameplayRam
-_080A19C0: .4byte 0x0874E488
+_080A19C0: .4byte sCredits+0x33D8
 _080A19C4:
 	ldr r1, _080A1A20 @ =gNonGameplayRam
 	adds r2, r1, #0
@@ -7570,7 +7570,7 @@ _080A19E8:
 	b _080A1B50
 	.align 2, 0
 _080A1A20: .4byte gNonGameplayRam
-_080A1A24: .4byte 0x0874E53C
+_080A1A24: .4byte sCredits+0x348C
 _080A1A28:
 	cmp r1, #0
 	bne _080A1A90
@@ -7622,7 +7622,7 @@ _080A1A50:
 	b _080A1B50
 	.align 2, 0
 _080A1A88: .4byte gNonGameplayRam
-_080A1A8C: .4byte 0x0874DC90
+_080A1A8C: .4byte sCredits+0x2BE0
 _080A1A90:
 	cmp r1, #1
 	bne _080A1AF8
@@ -7674,7 +7674,7 @@ _080A1AB8:
 	b _080A1B50
 	.align 2, 0
 _080A1AF0: .4byte gNonGameplayRam
-_080A1AF4: .4byte 0x0874DCFC
+_080A1AF4: .4byte sCredits+0x2C4C
 _080A1AF8:
 	ldr r1, _080A1B58 @ =gNonGameplayRam
 	adds r2, r1, #0
@@ -7727,7 +7727,7 @@ _080A1B50:
 	bx r0
 	.align 2, 0
 _080A1B58: .4byte gNonGameplayRam
-_080A1B5C: .4byte 0x0874DD80
+_080A1B5C: .4byte sCredits+0x2CD0
 
 	thumb_func_start EndingImageDisplayLinePermanently
 EndingImageDisplayLinePermanently: @ 0x080A1B60
@@ -7763,7 +7763,7 @@ _080A1B8A:
 	b _080A1BFA
 	.align 2, 0
 _080A1B9C: .4byte gNonGameplayRam
-_080A1BA0: .4byte 0x0874DE4C
+_080A1BA0: .4byte sCredits+0x2D9C
 _080A1BA4:
 	ldr r0, _080A1BB4 @ =gNonGameplayRam
 	mov ip, r0
@@ -7775,7 +7775,7 @@ _080A1BA4:
 	b _080A1BFA
 	.align 2, 0
 _080A1BB4: .4byte gNonGameplayRam
-_080A1BB8: .4byte 0x0874DFD8
+_080A1BB8: .4byte sCredits+0x2F28
 _080A1BBC:
 	ldr r0, _080A1BCC @ =gNonGameplayRam
 	mov ip, r0
@@ -7787,7 +7787,7 @@ _080A1BBC:
 	b _080A1BFA
 	.align 2, 0
 _080A1BCC: .4byte gNonGameplayRam
-_080A1BD0: .4byte 0x0874E1D0
+_080A1BD0: .4byte sCredits+0x3120
 _080A1BD4:
 	ldr r0, _080A1BE4 @ =gNonGameplayRam
 	mov ip, r0
@@ -7799,7 +7799,7 @@ _080A1BD4:
 	b _080A1BFA
 	.align 2, 0
 _080A1BE4: .4byte gNonGameplayRam
-_080A1BE8: .4byte 0x0874E440
+_080A1BE8: .4byte sCredits+0x3390
 _080A1BEC:
 	ldr r0, _080A1C7C @ =gNonGameplayRam
 	mov ip, r0
@@ -7878,5 +7878,5 @@ _080A1C70:
 	bx r0
 	.align 2, 0
 _080A1C7C: .4byte gNonGameplayRam
-_080A1C80: .4byte 0x0874DC48
+_080A1C80: .4byte sCredits+0x2B98
 

@@ -81,4 +81,4 @@ _080001C4:
 	bx lr
 	.align 2, 0
 _08000228: .4byte 0x00002400
-_0800022C: .4byte 0x080A5224
+_0800022C: .4byte sSineTable+0x280

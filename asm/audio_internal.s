@@ -353,7 +353,7 @@ _08004806:
 	pop {r0}
 	bx r0
 	.align 2, 0
-_08004810: .4byte 0x080A8CDC
+_08004810: .4byte sMusicTrackDataRom
 _08004814: .4byte gMusicInfo
 _08004818: .4byte 0x00000008
 

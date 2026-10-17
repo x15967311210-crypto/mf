@@ -20,8 +20,21 @@ python3 tools/shift/map_symbols.py --map mf_us.map --out work/shift/symbols.json
 python3 tools/shift/audit_asm.py --map mf_us.map --out work/shift/abs_refs.json
 python3 tools/shift/audit_blobs.py --map mf_us.map --out work/shift/blob_scan.json
 python3 tools/shift/rewrite_refs.py --out work/shift/rewrite_suggestions.md
+python3 tools/shift/apply_refs.py --dry-run
+python3 tools/shift/apply_refs.py --check
 python3 tools/shift/report.py --out docs/shiftability-audit.md
 ```
+
+`apply_refs.py` rewrites the operand of each `.4byte`/`.word` ROM literal in
+`abs_refs.json` to a symbol expression (`symbol` or `symbol+0xNN`).  It refuses
+to touch a line whose label, directive, or value no longer matches the ledger,
+and `--check` fails while any literal is still numeric.  Static (`STB_LOCAL`)
+data symbols in C objects are not link-visible across objects, so those targets
+use an equivalent global anchor in the same output section (for example the
+literal `0x0839EC68` inside `sBlob_39aa34_39f4b0` becomes
+`sOmegaMetroidPartOam_LeftLeg_Swiping+0x4264`); `--elf` points at the baseline
+ELF used for that lookup.  The rewrite is address-equivalent: the SHA1 of the
+rebuilt ROM must not change.
 
 `audit_blobs.py` reads extracted bytes from `data/` by default.  In a worktree
 without extracted data (for example a fresh `git worktree`), the audit reports
@@ -30,9 +43,10 @@ without extracted data (for example a fresh `git worktree`), the audit reports
 
 ## Current baseline counts
 
-- 662 ROM literals in `.4byte`/`.word`; 697 `ldr =0x08...` reference comments.
+- SHIFT-005 rewrote all 662 ROM literals in `.4byte`/`.word` to symbol
+  expressions (0 remain); 697 `ldr =0x08...` reference comments remain.
 - 388 unique ROM values.
-- Literal targets: 580 in `.rodata`, 82 in `.data`.
+- Rewritten targets: 580 in `.rodata`, 82 in `.data`.
 - 47 extracted blobs: 7 confirmed pointer tables, 3 possible (embedded
   pointers in struct/audio data), 37 data.  The SHIFT-002 density rule is kept
   as `baseline_classification`; see `docs/blob-classification.md` for the
@@ -77,6 +91,6 @@ the leftovers and to prove the result with the shift test.
 `shift_test.py --build` moves the normal `mf_us.gba/.elf/.map` into
 `work/shift/baseline/`, builds with `. += 0x1000` after `intr_main`, copies the
 result to `work/shift/mf_us_shift.gba`, and restores the baseline in a `finally`
-block.  It is expected to build today; the dynamic behavior test will fail until
-SHIFT-005/006 rewrite the pointers.  That failing run is the refactor's
-acceptance target.
+block.  It builds today; the dynamic behavior test still fails at boot until
+SHIFT-006 converts the raw blob pointer tables.  That failing run is the
+refactor's acceptance target.

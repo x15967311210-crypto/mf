@@ -113,7 +113,7 @@ _08003EA8:
 	pop {r4, r5, r6, r7}
 	bx lr
 	.align 2, 0
-_08003EB8: .4byte 0x080A548A
+_08003EB8: .4byte sArray_a548a
 
 	thumb_func_start CallSoundCodeA
 CallSoundCodeA: @ 0x08003EBC
