@@ -146,3 +146,32 @@ Next focus: trace `InitTrack` and the first callback setup at frames 18–24 in
 both builds, and compare the call stack/state that makes the shifted build
 enter intro code early. Then decide whether the correct fix is the init/Halt
 path or another raw table.
+
+## Resolved — 2026-10-17
+
+`SHIFT-006c` is closed.  The shifted boot now matches baseline:
+
+```text
+BOOT frames=600 frame_counter=578 area=0 main_mode=0 sub_mode=0x0001
+SHIFT-STATIC: PASS
+SHIFT-DYNAMIC: PASS
+SHIFT-CHECK: PASS
+```
+
+Final fixes:
+
+1. `SHIFT-006c2`: carved the 9-entry `FrameData` table at
+   `sTitleScreenSpaceBackgroundTilemap+0x19E8` out of the raw blob; boot moved
+   from frame 3 to 86.
+2. `SHIFT-006c3`: corrected the earlier `InitTrack`/`SWI 2` hypothesis.
+   `InitTrack` is byte-identical between builds and contains no Halt.  The
+   first real divergence was another raw pointer table, not init timing.
+3. `SHIFT-006c4`: replaced the remaining raw `FrameData` tail
+   (`sBlob_6094d0_after`, 159 entries at blob offset `0x1780`) with a C
+   `struct FrameData[159]`; every pFrame is now a relocatable
+   `sTitleScreenSpaceBackgroundTilemap + offset` expression.
+
+`make check` still produces baseline SHA1
+`ca33f4348c2c05dd330d37b97e2c5a69531dfe87`; the audit, strict relocation gate,
+smoke, and headless behavior test are green.  Next: `SHIFT-008` section-reorder
+build, then the M0 human playtest.
