@@ -1,0 +1,8 @@
+# QA-006 normal-ROM 30k checkpoint regression, headless mGBA (HLE BIOS).
+# Not BizHawk parity: the .bk2 reference was recorded with a real BIOS.
+# frame disp main s1 s2
+300   0x1C00 0 3 1
+600   0x1C00 7 3 0
+900   0x1E00 7 3 0
+4000  0x1F00 7 3 1
+30000 0x1A00 1 3 256

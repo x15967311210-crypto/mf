@@ -76,9 +76,10 @@ Those two IWRAM addresses come from `linker.ld` and are intentionally fixed
 ### `input` (QA-002)
 
 `harness.c --scenario input --input FILE` replays a `frame keys` file without
-BizHawk.  A 4,000-frame prefix is committed as a button/frame fixture at
-`tests/emulator/inputs/baseline_first4000.input`; no ROM, savestate or
-screenshot is committed.
+BizHawk.  Committed button/frame fixtures are the 4,000-frame prefix at
+`tests/emulator/inputs/baseline_first4000.input` (QA-002) and the 30,000-frame
+prefix at `tests/emulator/inputs/baseline_first30000.input` (QA-006); no ROM,
+savestate or screenshot is committed.
 
 The automatic tier runs the normal ROM, the fixture, and the expected
 checkpoints:
@@ -123,7 +124,7 @@ Frame numbers must increase, so a truncated or spliced file fails at parse
 time.
 
 The harness prints one `INPUT frame=... keys=... disp=... main=... s1=...
-s2=...` line after 300, 600, 900 and 4000 completed frames (the BizHawk
+s2=...` line after 300, 600, 900, 4000 and 30000 completed frames (the BizHawk
 frame-count convention), then `INPUT_FINAL ...`.  The verdict covers parse
 success, the requested frame count, and the same `gFrameCounter16Bit`
 liveness floor as `boot_smoke`.
@@ -140,7 +141,8 @@ frame-identical, so compare state transitions and divergence points rather
 than exact checkpoint equality.  The replay is still deterministic across
 normal/shifted/reordered builds of the same harness, which is what makes it a
 fast differential pre-gate before a BizHawk run.  A full 259k-frame input is a
-manual run (the runner allows `--timeout`); only the 4k prefix is automatic.
+manual run (the runner allows `--timeout`); the 4k and 30k prefixes are
+automatic.
 
 ### Screenshot parity (QA-005)
 
@@ -193,6 +195,27 @@ checkpoint and liveness assertions (BUG-002: divergence at frame 900, final
 `frame_counter=792` against the 3,000-frame floor).  The target stays separate
 from `shift-check` so the behavior regression is visible without changing the
 padding/boot gate.
+
+### 30k input parity (QA-006)
+
+```sh
+make -f Makefile.shift shift-input-30k
+```
+
+builds the padded shifted ROM through `shift_test.py --build`, runs the normal
+ROM against `baseline_first30000.input` with
+`baseline_first30000.expected`, then runs the shifted ROM over the same 30,000
+frames.  It compares the `INPUT frame=30000` checkpoint and the `INPUT_FINAL`
+state fields `frame_counter`, `disp`, `main`, `s1` and `s2`, and reports
+`SHIFT-INPUT-30K: PASS|FAIL|SKIP (77)`; a missing harness is a skip, never a
+pass.
+
+The normal leg must pass its expected checkpoint (`0x1A00 1 3 256` at frame
+30000).  While BUG-004 is open the shifted build is expected to fail this
+target: it reaches `frame_counter=24469 disp=0x1800 main=7 s1=11 s2=1` against
+normal `frame_counter=29857 disp=0x1A00 main=1 s1=3 s2=256`.  This is the
+intended red gate for the 4k-green/30k-divergent regression; do not fold it
+into `shift-check` until BUG-004 is fixed.
 
 ### `start` (QA-001)
 

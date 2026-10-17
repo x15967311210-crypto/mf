@@ -30,6 +30,9 @@ START_FRAMES ?= 1200
 INPUT ?= tests/emulator/inputs/baseline_first4000.input
 INPUT_FRAMES ?=
 INPUT_EXPECT ?= tests/emulator/inputs/baseline_first4000.expected
+INPUT_30K ?= tests/emulator/inputs/baseline_first30000.input
+INPUT_30K_EXPECT ?= tests/emulator/inputs/baseline_first30000.expected
+INPUT_30K_FRAMES ?= 30000
 PAD_BYTES ?= 0x1000
 DATA_ROOT ?= data
 DATABASE ?= database.json
@@ -44,8 +47,8 @@ REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit \
         check-relocs check-relocs-strict check-linker smoke test test-input \
         input-smoke emulator-harness shift-build shift-test shift-check \
-        shift-reorder shift-start shift-input shift-screen screen-diff \
-        shift-check-all help
+        shift-reorder shift-start shift-input shift-input-30k shift-screen \
+        screen-diff shift-check-all help
 
 all: audit
 
@@ -198,6 +201,101 @@ shift-input:
 	fi; \
 	exit $$status
 
+# QA-006: 30k input parity gate.  The 4k fixture is already green, so run the
+# normal and padded-shift builds through the committed 30k prefix and compare
+# the frame-30000 checkpoint plus the final state.  BUG-004 currently diverges
+# only after the 4k prefix, so the shifted leg is expected to report a
+# mismatch here.  A missing harness is SKIP (77), never a pass.
+shift-input-30k:
+	@mkdir -p $(SHIFT_WORK); \
+	normal_log=$(SHIFT_WORK)/input30k_normal.log; \
+	shift_log=$(SHIFT_WORK)/input30k_shift.log; \
+	get_field() { \
+		echo "$$1" | tr ' ' '\n' | grep "^$$2=" | head -1 | cut -d= -f2; \
+	}; \
+	echo "input-30k: normal replay"; \
+	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario input \
+		--input "$(INPUT_30K)" --expect "$(INPUT_30K_EXPECT)" \
+		--frames $(INPUT_30K_FRAMES) > $$normal_log 2>&1; \
+	normal=$$?; \
+	cat $$normal_log; \
+	if [ $$normal -eq 77 ]; then \
+		echo "SHIFT-INPUT-30K: SKIP (77) - no emulator/harness; dynamic behavior did not run"; \
+		echo "                   this is not a pass"; \
+		exit 77; \
+	fi; \
+	if [ $$normal -ne 0 ]; then \
+		echo "SHIFT-INPUT-30K: FAIL ($$normal) - normal 30k replay did not pass"; \
+		exit $$normal; \
+	fi; \
+	echo "input-30k: padded shifted build"; \
+	$(PYTHON) tools/shift/shift_test.py --build --pad-bytes $(PAD_BYTES) \
+		--toolchain "$(TOOLCHAIN)" > $(SHIFT_WORK)/input30k_build.log 2>&1; \
+	build=$$?; \
+	cat $(SHIFT_WORK)/input30k_build.log; \
+	if [ $$build -ne 0 ]; then \
+		echo "SHIFT-INPUT-30K: FAIL ($$build) - shifted build did not complete"; \
+		exit $$build; \
+	fi; \
+	echo "input-30k: shifted replay"; \
+	$(PYTHON) tests/emulator/run.py --rom $(SHIFT_WORK)/mf_us_shift.gba \
+		--scenario input --input "$(INPUT_30K)" \
+		--frames $(INPUT_30K_FRAMES) > $$shift_log 2>&1; \
+	shifted=$$?; \
+	cat $$shift_log; \
+	if [ $$shifted -eq 77 ]; then \
+		echo "SHIFT-INPUT-30K: FAIL - harness disappeared after the normal replay"; \
+		exit 1; \
+	fi; \
+	normal_final=$$(grep '^INPUT_FINAL ' $$normal_log | tail -1); \
+	shift_final=$$(grep '^INPUT_FINAL ' $$shift_log | tail -1); \
+	normal_ckpt=$$(grep '^INPUT frame=$(INPUT_30K_FRAMES) ' $$normal_log | tail -1); \
+	shift_ckpt=$$(grep '^INPUT frame=$(INPUT_30K_FRAMES) ' $$shift_log | tail -1); \
+	if [ -z "$$normal_final" ] || [ -z "$$shift_final" ]; then \
+		echo "SHIFT-INPUT-30K: FAIL - missing INPUT_FINAL state"; \
+		exit 1; \
+	fi; \
+	if [ -z "$$normal_ckpt" ] || [ -z "$$shift_ckpt" ]; then \
+		echo "SHIFT-INPUT-30K: FAIL - missing INPUT checkpoint at frame $(INPUT_30K_FRAMES)"; \
+		exit 1; \
+	fi; \
+	nfc=$$(get_field "$$normal_final" frame_counter); \
+	sfc=$$(get_field "$$shift_final" frame_counter); \
+	ndisp=$$(get_field "$$normal_final" disp); \
+	sdisp=$$(get_field "$$shift_final" disp); \
+	nmain=$$(get_field "$$normal_final" main); \
+	smain=$$(get_field "$$shift_final" main); \
+	ns1=$$(get_field "$$normal_final" s1); \
+	ss1=$$(get_field "$$shift_final" s1); \
+	ns2=$$(get_field "$$normal_final" s2); \
+	ss2=$$(get_field "$$shift_final" s2); \
+	ncd=$$(get_field "$$normal_ckpt" disp); \
+	scd=$$(get_field "$$shift_ckpt" disp); \
+	ncm=$$(get_field "$$normal_ckpt" main); \
+	scm=$$(get_field "$$shift_ckpt" main); \
+	ncs1=$$(get_field "$$normal_ckpt" s1); \
+	scs1=$$(get_field "$$shift_ckpt" s1); \
+	ncs2=$$(get_field "$$normal_ckpt" s2); \
+	scs2=$$(get_field "$$shift_ckpt" s2); \
+	echo "SHIFT-INPUT-30K normal  frame_counter=$$nfc disp=$$ndisp main=$$nmain s1=$$ns1 s2=$$ns2"; \
+	echo "SHIFT-INPUT-30K shifted frame_counter=$$sfc disp=$$sdisp main=$$smain s1=$$ss1 s2=$$ss2"; \
+	if [ "$$nfc" != "$$sfc" ] || [ "$$ndisp" != "$$sdisp" ] || \
+	   [ "$$nmain" != "$$smain" ] || [ "$$ns1" != "$$ss1" ] || \
+	   [ "$$ns2" != "$$ss2" ]; then \
+		echo "SHIFT-INPUT-30K: FAIL - normal/shifted final state diverged at $(INPUT_30K_FRAMES) frames (BUG-004)"; \
+		exit 1; \
+	fi; \
+	if [ "$$ncd" != "$$scd" ] || [ "$$ncm" != "$$scm" ] || \
+	   [ "$$ncs1" != "$$scs1" ] || [ "$$ncs2" != "$$scs2" ]; then \
+		echo "SHIFT-INPUT-30K: FAIL - normal/shifted checkpoint state diverged at frame $(INPUT_30K_FRAMES) (BUG-004)"; \
+		exit 1; \
+	fi; \
+	if [ $$shifted -ne 0 ]; then \
+		echo "SHIFT-INPUT-30K: FAIL ($$shifted) - shifted replay did not pass"; \
+		exit $$shifted; \
+	fi; \
+	echo "SHIFT-INPUT-30K: PASS - normal and shifted state match at $(INPUT_30K_FRAMES) frames"
+
 # QA-005: screenshot parity at the input checkpoints.  Run the committed 4k
 # replay with --screen on the normal, padded-shift and data-reorder builds.
 # The gate compares the framebuffer hashes at frames 600 and 900; the shifted
@@ -332,8 +430,9 @@ help:
 	@echo "  shift-check         audit + smoke + link check + shift-test (padding)"
 	@echo "  shift-start         padded build + Start/file-select scenario (QA-001)"
 	@echo "  shift-input         padded build + 4k input replay + checkpoint assertion (QA-003)"
+	@echo "  shift-input-30k     normal/shifted 30k input parity + checkpoint assertion (QA-006)"
 	@echo "  shift-screen        normal/shifted/reordered 4k framebuffer parity at 600/900 (QA-005)"
 	@echo "  screen-diff         alias for shift-screen"
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
-	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, PAD_BYTES, SHIFT_WORK"
+	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, INPUT_30K, INPUT_30K_EXPECT, INPUT_30K_FRAMES, PAD_BYTES, SHIFT_WORK"

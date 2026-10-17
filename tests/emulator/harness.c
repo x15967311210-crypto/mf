@@ -104,7 +104,7 @@ typedef struct {
 static int screen_enabled;
 static mColor screen_buffer[SCREEN_PIXELS];
 
-static const size_t INPUT_CHECKPOINTS[] = {300, 600, 900, 4000};
+static const size_t INPUT_CHECKPOINTS[] = {300, 600, 900, 4000, 30000};
 #define INPUT_CHECKPOINT_COUNT \
     (sizeof(INPUT_CHECKPOINTS) / sizeof(INPUT_CHECKPOINTS[0]))
 
@@ -630,8 +630,9 @@ static ScreenSample screen_report(size_t frame) {
 /*
  * QA-002: replay `frame keys` lines in order.  setKeys is called before
  * runFrame, so line 0 is the first emulated frame.  Checkpoints are reported
- * after 300/600/900/4000 completed frames (matching the BizHawk frame-count
- * convention).  The verdict only covers the replay itself: a differing
+ * after 300/600/900/4000/30000 completed frames (matching the BizHawk
+ * frame-count convention).  The verdict only covers the replay itself: a
+ * differing
  * checkpoint value is data for the differential gate, not a harness failure.
  */
 static int run_input(
