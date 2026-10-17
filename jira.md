@@ -54,9 +54,10 @@ parity) and HACK-001/001a/006
     frame 49647 `disp=0000`, pure black
   - artifacts: `work/playtest/m0e-2026-10-17/scripts/m0e_shifted_slot*.ss*`,
     `slot*.png`, `slots23_capture.log`
-  - QA-004 scan flags raw FrameData runs in
-    `Blob_5657a8_575a60` (pause-screen/map data) at 0x10A0/326,
-    0x3124/223, 0x486C/72; inspect/carve the map/dialog table next
+  - QA-004 `Blob_5657a8` FrameData runs are **false positives**: pause-screen
+    code uses fixed `sMinimapTilesGfx+offset` graphics, not those runs
+  - next: trace slot3 Start/Enter VRAM/palette/DMA writers; the map/dialog/
+    text path needs a normal reference or a state transplant
   - 4k `screen-diff` cannot cover this; diagnose VRAM/tilemap/dialog source
 - [DONE] QA-006 (emulator) — 30k input fixture + `shift-input-30k` gate
   - normal/reordered 30k PASS; shifted 30k FAIL (`frame_counter=24469`)
