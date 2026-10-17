@@ -25,6 +25,10 @@ section-reordered boot, Start/file-select gate, 578/600) and HACK-001/001a/006
 
 - [TODO] SHIFT-001a (baseline) — add title/new-game/pause/save scenarios
 - [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox
+- [DOING @dev2] QA-002 (emulator) — headless TAS input replay
+  - feed a committed 4k `frame keys` fixture through `core->setKeys` + `runFrame`
+  - make it an automatic smoke target; full 259k input stays manual/BizHawk
+  - manual playtest (`PLAYTEST-000`) remains the extra human check, not removed
 
 ## Phase S2 — relocatable build
 
