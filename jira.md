@@ -46,8 +46,11 @@ headless TAS input replay, 578/600 and 4k input parity) and HACK-001/001a/006
   at frames 600/900
   - normal screenshots: 600 `a9e636...`, 900 `efda7a...`
   - shifted: 600 `13d764...`, 900 `0c6af3...`; reordered == normal
-  - no stall; frame 1200+ identical; likely another raw pointer/table in the
-    file-select OAM animation path
+  - first data diff is OAM-only at frame 459: normal slots 26–31 hold 6 real
+    overlay sprites, shifted has garbage after slot 25; palette/BG/OBJ VRAM/
+    DISPCNT/BGxCNT/BGxOFS all identical
+  - `sMessageTextPointers+0x1A9C` (0x0879E890) is correctly relocated; trace
+    the FileSelectSetupOam type-7 / FileSelectDrawAllOam writer for slots 26+
 - [DOING @dev2] QA-005 (emulator) — add screenshot-parity checkpoints to the
   4k input gate (frame 600/900, normal vs shifted)
 
