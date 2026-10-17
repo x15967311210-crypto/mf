@@ -14,10 +14,11 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
 Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008,
-QA-001/QA-002/QA-003, BUG-001/002 (harness, audit, symbol map, blob
+QA-001/002/003/005, BUG-001/002/003 (harness, audit, symbol map, blob
 classification, literal and C-literal rewrites, raw FrameData/Sa-X table
 relocation, padded and section-reordered boot, Start/file-select gate,
-headless TAS input replay, 578/600 and 4k input parity) and HACK-001/001a/006
+headless TAS input replay, screenshot parity, 578/600 and 4k input/visual
+parity) and HACK-001/001a/006
 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
@@ -35,22 +36,12 @@ headless TAS input replay, 578/600 and 4k input parity) and HACK-001/001a/006
 
 ## Phase S2 — relocatable build
 
-- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - M0c handoff `work/playtest/m0c-2026-10-17/`: functional PASS, visual
-    **BLOCKED** at file-select frames 600/900
-  - normal/reordered screenshots identical; shifted has OAM/Samus-sprite
-    corruption at 600/900, byte-identical from 1200 onward
-  - blocked by BUG-003; M0d after the fix
+- [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - BUG-003 fixed; new handoff: `work/playtest/m0d-2026-10-17/`
+  - normal / shifted / reordered; `SHIFT-CHECK`, `SHIFT-START`,
+    `SHIFT-INPUT`, `SCREEN-DIFF` and `make test` all PASS
+  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
   - M0 is not DONE and M1 does not start until human sign-off
-- [DOING @dev1] BUG-003 (playtest) — shifted file-select OAM/sprites corrupt
-  at frames 600/900
-  - root cause: type-6/audio-logos overlay uses a raw **39-entry FrameData
-    table** at blob offset `0xC5C2` (ROM `0x087407E0`), immediately before the
-    carved 38/88-entry tables; its pFrame words are stale
-  - normal draws 6 sprites in slots 26–31; shifted follows stale pFrame, reads
-    a bogus count and writes garbage through slot 125
-  - fix: carve `0xC5C2..0xC6FA` (39 entries) into C; prefix shrinks to
-    `0xC5C2`; preserve layout and 0x087407E0/0x087417E0
 - [DONE] QA-005 (emulator) — screenshot-parity gate
   - `screen-diff` compares framebuffer hashes at 600/900; normal/reordered match,
     shifted currently FAIL (`a64b...`/`fa91...` vs `1aba...`/`e0fa...`)
