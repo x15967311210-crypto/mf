@@ -17,7 +17,10 @@
  *                          16=Right, 32=Left, 64=Up, 128=Down, 256=R, 512=L).
  *                          Lines starting with `#` are comments.  `--screen`
  *                          additionally hashes the 240x160 framebuffer at
- *                          every input checkpoint (QA-005).
+ *                          every input checkpoint (QA-005), and every input
+ *                          checkpoint also prints an `OAM` line with the
+ *                          gNextOamSlot count and FNV-1a hashes of the
+ *                          hardware OAM and gOamData buffers (QA-008).
  *
  * The legacy form `harness rom.gba [frames]` keeps the boot-smoke output and
  * exit semantics unchanged.
@@ -43,7 +46,15 @@
 #define IWRAM_SUB_MODE 0x03000BE0
 #define IWRAM_SUB_MODE1 0x03000BE0
 #define IWRAM_SUB_MODE2 0x03000BE2
+#define IWRAM_OAM_DATA 0x03000DE8
+#define IWRAM_NEXT_OAM_SLOT 0x030011EE
 #define REG_DISPCNT 0x04000000
+#define REG_OAM 0x07000000
+
+/* 128 hardware OAM entries, 8 bytes each (linker.ld reserves the same size). */
+#define OAM_ENTRY_COUNT 128
+#define OAM_ENTRY_BYTES 8
+#define OAM_BYTES (OAM_ENTRY_COUNT * OAM_ENTRY_BYTES)
 
 #define BOOT_SMOKE_FRAMES 600
 #define START_FRAMES 1200
@@ -97,6 +108,18 @@ typedef struct {
 } ScreenSample;
 
 /*
+ * QA-008: OAM telemetry.  `count` is gNextOamSlot, the number of slots the
+ * game queued this frame; `hash` covers all 128 hardware OAM entries at
+ * 0x07000000 and `stage` covers the gOamData shadow buffer the game fills
+ * before the VBlank DMA.
+ */
+typedef struct {
+    uint8_t count;
+    uint64_t hash;
+    uint64_t stage;
+} OamSample;
+
+/*
  * QA-005: optional framebuffer capture.  mGBA renders into this buffer when
  * the core is reset; the harness hashes the native pixels at input checkpoints.
  * The buffer is only wired up with --screen, so ordinary replays pay nothing.
@@ -104,7 +127,7 @@ typedef struct {
 static int screen_enabled;
 static mColor screen_buffer[SCREEN_PIXELS];
 
-static const size_t INPUT_CHECKPOINTS[] = {300, 600, 900, 4000, 30000};
+static const size_t INPUT_CHECKPOINTS[] = {300, 600, 900, 1059, 4000, 30000};
 #define INPUT_CHECKPOINT_COUNT \
     (sizeof(INPUT_CHECKPOINTS) / sizeof(INPUT_CHECKPOINTS[0]))
 
@@ -628,11 +651,54 @@ static ScreenSample screen_report(size_t frame) {
 }
 
 /*
+ * FNV-1a over a halfword-addressable memory region.  OAM is write-only on
+ * real hardware but mGBA keeps a readable copy, so GBAView16 works for both
+ * 0x07000000 and the EWRAM gOamData buffer.  Hashing halfwords keeps the
+ * loop independent of byte access quirks; the two bytes are folded in order.
+ */
+static uint64_t hash_region(
+    struct GBA* gba,
+    uint32_t address,
+    size_t bytes
+) {
+    uint64_t hash = UINT64_C(14695981039346656037);
+    for (size_t offset = 0; offset < bytes; offset += 2) {
+        uint16_t value = GBAView16(
+            gba->cpu, address + (uint32_t)offset
+        );
+        hash ^= (uint8_t)(value & 0xFF);
+        hash *= UINT64_C(1099511628211);
+        hash ^= (uint8_t)(value >> 8);
+        hash *= UINT64_C(1099511628211);
+    }
+    return hash;
+}
+
+static OamSample oam_sample(struct GBA* gba) {
+    OamSample sample;
+    sample.count = GBAView8(gba->cpu, IWRAM_NEXT_OAM_SLOT);
+    sample.hash = hash_region(gba, REG_OAM, OAM_BYTES);
+    sample.stage = hash_region(gba, IWRAM_OAM_DATA, OAM_BYTES);
+    return sample;
+}
+
+static OamSample oam_report(struct GBA* gba, size_t frame) {
+    OamSample sample = oam_sample(gba);
+    printf(
+        "OAM frame=%zu count=%u hash=%016llx stage=%016llx\n",
+        frame, (unsigned)sample.count,
+        (unsigned long long)sample.hash,
+        (unsigned long long)sample.stage
+    );
+    return sample;
+}
+
+/*
  * QA-002: replay `frame keys` lines in order.  setKeys is called before
  * runFrame, so line 0 is the first emulated frame.  Checkpoints are reported
- * after 300/600/900/4000/30000 completed frames (matching the BizHawk
- * frame-count convention).  The verdict only covers the replay itself: a
- * differing
+ * after 300/600/900/1059/4000/30000 completed frames (matching the BizHawk
+ * frame-count convention).  Every checkpoint prints an INPUT state line and a
+ * QA-008 OAM line; the verdict only covers the replay itself: a differing
  * checkpoint value is data for the differential gate, not a harness failure.
  */
 static int run_input(
@@ -679,6 +745,7 @@ static int run_input(
         size_t completed = i + 1;
         if (input_is_checkpoint(completed)) {
             input_print_state(gba, completed, keys, "INPUT");
+            oam_report(gba, completed);
             InputState state = input_read_state(gba);
             if (input_check_expect(expect, completed, state,
                                    &expected_checked)) {

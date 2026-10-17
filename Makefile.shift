@@ -33,6 +33,7 @@ INPUT_EXPECT ?= tests/emulator/inputs/baseline_first4000.expected
 INPUT_30K ?= tests/emulator/inputs/baseline_first30000.input
 INPUT_30K_EXPECT ?= tests/emulator/inputs/baseline_first30000.expected
 INPUT_30K_FRAMES ?= 30000
+OAM_CHECKPOINTS ?= 300 600 900 1059 4000 30000
 PAD_BYTES ?= 0x1000
 DATA_ROOT ?= data
 DATABASE ?= database.json
@@ -48,7 +49,7 @@ REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
         check-relocs check-relocs-strict check-linker smoke test test-input \
         input-smoke emulator-harness shift-build shift-test shift-check \
         shift-reorder shift-start shift-input shift-input-30k shift-screen \
-        screen-diff shift-check-all help
+        screen-diff oam-diff shift-check-all help
 
 all: audit
 
@@ -296,6 +297,70 @@ shift-input-30k:
 	fi; \
 	echo "SHIFT-INPUT-30K: PASS - normal and shifted state match at $(INPUT_30K_FRAMES) frames"
 
+# QA-008: OAM parity telemetry.  Replay the committed 30k fixture on the normal
+# and padded-shift builds, then compare the harness's OAM checkpoint lines:
+# `count` is gNextOamSlot and `hash` is FNV-1a over all 128 hardware OAM
+# entries.  A count/hash mismatch at a shared checkpoint fails this target.
+# The line also carries a gOamData shadow-buffer hash; it is reported as
+# telemetry and does not decide pass/fail.  A missing harness is SKIP (77),
+# never a pass.  Savestate-based map/objective-page comparisons stay local-only
+# (see tests/emulator/README.md); no .state file is part of this gate.
+oam-diff:
+	@mkdir -p $(SHIFT_WORK); \
+	normal_log=$(SHIFT_WORK)/oam30k_normal.log; \
+	shift_log=$(SHIFT_WORK)/oam30k_shift.log; \
+	$(PYTHON) tests/emulator/oam_diff.py --self-check; \
+	selfcheck=$$?; \
+	if [ $$selfcheck -ne 0 ]; then \
+		echo "OAM-DIFF: FAIL ($$selfcheck) - oam_diff self-check failed"; \
+		exit $$selfcheck; \
+	fi; \
+	echo "oam-diff: normal 30k replay"; \
+	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario input \
+		--input "$(INPUT_30K)" --expect "$(INPUT_30K_EXPECT)" \
+		--frames $(INPUT_30K_FRAMES) > $$normal_log 2>&1; \
+	normal=$$?; \
+	cat $$normal_log; \
+	if [ $$normal -eq 77 ]; then \
+		echo "OAM-DIFF: SKIP (77) - no emulator/harness; dynamic behavior did not run"; \
+		echo "               this is not a pass"; \
+		exit 77; \
+	fi; \
+	if [ $$normal -ne 0 ]; then \
+		echo "OAM-DIFF: FAIL ($$normal) - normal 30k replay did not pass"; \
+		exit $$normal; \
+	fi; \
+	echo "oam-diff: padded shifted build"; \
+	$(PYTHON) tools/shift/shift_test.py --build --pad-bytes $(PAD_BYTES) \
+		--toolchain "$(TOOLCHAIN)" > $(SHIFT_WORK)/oam30k_build.log 2>&1; \
+	build=$$?; \
+	cat $(SHIFT_WORK)/oam30k_build.log; \
+	if [ $$build -ne 0 ]; then \
+		echo "OAM-DIFF: FAIL ($$build) - shifted build did not complete"; \
+		exit $$build; \
+	fi; \
+	echo "oam-diff: shifted 30k replay"; \
+	$(PYTHON) tests/emulator/run.py --rom $(SHIFT_WORK)/mf_us_shift.gba \
+		--scenario input --input "$(INPUT_30K)" \
+		--frames $(INPUT_30K_FRAMES) > $$shift_log 2>&1; \
+	shifted=$$?; \
+	cat $$shift_log; \
+	if [ $$shifted -eq 77 ]; then \
+		echo "OAM-DIFF: FAIL - harness disappeared after the normal replay"; \
+		exit 1; \
+	fi; \
+	if [ $$shifted -ne 0 ]; then \
+		echo "OAM-DIFF: FAIL ($$shifted) - shifted replay did not pass"; \
+		exit $$shifted; \
+	fi; \
+	$(PYTHON) tests/emulator/oam_diff.py --normal $$normal_log \
+		--shifted $$shift_log --checkpoints "$(OAM_CHECKPOINTS)"; \
+	status=$$?; \
+	if [ $$status -ne 0 ]; then \
+		echo "OAM-DIFF: FAIL ($$status) - OAM checkpoint comparison failed"; \
+	fi; \
+	exit $$status
+
 # QA-005: screenshot parity at the input checkpoints.  Run the committed 4k
 # replay with --screen on the normal, padded-shift and data-reorder builds.
 # The gate compares the framebuffer hashes at frames 600 and 900; the shifted
@@ -433,6 +498,7 @@ help:
 	@echo "  shift-input-30k     normal/shifted 30k input parity + checkpoint assertion (QA-006)"
 	@echo "  shift-screen        normal/shifted/reordered 4k framebuffer parity at 600/900 (QA-005)"
 	@echo "  screen-diff         alias for shift-screen"
+	@echo "  oam-diff            normal/shifted 30k OAM count/hash parity at 300..30000 (QA-008)"
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
-	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, INPUT_30K, INPUT_30K_EXPECT, INPUT_30K_FRAMES, PAD_BYTES, SHIFT_WORK"
+	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, INPUT_30K, INPUT_30K_EXPECT, INPUT_30K_FRAMES, OAM_CHECKPOINTS, PAD_BYTES, SHIFT_WORK"

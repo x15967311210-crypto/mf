@@ -124,10 +124,11 @@ Frame numbers must increase, so a truncated or spliced file fails at parse
 time.
 
 The harness prints one `INPUT frame=... keys=... disp=... main=... s1=...
-s2=...` line after 300, 600, 900, 4000 and 30000 completed frames (the BizHawk
-frame-count convention), then `INPUT_FINAL ...`.  The verdict covers parse
-success, the requested frame count, and the same `gFrameCounter16Bit`
-liveness floor as `boot_smoke`.
+s2=...` line after 300, 600, 900, 1059, 4000 and 30000 completed frames (the
+BizHawk frame-count convention), then `INPUT_FINAL ...`.  Every checkpoint also
+prints an `OAM frame=... count=... hash=... stage=...` telemetry line (QA-008).
+The verdict covers parse success, the requested frame count, and the same
+`gFrameCounter16Bit` liveness floor as `boot_smoke`.
 
 `--expect FILE` adds one `frame disp main s1 s2` line per checkpoint and
 prints `INPUT_CHECK frame=... status=pass|fail` plus a summary.  The committed
@@ -216,6 +217,40 @@ target: it reaches `frame_counter=24469 disp=0x1800 main=7 s1=11 s2=1` against
 normal `frame_counter=29857 disp=0x1A00 main=1 s1=3 s2=256`.  This is the
 intended red gate for the 4k-green/30k-divergent regression; do not fold it
 into `shift-check` until BUG-004 is fixed.
+
+### OAM parity telemetry (QA-008)
+
+Every input checkpoint also prints one stable OAM line:
+
+```text
+OAM frame=30000 count=8 hash=ca3eeeb636fa7fc2 stage=ca3eeeb636fa7fc2
+```
+
+- `count` is `gNextOamSlot` (`0x030011EE`), the slots the game filled.
+- `hash` is FNV-1a 64 over all 128 hardware OAM entries at `0x07000000`.
+- `stage` is the same hash over the `gOamData` shadow buffer at `0x03000DE8`.
+- Checkpoints are 300, 600, 900, 1059, 4000 and 30000, when reached.
+
+```sh
+make -f Makefile.shift oam-diff
+```
+
+replays `baseline_first30000.input` on the normal and padded-shift builds and
+compares every checkpoint.  It reports `OAM-DIFF: PASS|FAIL|SKIP (77)`; a count
+or hardware-OAM hash mismatch at a shared checkpoint fails, and a missing
+harness is a skip, never a pass.  The `stage` hash is telemetry: stale free
+slots in `gOamData` do not fail an otherwise identical frame.  The normal and
+shifted builds currently match at every checkpoint (frame 30000 reports
+`count=8` in both).  A worktree missing the generated `data/Blob_*` inputs can
+build a shifted ROM with zero-filled carved tables and produce a false
+state/OAM mismatch; rebuild both artifacts with the full `data/` tree before
+treating a difference as a parity finding.
+`python3 tests/emulator/oam_diff.py --self-check` runs the parser/comparison
+checks without an emulator.
+
+Savestate-based OAM comparison of the Navigation Room objective page stays
+**local-only** under `work/playtest`: savestates are never committed, and no
+`.state` file is part of this gate or of Git.
 
 ### `start` (QA-001)
 
