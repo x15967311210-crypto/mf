@@ -37,12 +37,17 @@ input/visual parity) and HACK-001/001a/006
 
 ## Phase S2 — relocatable build
 
-- [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - BUG-005 fixed; new handoff: `work/playtest/m0f-2026-10-17/`
-  - 4k/30k/screen gates green; slot3 savestate Start/Enter now `disp=0x7E00`
-    (non-black)
-  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
+- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - M0f fresh shifted map at frame 7806: tile garbage fixed, but objective
+    dialog box body/legend/bottom UI missing (BUG-006)
   - M0 is not DONE and M1 does not start until human sign-off
+- [DOING @dev1] BUG-006 (playtest) — shifted fresh map objective UI missing
+  - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
+    `disp=5F00 main=3 s1=0 s2=0`
+  - text renders; dialog box frame, L1-L4 legend and bottom `3 4 5 6` UI are
+    missing; old M0e slot screenshots are stale VRAM and not evidence
+  - compare OAM/BG/OBJ/palette and map UI writers; TAS map frame 1059 is a
+    clean reference for the plain map, not the objective text
 - [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint
   - shifted black-screen reproduction can be automated from
     `m0e_shifted_slot3.ss3` + held Start; map/dialog visual comparison needs a
