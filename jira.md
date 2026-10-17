@@ -30,9 +30,15 @@ padded and section-reordered boot 578/600, strict gate) and HACK-001/001a/006
 
 - [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
   - handoff: `work/playtest/m0-2026-10-17/`
-  - normal / shifted / reordered artifacts all boot 578/600; SHA1s in README
-  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
-  - M0 is not DONE and M1 does not start until human sign-off
+  - normal passes; **shifted black-screens after Start**; reordered passes
+  - blocked on BUG-001; M0 is not DONE and M1 does not start
+- [DOING @human] BUG-001 (playtest) — shifted M0 build black screen after
+  pressing Start on the title
+  - headless HLE harness at several Start timings shows normal == shifted
+    state/VRAM/palette/OAM; not reproduced yet
+  - need: emulator/version, BIOS/HLE setting, `.sav` state, and a savestate at
+    the black screen; test with all `.sav` files removed and with normal's
+    `.sav` copied to shifted
 
 ## Phase S3a — hack-critical C (106 functions)
 
