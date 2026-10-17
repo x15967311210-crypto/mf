@@ -28,9 +28,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 ## Phase S2 — relocatable build
 
 - [DOING @dev1] SHIFT-006c (emulator) — diagnose shifted boot `frame_counter=3`
-  - static gates all green; see `docs/shift-test-diagnosis.md`
-  - baseline/shifted PC diverges at frame 24; `InitTrack` SWI2 path is skipped
-  - watch `gNonGameplayRam+0x1C`; test data-only reorder vs code padding
+  - root cause narrowed: raw `struct FrameData` table at
+    `sTitleScreenSpaceBackgroundTilemap+0x19E8` inside
+    `sBlob_6094d0_60b148` has unrelocated pFrame pointers
+  - fix by carving the 9-entry table out of the raw blob; see
+    `docs/shift-test-diagnosis.md`
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
 - [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
