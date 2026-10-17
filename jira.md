@@ -65,8 +65,12 @@ input/visual parity) and HACK-001/001a/006
     normal before 4433 main=1 OAM=30 -> after 4824 main=3 OAM=27
     shifted before 5266 main=1 OAM=26 -> after 5625 main=3 OAM=0
   - before OAM is healthy; only the map-open transition fails (44 slots differ
-    in normal after). Trace `PauseScreenInit`/`PauseScreenProcessOam` from the
-    before states with Start, looking for a skipped build/count=0
+    in normal after). Normal after has MenuOam entries 33–36; shifted misses
+    them, entry 18 oamId 0x1B vs 0x1A, and shifted after leaves one stray
+    gOamData slot (`gNextOamSlot=1`)
+  - the raw `0x08576150/51/58` comments are already `sSecurityUnlockEvents`
+    symbol literals; not the cause
+  - next: trace the before→open transition and the MenuOam setup/count path
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
