@@ -13,10 +13,10 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/006a/006b1/006b2/006b3/007 (harness,
-audit, symbol map, blob classification, 662 literal rewrites, all pointer-like
-blobs, strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in
-`git log`.
+Last landed: SHIFT-001/002/003/004/005/005b/006a/006b1/006b2/006b3/007
+(harness, audit, symbol map, blob classification, literal rewrites, all
+pointer-like blobs, 7-digit audit, strict gate) and HACK-001/001a/006 (GDD,
+layout, Cantor).  Details in `git log`.
 
 ---
 
@@ -27,12 +27,9 @@ blobs, strict gate) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev2] SHIFT-005b (baseline) — audit 7-digit `.word 0x80a....`
-  - `sound/tracks/*.s` headers use `0x80a5710`-style addresses; the current
-    literal regex requires 8 hex digits and misses them
-  - regenerate `abs_refs.json`, verify the new refs resolve
-- [TODO] SHIFT-006b4 (baseline) — rewrite track-header pointers to symbols
-  [deps: SHIFT-005b]
+- [DOING @dev3] SHIFT-006b4 (baseline) — rewrite the 660 track-header pointers
+  - all resolve to `sBlob_a5710_a8cdc+offset`; widen `apply_refs.py` numeric
+    matching to 1–8 hex digits and use the local→global-anchor rule
 - [TODO] SHIFT-006c (emulator) — shift-check passes after track headers
   [deps: SHIFT-006b4]
 - [TODO] SHIFT-008 (emulator) — shift test: padding and section reorder
