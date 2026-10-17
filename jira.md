@@ -13,11 +13,11 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007
+Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008
 (harness, audit, symbol map, blob classification, literal/pseudo-literal and
 1034 C-literal rewrites, all pointer-like blobs, raw FrameData relocation,
-shifted boot 578/600, strict gate) and HACK-001/001a/006 (GDD, layout,
-Cantor).  Details in `git log`.
+padded and section-reordered boot 578/600, strict gate) and HACK-001/001a/006
+(GDD, layout, Cantor).  Details in `git log`.
 
 ---
 
@@ -28,10 +28,11 @@ Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DOING @dev2] SHIFT-008 (emulator) — shift test: padding and section reorder
-  - padding boot is green (`SHIFT-CHECK: PASS`, 578/600); add the
-    section-reorder build and make it a repeatable gate
-- [TODO] PLAYTEST-000 (human) — M0 shiftable-boot playtest  [deps: SHIFT-008]
+- [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - handoff: `work/playtest/m0-2026-10-17/`
+  - normal / shifted / reordered artifacts all boot 578/600; SHA1s in README
+  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
+  - M0 is not DONE and M1 does not start until human sign-off
 
 ## Phase S3a — hack-critical C (106 functions)
 
