@@ -23,18 +23,40 @@ SCENARIO_DIR = Path(__file__).resolve().parent
 PASS_MARKERS = {
     "boot_smoke": "PASS: boot smoke",
     "start": "PASS: start/file-select",
+    "input": "PASS: input replay",
 }
 DEFAULT_FRAMES = {
     "boot_smoke": 600,
     "start": 1200,
 }
 
+# Input replay is only implemented by the C harness.  A full TAS file can run
+# for minutes, so give it a larger default than the fixed scenarios.
+DEFAULT_TIMEOUT = 180
+INPUT_TIMEOUT = 1800
 
-def harness_command(harness: str, rom: Path, scenario: str, frames: int) -> list[str]:
+
+def harness_command(
+    harness: str,
+    rom: Path,
+    scenario: str,
+    frames: int | None,
+    input_path: str | None = None,
+    expect_path: str | None = None,
+) -> list[str]:
     """Build the harness argv, preserving the legacy boot-smoke invocation."""
     if scenario == "boot_smoke":
         return [harness, str(rom), str(frames)]
-    return [harness, str(rom), "--scenario", scenario, "--frames", str(frames)]
+    cmd = [harness, str(rom), "--scenario", scenario]
+    if scenario == "input":
+        if not input_path:
+            raise ValueError("input scenario needs --input FILE")
+        cmd += ["--input", input_path]
+        if expect_path:
+            cmd += ["--expect", expect_path]
+    if frames is not None:
+        cmd += ["--frames", str(frames)]
+    return cmd
 
 
 def find_mgba() -> str | None:
@@ -65,18 +87,29 @@ def run_static(rom: Path, expect_sha1: str | None) -> int:
     return subprocess.call(cmd)
 
 
-def run_dynamic(rom: Path, scenario: str, frames: int) -> int:
+def run_dynamic(
+    rom: Path,
+    scenario: str,
+    frames: int | None,
+    input_path: str | None = None,
+    expect_path: str | None = None,
+    timeout: int | None = None,
+) -> int:
     harness = find_harness()
     if harness:
-        cmd = harness_command(harness, rom, scenario, frames)
+        cmd = harness_command(
+            harness, rom, scenario, frames, input_path, expect_path
+        )
         print("RUN:", " ".join(cmd))
+        if timeout is None:
+            timeout = INPUT_TIMEOUT if scenario == "input" else DEFAULT_TIMEOUT
         try:
             proc = subprocess.run(
                 cmd,
                 text=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                timeout=180,
+                timeout=timeout,
             )
         except subprocess.TimeoutExpired:
             print("FAIL: harness timed out")
@@ -88,7 +121,10 @@ def run_dynamic(rom: Path, scenario: str, frames: int) -> int:
             for line in output.splitlines()
             if not line.startswith(("GBA ", "GBA:", "GBA BIOS", "GBA DMA", "GBA Memory"))
         ]
-        for line in lines[-12:]:
+        # Fixed scenarios print a short summary.  Input replay keeps every
+        # checkpoint line so a full run's early checkpoints are not truncated.
+        shown = lines if scenario == "input" else lines[-12:]
+        for line in shown:
             print(line)
         if proc.returncode != 0:
             print(f"FAIL: harness exited {proc.returncode}")
@@ -99,6 +135,13 @@ def run_dynamic(rom: Path, scenario: str, frames: int) -> int:
             return 1
         print(f"PASS: {scenario}")
         return 0
+
+    if scenario == "input":
+        print(
+            "SKIP: input replay needs the headless harness "
+            "(build tests/emulator/bin/mgba-harness or set MF_MGBA_HARNESS)"
+        )
+        return 77
 
     mgba = find_mgba()
     if not mgba:
@@ -157,20 +200,48 @@ def main() -> int:
     ap.add_argument("--baserom", default="mf_us_baserom.gba")
     ap.add_argument("--scenario", default="boot_smoke")
     ap.add_argument("--frames", type=int, default=None)
+    ap.add_argument(
+        "--input",
+        default=None,
+        help="`frame keys` file to replay (implies --scenario input)",
+    )
+    ap.add_argument(
+        "--expect",
+        default=None,
+        help="expected `frame disp main s1 s2` checkpoints for --input",
+    )
+    ap.add_argument(
+        "--timeout",
+        type=int,
+        default=None,
+        help=f"harness timeout in seconds (default: {DEFAULT_TIMEOUT}, "
+        f"{INPUT_TIMEOUT} for input replay)",
+    )
     ap.add_argument("--static", action="store_true", help="only static ROM checks")
     ap.add_argument("--expect-sha1", default=None)
     args = ap.parse_args()
+
+    if args.input and args.scenario not in ("input", "boot_smoke"):
+        ap.error("--input implies the input scenario; do not combine it with "
+                 f"--scenario {args.scenario}")
+    if args.expect and not args.input:
+        ap.error("--expect requires --input FILE")
+    scenario = "input" if args.input else args.scenario
+    if scenario == "input" and not args.input:
+        ap.error("--scenario input requires --input FILE")
 
     rom = Path(args.rom)
     if not rom.is_absolute():
         rom = ROOT / rom
     frames = args.frames
-    if frames is None:
-        frames = DEFAULT_FRAMES.get(args.scenario, 600)
+    if frames is None and scenario != "input":
+        frames = DEFAULT_FRAMES.get(scenario, 600)
     static_code = run_static(rom, args.expect_sha1)
     if static_code != 0 or args.static:
         return static_code
-    return run_dynamic(rom, args.scenario, frames)
+    return run_dynamic(
+        rom, scenario, frames, args.input, args.expect, args.timeout
+    )
 
 
 if __name__ == "__main__":

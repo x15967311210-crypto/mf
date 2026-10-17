@@ -27,6 +27,9 @@ BASEROM ?= mf_us_baserom.gba
 SCENARIO ?= boot_smoke
 FRAMES ?= 600
 START_FRAMES ?= 1200
+INPUT ?= tests/emulator/inputs/baseline_first4000.input
+INPUT_FRAMES ?=
+INPUT_EXPECT ?= tests/emulator/inputs/baseline_first4000.expected
 PAD_BYTES ?= 0x1000
 DATA_ROOT ?= data
 DATABASE ?= database.json
@@ -39,9 +42,9 @@ BLOB_SCAN ?= $(SHIFT_WORK)/blob_scan.json
 REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
 
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit \
-        check-relocs check-relocs-strict check-linker smoke test \
-        emulator-harness shift-build shift-test shift-check shift-reorder \
-        shift-start shift-check-all help
+        check-relocs check-relocs-strict check-linker smoke test test-input \
+        input-smoke emulator-harness shift-build shift-test shift-check \
+        shift-reorder shift-start shift-check-all help
 
 all: audit
 
@@ -88,8 +91,39 @@ emulator-harness:
 	MGBA_SRC=$(MGBA_SRC) MGBA_BUILD=$(MGBA_BUILD) \
 		tests/emulator/build_harness.sh tests/emulator/bin/mgba-harness
 
+# Boot smoke plus the committed 4k input replay.  A missing harness makes the
+# input leg exit 77; propagate that skip instead of reporting a pass.
 test:
-	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario $(SCENARIO) --frames $(FRAMES)
+	@status=0; \
+	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario $(SCENARIO) --frames $(FRAMES); \
+	first=$$?; \
+	if [ $$first -ne 0 ]; then status=$$first; fi; \
+	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario input \
+		--input "$(INPUT)" $(if $(INPUT_EXPECT),--expect "$(INPUT_EXPECT)") \
+		$(if $(INPUT_FRAMES),--frames $(INPUT_FRAMES)); \
+	second=$$?; \
+	if [ $$second -eq 77 ]; then \
+		if [ $$status -eq 0 ]; then status=77; fi; \
+	elif [ $$second -ne 0 ]; then status=$$second; fi; \
+	exit $$status
+
+# QA-002: automatic replay of the committed 4k fixture on the normal ROM with
+# the normal-fixture checkpoint assertion.  This is not a BizHawk parity test.
+test-input:
+	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario input \
+		--input "$(INPUT)" $(if $(INPUT_EXPECT),--expect "$(INPUT_EXPECT)") \
+		$(if $(INPUT_FRAMES),--frames $(INPUT_FRAMES))
+
+# Explicit replay of any `frame keys` file, without the normal fixture's
+# checkpoint assertion.  INPUT defaults to the committed 4k fixture:
+#   make -f Makefile.shift input-smoke INPUT=/path/to/full.input INPUT_FRAMES=4000
+input-smoke:
+	@if [ -z "$(INPUT)" ]; then \
+		echo "usage: make -f Makefile.shift input-smoke INPUT=path/to/file.input [INPUT_FRAMES=N]"; \
+		exit 2; \
+	fi
+	$(PYTHON) tests/emulator/run.py --rom $(ROM) --scenario input \
+		--input "$(INPUT)" $(if $(INPUT_FRAMES),--frames $(INPUT_FRAMES))
 
 shift-build:
 	$(PYTHON) tools/shift/shift_test.py --build --pad-bytes $(PAD_BYTES) \
@@ -164,11 +198,13 @@ help:
 	@echo "  check-linker        verify linker.ld has no fixed ROM addresses"
 	@echo "  smoke               static ROM/header smoke"
 	@echo "  emulator-harness    build tests/emulator/bin/mgba-harness (MGBA_SRC/MGBA_BUILD)"
-	@echo "  test                static + headless behavior scenario (exit 77 if no harness)"
+	@echo "  test                static + headless boot smoke + 4k input replay (exit 77 if no harness)"
+	@echo "  test-input          normal-ROM 4k input replay + checkpoint assertion"
+	@echo "  input-smoke         replay a frame/keys file (INPUT=..., INPUT_FRAMES=N)"
 	@echo "  shift-build         build with a padded linker layout"
 	@echo "  shift-test          padded build + behavior scenario"
 	@echo "  shift-check         audit + smoke + link check + shift-test (padding)"
 	@echo "  shift-start         padded build + Start/file-select scenario (QA-001)"
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
-	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, PAD_BYTES, SHIFT_WORK"
+	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, PAD_BYTES, SHIFT_WORK"

@@ -73,6 +73,75 @@ If no emulator is found the runner exits **77** (skip), never 0.
 Those two IWRAM addresses come from `linker.ld` and are intentionally fixed
 (D-002), so the scenario survives the ROM shift refactor.
 
+### `input` (QA-002)
+
+`harness.c --scenario input --input FILE` replays a `frame keys` file without
+BizHawk.  A 4,000-frame prefix is committed as a button/frame fixture at
+`tests/emulator/inputs/baseline_first4000.input`; no ROM, savestate or
+screenshot is committed.
+
+The automatic tier runs the normal ROM, the fixture, and the expected
+checkpoints:
+
+```sh
+make -f Makefile.shift test-input
+```
+
+`make -f Makefile.shift test` runs the existing boot/`SCENARIO` leg and then
+`test-input`.  If the harness is absent the input leg exits **77** (skip), and
+`test` reports 77 rather than a pass.  To replay another file without the
+normal-fixture assertion, use the explicit target:
+
+```sh
+make -f Makefile.shift input-smoke \
+  INPUT=work/playtest/m0-2026-10-17/tas/baseline_first4000.input INPUT_FRAMES=4000
+```
+
+Direct harness / runner equivalents:
+
+```sh
+tests/emulator/bin/mgba-harness mf_us.gba \
+  --input tests/emulator/inputs/baseline_first4000.input \
+  --expect tests/emulator/inputs/baseline_first4000.expected
+python3 tests/emulator/run.py --rom mf_us.gba \
+  --input tests/emulator/inputs/baseline_first4000.input \
+  --expect tests/emulator/inputs/baseline_first4000.expected --frames 4000
+```
+
+Input format:
+
+```text
+# comments and `# frames=N` metadata are ignored
+frame keys
+```
+
+`keys` is the GBA key bitmask: `1=A, 2=B, 4=Select, 8=Start, 16=Right,
+32=Left, 64=Up, 128=Down, 256=R, 512=L`.  Each data line is one emulated
+frame; the harness calls `core->setKeys()` **before** `core->runFrame()`.
+`--frames N` caps the replay at N lines; without it every parsed line runs.
+Frame numbers must increase, so a truncated or spliced file fails at parse
+time.
+
+The harness prints one `INPUT frame=... keys=... disp=... main=... s1=...
+s2=...` line after 300, 600, 900 and 4000 completed frames (the BizHawk
+frame-count convention), then `INPUT_FINAL ...`.  The verdict covers parse
+success, the requested frame count, and the same `gFrameCounter16Bit`
+liveness floor as `boot_smoke`.
+
+`--expect FILE` adds one `frame disp main s1 s2` line per checkpoint and
+prints `INPUT_CHECK frame=... status=pass|fail` plus a summary.  The committed
+expected file asserts the **normal headless mGBA** values only; it is not
+BizHawk parity, and shifted/reordered replays are run without it.  Without
+`--expect`, checkpoint values are reported but never fail the replay.
+
+Caveat: this tree's harness uses mGBA with its HLE BIOS, while the reference
+`.bk2` was recorded by BizHawk with a real BIOS.  The timelines are *not*
+frame-identical, so compare state transitions and divergence points rather
+than exact checkpoint equality.  The replay is still deterministic across
+normal/shifted/reordered builds of the same harness, which is what makes it a
+fast differential pre-gate before a BizHawk run.  A full 259k-frame input is a
+manual run (the runner allows `--timeout`); only the 4k prefix is automatic.
+
 ### `start` (QA-001)
 
 `start.lua` / `harness.c --scenario start` drives the title -> file-select
