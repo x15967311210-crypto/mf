@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Generate relocatable C arrays for the confirmed pointer-table data blobs.
+"""Generate relocatable C arrays for the classified data blobs.
 
-SHIFT-004 classified seven extracted blobs as flat pointer tables
-(``docs/blob-classification.md``).  Each blob is currently declared as
+SHIFT-004 classified seven extracted blobs as flat pointer tables and three as
+``possible`` (``docs/blob-classification.md``).  Each blob is currently
+declared as
 
     static u8 sBlob_x_y[] = INCBIN_U8("data/Blob_x_y.bin");
 
 so its pointer words stay raw absolute ROM addresses and break when the link
-moves.  This tool reads each blob, resolves every aligned 32-bit word to a
-symbol expression, and renders an equivalent ``u32[]`` initialiser with the
-exact same byte size:
+moves.  This tool reads each blob, resolves every pointer to a symbol
+expression, and renders either an equivalent ``u32[]`` initialiser, a struct
+array, or a mixed field model with the exact same byte size:
 
     static u32 sBlob_x_y[13] = {
         (u32)Dma2IntrCode + 1,
@@ -28,6 +29,20 @@ is modelled as one C struct whose fields cover the whole blob; only the Thumb
 code pointers and the 21-entry text-pointer array become symbol expressions,
 every other byte is emitted verbatim.  The positional struct initialiser keeps
 the exact byte offsets and a compile-time size check catches padding.
+
+``Blob_74dc48_74e620`` (SHIFT-006b2) is a 210-entry array of 12-byte records
+(``u8`` flags, three unknown bytes, two ``u16`` coordinates, one pointer), so
+it is rendered as a struct array instead of a flat word array:
+
+    struct EndingImageLine {
+        u8 flags;
+        ...
+        const u8* pText;
+    };
+    static const struct EndingImageLine sBlob_74dc48_74e620[210] = {
+        { 0x2, 0x0, 0x0, 0x0, 0x78, 0x28, (const u8*)((u32)sResultsTextPal+0xBA) },
+        ...
+    };
 
 Resolution rules
 ----------------
@@ -83,16 +98,37 @@ class GenError(Exception):
 
 
 @dataclass(frozen=True)
+class StructField:
+    c_type: str
+    name: str
+
+
+# C field widths and alignments.  Only the types used by the struct specs below
+# are accepted, so an unsupported type fails before any source is written.
+FIELD_INFO = {
+    "u8": (1, 1),
+    "u16": (2, 2),
+    "u32": (4, 4),
+    "const u8*": (4, 4),
+}
+
+
+@dataclass(frozen=True)
 class BlobSpec:
     symbol: str
     file: str  # extracted bytes, relative to --data-root
     source: str  # C source that owns the declaration
     data_bytes: int  # database.json count
     const: bool
+    # Empty for a flat u32 pointer table.  When set, the blob is an array of
+    # fixed-size records rendered as a struct array instead.
+    struct_name: str = ""
+    fields: tuple[StructField, ...] = ()
 
 
-# The seven confirmed flat pointer tables from docs/blob-classification.md.
-# Order is stable and matches the report, so re-running the tool is a no-op.
+# The seven confirmed flat pointer tables plus the 74dc48 struct table from
+# docs/blob-classification.md.  Order is stable and matches the report, so
+# re-running the tool is a no-op.
 BLOBS = (
     BlobSpec(
         "sBlob_a5224_a5258",
@@ -142,6 +178,26 @@ BLOBS = (
         "src/new_file_intro.c",
         0x438,
         False,
+    ),
+    # SHIFT-006b2: 210 x 12-byte ending-image line records.  The consumer
+    # (EndingImageLoadTextOam / EndingImageDisplayLinePermanently) reads bytes
+    # 0, 1, 2, halfwords 4 and 6, and the pointer at offset 8.
+    BlobSpec(
+        "sBlob_74dc48_74e620",
+        "Blob_74dc48_74e620.bin",
+        "src/data/ending_data.c",
+        0x9D8,
+        True,
+        struct_name="EndingImageLine",
+        fields=(
+            StructField("u8", "flags"),
+            StructField("u8", "unk_1"),
+            StructField("u8", "unk_2"),
+            StructField("u8", "unk_3"),
+            StructField("u16", "x"),
+            StructField("u16", "y"),
+            StructField("const u8*", "pText"),
+        ),
     ),
 )
 
@@ -397,6 +453,28 @@ def pointer_expression(
     return f"(u32){resolve_expression(sm, elf, value)}"
 
 
+def struct_layout(fields: tuple[StructField, ...]) -> tuple[list[tuple[StructField, int, int]], int]:
+    """Return (field, byte offset, byte size) plus the C struct size."""
+    if not fields:
+        raise GenError("struct blob has no fields")
+    offset = 0
+    alignment = 1
+    layout: list[tuple[StructField, int, int]] = []
+    for field in fields:
+        try:
+            size, field_alignment = FIELD_INFO[field.c_type]
+        except KeyError:
+            raise GenError(
+                f"unsupported struct field type {field.c_type!r}"
+            ) from None
+        offset = (offset + field_alignment - 1) & ~(field_alignment - 1)
+        layout.append((field, offset, size))
+        offset += size
+        alignment = max(alignment, field_alignment)
+    size = (offset + alignment - 1) & ~(alignment - 1)
+    return layout, size
+
+
 def blob_bytes(spec: BlobSpec | MixedBlobSpec, data_root: Path) -> bytes:
     path = data_root / spec.file
     if not path.exists():
@@ -410,12 +488,21 @@ def blob_bytes(spec: BlobSpec | MixedBlobSpec, data_root: Path) -> bytes:
             f"{path}: {len(data)} bytes, expected 0x{spec.data_bytes:X} "
             "from database.json"
         )
-    if len(data) % 4 != 0:
+    if isinstance(spec, BlobSpec) and spec.fields:
+        _, record_size = struct_layout(spec.fields)
+        if record_size == 0 or len(data) % record_size != 0:
+            raise GenError(
+                f"{path}: size is not a multiple of the "
+                f"{record_size}-byte struct"
+            )
+    elif len(data) % 4 != 0:
         raise GenError(f"{path}: size is not a multiple of 4")
     return data
 
 
-def render_block(spec: BlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols) -> str:
+def render_flat_block(
+    spec: BlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols
+) -> str:
     count = len(data) // 4
     qualifier = "const " if spec.const else ""
     lines = [
@@ -434,6 +521,59 @@ def render_block(spec: BlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols) ->
     )
     lines.append(END_MARKER.format(name=spec.symbol))
     return "\n".join(lines)
+
+
+def render_struct_block(
+    spec: BlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols
+) -> str:
+    if not spec.struct_name:
+        raise GenError(f"{spec.symbol}: struct spec has no struct name")
+    layout, record_size = struct_layout(spec.fields)
+    count = len(data) // record_size
+    qualifier = "const " if spec.const else ""
+    lines = [
+        BEGIN_MARKER.format(name=spec.symbol),
+        f"struct {spec.struct_name} {{",
+    ]
+    for field in spec.fields:
+        lines.append(f"    {field.c_type} {field.name};")
+    lines.append("};")
+    lines.append("")
+    lines.append(
+        f"static {qualifier}struct {spec.struct_name} {spec.symbol}[{count}] = {{"
+    )
+    for index in range(count):
+        base = index * record_size
+        values: list[str] = []
+        for field, offset, size in layout:
+            raw = int.from_bytes(data[base + offset : base + offset + size], "little")
+            if field.c_type.endswith("*"):
+                if raw & 1:
+                    raise GenError(
+                        f"{spec.file}: entry {index} field {field.name} "
+                        f"0x{raw:08X} has the low bit set"
+                    )
+                values.append(f"({field.c_type})((u32){resolve_expression(sm, elf, raw)})")
+            else:
+                values.append(f"0x{raw:X}")
+        lines.append("    { " + ", ".join(values) + " },")
+    lines.append("};")
+    lines.append(
+        f"typedef char struct_{spec.struct_name}_size_check"
+        f"[sizeof(struct {spec.struct_name}) == {record_size} ? 1 : -1];"
+    )
+    lines.append(
+        f"typedef char {spec.symbol}_size_check"
+        f"[sizeof({spec.symbol}) == {len(data)} ? 1 : -1];"
+    )
+    lines.append(END_MARKER.format(name=spec.symbol))
+    return "\n".join(lines)
+
+
+def render_block(spec: BlobSpec, data: bytes, sm: SymbolMap, elf: ElfSymbols) -> str:
+    if spec.fields:
+        return render_struct_block(spec, data, sm, elf)
+    return render_flat_block(spec, data, sm, elf)
 
 
 def render_mixed_block(
@@ -618,9 +758,12 @@ def main() -> int:
                 print(f"gen_blob_tables: ERROR: {message}", file=sys.stderr)
             print("FAIL: generated blob arrays are not up to date", file=sys.stderr)
             return 1
+        struct_count = sum(1 for spec in BLOBS if spec.fields)
+        flat_count = len(BLOBS) - struct_count
         print(
-            f"PASS: {len(BLOBS)} pointer-table blobs and {len(MIXED_BLOBS)} "
-            f"mixed blob match the baseline bytes and checked-in C arrays"
+            f"PASS: {flat_count} pointer-table blobs + {len(MIXED_BLOBS)} "
+            f"mixed + {struct_count} struct match the baseline bytes and "
+            f"checked-in C arrays"
         )
         return 0
 
