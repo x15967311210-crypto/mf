@@ -75,8 +75,13 @@ input/visual parity) and HACK-001/001a/006
     `sSecurityUnlockEvents+0x88/0x89/0x90` bytes are correct, so focus on the
     `PauseScreenSetupOam`/`MapScreenDrawSpecialOam` branch and OAM id 0x1A/0x1B
     at entry 18
-  - next: runtime breakpoint trace of the before→open transition; automate
-    OAM-state comparison locally for this pair
+  - before→open trace: setup writes MenuOam 33–36 correctly in both
+    (normal `pc=08078308`, shifted `pc=08079308`); but `PauseScreenProcessOam`
+    writes gOamData **~26k times normal vs 579 shifted**, leaving shifted
+    gNextOamSlot=1. So setup runs, but the per-frame OAM processing/handler
+    stops after ~one pass in shifted
+  - next: why `PauseScreenHandler`/ProcessOam is not called repeatedly in the
+    shifted map page (main loop/VBlank/pause flag), not a raw table
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
