@@ -39,13 +39,13 @@ and section-reordered boot, Start/file-select gate, headless TAS input replay,
     one-off full baseline stopped at frame 40000 with no done marker
   - blocked again by BUG-002; do not hand M0b for sign-off yet
   - M0 is not DONE and M1 does not start until human sign-off
-- [DOING @dev1] BUG-002 (input replay) — shifted 4k TAS input stalls after
-  frame 900
+- [DOING @dev1] BUG-002 (input replay) — shifted 4k TAS input stalls at
+  frame 826
   - normal: `frame_counter=3951`, checkpoints 300/600/900/4000 match fixture
-  - shifted: 300/600 match, frame 900 `disp=1C00 main=7 s1=3 s2=0`, final
-    `frame_counter=792` (below 3000 liveness floor)
-  - reordered matches normal; this is shifted-only, likely another raw table
-    in the intro/file-select path
+  - shifted: 300/600 match, then PC in `FileSelectDrawOam`, frame counter
+    freezes at 792; `gVBlankCallback=080918CA`, `gHBlankCallback=F3E3F395`
+  - reordered matches normal; likely another raw table in the
+    intro/file-select OAM path; BUG-002a tracing first corrupt write
 
 ## Phase S3a — hack-critical C (106 functions)
 
