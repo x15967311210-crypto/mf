@@ -31,8 +31,9 @@ parity) and HACK-001/001a/006
   - committed 4k fixture + `INPUT_CHECK` assertions; `make test` runs it
   - `shift-input` runs the same 4k input against the shifted build; PASS
   - full 259k input stays manual/BizHawk; manual playtest remains extra
-- [TODO] QA-004 (tools) — scan raw blobs for 2-byte-aligned embedded ROM
-  pointer tables and feed them into `audit`/`check_relocs`
+- [DOING @dev2] QA-004 (tools) — scan raw blobs for 2-byte-aligned embedded
+  `FrameData`/pointer tables and report unrelocated shifted entries; use the
+  report to drive BUG-004 and future carves
 
 ## Phase S2 — relocatable build
 
