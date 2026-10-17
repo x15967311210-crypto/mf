@@ -275,3 +275,26 @@ Verification:
   (`e0fa16f4798c03e4`).
 - `shift-check`, `shift-start`, `audit`, `check-relocs-strict`, and `smoke`
   are green.
+
+## Resolved — BUG-004 (30k input divergence)
+
+The 30k TAS input gate exposed a later shifted-only divergence.  QA-004's
+2-byte-aligned scan found two raw `FrameData` tables in
+`sBlob_5f6990_60093c`:
+
+- `0x79E0` / ROM `0x085FE370`: 26 entries (intro landing/OAM setup)
+- `0x8B48` / ROM `0x085FF4D8`: 70 entries (intro cutscene)
+
+Both pFrame arrays are now C with prefix/middle anchors; baseline tables are
+byte-identical and shifted tables are 26/26 + 70/70 at `+0x1000`.
+
+Result:
+
+```text
+SHIFT-INPUT-30K normal  frame_counter=29857 disp=1A00 main=1 s1=3 s2=256
+SHIFT-INPUT-30K shifted frame_counter=29857 disp=1A00 main=1 s1=3 s2=256
+SHIFT-INPUT-30K: PASS
+```
+
+`SCREEN-DIFF` at 600/900 also passes for normal/shifted/reordered.  M0e is the
+human retest candidate.

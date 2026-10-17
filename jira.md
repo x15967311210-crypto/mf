@@ -14,10 +14,10 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
 Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008,
-QA-001/002/003/005, BUG-001/002/003 (harness, audit, symbol map, blob
-classification, literal and C-literal rewrites, raw FrameData/Sa-X table
-relocation, padded and section-reordered boot, Start/file-select gate,
-headless TAS input replay, screenshot parity, 578/600 and 4k input/visual
+QA-001/002/003/005/006, BUG-001/002/003/004 (harness, audit, symbol map, blob
+classification, literal and C-literal rewrites, raw FrameData/Sa-X/intro
+table relocation, padded and section-reordered boot, Start/file-select gate,
+headless TAS input 4k/30k, screenshot parity, 578/600 and input/visual
 parity) and HACK-001/001a/006
 (GDD, layout, Cantor).  Details in `git log`.
 
@@ -31,24 +31,18 @@ parity) and HACK-001/001a/006
   - committed 4k fixture + `INPUT_CHECK` assertions; `make test` runs it
   - `shift-input` runs the same 4k input against the shifted build; PASS
   - full 259k input stays manual/BizHawk; manual playtest remains extra
-- [DOING @dev2] QA-004 (tools) — scan raw blobs for 2-byte-aligned embedded
-  `FrameData`/pointer tables and report unrelocated shifted entries; use the
-  report to drive BUG-004 and future carves
+- [TODO] QA-004 (tools) — scanner for 2-byte-aligned embedded
+  `FrameData`/pointer tables; prototype found the BUG-003/004 tables but the
+  tool/report is not committed yet
 
 ## Phase S2 — relocatable build
 
-- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - M0c was BLOCKED on BUG-003; BUG-003 fixed, but the requested 30k run
-    found a new shifted-only state divergence (BUG-004)
-  - do **not** hand M0d or sign off yet
+- [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - final candidate: `work/playtest/m0e-2026-10-17/`
+  - `SHIFT-CHECK`, `SHIFT-START`, `SHIFT-INPUT`, `SHIFT-INPUT-30K`,
+    `SCREEN-DIFF` and `make test` all PASS
+  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
   - M0 is not DONE and M1 does not start until human sign-off
-- [DOING @dev1] BUG-004 (input replay) — shifted diverges by 30k frames
-  - normal/reordered 30k: `frame_counter=29857`, `main=1`, `s1=3`, `s2=256`
-  - shifted 30k: `frame_counter=24469`, `main=7`, `s1=11`, `s2=1`
-  - QA-004 scan found two unrelocated **FrameData** tables in
-    `sBlob_5f6990_60093c`: `0x79E0`/26 entries (abs `0x085FE370`) and
-    `0x8B48`/70 entries (abs `0x085FF4D8`); both referenced from
-    intro/OAM setup. Carve them into C, preserve layout, verify 30k parity.
 - [DONE] QA-006 (emulator) — 30k input fixture + `shift-input-30k` gate
   - normal/reordered 30k PASS; shifted 30k FAIL (`frame_counter=24469`)
   - harness binary must be rebuilt after harness changes; noted
