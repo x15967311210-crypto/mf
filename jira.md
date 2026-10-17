@@ -30,7 +30,7 @@ Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
   - map + ELF local symbols merged; all 662 ROM literals now resolve to
     `symbol+offset`, `unknown=0`; rewrite proposals in
     `work/shift/rewrite_suggestions.md`
-- [TODO] SHIFT-004 (REA) — classify blob pointer tables vs graphics/audio  [deps: SHIFT-002]
+- [DOING @dev1] SHIFT-004 (REA) — classify blob pointer tables vs graphics/audio  [deps: SHIFT-002]
 
 ## Phase S2 — relocatable build
 
