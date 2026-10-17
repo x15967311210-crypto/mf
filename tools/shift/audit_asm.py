@@ -5,6 +5,11 @@ The first shiftability question is simple: which 32-bit values in the shipped
 assembly are ROM addresses that will break when the link moves?  This script
 answers that, maps each target to a symbol where possible, and writes a JSON
 ledger the rewrite/gate tools consume.
+
+Literal operands may omit leading zeros: `sound/tracks/track_1.s` writes
+`.word 0x80a5710` for the address `0x080A5710`.  One to eight hex digits are
+accepted and normalized to the canonical eight-digit `value` in the ledger;
+`text` keeps the original line so the rewrite tools can reproduce it.
 """
 
 from __future__ import annotations
@@ -14,23 +19,25 @@ import json
 import re
 import sys
 from collections import Counter
+from collections.abc import Iterable
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from map_symbols import SymbolMap, category  # noqa: E402
 
+# 1-8 hex digits: the audio track headers use the 7-digit form 0x80a5710.
 LITERAL_RE = re.compile(
-    r"^\s*(?:[A-Za-z_.$][\w.$@]*:\s*)?\.(?:4byte|word)\s+0x([0-9a-fA-F]{8})\b"
+    r"^\s*(?:[A-Za-z_.$][\w.$@]*:\s*)?\.(?:4byte|word)\s+0x([0-9a-fA-F]{1,8})\b"
 )
 LDR_RE = re.compile(r"=\s*0x([0-9a-fA-F]{8})\b")
 ANY_ROM_RE = re.compile(r"\b0x(08[0-9a-fA-F]{6})\b")
 
 
-def scan_file(path: Path, sm: SymbolMap) -> list[dict]:
+def scan_lines(path: Path, lines: Iterable[str], sm: SymbolMap) -> list[dict]:
     records: list[dict] = []
     seen: set[tuple[int, int, str]] = set()
 
-    for lineno, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
+    for lineno, line in enumerate(lines, 1):
         found: list[tuple[str, int]] = []
 
         m = LITERAL_RE.search(line)
@@ -87,6 +94,93 @@ def scan_file(path: Path, sm: SymbolMap) -> list[dict]:
     return records
 
 
+def scan_file(path: Path, sm: SymbolMap) -> list[dict]:
+    return scan_lines(path, path.read_text(errors="replace").splitlines(), sm)
+
+
+class _StubSymbolMap:
+    """Stand-in resolver for --self-check: every ROM address is mapped."""
+
+    def resolve(self, addr: int) -> dict:
+        return {
+            "addr": f"0x{addr:08X}",
+            "symbol": "sTarget",
+            "offset": 0,
+            "section": ".rodata",
+            "object": "self-check.o",
+            "exact": True,
+            "known": True,
+        }
+
+
+# (name, source line, expected [(kind, value, category, status), ...])
+SELF_CHECK_CASES: list[tuple[str, str, list[tuple[str, str, str, str]]]] = [
+    (
+        "8-digit literal is not double-counted as operand",
+        "\t.4byte 0x080A5710",
+        [("literal", "0x080A5710", "rom", "open")],
+    ),
+    (
+        "7-digit ROM literal is zero-padded",
+        "\t.word 0x80a5710",
+        [("literal", "0x080A5710", "rom", "open")],
+    ),
+    (
+        "6-digit literal is zero-padded",
+        "\t.word 0x123456",
+        [("literal", "0x00123456", "other", "fixed")],
+    ),
+    (
+        "1-digit literal is zero-padded",
+        "\t.word 0x1",
+        [("literal", "0x00000001", "other", "fixed")],
+    ),
+    (
+        "non-ROM constant",
+        "\t.word 0x04000000",
+        [("literal", "0x04000000", "mmio", "fixed")],
+    ),
+    (
+        "symbol+offset is not a literal",
+        "\t.word track_1_lbl+4",
+        [],
+    ),
+    (
+        "symbol is not a literal",
+        "\t.word sMusicTrackDataRom",
+        [],
+    ),
+    (
+        "label-prefixed literal keeps its directive",
+        "_rc: .4byte 0x03007E60",
+        [("literal", "0x03007E60", "iwram", "fixed")],
+    ),
+]
+
+
+def self_check() -> int:
+    """Deterministic checks for literal width, normalization and dedup."""
+    path = Path("<self-check>")
+    sm = _StubSymbolMap()
+    failed = 0
+    for name, text, expected in SELF_CHECK_CASES:
+        got = [
+            (r["kind"], r["value"], r["category"], r["status"])
+            for r in scan_lines(path, [text], sm)
+        ]
+        if got != expected:
+            failed += 1
+            print(f"  FAIL {name}: expected {expected}, got {got}")
+        else:
+            print(f"  ok   {name}: {got}")
+    total = len(SELF_CHECK_CASES)
+    if failed:
+        print(f"self-check: {failed}/{total} failed")
+        return 1
+    print(f"self-check: {total}/{total} passed")
+    return 0
+
+
 def build_summary(records: list[dict]) -> dict:
     rom = [r for r in records if r["category"] == "rom"]
     literals = [r for r in rom if r["kind"] == "literal"]
@@ -125,7 +219,15 @@ def main() -> int:
     ap.add_argument("--symbols", default=None, help="pre-built symbols JSON")
     ap.add_argument("--out", default="work/shift/abs_refs.json")
     ap.add_argument("--strict", action="store_true")
+    ap.add_argument(
+        "--self-check",
+        action="store_true",
+        help="run literal width/normalization checks and exit (no map needed)",
+    )
     args = ap.parse_args()
+
+    if args.self_check:
+        return self_check()
 
     asm_dirs = [Path(d) for d in (args.asm_dir or ["asm", "sound"])]
     if args.symbols:

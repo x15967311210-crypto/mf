@@ -38,6 +38,7 @@ Or run the scripts directly:
 
 ```sh
 python3 tools/shift/map_symbols.py --map mf_us.map --out work/shift/symbols.json
+python3 tools/shift/audit_asm.py --self-check
 python3 tools/shift/audit_asm.py --map mf_us.map --out work/shift/abs_refs.json
 python3 tools/shift/audit_blobs.py --map mf_us.map --out work/shift/blob_scan.json
 python3 tools/shift/rewrite_refs.py --out work/shift/rewrite_suggestions.md
@@ -45,6 +46,14 @@ python3 tools/shift/apply_refs.py --dry-run
 python3 tools/shift/apply_refs.py --check
 python3 tools/shift/report.py --out docs/shiftability-audit.md
 ```
+
+`audit_asm.py` accepts `.4byte`/`.word` operands with 1–8 hex digits.  The
+audio track headers write a 7-digit address such as `0x80a5710`; the audit
+zero-pads it to the canonical `0x080A5710` in the ledger's `value` field while
+keeping the original source line in `text`.  `--self-check` exercises that
+parsing without needing a map: 8-, 7-, 6- and 1-digit operands, canonical
+zero-padding, non-ROM constants, and symbol/`symbol+offset` operands (which are
+not references and must not be flagged).
 
 `apply_refs.py` rewrites the operand of each `.4byte`/`.word` ROM literal in
 `abs_refs.json` to a symbol expression (`symbol` or `symbol+0xNN`).  It refuses
@@ -78,16 +87,23 @@ classifies the **extracted bytes**, and those bytes never change when a blob is
 converted.  `check_relocs.py` therefore checks whether the blob filename is
 still used by `INCBIN`.  All ten pointer-like blobs (seven SHIFT-006a tables plus
 the three SHIFT-006b models) are generated C now, so strict mode reports zero
-raw blobs and passes.
+raw blobs; it still fails on the 660 open track-header literals until
+SHIFT-006b4 rewrites them.
 
-Report mode prints the same list but exits 0.  Current expected output:
+Report mode prints the same list but exits 0.  Current output before
+SHIFT-006b4:
 
 ```text
 blob scan: 47 blobs, 10 pointer-like (10 converted, 0 still raw)
     converted          Blob_a5224_a5258.bin
     converted          Blob_a5710_a8cdc.bin
     ...
-PASS: strict relocation gate (no open literals, no C ROM refs, no raw pointer-like blobs)
+check_relocs: 1357 ROM refs in ledger
+  open literals: 660
+  unknown:       0
+  ldr comments:  697 (reference-only)
+REPORT: 1 issue(s) would fail --strict:
+  - 660 open ROM literal(s) remain
 ```
 
 `check_relocs.py --self-check` exercises the INCBIN parser and the
@@ -113,17 +129,24 @@ runs the same audit before linking.
 
 ## Current baseline counts
 
-- SHIFT-005 rewrote all 662 ROM literals in `.4byte`/`.word` to symbol
-  expressions (0 remain); 697 `ldr =0x08...` reference comments remain.
-- 388 unique ROM values.
-- Rewritten targets: 580 in `.rodata`, 82 in `.data`.
+- SHIFT-005 rewrote all 662 eight-digit ROM literals in `.4byte`/`.word` to
+  symbol expressions (0 remain in `asm/`); 697 `ldr =0x08...` reference
+  comments remain.
+- SHIFT-005b found the 660 seven-digit track-header literals in
+  `sound/tracks/*.s` (`.word 0x80a....`); all 660 resolve to
+  `sBlob_a5710_a8cdc+offset` in `.rodata`, and 0 are unknown.  They stay
+  `open` until SHIFT-006b4 rewrites them.
+- Ledger totals after SHIFT-005b: 5513 assembly references, 1357 ROM refs
+  (660 literals + 697 `ldr` comments), 425 unique ROM values.
+- SHIFT-005 rewrite targets: 580 in `.rodata`, 82 in `.data`.
 - 47 extracted blobs: 7 confirmed pointer tables, 3 possible (embedded
   pointers in struct/audio data), 37 data.  The SHIFT-002 density rule is kept
   as `baseline_classification`; see `docs/blob-classification.md` for the
   per-blob evidence and the 11/7 baseline reconciliation.
 - SHIFT-006a converted the 7 pointer tables to C arrays; SHIFT-006b1/2/3
   converted `79c170`, `74dc48` and `a5710`.  The strict gate reports all ten
-  pointer-like blobs as `converted` and now passes.
+  pointer-like blobs as `converted`, but fails on the 660 open track-header
+  literals until SHIFT-006b4 lands.
 
 After SHIFT-005, the six remaining assembly blobs still contain only `ldr`
 reference comments, not data literals:
@@ -141,10 +164,11 @@ SHIFT-006a converted the seven confirmed blob pointer tables to relocatable C
 arrays.  SHIFT-006b1/2/3 converted the three `possible` blobs (`79c170`,
 `74dc48`, `a5710`) to relocatable structs.  The padded build and static checks
 pass, but the boot smoke still stops at `frame_counter=3`, below the 450-frame
-floor; the shift test remains the proof target.  The `sound/tracks/*.s` header
-words that point into `a5710` are still numeric `.word` literals outside
-`audit_asm.py`'s `asm/` scan, so they are a known remaining absolute-reference
-surface even though the blob's internal pointers relocate.
+floor; the shift test remains the proof target.  SHIFT-005b made the 660
+numeric `.word` track-header pointers into `a5710` visible to the audit: every
+one is an `open` literal resolving to `sBlob_a5710_a8cdc+offset` in `.rodata`.
+They are the last absolute-reference surface for the shift test; SHIFT-006b4
+rewrites them to symbol expressions.
 
 ## Pointer tables (SHIFT-006a)
 
@@ -204,6 +228,8 @@ bytes.  The 37 `data` blobs stay `INCBIN`.
 - EWRAM/IWRAM/MMIO/palette/VRAM/OAM: fixed by D-002; not rewritten.
 - `.4byte`/`.word` records are the actual data word; `ldr` comments are references
   to that word.  A rewrite fixes the `.4byte` line, not the `ldr` comment.
+- Literal operands accept 1–8 hex digits and are zero-padded to eight in the
+  ledger (`0x80a5710` -> `0x080A5710`); `text` keeps the original source.
 - A blob is pointer-like when an aligned word lands in a ROM/RAM address range.
   Density alone is not enough: 16-bit palettes, tilemaps and sprite data can
   form `0x08xxxxxx`/`0x03xxxxxx` values from two adjacent samples.
