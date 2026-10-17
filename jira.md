@@ -58,6 +58,10 @@ input/visual parity) and HACK-001/001a/006
     `main=3/s2=0` match -> missing UI is the OAM layer, not VRAM/palette
   - trace why `PauseScreenProcessOam`/MapScreenDrawSpecialOam does not populate
     gOamData in the shifted state
+- [DOING @dev2] QA-008 (emulator) — OAM parity telemetry at checkpoints
+  - print OAM count/hash at 300/600/900/1059/4000/30000 in input replay
+  - add `oam-diff` normal vs shifted; savestate-based map UI comparison stays
+    local-only because savestates must not be committed
 - [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint
   - shifted black-screen reproduction can be automated from
     `m0e_shifted_slot3.ss3` + held Start; map/dialog visual comparison needs a
