@@ -36,12 +36,17 @@ parity) and HACK-001/001a/006
 
 ## Phase S2 — relocatable build
 
-- [PARK @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - BUG-003 fixed; new handoff: `work/playtest/m0d-2026-10-17/`
-  - normal / shifted / reordered; `SHIFT-CHECK`, `SHIFT-START`,
-    `SHIFT-INPUT`, `SCREEN-DIFF` and `make test` all PASS
-  - awaiting `PLAYTEST-PASS` or a blocking `BUG-*` / `PLAYTEST-*` list
+- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+  - M0c was BLOCKED on BUG-003; BUG-003 fixed, but the requested 30k run
+    found a new shifted-only state divergence (BUG-004)
+  - do **not** hand M0d or sign off yet
   - M0 is not DONE and M1 does not start until human sign-off
+- [DOING @dev1] BUG-004 (input replay) — shifted diverges by 30k frames
+  - normal/reordered 30k: `frame_counter=29857`, `main=1`, `s1=3`, `s2=256`
+  - shifted 30k: `frame_counter=24469`, `main=7`, `s1=11`, `s2=1`
+  - 4k is identical; likely another raw table/pointer in the later intro path
+- [DOING @dev2] QA-006 (emulator) — commit a 30k input fixture and
+  `shift-input-30k` gate; normal PASS expected, shifted FAIL until BUG-004
 - [DONE] QA-005 (emulator) — screenshot-parity gate
   - `screen-diff` compares framebuffer hashes at 600/900; normal/reordered match,
     shifted currently FAIL (`a64b...`/`fa91...` vs `1aba...`/`e0fa...`)
