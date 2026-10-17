@@ -38,10 +38,12 @@ input/visual parity) and HACK-001/001a/006
 ## Phase S2 — relocatable build
 
 - [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
-  - M0f fresh shifted map at frame 7806: tile garbage fixed, but objective
-    dialog box body/legend/bottom UI missing (BUG-006)
-  - M0 is not DONE and M1 does not start until human sign-off
-- [DOING @dev1] BUG-006 (playtest) — shifted fresh map objective UI missing
+  - M0f source fix landed (`462d803`); fixed shifted candidate is
+    `work/playtest/m0f-2026-10-17/fixed/mf_us_m0f_shifted_fixed.gba`
+    (`a822b2d8...`), with normal/reordered original artifacts unchanged.
+  - M0f human retest is pending; M0 is not DONE and M1 does not start until
+    `PLAYTEST-PASS`.
+- [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
   - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
     `disp=5F00 main=3 s1=0 s2=0`
   - normal screenshot shows top `L SLEEP`/`MAIN DECK`/`STATUS R`, right
@@ -113,9 +115,21 @@ input/visual parity) and HACK-001/001a/006
     relocatable C table/symbol expressions (or equivalent generated frame
     table); keep the normal/reordered builds unchanged. Secondary cleanup:
     direct `sBlob_79bec0_79c128` reference in `asm/disasm_0x080765f8.s`.
-  - next: implement the source relocation, verify the controlled pair, then
-    rebuild M0f shifted artifact for human retest; do not mark BUG-006 DONE
-    until the controlled pair matches byte-for-byte.
+  - LANDED `462d803`: `tools/shift/gen_map_oam_blob.py` generates the blob
+    as `u32[16558]`; 501 pointer words are same-object address expressions
+    (target offset, not pointer-word offset), all other words verbatim.
+  - normal SHA1 `ca33f4348c2c05dd330d37b97e2c5a69531dfe87`; shifted build
+    SHA1 `a822b2d82a6501b7d6caa74211f3b7079c7be885`, exactly the validated
+    temporary-patch artifact. 501/501 pointers are baseline+0x1000; 0 stale,
+    0 outside, 16057 non-pointer words unchanged.
+  - automatic gates: `shift-input`, `shift-input-30k`, `screen-diff`,
+    `oam-diff` 6/6, `shift-check`, `shift-start`, audit, strict relocs and
+    smoke all PASS.
+  - controlled pair: fixed shifted SHA equals the patched artifact that
+    produced active_oam 22/29/51 and after/final screenshots byte-identical
+    to normal; fixed candidate at
+    `work/playtest/m0f-2026-10-17/fixed/mf_us_m0f_shifted_fixed.gba`.
+  - M0f still needs the human retest; M0 is not DONE and M1 does not start.
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
