@@ -26,8 +26,10 @@ and section-reordered boot, Start/file-select gate, headless TAS input replay,
 
 - [TODO] SHIFT-001a (baseline) — add title/new-game/pause/save scenarios
 - [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox
-- [DONE] QA-002 (emulator) — headless TAS input replay
-  - committed 4k fixture + `INPUT_CHECK` assertions; `make test` now runs it
+- [DONE] QA-002/QA-003 (emulator) — headless TAS input replay + shifted gate
+  - committed 4k fixture + `INPUT_CHECK` assertions; `make test` runs it
+  - `shift-input` runs the same 4k input against the shifted build; currently
+    FAIL until BUG-002 is fixed
   - full 259k input stays manual/BizHawk; manual playtest remains extra
 
 ## Phase S2 — relocatable build
