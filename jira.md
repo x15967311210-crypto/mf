@@ -26,9 +26,10 @@ classification) and HACK-001/001a/006 (GDD, layout, Cantor).  Details in
 
 ## Phase S2 — relocatable build
 
-- [TODO] SHIFT-005 (baseline) — rewrite hardcoded refs in non-disasm asm
+- [DOING @dev1] SHIFT-005 (baseline) — rewrite hardcoded ROM literals to symbols
   - all 662 ROM literals resolve to `symbol+offset`; proposals in
     `work/shift/rewrite_suggestions.md`
+  - scope: 6 disasm blobs + non-disasm asm; keep asm, do not convert to C
 - [TODO] SHIFT-006 (baseline) — convert blob pointer tables to relocatable C
   - 7 confirmed tables, 3 `possible` struct/mixed cases, 37 data blobs stay raw
 - [TODO] SHIFT-007 (baseline) — relocatable linker + `check_relocs` gate
