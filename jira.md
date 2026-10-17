@@ -44,13 +44,13 @@ headless TAS input replay, 578/600 and 4k input parity) and HACK-001/001a/006
   - M0 is not DONE and M1 does not start until human sign-off
 - [DOING @dev1] BUG-003 (playtest) — shifted file-select OAM/sprites corrupt
   at frames 600/900
-  - normal screenshots: 600 `a9e636...`, 900 `efda7a...`
-  - shifted: 600 `13d764...`, 900 `0c6af3...`; reordered == normal
-  - first data diff is OAM-only at frame 459: normal slots 26–31 hold 6 real
-    overlay sprites, shifted has garbage after slot 25; palette/BG/OBJ VRAM/
-    DISPCNT/BGxCNT/BGxOFS all identical
-  - `sMessageTextPointers+0x1A9C` (0x0879E890) is correctly relocated; trace
-    the FileSelectSetupOam type-7 / FileSelectDrawAllOam writer for slots 26+
+  - root cause: type-6/audio-logos overlay uses a raw **39-entry FrameData
+    table** at blob offset `0xC5C2` (ROM `0x087407E0`), immediately before the
+    carved 38/88-entry tables; its pFrame words are stale
+  - normal draws 6 sprites in slots 26–31; shifted follows stale pFrame, reads
+    a bogus count and writes garbage through slot 125
+  - fix: carve `0xC5C2..0xC6FA` (39 entries) into C; prefix shrinks to
+    `0xC5C2`; preserve layout and 0x087407E0/0x087417E0
 - [DONE] QA-005 (emulator) — screenshot-parity gate
   - `screen-diff` compares framebuffer hashes at 600/900; normal/reordered match,
     shifted currently FAIL (`a64b...`/`fa91...` vs `1aba...`/`e0fa...`)
