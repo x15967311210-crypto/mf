@@ -18,7 +18,7 @@ QA-001/002/003/005/006, BUG-001/002/003/004/005/006 (harness, audit, symbol
 map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
 Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
-578/600 and input/visual parity), PLAYTEST-000 (M0 `PLAYTEST-PASS`), and
+578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
 HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ---
@@ -53,15 +53,26 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     a BUG-006 regression.  Evidence in
     `work/playtest/m0-2026-10-17/tas/bizhawk_m0f_20261018/`.
   - M0 is **not DONE**; M1 blockout is paused until this is resolved.
-- [TODO] QA-011 (emulator) — common file-select state parity
-  - boot normal to file-select, save one common state before input, load it in
-    normal/reordered/shifted, run the same START/A sequence, compare frame-by-
-    frame states and screenshots at 600/900/4000.
-  - If they match, the full-TAS difference is boot/input alignment; fix the
-    harness to use the common state.  If they differ, file the source bug.
+- [DONE] QA-011 (emulator) — common file-select state parity (inconclusive)
+  - mGBA f600 common state loads visually identically in normal/reordered/
+    shifted (`1C00/7/3/0`, same framebuffer hash).
+  - Execution-level replay is invalid: the state was captured mid-BIOS with
+    saved code/IWRAM pointers.  Normal resumes; reordered and shifted freeze
+    with PC in BIOS (`~0x38..0x68`, IRQ disabled).  Reordered is the control
+    and fails too, so this cannot decide BUG-008.  mGBA 0.11 vs capture 0.10.5
+    and the committed harness having no state option are contributing factors.
+  - Do not use the mid-BIOS state or a per-build input offset as a gate.
+- [TODO] QA-011a (emulator) — cold-boot file-select parity, rebuilt artifacts
+  - rebuild normal/reordered/shifted in one tree with identical `data/Blob_*`
+    inputs and record SHA1s; use the common SaveRAM and cold boot, not a
+    cross-build BIOS state;
+  - log `frame_counter disp main s1 s2` every frame around file-select
+    (normal 600 vs shifted 600) and compare first divergence;
+  - if shifted is exactly one frame ahead from the same boot/input, classify
+    boot/frame alignment vs engine; do not close BUG-008 until this is proven.
 - [TODO] BUG-008 (shift/engine) — shifted file-select one-frame parity
-  - provisionally filed pending QA-011; do not mask with a per-build input
-    offset and do not call M0 PASS while it is open.
+  - open and unconfirmed; do not mask with a per-build input offset and do not
+    call M0 PASS while it is open.
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
   - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
     `disp=5F00 main=3 s1=0 s2=0`
