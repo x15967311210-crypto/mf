@@ -156,14 +156,20 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
 - [TODO] QA-015 (emulator/tools) — full-route frame bitset differential
-  - add per-frame harness trace (PC/disp/main/s1/s2/event + OAM/PAL/VRAM/IO/
-    IWRAM/EWRAM page hashes or a normalized bitset); compare normal/shifted/
-    reordered and report the first divergent frame/page.
   - use a story route/TAS that reaches the elevator/event 4, not the baseline
     movement TAS (event counter stays 0).  Matched SaveRAM/start state is
     mandatory; normalize shifted ROM pointers and IWRAM.
-  - bisect from the last matching checkpoint and dump the first differing
-    state; feed BUG-010/BUG-009 regressions.
+  - frame bisection: predicate = "normal and shifted state at frame N match"
+    (OAM/PAL/VRAM/IO/event/selected WRAM page bitset).  With full-run failure
+    known, binary-search the first failing N (lo=known pass, hi=total); if no
+    failure is known, exponential-double then binary-search.  Re-run from a
+    fresh state for each N, not from the previous trial's end.
+  - each trial uses the harness `--state --frames N --final` (optionally
+    `--dump-prefix`); retain N, N-1 and the state at the first differing frame.
+    If the mismatch can resynchronize, use a per-frame trace to find the first
+    mismatch before bisecting.
+  - feed BUG-010/BUG-009 regressions; no source change from a non-monotonic
+    mismatch without a per-frame trace.
 - [DOING @dev1] BUG-010 (playtest) — shifted elevator hard freeze / black screen
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
