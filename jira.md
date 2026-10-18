@@ -117,11 +117,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     FileSelectVblank+1; shifted IE=0x2400 (VBlank cleared), callback
     0x0809C30A.  Shifted is at game frame 84, normal at 99, so this is not yet
     a same-phase comparison.
-  - next: capture normal at `gFrameCounter=84` and/or a live trace around
-    shifted game frames 78-90, comparing IE/VBlank callback and PC.  If normal
-    at 84 also has VBlank off, this is a cutscene timing difference; if not,
-    the cutscene/VBlank transition is the bug.  Do not patch source from the
-    400/401 state difference alone.
+  - game84 comparison: normal `VBlankReq=0, callback 0x0809E9E1
+    (FileSelectVblank+1)`; shifted `VBlankReq=1, callback 0x0809C30A`, then
+    IE `0x2401 -> 0x2400` and SVC.  Frames 78-83 match, so the divergence is
+    the game-frame-84 VBlank transition.  `0x0809C30A` is inside normal
+    `CutsceneBslExplodingInit`, not a callback; the shifted FileSelectVblank
+    literal itself is correct (`0x0809F9E1`).
+  - next: BizHawk watchpoint on `gVBlankCallback` (0x030019C4) at game frame
+    84 with writer PC/LR/stack, or live PC/LR trace at 84.  Do not patch from
+    the state value alone.
   - keep BUG-008 open; do not mask with input offset.
 
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing

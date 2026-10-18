@@ -450,3 +450,26 @@ If normal at 84 has VBlank enabled and a valid callback while shifted at 84
 does not, the freeze is in the cutscene/VBlank transition; otherwise it is an
 emulator-core timing difference.  Do not patch source from the 400/401 state
 difference alone.
+
+### BUG-008 game-frame-84 VBlank transition (2026-10-18)
+
+At the first aligned game frame, both builds are at `gFrameCounter16=84`:
+
+```text
+normal : IE=0x2401 IF=0x0001 VBlankReq=0 VBlankCb=0x0809E9E1 (FileSelectVblank+1)
+         gInput=0x0080 gChanged=0x0080 PC=0x1C CPSR=0x92
+shifted: IE=0x2401 IF=0x0001 VBlankReq=1 VBlankCb=0x0809C30A
+         gInput=0xF077 gChanged=0xFC03 PC=0x1C CPSR=0x92
+```
+
+The next shifted frame clears VBlank in IE (`0x2400`) and enters SVC.  Frames
+78–83 match, so the divergence is the **game-frame-84 VBlank transition**, not
+a boot-wide offset.
+
+`0x0809C30A` is a normal-code address inside `CutsceneBslExplodingInit`, not a
+VBlank callback.  The shifted `FileSelectVblank` literal is correct
+(`0x0809F9E1`) in ROM, so the wrong callback is written by the transition path
+or comes from a stale pointer/register/stack value.  A BizHawk watchpoint on
+`gVBlankCallback` (`0x030019C4`) at game frame 84 (writer PC/LR/stack), or a
+live PC/LR trace at 84, is the next required artifact.  Do not patch source
+from the state value alone.
