@@ -202,6 +202,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     enough; inspect the actual MenuOam entry `pAnim`/count at 384/385 and the
     `FileSelectDrawOam` loop (`gNextOamSlot + sb`), plus other file-select
     frame-data pointers.  Engine dev2 hit its step limit; BUG-008 still DOING.
+  - further check: area-name entries 19-21 at 384 carry valid shifted pAnim
+    targets; their pFrame targets/counts are identical normal/shifted
+    (1/26/6).  The simple pointer-table hypothesis is false.  Need the actual
+    `r5/r7/r3/r9/sl`/`gNextOamSlot` at the writer store to see which entry/index
+    makes `r7` reach 0x030019C4; add register logging to the MGBAHawk hook.
+  - QA-017c: extend the native hook with r5/r7/r3/r9/sl/sb/gNextOamSlot at the
+    watched store (and pAnim writes); capture the exact entry and count.
   - next: capture the writer in BizHawk's VBA-Next/MGBAHawk path (the core that
     reproduces); mGBA standalone is not sufficient.  Do not source-patch until
     a reproducing core reports PC/LR/SP/value.

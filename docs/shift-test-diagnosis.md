@@ -916,3 +916,13 @@ A later VBA-Next control did **not** reproduce the callback corruption.
 Therefore BUG-008 is an mGBA/MGBAHawk-path-parity bug with a real shifted OAM
 overrun, not a universal emulator-core bug.  The FileSelectDrawOam overrun is
 the source target.
+
+### BUG-008 area-name table check (2026-10-18)
+
+`FileSelectSetUpAreaNameOam`'s table is correctly relocated:
+normal `0x0879E944` -> shifted `0x0879F944`, all language/case words +0x1000.
+The valid file-select entries 19-21 at state 384 have valid shifted pAnim
+pointers, and their pFrame targets/counts are identical (1/26/6).  The OAM
+overrun is therefore not explained by that table alone; the next hook must log
+`r5/r7/r3/r9/sl/sb` and `gNextOamSlot` at the watched store to identify the
+entry/index that makes `r7` reach `0x030019C4`.
