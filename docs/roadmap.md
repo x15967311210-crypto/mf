@@ -83,9 +83,10 @@ Gate **S4**: playable slice sign-off, then content production.
 
 ## Current status
 
-**M0 shiftable-boot gate: PASS** (`PLAYTEST-PASS`, 2026-10-18; fixed shifted
-candidate `a822b2d8...`).  M1 blockout design/content pipeline is the active
-work.  See `jira.md`.
+**M0 shiftable-boot gate: BLOCKED** — the controlled map `PLAYTEST-PASS` is
+valid, but the BizHawk baseline TAS file-select parity check reopened M0
+(shifted frame 600 `s1=0003 s2=0000` vs normal/reordered `s1=0002 s2=0001`).
+M1 blockout is paused; see `jira.md` QA-011/BUG-008.
 
 Baseline evidence (2026-10-17):
 

@@ -37,15 +37,31 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [DONE] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
   - `PLAYTEST-PASS` received 2026-10-18 for the fixed shifted candidate
     `work/playtest/m0f-2026-10-17/fixed/mf_us_m0f_shifted_fixed.gba`
     (`a822b2d8...`); normal/reordered original artifacts unchanged.
   - Retest evidence: `work/playtest/m0f-2026-10-17/fixed/RETEST.md` and
     `fixed/retest/`; common save restored to pristine `C34B0F60...`.
   - before/after/final `active_oam=22/29/51`; after/final screenshots
-    byte-identical to normal (`97EFFB81...` / `1E6535B7...`).
-  - M0 is DONE; M1 blockout is next.
+    byte-identical to normal (`97EFFB81...` / `1E6535B7...`).  This controlled
+    map check remains valid.
+  - **REOPENED 2026-10-18**: BizHawk baseline TAS file-select parity fails.
+    normal/reordered frame 600 `s1=0002 s2=0001`; shifted `s1=0003 s2=0000`.
+    The original movie sticks at `SAMUS DATA`; ±1-frame input offset reaches
+    gameplay, so it is not a hard deadlock.  Same on unpatched shifted, so not
+    a BUG-006 regression.  Evidence in
+    `work/playtest/m0-2026-10-17/tas/bizhawk_m0f_20261018/`.
+  - M0 is **not DONE**; M1 blockout is paused until this is resolved.
+- [TODO] QA-011 (emulator) — common file-select state parity
+  - boot normal to file-select, save one common state before input, load it in
+    normal/reordered/shifted, run the same START/A sequence, compare frame-by-
+    frame states and screenshots at 600/900/4000.
+  - If they match, the full-TAS difference is boot/input alignment; fix the
+    harness to use the common state.  If they differ, file the source bug.
+- [TODO] BUG-008 (shift/engine) — shifted file-select one-frame parity
+  - provisionally filed pending QA-011; do not mask with a per-build input
+    offset and do not call M0 PASS while it is open.
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
   - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
     `disp=5F00 main=3 s1=0 s2=0`
@@ -210,7 +226,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - generated `hack/gen/rooms/` stays ignored; README has the HACK-004a2
     integration checklist. Door IDs 10/11 are a provisional post-boss return
     pair and need design sign-off before the 13-entry door table is committed.
-- [TODO] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms
+- [PARK] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms (paused: M0 file-select parity)
   - extend `sTest1RoomEntries` to 5 and `sTest1Doors` to 13; room/door data
     promotion needs an ADR because `src/data` is baseline-owned
   - resolve tileset 0, bg0/dark-room handling, spawn tables, entry warp
