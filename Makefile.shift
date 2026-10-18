@@ -49,7 +49,7 @@ REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
         check-relocs check-relocs-strict check-linker smoke test test-input \
         input-smoke emulator-harness shift-build shift-test shift-check \
         shift-reorder shift-start shift-input shift-input-30k shift-screen \
-        screen-diff oam-diff shift-check-all content-check help
+        screen-diff oam-diff event-diff shift-check-all content-check help
 
 all: audit
 
@@ -303,6 +303,13 @@ shift-input-30k:
 	fi; \
 	echo "SHIFT-INPUT-30K: PASS - normal and shifted state match at $(INPUT_30K_FRAMES) frames"
 
+# QA-013: compare the saved gEventCounter high-water sequence and its
+# area/room/nav context at the committed 30k checkpoints/transitions.
+event-diff: shift-input-30k
+	$(PYTHON) tests/emulator/event_diff.py --self-check
+	$(PYTHON) tests/emulator/event_diff.py \
+		$(SHIFT_WORK)/input30k_normal.log $(SHIFT_WORK)/input30k_shift.log
+
 # QA-008: OAM parity telemetry.  Replay the committed 30k fixture on the normal
 # and padded-shift builds, then compare the harness's OAM checkpoint lines:
 # `count` is gNextOamSlot and `hash` is FNV-1a over all 128 hardware OAM
@@ -506,6 +513,7 @@ help:
 	@echo "  shift-screen        normal/shifted/reordered 4k framebuffer parity at 600/900 (QA-005)"
 	@echo "  screen-diff         alias for shift-screen"
 	@echo "  oam-diff            normal/shifted 30k OAM count/hash parity at 300..30000 (QA-008)"
+	@echo "  event-diff          normal/shifted 30k event-counter/context parity (QA-013)"
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
 	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, INPUT_30K, INPUT_30K_EXPECT, INPUT_30K_FRAMES, OAM_CHECKPOINTS, PAD_BYTES, SHIFT_WORK"

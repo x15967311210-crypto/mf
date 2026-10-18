@@ -299,3 +299,29 @@ visible without breaking the existing padding gate.
 
 Do not commit savestates, screenshots with original graphics, or ROM-derived
 fixtures.  Scenarios are source (Lua/YAML) and semantic assertions.
+
+## Event-progress telemetry (QA-013)
+
+The input harness prints a saved high-water event marker at every checkpoint
+and on every sampled transition:
+
+```text
+EVENT frame=300 counter=0 area=0 room=0 nav=0
+EVENTCHG frame=1234 old=0 new=1 area=0 room=5 nav=0
+```
+
+`gEventCounter` is a monotonic u8 progress marker, not a per-event flag set.
+`event_diff.py` compares the normal/shifted (and optional reordered) sequences;
+`make -f Makefile.shift event-diff` runs the committed 30k fixture and checks
+the event sequence.  The full 259k local input can be checked with the same
+parser by saving the harness `EVENT`/`EVENTCHG` lines:
+
+```sh
+tests/emulator/bin/mgba-harness <rom> --scenario input \
+  --input work/playtest/.../baseline.input --frames 259176 \
+  2>/dev/null | grep -E '^(EVENT|EVENTCHG)' > /tmp/events.log
+python3 tests/emulator/event_diff.py normal.log shifted.log
+```
+
+The 30k fixture only reaches area 3 and may have no event transitions; the
+full input exercises later event progression.

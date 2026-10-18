@@ -21,6 +21,9 @@
  *                          checkpoint also prints an `OAM` line with the
  *                          gNextOamSlot count and FNV-1a hashes of the
  *                          hardware OAM and gOamData buffers (QA-008).
+ *                          QA-013 adds an `EVENT` line at every checkpoint and
+ *                          an `EVENTCHG` line whenever the sampled
+ *                          gEventCounter changes, with area/room/nav context.
  *
  * The legacy form `harness rom.gba [frames]` keeps the boot-smoke output and
  * exit semantics unchanged.
@@ -42,6 +45,9 @@
 
 #define IWRAM_FRAME_COUNTER 0x03000002
 #define IWRAM_CURRENT_AREA 0x0300002C
+#define IWRAM_CURRENT_ROOM 0x0300002D
+#define IWRAM_CURRENT_NAVIGATION_ROOM 0x03000048
+#define IWRAM_EVENT_COUNTER 0x03000B87
 #define IWRAM_MAIN_MODE 0x03000BDE
 #define IWRAM_SUB_MODE 0x03000BE0
 #define IWRAM_SUB_MODE1 0x03000BE0
@@ -118,6 +124,19 @@ typedef struct {
     uint64_t hash;
     uint64_t stage;
 } OamSample;
+
+/*
+ * QA-013: event-progress telemetry.  gEventCounter is a saved u8 progress
+ * marker, not a per-event flag set; area/room/nav give the context in which
+ * the sampled marker was observed.  The harness samples once per completed
+ * frame, so two writes inside one frame appear as one net EVENTCHG.
+ */
+typedef struct {
+    uint8_t counter;
+    uint8_t area;
+    uint8_t room;
+    uint8_t nav;
+} EventSample;
 
 /*
  * QA-005: optional framebuffer capture.  mGBA renders into this buffer when
@@ -693,6 +712,39 @@ static OamSample oam_report(struct GBA* gba, size_t frame) {
     return sample;
 }
 
+static EventSample event_sample(struct GBA* gba) {
+    EventSample sample;
+    sample.counter = GBAView8(gba->cpu, IWRAM_EVENT_COUNTER);
+    sample.area = GBAView8(gba->cpu, IWRAM_CURRENT_AREA);
+    sample.room = GBAView8(gba->cpu, IWRAM_CURRENT_ROOM);
+    sample.nav = GBAView8(gba->cpu, IWRAM_CURRENT_NAVIGATION_ROOM);
+    return sample;
+}
+
+static void event_report(struct GBA* gba, size_t frame) {
+    EventSample sample = event_sample(gba);
+    printf(
+        "EVENT frame=%zu counter=%u area=%u room=%u nav=%u\n",
+        frame, (unsigned)sample.counter, (unsigned)sample.area,
+        (unsigned)sample.room, (unsigned)sample.nav
+    );
+}
+
+static void event_transition(
+    size_t frame,
+    EventSample previous,
+    EventSample current
+) {
+    if (previous.counter == current.counter) {
+        return;
+    }
+    printf(
+        "EVENTCHG frame=%zu old=%u new=%u area=%u room=%u nav=%u\n",
+        frame, (unsigned)previous.counter, (unsigned)current.counter,
+        (unsigned)current.area, (unsigned)current.room, (unsigned)current.nav
+    );
+}
+
 /*
  * QA-002: replay `frame keys` lines in order.  setKeys is called before
  * runFrame, so line 0 is the first emulated frame.  Checkpoints are reported
@@ -744,15 +796,20 @@ static int run_input(
      * small raw counter and must not be compared against 3/4 of 259k.
      */
     uint16_t start_counter = GBAView16(gba->cpu, IWRAM_FRAME_COUNTER);
+    EventSample previous_event = event_sample(gba);
     for (size_t i = 0; i < limit; ++i) {
         uint16_t keys = replay->entries[i].keys;
         last_keys = keys;
         core->setKeys(core, keys);
         core->runFrame(core);
         size_t completed = i + 1;
+        EventSample current_event = event_sample(gba);
+        event_transition(completed, previous_event, current_event);
+        previous_event = current_event;
         if (input_is_checkpoint(completed)) {
             input_print_state(gba, completed, keys, "INPUT");
             oam_report(gba, completed);
+            event_report(gba, completed);
             InputState state = input_read_state(gba);
             if (input_check_expect(expect, completed, state,
                                    &expected_checked)) {
