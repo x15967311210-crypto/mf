@@ -52,7 +52,8 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     gameplay, so it is not a hard deadlock.  Same on unpatched shifted, so not
     a BUG-006 regression.  Evidence in
     `work/playtest/m0-2026-10-17/tas/bizhawk_m0f_20261018/`.
-  - M0 is **not DONE**; M1 blockout is paused until this is resolved.
+  - M0 is **not DONE**; decision A is mGBA 0.11 authoritative.  Final mGBA
+    0.11 human sign-off is pending; M1 blockout stays paused until then.
 - [DONE] QA-011 (emulator) — common file-select state parity (inconclusive)
   - mGBA f600 common state loads visually identically in normal/reordered/
     shifted (`1C00/7/3/0`, same framebuffer hash).
@@ -76,9 +77,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     mGBA 0.11 control.
   - decide whether the gate is BizHawk-specific or whether mGBA 0.11 is
     authoritative before changing source.
-- [DOING @dev1] BUG-008 (shift/engine) — shifted file-select input parity
-  - CONFIRMED cold-boot source parity, not boot/state offset: normal and
-    reordered are identical for 701 frames; first divergence at frame 401
+- [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
+  - Observed BizHawk-only: normal and reordered are identical for 701
+    frames; first divergence at frame 401
     immediately after the single-frame A at 400. normal/reordered go
     `1C00 -> 1E00`; shifted stays `1C00 / 0007 / 0003 / 0000` through 700.
     No k=-10..+10 shift matches; same SaveRAM `7E6591CD...`, no per-build
@@ -137,6 +138,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     patch source without the writer.
   - keep BUG-008 open; do not mask with input offset.
 
+  - DECISION A (2026-10-18): mGBA 0.11 standalone is authoritative for M0;
+    BizHawk 2.3.0.1/2.3.2 mGBA cores are a known compatibility issue.  BUG-008
+    is parked (source relocation unconfirmed; writer unknown); no source patch.
+  - M0f final mGBA handoff:
+    `work/playtest/m0f-2026-10-17/mgba-final/` (shifted `a822b2d8...`,
+    normal `ca33f434...`, reordered `af62233e...`, common save `C34B0F60...`).
+    Final human `PLAYTEST-PASS` in mGBA 0.11 is still pending.
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
   - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
     `disp=5F00 main=3 s1=0 s2=0`

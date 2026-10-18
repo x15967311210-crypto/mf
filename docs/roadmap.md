@@ -83,10 +83,10 @@ Gate **S4**: playable slice sign-off, then content production.
 
 ## Current status
 
-**M0 shiftable-boot gate: BLOCKED** — the controlled map `PLAYTEST-PASS` is
-valid, but the BizHawk baseline TAS file-select parity check reopened M0
-(shifted frame 600 `s1=0003 s2=0000` vs normal/reordered `s1=0002 s2=0001`).
-M1 blockout is paused; see `jira.md` QA-011/BUG-008.
+**M0 shiftable-boot gate: BLOCKED** — decision A uses mGBA 0.11 standalone as
+authoritative.  The BizHawk 2.3.0.1/2.3.2 file-select VBlank failure is a
+BizHawk-only compatibility issue (BUG-008, source relocation unconfirmed).
+Final mGBA 0.11 human sign-off is pending; M1 blockout is paused until then.
 
 Baseline evidence (2026-10-17):
 
