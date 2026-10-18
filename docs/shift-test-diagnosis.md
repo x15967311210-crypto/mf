@@ -693,3 +693,19 @@ result because the normal story route uses `story_route_normal.sav`
 (`4FD087E9...`) while the shifted start state's SaveRAM is not confirmed to be
 the same.  Capture a shifted state at the same start frame and same SaveRAM,
 then rerun the event comparison.
+
+### QA-013a pass (2026-10-18)
+
+Using the same SaveRAM `4FD087E9BB691F15E1BCAA08773463A66B8CC829`, normal and
+shifted frame-139 Nintendo-Presents states, and
+`story_route_normal_from139.input`, both builds produced the same event log:
+
+```text
+EVENTCHG 0 -> 1
+EVENTCHG 1 -> 2
+EVENTCHG 2 -> 3
+```
+
+Both logs SHA1 `643E1FC9DA960CAB5BB0FB29C59D1DF5CE985F7F`;
+`event_diff.py` reports `PASS (checkpoints=74 transitions=3)`.  The earlier
+shifted miss was due to using a start state from a different SaveRAM.

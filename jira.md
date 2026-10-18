@@ -322,20 +322,20 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - full 259k baseline also has `gEventCounter=0` throughout: it is a movement/
     visual route, not a story-event route.  Need a story fixture that triggers
     the important events (e.g. matched normal recording ending at event=3).
-- [DOING @qa] QA-013a (emulator) — story-route event parity fixture
+- [DONE] QA-013a (emulator) — story-route event parity fixture
   - capture/replay a normal route that sets the key story/event IDs, then run
     shifted from the same save/route and compare `EVENTCHG` sequences, not just
     final state.
-  - harness now supports `--state FILE` and `--save FILE`; normal story route
-    from Nintendo Presents reproduces EVENTCHG 0->1->2->3 (relative frames
-    12610/16601/19039) and matches the reference order.
-  - shifted `matched_state/shifted_start_139.state` + the same input reaches
-    0->1->2 but not 3, ending `main=1`; however the normal story route uses
-    `story_route_normal.sav` (`4FD087E9...`) while the matched shifted start
-    may use a different SaveRAM (`DCBFE5...`).  Need a shifted start state from
-    the **same SaveRAM and same start frame** before classifying this as a
-    source/event parity bug.
-  - do not substitute the baseline movement TAS (event counter stays 0).
+  - harness `--state`/`--save` support landed.  Matching **4FD087E9...**
+    normal/shifted frame-139 states from Nintendo Presents reproduce:
+    `EVENTCHG 0->1->2->3` (relative 12610/16601/19039); event logs SHA1
+    `643E1FC9...` identical; `EVENT-DIFF: PASS (checkpoints=74,
+    transitions=3)`.
+  - the earlier missing 2->3 was a SaveRAM/start-state mismatch, not event
+    parity.  Story fixture files:
+    `story_route/{normal,shifted}_start_4fd0_139.state` + from139 input.
+  - baseline movement TAS still has event counter 0; do not use it for story
+    coverage.
 - [TODO] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix
   - run normal/shifted/reordered from matched saves/states through all rooms,
     Navigation Room dialogs, pause/map/status, save/load, intro/ending and
