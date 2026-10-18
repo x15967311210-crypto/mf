@@ -256,55 +256,75 @@ const u8 sCharacterWidths[] = {
 static const u8 sBlob_5766D4_prefix[0x557C] = INCBIN_U8("data/Blob_5766D4_prefix.bin");
 
 // Navigation conversation pop-up graphics descriptors (baseline 0x0857BC50).
-// pGraphics words are relocated through the prefix anchor; the remaining
-// bytes are copied verbatim and stay identical in the shifted build.
+// The 0x14-byte preamble describes pop-up 0; each 0x18-byte record adds the
+// pGraphics word in front of a copy of that 0x14-byte descriptor block.  Every
+// ROM pointer is resolved from the prefix blob so it follows the blob when the
+// build moves.
+struct NavigationConversationPopUpGraphicsData {
+    const u8* pData;    // +0x00
+    u32 count;          // +0x04
+    const u8* pPalette; // +0x08
+    const u8* pFrames;  // +0x0C
+    u32 flags;          // +0x10
+};
+
 struct NavigationConversationPopUpGraphics {
     const u8* pGraphics;
-    u8 data[0x14];
+    struct NavigationConversationPopUpGraphicsData data;
 };
 
 struct NavigationConversationPopUpGraphicsTable {
-    u8 preamble[0x14];
+    struct NavigationConversationPopUpGraphicsData preamble;
     struct NavigationConversationPopUpGraphics records[4];
 };
 
 const struct NavigationConversationPopUpGraphicsTable sNavigationConversationPopUpGraphics = {
     .preamble = {
-        0xC4, 0xBB, 0x57, 0x08, 0x06, 0x00, 0x00, 0x00,
-        0x04, 0x68, 0x57, 0x08, 0x24, 0x68, 0x57, 0x08,
-        0x00, 0x06, 0x08, 0x00,
+        .pData = (const u8*)sBlob_5766D4_prefix + 0x54F0,
+        .count = 6,
+        .pPalette = (const u8*)sBlob_5766D4_prefix + 0x130,
+        .pFrames = (const u8*)sBlob_5766D4_prefix + 0x150,
+        .flags = 0x00080600,
     },
     .records = {
         {
-            .pGraphics = (const u8*)((u8*)sBlob_5766D4_prefix + 0x230),
+            .pGraphics = (const u8*)sBlob_5766D4_prefix + 0x230,
             .data = {
-                0xC4, 0xBB, 0x57, 0x08, 0x06, 0x00, 0x00, 0x00,
-                0x04, 0x68, 0x57, 0x08, 0x24, 0x68, 0x57, 0x08,
-                0x00, 0x06, 0x08, 0x00,
+                .pData = (const u8*)sBlob_5766D4_prefix + 0x54F0,
+                .count = 6,
+                .pPalette = (const u8*)sBlob_5766D4_prefix + 0x130,
+                .pFrames = (const u8*)sBlob_5766D4_prefix + 0x150,
+                .flags = 0x00080600,
             },
         },
         {
-            .pGraphics = (const u8*)((u8*)sBlob_5766D4_prefix + 0x230),
+            .pGraphics = (const u8*)sBlob_5766D4_prefix + 0x230,
             .data = {
-                0xD0, 0xBB, 0x57, 0x08, 0x10, 0x00, 0x00, 0x00,
-                0x44, 0x68, 0x57, 0x08, 0x64, 0x68, 0x57, 0x08,
-                0x00, 0x14, 0x24, 0x00,
+                .pData = (const u8*)sBlob_5766D4_prefix + 0x54FC,
+                .count = 0x10,
+                .pPalette = (const u8*)sBlob_5766D4_prefix + 0x170,
+                .pFrames = (const u8*)sBlob_5766D4_prefix + 0x190,
+                .flags = 0x00241400,
             },
         },
         {
-            .pGraphics = (const u8*)((u8*)sBlob_5766D4_prefix + 0x950),
+            .pGraphics = (const u8*)sBlob_5766D4_prefix + 0x950,
             .data = {
-                0xF0, 0xBB, 0x57, 0x08, 0x30, 0x00, 0x00, 0x00,
-                0x84, 0x68, 0x57, 0x08, 0xA4, 0x68, 0x57, 0x08,
-                0x00, 0x06, 0x08, 0x00,
+                .pData = (const u8*)sBlob_5766D4_prefix + 0x551C,
+                .count = 0x30,
+                .pPalette = (const u8*)sBlob_5766D4_prefix + 0x1B0,
+                .pFrames = (const u8*)sBlob_5766D4_prefix + 0x1D0,
+                .flags = 0x00080600,
             },
         },
         {
-            .pGraphics = (const u8*)((u8*)sBlob_5766D4_prefix + 0x207C),
+            .pGraphics = (const u8*)sBlob_5766D4_prefix + 0x207C,
             .data = {
-                0xD0, 0xBB, 0x57, 0x08, 0x10, 0x00, 0x00, 0x00,
-                0xC4, 0x68, 0x57, 0x08, 0xE4, 0x68, 0x57, 0x08,
-                0x00, 0x14, 0x24, 0x00,
+                .pData = (const u8*)sBlob_5766D4_prefix + 0x54FC,
+                .count = 0x10,
+                .pPalette = (const u8*)sBlob_5766D4_prefix + 0x1F0,
+                .pFrames = (const u8*)sBlob_5766D4_prefix + 0x210,
+                .flags = 0x00241400,
             },
         },
     },
