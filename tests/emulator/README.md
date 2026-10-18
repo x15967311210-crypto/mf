@@ -325,3 +325,17 @@ python3 tests/emulator/event_diff.py normal.log shifted.log
 
 The 30k fixture only reaches area 3 and may have no event transitions; the
 full input exercises later event progression.
+
+### Story-route state/save replay (QA-013a)
+
+The input scenario also accepts:
+
+```text
+--state FILE   mGBA savestate to load after reset
+--save FILE    SaveRAM to load before reset
+```
+
+Use `--state` for the common Nintendo-Presents start point and the
+`*_from<frame>.input` fixture; `--state` is per-build (do not load a normal
+state into the shifted ROM).  Event frames are relative to the state, so offset
+absolute reference logs by the state frame before comparing.

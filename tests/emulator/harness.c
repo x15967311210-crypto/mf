@@ -30,7 +30,9 @@
  */
 #include <mgba/core/config.h>
 #include <mgba/core/core.h>
+#include <mgba/core/serialize.h>
 #include <mgba/gba/core.h>
+#include <mgba-util/vfs.h>
 #include <mgba/internal/gba/gba.h>
 #include <mgba/internal/gba/input.h>
 #include <mgba/internal/gba/memory.h>
@@ -38,6 +40,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,8 +161,10 @@ static void usage(const char* argv0) {
         "       %s rom.gba --input FILE [--frames N] [--expect FILE] "
         "[--screen]\n"
         "       %s rom.gba --scenario input --input FILE [--frames N] "
-        "[--expect FILE] [--screen]\n"
-        "       --screen hashes the 240x160 framebuffer at input checkpoints\n",
+        "[--expect FILE] [--screen] [--state FILE] [--save FILE]\n"
+        "       --screen hashes the 240x160 framebuffer at input checkpoints\n"
+        "       --state loads an mGBA savestate before the input replay\n"
+        "       --save loads a SaveRAM before reset\n",
         argv0, argv0, argv0, argv0
     );
 }
@@ -904,6 +909,8 @@ int main(int argc, char** argv) {
     const char* scenario = "boot_smoke";
     const char* input_path = NULL;
     const char* expect_path = NULL;
+    const char* state_path = NULL;
+    const char* save_path = NULL;
     int scenario_set = 0;
     int frames = 0;
     int frames_set = 0;
@@ -939,6 +946,18 @@ int main(int argc, char** argv) {
             frames_set = 1;
         } else if (strcmp(argv[i], "--screen") == 0) {
             screen = 1;
+        } else if (strcmp(argv[i], "--state") == 0) {
+            if (++i >= argc) {
+                usage(argv[0]);
+                return 2;
+            }
+            state_path = argv[i];
+        } else if (strcmp(argv[i], "--save") == 0) {
+            if (++i >= argc) {
+                usage(argv[0]);
+                return 2;
+            }
+            save_path = argv[i];
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
             usage(argv[0]);
             return 0;
@@ -1028,7 +1047,26 @@ int main(int argc, char** argv) {
         input_replay_free(&replay);
         return 1;
     }
+    if (save_path && !mCoreLoadSaveFile(core, save_path, false)) {
+        fprintf(stderr, "FAIL: could not load SaveRAM %s\n", save_path);
+        core->deinit(core);
+        input_expectations_free(&expect);
+        input_replay_free(&replay);
+        return 1;
+    }
     core->reset(core);
+    if (state_path) {
+        struct VFile* vf = VFileOpen(state_path, O_RDONLY);
+        if (!vf || !mCoreLoadStateNamed(core, vf, SAVESTATE_ALL)) {
+            fprintf(stderr, "FAIL: could not load state %s\n", state_path);
+            if (vf) vf->close(vf);
+            core->deinit(core);
+            input_expectations_free(&expect);
+            input_replay_free(&replay);
+            return 1;
+        }
+        vf->close(vf);
+    }
 
     int rc;
     if (strcmp(scenario, "boot_smoke") == 0) {
