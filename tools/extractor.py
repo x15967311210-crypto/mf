@@ -42,6 +42,7 @@ def extract_data(region: str, debug: bool, quiet: bool = False) -> None:
     split_intro_blob()
     split_sa_x_close_up_blob()
     split_new_file_intro_frame_data_blob()
+    split_new_file_intro_data_pointer_tables()
     split_navigation_pop_up_graphics_blob()
 
 
@@ -154,6 +155,41 @@ def split_new_file_intro_frame_data_blob() -> None:
         (0x0000, 0x79E0, "Blob_5f6990_prefix.bin"),
         (0x7AB0, 0x8B48, "Blob_5f6990_middle.bin"),
         (0x8D78, 0x9FAC, "Blob_5f6990_after.bin"),
+    )
+    for start, end, name in spans:
+        Path(DATA_PATH, name).write_bytes(blob[start:end])
+
+
+def split_new_file_intro_data_pointer_tables() -> None:
+    """Split the raw FrameData pointer tables out of the intro data blob.
+
+    `Blob_6638a0_682fac.bin` has a 0x50-byte region at 0x5BC containing two
+    FrameData tables used by the monologue cutscenes.  Their pFrame words are
+    raw ROM addresses; split the surrounding bytes into segments so the C
+    representation can relocate the eight pointers.  The table bytes must stay
+    at their original offsets because the cutscene code references the tables
+    by absolute address.
+    """
+    blob_path = Path(DATA_PATH, "Blob_6638a0_682fac.bin")
+    if not blob_path.exists():
+        return
+    blob = blob_path.read_bytes()
+    if len(blob) != 0x1F70C:
+        raise ValueError(
+            f"{blob_path} is {len(blob)} bytes, expected 0x1F70C")
+    spans = (
+        (0x0000, 0x05BC, "Blob_6638a0_before.bin"),
+        (0x05C0, 0x05C4, "Blob_6638a0_gap_05C0.bin"),
+        (0x05C8, 0x05CC, "Blob_6638a0_gap_05C8.bin"),
+        (0x05CC, 0x05D4, "Blob_6638a0_term_05CC.bin"),
+        (0x05D8, 0x05DC, "Blob_6638a0_gap_05D8.bin"),
+        (0x05E0, 0x05E4, "Blob_6638a0_gap_05E0.bin"),
+        (0x05E8, 0x05EC, "Blob_6638a0_gap_05E8.bin"),
+        (0x05F0, 0x05F4, "Blob_6638a0_gap_05F0.bin"),
+        (0x05F8, 0x05FC, "Blob_6638a0_gap_05F8.bin"),
+        (0x0600, 0x0604, "Blob_6638a0_gap_0600.bin"),
+        (0x0604, 0x060C, "Blob_6638a0_term_0604.bin"),
+        (0x060C, 0x1F70C, "Blob_6638a0_after.bin"),
     )
     for start, end, name in spans:
         Path(DATA_PATH, name).write_bytes(blob[start:end])

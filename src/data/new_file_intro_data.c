@@ -22182,4 +22182,48 @@ static const u8 sBlob_662cfc_663820[] = INCBIN_U8("data/Blob_662cfc_663820.bin")
 
 const u16 sIntroPal_663820[4 * PAL_ROW] = INCBIN_U16("data/new_file_intro/663820.pal");
 
-static const u8 sBlob_6638a0_682fac[] = INCBIN_U8("data/Blob_6638a0_682fac.bin");
+struct NewFileIntroDataBlob {
+    u8 before[0x5BC];
+    const u8 *p05BC;
+    u8 gap05C0[4];
+    const u8 *p05C4;
+    u8 gap05C8[4];
+    u8 term05CC[8];
+    const u8 *p05D4;
+    u8 gap05D8[4];
+    const u8 *p05DC;
+    u8 gap05E0[4];
+    const u8 *p05E4;
+    u8 gap05E8[4];
+    const u8 *p05EC;
+    u8 gap05F0[4];
+    const u8 *p05F4;
+    u8 gap05F8[4];
+    const u8 *p05FC;
+    u8 gap0600[4];
+    u8 term0604[8];
+    u8 after[0x1F100];
+} __attribute__((packed));
+
+static const struct NewFileIntroDataBlob sBlob_6638a0_682fac = {
+    .before = INCBIN_U8("data/Blob_6638a0_before.bin"),
+    .p05BC = (const u8*)&sBlob_6638a0_682fac + 0x568,
+    .gap05C0 = INCBIN_U8("data/Blob_6638a0_gap_05C0.bin"),
+    .p05C4 = (const u8*)&sBlob_6638a0_682fac + 0x576,
+    .gap05C8 = INCBIN_U8("data/Blob_6638a0_gap_05C8.bin"),
+    .term05CC = INCBIN_U8("data/Blob_6638a0_term_05CC.bin"),
+    .p05D4 = (const u8*)&sBlob_6638a0_682fac + 0x584,
+    .gap05D8 = INCBIN_U8("data/Blob_6638a0_gap_05D8.bin"),
+    .p05DC = (const u8*)&sBlob_6638a0_682fac + 0x592,
+    .gap05E0 = INCBIN_U8("data/Blob_6638a0_gap_05E0.bin"),
+    .p05E4 = (const u8*)&sBlob_6638a0_682fac + 0x5A0,
+    .gap05E8 = INCBIN_U8("data/Blob_6638a0_gap_05E8.bin"),
+    .p05EC = (const u8*)&sBlob_6638a0_682fac + 0x5AE,
+    .gap05F0 = INCBIN_U8("data/Blob_6638a0_gap_05F0.bin"),
+    .p05F4 = (const u8*)&sBlob_6638a0_682fac + 0x5A0,
+    .gap05F8 = INCBIN_U8("data/Blob_6638a0_gap_05F8.bin"),
+    .p05FC = (const u8*)&sBlob_6638a0_682fac + 0x592,
+    .gap0600 = INCBIN_U8("data/Blob_6638a0_gap_0600.bin"),
+    .term0604 = INCBIN_U8("data/Blob_6638a0_term_0604.bin"),
+    .after = INCBIN_U8("data/Blob_6638a0_after.bin"),
+};
