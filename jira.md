@@ -155,6 +155,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - capture true pre-entry states in all three builds from the same SaveRAM,
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
+- [TODO] QA-015 (emulator/tools) — full-route frame bitset differential
+  - add per-frame harness trace (PC/disp/main/s1/s2/event + OAM/PAL/VRAM/IO/
+    IWRAM/EWRAM page hashes or a normalized bitset); compare normal/shifted/
+    reordered and report the first divergent frame/page.
+  - use a story route/TAS that reaches the elevator/event 4, not the baseline
+    movement TAS (event counter stays 0).  Matched SaveRAM/start state is
+    mandatory; normalize shifted ROM pointers and IWRAM.
+  - bisect from the last matching checkpoint and dump the first differing
+    state; feed BUG-010/BUG-009 regressions.
 - [DOING @dev1] BUG-010 (playtest) — shifted elevator hard freeze / black screen
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
