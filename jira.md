@@ -99,9 +99,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     CPSR=0x8000009B (SVC); masterCycles shifted +2 (`...88` vs `...8A`).
     Same displayed state, different saved execution point; these snapshots
     alone cannot prove a source branch.
-  - next: per-build BizHawk PC/GPR trace at frames 398-403, or an equivalent
-    state aligned by masterCycles.  mGBA 0.11 cold boot is clean; do not edit
-    source until the BizHawk 0.6 path is located.  Keep BUG-008 open.
+  - state consistency check: the shifted f400 and f401 `.State` files contain
+    the **same game state** (`gFrameCounter=84`, `gInput=0xF077`,
+    `gChanged=0xFC03`); normal advances `gFrameCounter=99 -> 100` with
+    `gInput=0 -> A`.  The BizHawk frame trailer (400/401) does not match the
+    core game frame for the shifted states, so the 398-403 register trace is
+    not at the A-handler decision.  This invalidates the state/trace
+    comparison; no source conclusion.
+  - next: re-capture per-build states with core `gFrameCounter`/input logged at
+    capture time, or provide a **live** BizHawk PC/GPR trace at the actual
+    frames 400/401.  mGBA 0.11 cold boot remains clean.  Keep BUG-008 open.
   - keep BUG-008 open; do not mask with input offset.
 
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing

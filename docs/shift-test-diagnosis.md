@@ -385,3 +385,27 @@ are identical, file-select A is at mGBA frame 824, and both transition
 or a cycle/layout-sensitive effect; a per-build PC/GPR trace at frames 398-403
 (or a state aligned to the same master cycle) is needed before changing source.
 Do not close BUG-008 or mask it with an input offset.
+
+### BizHawk 400/401 state consistency check (2026-10-18)
+
+The `.State` ZIP trailers say frame 400/401, but the **core state** does not
+match that timeline:
+
+```text
+normal f400: gFrameCounter=99  gInput=0x0000 gChanged=0x0000
+normal f401: gFrameCounter=100 gInput=0x0001 gChanged=0x0001
+shifted f400: gFrameCounter=84 gInput=0xF077 gChanged=0xFC03
+shifted f401: gFrameCounter=84 gInput=0xF077 gChanged=0xFC03
+```
+
+`shifted_f400.State` and `shifted_f401.State` are the **same game state**
+(frame 84), and do not advance; normal f400→f401 advances 99→100.  The BizHawk
+frame trailer is not the game frame counter for these shifted states.  The
+398–403 register trace derived from those states therefore describes a
+different game point, not the file-select A decision.
+
+This invalidates the state/trace comparison for BUG-008.  BUG-008 remains open;
+the cold-boot frame log (401 divergence) is still the valid observation, and
+mGBA 0.11 cold boot remains clean.  Re-capture states with the core-frame
+counter/input logged at capture time, or provide a live BizHawk PC/GPR trace at
+the actual 400/401 file-select frames.
