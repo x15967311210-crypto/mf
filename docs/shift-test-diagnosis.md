@@ -851,3 +851,18 @@ Both PCs are in the BIOS (`0x1C`), so use the saved states for instruction-level
 inspection and first compare the loaded 223200 dumps to determine whether the
 resume states themselves are matched.  Saved states/dumps and
 `BUG011_FINE.md` are under `tas/bizhawk_fine/`.
+
+### BUG-008 IRQ/undefined evidence (2026-10-18)
+
+Native BizHawk 2.3.2 and VBA-Next agree on the shifted failure, so it is not
+mGBA-core-only.  The first IRQ anomaly is frame 385:
+
+```text
+normal : LR=0x000001B8 SPSR=0x1F PC=0x1C CPSR=0x92
+shifted: LR=0x080A2334 SPSR=0x3F PC=0x1C CPSR=0x92
+```
+
+At frame 386 shifted enters Undefined mode (`CPSR=0x4000009B`), clears IE bit0,
+and later stops updating DISPCNT; normal stays in IRQ.  IRQ vector and IF/IME
+match.  Investigate the shifted IRQ entry/return path and the file-select
+callback/IE write; BUG-008 is now active source work, not a parked core issue.

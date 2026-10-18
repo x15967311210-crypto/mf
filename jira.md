@@ -211,7 +211,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     use the same mGBA version and verify loader has no "different game" warning.
     Only then can BUG-010 be classified as source.
   - Do not call M0 PASS; no source patch from this unmatched phase.
-- [DOING @dev1] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
+- [DOING @dev2] BUG-008 (shift/engine) — shifted IRQ/file-select undefined path
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401
     immediately after the single-frame A at 400. normal/reordered go
@@ -249,11 +249,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     mGBA 0.11 standalone passes.  The problem is in the BizHawk core path, not
     an old-0.6-only issue.
   - native 100% TAS (BizHawk 2.3.2) confirms the same first divergence at
-    frame 401 (`DISPCNT 1E00` normal vs `1C00` shifted) and shifted never
-    reaches the TAS ending/elevator.  If native TAS parity is authoritative,
-    BUG-008 is active again; mGBA 0.11 still passes, so do not call it a proven
-    source bug.  Need native TAS 400/401 PC/GPR/IRQ trace to separate core from
-    ROM.
+    frame 401; shifted never reaches the TAS ending/elevator.  VBA-Next gives
+    the same PC/GPR/IRQ trace and 400/401 dumps as mGBA, so this is **not
+    mGBA-core-only**.
+  - first IRQ anomaly at frame 385: shifted `LR=0x080A2334`, `SPSR=0x3F`
+    (normal `LR=0x1B8`, `SPSR=0x1F`); frame 386 shifted enters Undefined mode
+    (`CPSR=0x4000009B`) and clears IE bit0; normal stays in IRQ.  IRQ vector
+    `0x03000BE8`, IF/IME equal.  Evidence:
+    `work/playtest/m0f-2026-10-17/tas/bizhawk_bug008/BUG008_TRACE.md`.
+  - investigate the shifted IRQ entry/return and file-select callback/IE
+    write; do not patch until the wrong LR/SPSR source is proven.
   - state IO at the trace point: normal IE=0x2401 (VBlank on), callback
     FileSelectVblank+1; shifted IE=0x2400 (VBlank cleared), callback
     0x0809C30A.  Shifted is at game frame 84, normal at 99, so this is not yet
