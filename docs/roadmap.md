@@ -84,9 +84,10 @@ Gate **S4**: playable slice sign-off, then content production.
 ## Current status
 
 **M0 shiftable-boot gate: BLOCKED** — decision A uses mGBA 0.11 standalone as
-authoritative.  The BizHawk 2.3.0.1/2.3.2 file-select VBlank failure is a
-BizHawk-only compatibility issue (BUG-008, source relocation unconfirmed).
-Final mGBA 0.11 human sign-off is pending; M1 blockout is paused until then.
+authoritative, but the fresh manual Navigation Room/computer-dialogue path
+still corrupts on shifted (BUG-009, active_oam=96 vs normal 66).  The
+BizHawk 2.3.x file-select VBlank issue is parked as BUG-008.  M1 blockout is
+paused; see `jira.md`.
 
 Baseline evidence (2026-10-17):
 

@@ -496,3 +496,25 @@ MGBAHawk core with a write watchpoint at `0x030019C4`, or use a reproducing
 core with a debugger.  Until then, use mGBA 0.11 standalone for shiftability
 behavior and treat BizHawk 2.3.x as a known emulator/integration compatibility
 issue.
+
+## BUG-009 — fresh Navigation Room/computer dialogue (2026-10-18)
+
+The common-save controlled map path is clean, but the fresh manual path still
+fails on the final shifted ROM `a822b2d8...`:
+
+```text
+slot1 Navigation Room frame 18171: disp=5E00 main=1 s2=0100 active_oam=40 clean
+slot2 computer dialogue frame 24263: disp=5F00 main=3 s2=0100 active_oam=96 corrupt
++180 frames: still 96, corrupt
+normal reference frame 26198: active_oam=66 clean
+controlled common-save final: active_oam=51 clean
+```
+
+Slot2 screenshot SHA1 `863862094074CB9930514F065A5B862EB05898CC`.
+This is a persistent fresh-path failure, not stale VRAM or a transition frame.
+It is not covered by the controlled map PASS.  Investigate Navigation Room /
+computer-dialogue OAM and data tables for another unrelocated pointer, beyond
+the BUG-006 501-frame-pointer fix.
+
+Evidence: `work/playtest/m0f-2026-10-17/FRESH_DIALOG_FAIL.md` and
+`mgba-final/retest_fresh_dialog/`.

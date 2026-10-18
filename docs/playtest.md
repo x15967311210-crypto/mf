@@ -95,4 +95,4 @@ does not advance the gate until the human signs off.
 
 | Gate | Date | Build | Result |
 |---|---|---|---|
-| M0 | 2026-10-18 | fixed shifted `a822b2d8...` | decision A: mGBA 0.11 authoritative; controlled map pass, BizHawk 2.3.x compatibility issue; final mGBA sign-off pending |
+| M0 | 2026-10-18 | fixed shifted `a822b2d8...` | decision A: mGBA 0.11 authoritative; controlled map pass, but fresh Navigation Room/computer dialogue reopened M0 (BUG-009); BizHawk 2.3.x issue parked as BUG-008 |
