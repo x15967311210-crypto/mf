@@ -196,6 +196,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     data/count and the `FileSelectDrawOam` destination calculation.
   - mGBA standalone did not reproduce; VBA-Next/native MGBAHawk does.  The
     source fix target is the OAM loop/count/pointer, not the callback setter.
+  - checked `FileSelectSetUpAreaNameOam` table at normal 0x0879E944 /
+    shifted 0x0879F944: code literal and all six language/case entries are
+    correctly +0x1000.  So the simple "raw area-name table" hypothesis is not
+    enough; inspect the actual MenuOam entry `pAnim`/count at 384/385 and the
+    `FileSelectDrawOam` loop (`gNextOamSlot + sb`), plus other file-select
+    frame-data pointers.  Engine dev2 hit its step limit; BUG-008 still DOING.
   - next: capture the writer in BizHawk's VBA-Next/MGBAHawk path (the core that
     reproduces); mGBA standalone is not sufficient.  Do not source-patch until
     a reproducing core reports PC/LR/SP/value.
