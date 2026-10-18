@@ -183,7 +183,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - `docs/design/content-ids.md`: Pulse = appended event `0x6F`; event block
     `0x6E–0x77`, `EVENT_END=0x78`; Test Area 1 rooms 0–4/doors 0–9; save
     version unchanged; no `Equipment` bit or `SaveFile` resize.
-  - blocking follow-up for HACK-004a: broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED`
+  - blocking follow-up for HACK-004a2: broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED`
     checks disable the save/navigation/recharge pads after `0x6F`; fix before
     M1 sign-off.
 - [DONE] HACK-003a (tools) — harden content pipeline before arbitrary rooms
@@ -196,7 +196,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     documented gaps
   - LANDED `9ad586e`: clipdata capped at 1024 blocks; table/direct sprite
     record encoding + decode round-trip; `content-check` PASS; docs updated.
-  - HACK-004a may now start with Test Area 1 rooms; still document bg3,
+  - HACK-004a2 may now start with Test Area 1 rooms; still document bg3,
     palettes, composition/scripts and secondary-sprite tables as pipeline gaps.
 - [DONE] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
 - [DONE] HACK-004a1 (content) — five-room blockout source assets
@@ -212,7 +212,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - resolve tileset 0, bg0/dark-room handling, spawn tables, entry warp
   - fix broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1
 
-- [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a]
+- [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a2]
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
 - [TODO] PLAYTEST-002 (human) — M2 pulse playtest  [deps: HACK-004b]
 - [TODO] HACK-004c (engine/content) — The Cantor prototype  [deps: PLAYTEST-002]
@@ -227,6 +227,6 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 - Audio timing under the C engine is unverified; treat as a risk until a
   behavior scenario covers it.
-- HACK-002 must decide the new ability bit and save version before content uses
-  them.
+- HACK-002 is decided in `docs/design/content-ids.md`; the save-pad broad-check
+  fix remains a HACK-004a2 blocker.
 - The 3 `possible` blobs need a data model before SHIFT-006 is complete.
