@@ -149,6 +149,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `449C2591...`.  Fresh path, not the saved slot2.
   - pop-up table fix `b394ab3` is the resolution; BUG-009 closed.
   - evidence: `work/playtest/m0f-2026-10-17/matched_state/bug009_fresh_0bddba78/`.
+- [TODO] QA-014 (emulator) — valid elevator/pre-transition reproducer
+  - capture states **before** the black screen with the same mGBA version/build
+    and verify loader warnings/CPU mode; include a cold-boot route if needed.
+  - matched normal/shifted/reordered states at the same transition; otherwise
+    BUG-010 is not actionable.
 - [DOING @dev1] BUG-010 (playtest) — shifted elevator hard freeze / black screen
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
@@ -159,9 +164,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     evidence `elevator_problem/`; normal_saves has pause/status/map/save/load/
     navigation/boss/game-over states.
   - M0f is blocked by this; QA-012 coverage matrix is paused.
-  - next: reproduce from the state, capture PC/LR/SP/exception, compare
-    candidate vs old `a822...`, and trace room-61/main-4 elevator setup,
-    DISPCNT/BG/VRAM/OAM and any unrelocated pointer.  Do not call M0 PASS.
+  - **state is not a valid reproducer**: mGBA state v0x01000007, candidate
+    romCrc; loader restores ARM state at `PC=0x0809680C` (inside padded
+    `EndingBslCrashing`), Thumb bytes -> illegal opcode `21038968`; old
+    `a822...` fails identically.  The `.ss0` was captured after the black
+    screen / mid-transition, not at a stable pre-transition frame.  Normal
+    reference is a different state version/size and route.
+  - next: recapture a valid pre-transition state (or cold-boot route) in the
+    same emulator/build; verify `mCoreLoadStateNamed` has no "different game"
+    warning and CPU is at a game PC/Thumb state.  Only then classify source.
+  - Do not call M0 PASS; no source patch from the invalid state.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401

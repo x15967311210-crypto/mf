@@ -777,3 +777,14 @@ Handoff/evidence: `work/playtest/m0f-2026-10-17/HANDOFF_ELEVATOR.md` and
 `elevator_problem/`.  Investigate PC/LR/SP/exception, compare the candidate
 with `a822...`, and trace room-61/main-4 elevator setup and unrelocated data.
 This blocks M0 and pauses QA-012.
+
+### BUG-010 state invalidity (2026-10-18)
+
+The supplied `elevator_01.ss0` is an mGBA 0.10-era state (`versionMagic
+0x01000007`) with the candidate ROM CRC.  The loaded core state has
+`PC=0x0809680C` in **ARM** mode (`CPSR=0x2000001F`), but that address contains
+Thumb code; the CPU traps on illegal opcode `21038968`.  Old shifted `a822...`
+fails identically, and the normal reference is a different state version/size
+and route.  The state was captured after the black screen/mid-transition, not
+at a stable pre-transition point.  No source fix is justified until a valid
+pre-transition state or cold-boot route reproduces the elevator failure.
