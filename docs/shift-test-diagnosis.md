@@ -473,3 +473,26 @@ or comes from a stale pointer/register/stack value.  A BizHawk watchpoint on
 `gVBlankCallback` (`0x030019C4`) at game frame 84 (writer PC/LR/stack), or a
 live PC/LR trace at 84, is the next required artifact.  Do not patch source
 from the state value alone.
+
+### BUG-008 emulator-core scope (2026-10-18)
+
+Latest control matrix:
+
+```text
+BizHawk 2.3.0.1 / mGBA 0.6.x   fail (game counter 84, bad VBlank callback)
+BizHawk 2.3.2   / mGBA 0.7.2   fail (same)
+mGBA 0.7.2 SDL standalone      no repro through VB700, no 0x030019C4 write hit
+mGBA 0.10.5 / 0.11             no repro
+```
+
+The mGBA 0.7.2 standalone run used the same ROM/SaveRAM/BIOS and frame-synced
+baseline input.  No `gVBlankCallback` write was observed.  BizHawk's GBA core
+does not expose breakpoints, so the writer of `0x030019C4` is still unknown.
+The source/data relocation conclusion is **not confirmed**; the current
+evidence is a BizHawk-only VBlank/callback corruption.
+
+Do not patch engine source.  To close BUG-008, either instrument BizHawk's
+MGBAHawk core with a write watchpoint at `0x030019C4`, or use a reproducing
+core with a debugger.  Until then, use mGBA 0.11 standalone for shiftability
+behavior and treat BizHawk 2.3.x as a known emulator/integration compatibility
+issue.

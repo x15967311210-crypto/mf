@@ -126,6 +126,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - next: BizHawk watchpoint on `gVBlankCallback` (0x030019C4) at game frame
     84 with writer PC/LR/stack, or live PC/LR trace at 84.  Do not patch from
     the state value alone.
+  - NEW scope: mGBA 0.7.2 **standalone** with frame-synced baseline input does
+    not reproduce through VB700 and sees **no `0x030019C4` write**; mGBA
+    0.10.5/0.11 also pass.  BizHawk 2.3.0.1 and 2.3.2 both fail.  The
+    source/data relocation conclusion is **not confirmed**; it is BizHawk-only
+    VBlank/callback corruption with an unknown writer.
+  - next: instrument BizHawk's MGBAHawk core with a `0x030019C4` write
+    watchpoint, or use mGBA 0.11 standalone as the authoritative shiftability
+    emulator and document BizHawk 2.3.x as a compatibility issue.  Do not
+    patch source without the writer.
   - keep BUG-008 open; do not mask with input offset.
 
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
