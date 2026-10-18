@@ -306,7 +306,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - `0300d80` wrap-aware harness: full 259k normal/shifted/reordered exit 0,
     `INPUT_FINAL frame_counter=61634 disp=0x5F00 main=1 s1=2 s2=256`.
   - 4k/30k/screen/OAM gates pass after the change; full input remains local.
-- [TODO] QA-013 (emulator) — event-progress telemetry and parity
+- [DONE] QA-013 (emulator) — event-progress telemetry and parity
   - `gEventCounter` (0x03000B87) is the saved u8 high-water event marker;
     `sEventLocationAndNavigationInfo`/`sPauseDebugEventNames` define the
     allowed event order and names.
@@ -317,6 +317,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - event counter is monotonic, not a per-event flag set; document that logs
     and independent flags cannot be inferred from it.
   - run 30k committed and full 259k local; add an `event-diff` target.
+  - `EVENT`/`EVENTCHG` telemetry + `event-diff.py` + `event-diff` target
+    landed `d9d3f96`; 30k gate passes (trivially 0 transitions).
+  - full 259k baseline also has `gEventCounter=0` throughout: it is a movement/
+    visual route, not a story-event route.  Need a story fixture that triggers
+    the important events (e.g. matched normal recording ending at event=3).
+- [TODO] QA-013a (emulator) — story-route event parity fixture
+  - capture/replay a normal route that sets the key story/event IDs, then run
+    shifted from the same save/route and compare `EVENTCHG` sequences, not just
+    final state.
+  - use the matched `normal` recording / Navigation Room route where possible;
+    do not substitute the baseline movement TAS (event counter stays 0).
 - [TODO] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix
   - run normal/shifted/reordered from matched saves/states through all rooms,
     Navigation Room dialogs, pause/map/status, save/load, intro/ending and

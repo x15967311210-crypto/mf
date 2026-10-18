@@ -660,3 +660,18 @@ The shifted table at file/ROM offset `0x57CC50` has all pointer words at
 baseline +0x1000.  New shifted artifact:
 `0bddba785137fe46c90c0b4f26ded6336890b886`.  The fresh matched room-16
 Navigation Conversation retest is still required before closing BUG-009.
+
+### QA-013 event telemetry (2026-10-18)
+
+The harness now prints:
+
+```text
+EVENT frame=... counter=... area=... room=... nav=...
+EVENTCHG frame=... old=... new=... area=... room=... nav=...
+```
+
+`event-diff.py` compares the normal/shifted (and optional reordered) sequences.
+The committed 30k gate and full 259k baseline both report `gEventCounter=0`
+throughout: the baseline movement TAS does not trigger story events.  A
+story-route fixture is still needed to exercise the important event IDs; do not
+treat the 30k event pass as story-event coverage.
