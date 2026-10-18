@@ -798,3 +798,15 @@ pre-entry state.  Shifted stops after t60; the normal `elevator_01.ss0`
 continues to t600, but normal/reordered use a different phase/route/SaveRAM.
 BUG-010 remains unconfirmed until all three builds have true pre-entry states
 from the same save/input/frame.
+
+### TAS conversion invalidation (2026-10-18)
+
+BizHawk `.bk2` playback is valid natively, but converting it to a bare
+`frame keys` input for the headless harness is **not** a valid TAS replay:
+`SyncSettings.json` has `SkipBios: true`, BizHawk uses MGBAHawk and a real BIOS,
+and the harness has its own HLE boot path.  `reseren-100.input` therefore
+produced false EVENT=0/final frames and cannot be used for TAS parity or
+elevator/ending proof.  Use BizHawk native playback for visual/ending reference;
+use the normal story recording/QA-013a for event coverage.  The 259k committed
+baseline remains a same-harness differential fixture, not a BizHawk TAS parity
+proof.

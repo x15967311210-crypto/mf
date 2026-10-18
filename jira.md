@@ -155,7 +155,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - capture true pre-entry states in all three builds from the same SaveRAM,
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
-- [TODO] QA-015 (emulator/tools) — full-route frame bitset differential
+- [PARK] QA-015 (emulator/tools) — full-route frame bitset differential
+  - **headless TAS input is invalid for TAS parity**: BizHawk `.bk2` uses
+    SkipBios/real BIOS/MGBAHawk sync state; our `reseren-100.input` has only
+    frame/keys and produced false EVENT=0/final frames.  Use BizHawk native
+    playback for TAS visual/ending reference.
+  - retain bitset/bisection only for a matched **normal recording/state route**
+    in the same headless core, not a converted TAS.
   - the 259k baseline was rechecked on all three builds: every final state is
     `area=0 room=0 nav=0`, `eventCounter=0`, `main=1`; it does **not** reach
     room 61/elevator.  It is not a usable elevator/story TAS.
@@ -389,7 +395,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - reordered frame-139 state supplied and works; final `--final`/dump-prefix
     harness support landed (`4c61351`).
   - remaining coverage gaps: pause/status, map/save/load, other Navigation
-    dialogs/rooms, intro beyond start, ending and game over.  No M0 PASS yet.
+    dialogs/rooms, intro beyond start, ending and game over.  Use normal
+    recording/BizHawk native for ending reference; do not convert `.bk2` to
+    headless input for parity.  No M0 PASS yet.
   - next: extend the route/UI matrix for those paths; normalize IWRAM for the
     shift/reorder ROM pointers.
 - [DONE] QA-013a (emulator) — story-route event parity fixture
