@@ -155,18 +155,27 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - capture true pre-entry states in all three builds from the same SaveRAM,
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
-- [DOING @qa] QA-015 (emulator/tools) — native BizHawk TAS parity
-  - corrected: all three builds can load the `.bk2` in native BizHawk; results
-    may differ, so compare them for exact parity.  The normal-only statement in
-    the old workflow is withdrawn.
-  - use `tools/bizhawk/parity_dump.lua` with the same BIOS/SaveRAM/checkpoints
-    for normal/shifted/reordered, then `compare_parity.py`.  The 100% TAS
-    includes the elevator route; this is the authoritative TAS reference.
-  - headless conversion of the `.bk2` remains invalid (SkipBios/MGBAHawk/BIOS
-    mismatch); do not use `reseren-100.input` for parity.
-  - for a divergent TAS, use native checkpoint frames and bisection; retain
-    matched states only when the TAS itself cannot be loaded.
+- [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
+  - native 100% TAS, normalized SaveRAM `FB611BD6...`: `PARITY: FAIL`.
+  - shifted first behavior divergence frame 401 (`DISPCNT 1E00` vs `1C00`),
+    state divergence at 600, then frozen through 339001 (known BUG-008
+    file-select/BizHawk path).
+  - reordered is identical through frame 223200; at 223300 `room=23` normal
+    vs `room=14` reordered; final state differs.  Coarse trace only; refine
+    223201-223300.
+  - normal reaches the ending state at 339001.  Event counter is not QA-013a
+    story evidence.
+- [DOING @qa] QA-016 (emulator) — refine reordered TAS room branch
+  - run native BizHawk single-frame/checkpoint trace 223201-223300 for normal
+    and reordered; capture first differing frame, PC/LR/SP, room/transition,
+    OAM/VRAM/IO and the last matching state.
+  - feed BUG-011; do not patch source until the exact branch/table is proven.
 
+- [TODO] BUG-011 (shift/reorder) — reordered room branch at TAS frame ~223300
+  - native 100% TAS normal vs reordered: identical through 223200; at 223300
+    normal `room=23`, reordered `room=14`; final state differs.
+  - not the shifted file-select BUG-008 and not the elevator state; reordered
+    is a data/layout parity bug.  Exact frame/PC/data table needs QA-016.
 - [DOING @dev1] BUG-010 (playtest) — shifted elevator hard freeze / black screen
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`

@@ -819,3 +819,18 @@ can load the `.bk2` in native BizHawk; results may differ and must be compared.
 Headless conversion of the `.bk2` remains invalid.  Use the native workflow for
 TAS/ending/elevator reference and matched-state comparison; keep the headless
 mGBA harness for automatic matched-state replay.
+
+### QA-015 native TAS parity result (2026-10-18)
+
+Native BizHawk 2.3.2, normalized SaveRAM `FB611BD6...`, 100% TAS:
+
+- shifted: first `DISPCNT` divergence at frame 401, state divergence at 600,
+  then frozen through 339001 (BUG-008 known file-select/BizHawk path).
+- reordered: identical through 223200; at 223300 `room=23` normal vs
+  `room=14` reordered; final state differs.
+- normal: reaches the normal ending state at 339001.
+
+This is a native TAS result, not headless input parity.  BUG-011 is the new
+reordered room-branch candidate; refine the 223201-223300 interval before
+changing source.  The shifted failure does not reach the elevator, so it does
+not close BUG-010.
