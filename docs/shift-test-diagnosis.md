@@ -810,3 +810,12 @@ elevator/ending proof.  Use BizHawk native playback for visual/ending reference;
 use the normal story recording/QA-013a for event coverage.  The 259k committed
 baseline remains a same-harness differential fixture, not a BizHawk TAS parity
 proof.
+
+### BizHawk native parity workflow (2026-10-18)
+
+WSL can launch the Windows BizHawk GUI and use `parity_dump.lua` plus
+`compare_parity.py`.  This is authoritative for native TAS/ending visual
+reference, but the 100% TAS is normal-only; it cannot be replayed directly on
+shifted/reordered.  Use it for normal elevator/ending reference and for
+manual matched-state comparison; keep the headless mGBA harness for automatic
+normal/shifted/reordered replay from matched states.

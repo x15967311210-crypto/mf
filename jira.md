@@ -395,9 +395,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - reordered frame-139 state supplied and works; final `--final`/dump-prefix
     harness support landed (`4c61351`).
   - remaining coverage gaps: pause/status, map/save/load, other Navigation
-    dialogs/rooms, intro beyond start, ending and game over.  Use normal
-    recording/BizHawk native for ending reference; do not convert `.bk2` to
-    headless input for parity.  No M0 PASS yet.
+    dialogs/rooms, intro beyond start, ending and game over.  BizHawk native
+    parity Lua is available and is authoritative for normal TAS/ending visual
+    reference; the 100% TAS is normal-only and cannot be replayed directly on
+    shifted/reordered.  Headless TAS conversion remains invalid for parity.
+    No M0 PASS yet.
   - next: extend the route/UI matrix for those paths; normalize IWRAM for the
     shift/reorder ROM pointers.
 - [DONE] QA-013a (emulator) — story-route event parity fixture
