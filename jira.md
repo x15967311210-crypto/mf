@@ -70,7 +70,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     (normal 600 vs shifted 600) and compare first divergence;
   - if shifted is exactly one frame ahead from the same boot/input, classify
     boot/frame alignment vs engine; do not close BUG-008 until this is proven.
-- [TODO] QA-011b (emulator) — BizHawk file-select A trace
+- [DONE] QA-011b (emulator) — BizHawk file-select A trace
   - capture per-build BizHawk 2.3 states at 400/401 and CPU/PC trace around the
     A handler; record the BizHawk mGBA core version; compare with the clean
     mGBA 0.11 control.
@@ -89,10 +89,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     file-select A is at mGBA frame 824 and both transition `1C00 -> 1E00` at
     mGBA frame 837.  So the BizHawk 2.3 failure is currently
     emulator-core/timing-specific, not proven source; do not patch blindly.
-  - next: obtain a BizHawk 400/401 state or CPU/PC trace for normal and shifted
-    (per-build states are fine), and the BizHawk mGBA core version; compare the
-    A-handler branch at 401.  If the mGBA 0.11 control and BizHawk disagree,
-    decide which emulator is authoritative for the gate.
+  - BizHawk core identified: EmuHawk 2.3.0.1, mgba.dll SHA1
+    `4109E16135B2F44A4E8EF046ACD99EAB8600AC4A` = mGBA 0.6.x branch (not
+    0.10/0.11).  Per-build 400/401 states and logs are in
+    `work/playtest/m0f-2026-10-17/tas/bizhawk_400_401/`.
+  - next: load each build's **own** f400/f401 state in the corresponding ROM
+    (no cross-build load), normalize shifted ROM pointers by +0x1000, and diff
+    PC/regs/IWRAM/EWRAM/IO at the A handler.  Identify the exact variable or
+    branch that differs; no source edit until that is proven.
   - keep BUG-008 open; do not mask with input offset.
 
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
