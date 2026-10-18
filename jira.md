@@ -104,8 +104,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `gCurrentRoom=0`, `navroom=0`, `s2=0`, `active_oam=66`; it is a different
     room/UI, so it cannot decide BUG-009.  Need a normal **room 16 Navigation
     Room** state (`s2=0x100`, active ~96) for a matched comparison.
-  - next: capture normal area 0 room 16 Navigation Room at the same dialogue
-    node, then compare BG/legend/tilemap and OAM; no source fix from room 0.
+  - matched normal state now exists (`area=0 room=0x10 navroom=1 event=3
+    main=3 s2=0x0100 active_oam=96`).  Dump diff: OAM only 7 animation bytes;
+    PAL 40 bytes; IO 175; VRAM 2511 bytes starting 0xC80A/0x153B8.  The
+    corruption is BG tilemap/legend/OBJ data, not the OAM table; targeted
+    BG/legend descriptor investigation is next.  Evidence:
+    `work/playtest/m0f-2026-10-17/matched_state/`.
+  - next: trace the room-16 Navigation Room BG/legend loader and find the
+    unrelocated pointer/table feeding VRAM 0xC800; no OAM table patch.
   - M0f is BLOCKED again; controlled map PASS is path-specific only.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701

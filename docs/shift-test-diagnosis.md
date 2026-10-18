@@ -547,3 +547,19 @@ The normal reference is a different room/UI, so it is not a matched-state
 comparison.  The dialog image text is therefore not needed for node
 identification.  Capture normal area 0 room 0x10 Navigation Room at the same
 dialogue before comparing legend/BG tiles or patching source.
+
+### BUG-009 matched-state dump diff (2026-10-18)
+
+The matched normal state loads as `area=0 room=0x10 navroom=1 event=3
+main=3 s2=0x0100 active_oam=96`, matching shifted slot2.  Comparing dumps:
+
+```text
+OAM:  7 differing bytes (animation phase; entries 8/11/90/91)
+PAL:  40 differing bytes (palette 312+)
+IO:   175 differing bytes (BG/control configuration)
+VRAM: 2511 differing bytes, starting at 0xC80A and 0x153B8
+```
+
+The OAM table is mostly aligned; the persistent visual difference is in the
+**BG tilemap/legend and OBJ tile data**, not the 501 OAM frame pointers.  This
+is now a targeted BG/legend descriptor/table investigation for BUG-009.
