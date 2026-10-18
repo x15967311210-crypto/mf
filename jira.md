@@ -149,7 +149,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `449C2591...`.  Fresh path, not the saved slot2.
   - pop-up table fix `b394ab3` is the resolution; BUG-009 closed.
   - evidence: `work/playtest/m0f-2026-10-17/matched_state/bug009_fresh_0bddba78/`.
-- [DOING @qa] QA-014 (emulator) — valid elevator/pre-entry reproducer
+- [PARK] QA-014 (emulator) — valid elevator/pre-entry reproducer (deferred)
   - `pre-transition.ss0` is CPU-valid but the t0 image already shows the moving
     elevator/platform; it is post-entry and not matched to normal/reordered.
   - capture true pre-entry states in all three builds from the same SaveRAM,
@@ -170,13 +170,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     and reordered; capture first differing frame, PC/LR/SP, room/transition,
     OAM/VRAM/IO and the last matching state.
   - feed BUG-011; do not patch source until the exact branch/table is proven.
+  - next: run native normal/reordered fine trace 223201-223300 with PC/LR/SP
+    and first-diff dumps; the 100-frame coarse interval is not enough for a
+    source patch.
 
-- [TODO] BUG-011 (shift/reorder) — reordered room branch at TAS frame ~223300
+- [TODO] BUG-011 (shift/reorder) — reordered room branch at TAS frame ~223300 (active)
   - native 100% TAS normal vs reordered: identical through 223200; at 223300
     normal `room=23`, reordered `room=14`; final state differs.
   - not the shifted file-select BUG-008 and not the elevator state; reordered
     is a data/layout parity bug.  Exact frame/PC/data table needs QA-016.
-- [DOING @dev1] BUG-010 (playtest) — shifted elevator hard freeze / black screen
+- [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
     goes pure black, stops frame callbacks after ~60 frames; A/Start/Right/Up
