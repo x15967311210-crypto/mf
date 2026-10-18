@@ -95,4 +95,4 @@ does not advance the gate until the human signs off.
 
 | Gate | Date | Build | Result |
 |---|---|---|---|
-| M0 | 2026-10-18 | fixed shifted `0bddba78...` | mGBA 0.11 authoritative; BUG-009 fresh room-16 pass; QA-012 coverage matrix pending; BizHawk 2.3.x parked as BUG-008 |
+| M0 | 2026-10-18 | fixed shifted `0bddba78...` | mGBA 0.11 authoritative; BUG-009/event parity pass; BUG-010 room-61 elevator freeze blocks; QA-012 paused |

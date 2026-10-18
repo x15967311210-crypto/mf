@@ -55,8 +55,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - **REOPENED AGAIN 2026-10-18**: fresh manual shifted path fails Navigation
     Room/computer dialogue (slot2 corrupted, active_oam=96; normal 66); this
     path is not covered by the common-save controlled map PASS (BUG-009).
-  - M0 is **not DONE**; decision A is mGBA 0.11 authoritative.  Final mGBA
-    0.11 human sign-off is pending; M1 blockout stays paused until then.
+  - **BLOCKED AGAIN 2026-10-18**: candidate `0bddba78` hard-freezes on
+    room-61 elevator state (BUG-010); M0 is not DONE.  QA-012 coverage is
+    paused; M1 blockout stays parked.
 - [DONE] QA-011 (emulator) — common file-select state parity (inconclusive)
   - mGBA f600 common state loads visually identically in normal/reordered/
     shifted (`1C00/7/3/0`, same framebuffer hash).
@@ -148,6 +149,19 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `449C2591...`.  Fresh path, not the saved slot2.
   - pop-up table fix `b394ab3` is the resolution; BUG-009 closed.
   - evidence: `work/playtest/m0f-2026-10-17/matched_state/bug009_fresh_0bddba78/`.
+- [DOING @dev1] BUG-010 (playtest) — shifted elevator hard freeze / black screen
+  - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
+    `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
+    goes pure black, stops frame callbacks after ~60 frames; A/Start/Right/Up
+    cannot recover.  Normal `elevator_02.ss0` same area/room/event/main but
+    `disp=0x9700`, visible and advancing.
+  - handoff: `work/playtest/m0f-2026-10-17/HANDOFF_ELEVATOR.md`;
+    evidence `elevator_problem/`; normal_saves has pause/status/map/save/load/
+    navigation/boss/game-over states.
+  - M0f is blocked by this; QA-012 coverage matrix is paused.
+  - next: reproduce from the state, capture PC/LR/SP/exception, compare
+    candidate vs old `a822...`, and trace room-61/main-4 elevator setup,
+    DISPCNT/BG/VRAM/OAM and any unrelocated pointer.  Do not call M0 PASS.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401
@@ -356,7 +370,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `story_route/{normal,shifted}_start_4fd0_139.state` + from139 input.
   - baseline movement TAS still has event counter 0; do not use it for story
     coverage.
-- [DOING @qa] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix
+- [PARK] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix (paused: BUG-010)
   - run normal/shifted/reordered from matched saves/states through all rooms,
     Navigation Room dialogs, pause/map/status, save/load, intro/ending and
     game-over paths; compare OAM/PAL/VRAM/IO and normalized IWRAM/EWRAM.

@@ -759,3 +759,21 @@ Raw IWRAM hashes differ because code/ROM addresses differ; normalize pointers
 before treating that as a defect.  The route covers the story rooms/event path,
 not pause/status, save/load, all dialogs/rooms, ending or game over; QA-012
 remains a coverage matrix task.
+
+## BUG-010 — shifted elevator hard freeze (2026-10-18)
+
+Candidate `0bddba78...` loading `elevator_01.ss0` at frame 11274:
+
+```text
+event=4 area=0 room=61 main=4 s1=2 s2=0x100
+disp=0x1500 active_oam=3
+```
+
+goes to a 192-byte pure-black screen and stops frame callbacks after about 60
+frames; A/Start/Right/Up do not recover.  Normal `elevator_02.ss0` in the same
+room/event/main mode shows `disp=0x9700` and advances normally.
+
+Handoff/evidence: `work/playtest/m0f-2026-10-17/HANDOFF_ELEVATOR.md` and
+`elevator_problem/`.  Investigate PC/LR/SP/exception, compare the candidate
+with `a822...`, and trace room-61/main-4 elevator setup and unrelocated data.
+This blocks M0 and pauses QA-012.

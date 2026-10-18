@@ -84,10 +84,10 @@ Gate **S4**: playable slice sign-off, then content production.
 ## Current status
 
 **M0 shiftable-boot gate: BLOCKED** — decision A uses mGBA 0.11 standalone as
-authoritative.  BUG-009 is fixed and the fresh room-16 candidate matches normal
-byte-for-byte; the remaining M0 gate is the QA-012 room/dialog/UI coverage
-matrix (fresh paths, not only the controlled map).  BizHawk 2.3.x is parked as
-BUG-008.  M1 blockout is paused; see `jira.md`.
+authoritative.  BUG-009/room-16 and story event parity pass, but the candidate
+hard-freezes on a room-61 elevator state (BUG-010, black screen, frame loop
+stops).  QA-012 coverage is paused until the elevator fix.  BizHawk 2.3.x is
+parked as BUG-008.  M1 blockout is paused; see `jira.md`.
 
 Baseline evidence (2026-10-17):
 
