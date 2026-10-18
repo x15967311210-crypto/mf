@@ -155,11 +155,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - capture true pre-entry states in all three builds from the same SaveRAM,
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
-- [TODO] QA-017 (emulator) — pre-failure IRQ state/watchpoint
+- [DOING @dev2] QA-017 (emulator) — pre-failure IRQ state/watchpoint
   - capture normal/shifted/reordered state at frame 384/385 (before
     `gVBlankCallback` corruption) from the native TAS, same BIOS/state.
   - use mGBA 0.6.3/0.7.2 (BizHawk BIOS) or an instrumented core to watch writes
     to `0x030019C4`/`gNonGameplayRam+0x540`; report writer PC/LR/value.
+  - states/BIOS now available in `tas/bizhawk_bug008_watch/`:
+    `state_{normal,shifted,reordered}_{384,385}.State`, BIOS
+    `300C20DF...`.  BizHawk Lua cannot capture the writer; use mGBA
+    0.6.3/0.7.2 or an instrumented core from the 384 state.
+  - observed: shifted 384 callback `0x0809F9E1`, 385 `0x0809C30A`;
+    normal/reordered remain `0x0809E9E1`.  Wrong write is between 384-385.
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
   - native 100% TAS, normalized SaveRAM `FB611BD6...`: `PARITY: FAIL`.
   - shifted first behavior divergence frame 401 (`DISPCNT 1E00` vs `1C00`),

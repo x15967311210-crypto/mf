@@ -877,3 +877,13 @@ simple raw table literal.  The 400/401 states are after the corruption; a
 pre-failure 384/385 state and a write watchpoint on `0x030019C4` are required to
 find the writer.  The earlier LR/SPSR difference at 385 is not by itself proof
 of corruption; the bad callback and Undefined at 386 are the actionable path.
+
+### QA-017 pre-failure states (2026-10-18)
+
+`state_{normal,shifted,reordered}_{384,385}.State` and the matching BIOS
+(`300C20DF...`) are available under `tas/bizhawk_bug008_watch/`.  The shifted
+callback is correct at 384 (`0x0809F9E1`) and wrong at 385 (`0x0809C30A`);
+normal/reordered stay `0x0809E9E1`.  The corrupting write is between 384 and
+385.  BizHawk's Lua memory-write API did not return a usable writer, so the next
+step is mGBA 0.6.3/0.7.2 or an instrumented core with a write watchpoint at
+`0x030019C4`.
