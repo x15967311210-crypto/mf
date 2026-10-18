@@ -156,9 +156,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
 - [TODO] QA-015 (emulator/tools) — full-route frame bitset differential
-  - use a story route/TAS that reaches the elevator/event 4, not the baseline
-    movement TAS (event counter stays 0).  Matched SaveRAM/start state is
-    mandatory; normalize shifted ROM pointers and IWRAM.
+  - the 259k baseline was rechecked on all three builds: every final state is
+    `area=0 room=0 nav=0`, `eventCounter=0`, `main=1`; it does **not** reach
+    room 61/elevator.  It is not a usable elevator/story TAS.
+  - use a story route/TAS that reaches the elevator/event 4; matched
+    SaveRAM/start state is mandatory; normalize shifted ROM pointers/IWRAM.
   - frame bisection: predicate = "normal and shifted state at frame N match"
     (OAM/PAL/VRAM/IO/event/selected WRAM page bitset).  With full-run failure
     known, binary-search the first failing N (lo=known pass, hi=total); if no
