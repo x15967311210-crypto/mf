@@ -1005,3 +1005,22 @@ inside shifted `EndingProcessLeavingSmallShip` (`080967CC+0x14`), not a valid
 Thumb callback.  The likely mechanism is another raw pointer word in
 `sBlob_73421e_prefix` (the 0x8056/0xC4DA FrameData regions) causing an
 OAM/copy overflow; the write to `0x030019C4` must be captured before patching.
+
+### BUG-012 prefix pointer sweep landed (2026-10-19, `2650880`)
+
+All 29 raw pointer words inside `sBlob_73421e_prefix` are now relocatable
+packed-struct fields:
+
+```text
+0x8056..0x80B6 (12), 0xC4DA..0xC592 (15), 0xC5A2, 0xC5B2
+```
+
+`tools/extractor.py` emits 30 prefix segments; the 50,510 non-pointer bytes are
+byte-identical to the original.  Normal SHA1 remains
+`ca33f4348c2c05dd330d37b97e2c5a69531dfe87`; shifted is
+`25f92d3be6822655c26ad17fdbc90ad8bea8e35d`.
+
+Static checks: every pointer word is normal+0x1000 in shifted; file-select
+pFrame `0x087403CA` count 6.  All automatic gates pass.  Native 22923/full TAS
+retest is the remaining acceptance; candidate at
+`work/playtest/m0f-2026-10-17/mgba-final-bug012/`.

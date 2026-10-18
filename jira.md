@@ -269,6 +269,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     full final checkpoint not reached.  Evidence:
     `tas/bug008_candidate_fine/BUG008_CANDIDATE_FINE.md` and logs.
   - parity remains FAIL because of BUG-012, not BUG-008.
+- [DOING @human] QA-020 (emulator) — native TAS parity after BUG-012
+  - native BizHawk 2.3.2, mGBA core, BIOS `300C20DF...`, normalized SaveRAM
+    `FB611BD6...`, same 100% TAS; candidate `25f92d3b...`.
+  - require 22923 callbacks `0809A2C9`/`0809B2C9`, both `CPSR=92`; no Undefined
+    at 22924/22925; 22952 `DISPCNT=9700`; final 339001
+    `1900 0009 0002 0100 109 0 63 0`; file-select 385/401 still PASS.
+  - reordered still needs BUG-011 room 23/14; do not gate it on BUG-012.
 - [DOING @human] QA-019 (emulator) — capture 22923 gVBlankCallback writer
   - use the native MGBAHawk/BizHawk 2.3.2 path that reproduced BUG-008; watch
     `0x030019C4` and `0x030019C0..0x030019CC` over frames 22920-22930, same
@@ -314,7 +321,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - leading candidate: copied IRQ/callback table in IWRAM (`sBlob_a5224_a5258`
     at 0x080A5224, moved by reorder) or a raw literal in intr/audio code.
   - no fix yet; BUG-011 stays DOING.
-- [DOING @dev2] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
+- [DOING @human] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
   - candidate `812d0090...` (BUG-008 fix) passes file-select, then native TAS
     first CPU/IRQ divergence at **22923**:
     normal callback `0809A2C9` (`CutsceneElevatorMonologueVblank`), shifted
@@ -338,6 +345,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     capture the write to `030019C4` at 22923 with the native MGBAHawk hook.
   - do not patch the `CallbackSetVBlank` setter, IRQ vectors, or IWRAM tables
     from the symptom alone.
+  - **FIX LANDED `2650880`**: all 29 pointer words in the prefix
+    (0x8056..0x80B6, 0xC4DA..0xC592, 0xC5A2, 0xC5B2) are relocatable packed
+    struct fields; `tools/extractor.py` emits 30 byte-identical segments.
+    Normal SHA1 `ca33f434...`; shifted `25f92d3be6822655c26ad17fdbc90ad8bea8e35d`.
+  - static checks: all 29 words normal+0x1000 in shifted; 50,510 non-pointer
+    bytes identical; file-select pFrame `087403CA` count 6.
+  - automatic gates PASS: audit, smoke, test, strict relocs, shift/start/input
+    4k/30k, screen/OAM diff, shift-reorder.
+  - **native 22923 + full TAS retest is the remaining acceptance**; candidate
+    `work/playtest/m0f-2026-10-17/mgba-final-bug012/`.  Do not close BUG-012 or
+    M0f until EmuHawk confirms 22923/22952 and the final checkpoint.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
