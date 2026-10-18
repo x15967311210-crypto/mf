@@ -1,0 +1,103 @@
+{
+  "schema": "mf-hack.room-manifest/v1",
+  "room": {
+    "name": "resonance_chamber",
+    "area": "AREA_TEST_1",
+    "index": 2,
+    "tileset": {
+      "number": 0,
+      "image": "blockout_tileset.png",
+      "tile_pixels": [
+        16,
+        16
+      ],
+      "block_pixels": [
+        16,
+        16
+      ],
+      "colors_per_tile": 16,
+      "transparent_index": 0
+    },
+    "layers": {
+      "bg0": null,
+      "bg1": "bg1",
+      "bg2": "bg2",
+      "clip": "collision"
+    },
+    "tile_mapping": {
+      "bg1": {
+        "2": 1,
+        "5": 4,
+        "9": 8,
+        "13": 12
+      },
+      "bg2": {
+        "3": 2,
+        "4": 3,
+        "6": 5,
+        "7": 6,
+        "8": 7,
+        "12": 11,
+        "14": 13,
+        "15": 14
+      },
+      "clip": {
+        "1": "CLIPDATA_SOLID",
+        "2": "CLIPDATA_AIR",
+        "3": "CLIPDATA_DOOR_TRANSITION"
+      }
+    },
+    "spritesets": {
+      "default": {
+        "0": "PSPRITE_SAVE_PAD",
+        "1": "PSPRITE_DATA_PAD",
+        "2": "PSPRITE_HORNOAD",
+        "3": "PSPRITE_GERON_MISSILE_1",
+        "4": "PSPRITE_BOX",
+        "5": "PSPRITE_MESSAGE_BANNER"
+      }
+    },
+    "room_entry": {
+      "bg0_prop": "BG_PROP_NONE",
+      "bg1_prop": "BG_PROP_RLE_COMPRESSED",
+      "bg2_prop": "BG_PROP_RLE_COMPRESSED",
+      "bg3_prop": "BG_PROP_NONE",
+      "bg3_scrolling": 0,
+      "transparency": 0,
+      "effect": "EFFECT_NONE",
+      "effect_y": 255,
+      "music_track": 0,
+      "map_x": 2,
+      "map_y": 0,
+      "first_spriteset_event": 0,
+      "second_spriteset_event": 0,
+      "default_spriteset": 255,
+      "first_spriteset": 255,
+      "second_spriteset": 255
+    },
+    "camera": {
+      "scrolls": [
+        {
+          "x_start": 0,
+          "x_end": 14,
+          "y_start": 0,
+          "y_end": 9,
+          "breakable_x": 255,
+          "breakable_y": 255,
+          "extended_direction": 255,
+          "extended_value": 255
+        },
+        {
+          "x_start": 15,
+          "x_end": 29,
+          "y_start": 0,
+          "y_end": 9,
+          "breakable_x": 255,
+          "breakable_y": 255,
+          "extended_direction": 255,
+          "extended_value": 255
+        }
+      ]
+    }
+  }
+}

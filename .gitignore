@@ -30,3 +30,6 @@ err.log
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Generated content pipeline output (HACK-003/004a)
+/hack/gen/
