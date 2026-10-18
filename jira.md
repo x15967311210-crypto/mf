@@ -92,6 +92,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - evidence: `work/playtest/m0f-2026-10-17/FRESH_DIALOG_FAIL.md`,
     `mgba-final/retest_fresh_dialog/`; slot2 screenshot SHA1
     `863862094074CB9930514F065A5B862EB05898CC`.
+  - engine reproduction: slot2 OAM/shadow entries are structurally present and
+    `gNextOamSlot=96` is the game's queued count; the **dialog text is correct**
+    but the map legend/overlay tiles are wrong.  This is not the 501 OAM
+    pointer table alone; likely a legend/BG tilemap descriptor table.
+  - **reference mismatch**: normal reference frame 26198 is `s2=0` and
+    `active_oam=66`; shifted slot2 is `s2=0x0100` and `active_oam=96`.  These
+    are not the same UI/state, so the normal reference may not be comparable.
+    Need a normal **same Navigation Room/computer-dialogue** state (`s2=0x100`,
+    active 96) or a matched-state BG/tilemap comparison before a source fix.
   - M0f is BLOCKED again; controlled map PASS is path-specific only.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701

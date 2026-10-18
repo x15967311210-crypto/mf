@@ -518,3 +518,17 @@ the BUG-006 501-frame-pointer fix.
 
 Evidence: `work/playtest/m0f-2026-10-17/FRESH_DIALOG_FAIL.md` and
 `mgba-final/retest_fresh_dialog/`.
+
+### BUG-009 engine reproduction (2026-10-18)
+
+The shifted slot2 savestate reproduces exactly in mGBA 0.11: `gNextOamSlot=96`,
+`disp=5F00`, `main=3`, `s2=0x0100`.  OAM/shadow entries are structurally
+present; dialog text is correct, but the map legend/overlay tiles are wrong.
+This points at a legend/BG tilemap or descriptor table, not the 501 OAM frame
+pointers.
+
+The supplied normal reference is frame 26198 with `s2=0`, active_oam=66; the
+shifted state is `s2=0x0100`, active_oam=96.  These are different UI states, so
+the reference is not yet a matched-state comparison.  Need a normal state at
+the same Navigation Room/computer dialogue (`s2=0x100`) or a word-level
+BG/tilemap comparison at matched state before patching source.
