@@ -983,3 +983,25 @@ shifted SHA1   812d0090da1a1a28d8242a55ec355c6f2779b5ad
 Automatic gates pass: audit, smoke, test, strict relocs, shift-check,
 shift-start, shift-input 4k/30k, screen-diff, oam-diff and shift-reorder.
 The native BizHawk 384/385 and full 100% TAS retest remains the acceptance gate.
+
+### BUG-012 native elevator divergence (2026-10-18)
+
+The BUG-008 `812d0090...` candidate passes native file-select frames
+384/385/386 and 401.  The same 100% TAS then diverges at frame **22923**:
+
+```text
+22922  normal callback=0809A31D CPSR=60000092
+       shifted callback=0809B31D CPSR=60000092
+22923  normal callback=0809A2C9 CPSR=00000092
+       shifted callback=080967E0 CPSR=40000092
+22924  normal IE=2401 PC=1C
+       shifted IE=2400 PC=0809680C
+22925  shifted Undefined CPSR=8000009B
+22952  normal DISPCNT=9700, shifted 1500
+```
+
+`0809A2C9` is `CutsceneElevatorMonologueVblank`.  `080967E0` is an even address
+inside shifted `EndingProcessLeavingSmallShip` (`080967CC+0x14`), not a valid
+Thumb callback.  The likely mechanism is another raw pointer word in
+`sBlob_73421e_prefix` (the 0x8056/0xC4DA FrameData regions) causing an
+OAM/copy overflow; the write to `0x030019C4` must be captured before patching.

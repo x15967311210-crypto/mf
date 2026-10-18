@@ -244,11 +244,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     can no longer reach `gVBlankCallback`.
   - automatic gates on the integration tree: audit, smoke, test, strict
     relocs, shift/start/input 4k/30k, screen/OAM diff, reorder all PASS.
-  - **native 384/385 + 100% TAS retest is the remaining acceptance**; candidate
-    `work/playtest/m0f-2026-10-17/mgba-final-bug008/`.  Do not mark M0 DONE
-    until EmuHawk confirms no frame-385 callback corruption and the shifted
-    final checkpoint matches normal.
-- [DOING @human] QA-018 (emulator) — native TAS parity after BUG-008
+  - **native 384/385 PASS**: candidate `812d0090...`, native BizHawk 2.3.2,
+    mGBA core, normalized SaveRAM, 100% TAS: frames 384/385/386 callback
+    `0809F9E1`, IE `2401`, PC `1C`, CPSR `92`; frame 401 `DISPCNT=1E00`.
+    No Undefined transition.  BUG-008 is closed.
+  - the full run still fails later at frame 22923; that is **BUG-012**, not a
+    file-select regression.
+- [DONE] QA-018 (emulator) — native TAS parity after BUG-008
   - run native Windows BizHawk 2.3.2, mGBA core, BIOS `300C20DF...`, normalized
     SaveRAM `FB611BD6...`, 100% TAS movie; no converted `.bk2` input and no
     per-build offsets.
@@ -260,6 +262,21 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - reordered still needs the separate BUG-011 room 23/14 check; do not gate it
     on BUG-008.
   - only after this passes can M0f/PLAYTEST-000 advance.
+  - **result: PARTIAL**.  File-select 384/385/386/401 PASS, but shifted
+    diverges at native TAS frame **22923**: callback `080967E0` (normal
+    `0809A2C9`), `CPSR=40000092` vs `92`; frame 22924 IE lost / PC leaves IRQ,
+    22925 Undefined, 22952 still black while normal `DISPCNT=9700`.
+    full final checkpoint not reached.  Evidence:
+    `tas/bug008_candidate_fine/BUG008_CANDIDATE_FINE.md` and logs.
+  - parity remains FAIL because of BUG-012, not BUG-008.
+- [DOING @human] QA-019 (emulator) — capture 22923 gVBlankCallback writer
+  - use the native MGBAHawk/BizHawk 2.3.2 path that reproduced BUG-008; watch
+    `0x030019C4` and `0x030019C0..0x030019CC` over frames 22920-22930, same
+    BIOS/SaveRAM/movie and candidate `812d0090...`.
+  - save a state at 22922 (before the write) and log writer PC/LR/SP/value;
+    compare normal and shifted.  Do not use a converted headless input.
+  - if the write is an OAM/copy overflow, identify source table and hand it to
+    BUG-012; do not patch IWRAM or the callback setter.
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
   - native 100% TAS, normalized SaveRAM `FB611BD6...`: `PARITY: FAIL`.
   - shifted first behavior divergence frame 401 (`DISPCNT 1E00` vs `1C00`),
@@ -297,6 +314,30 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - leading candidate: copied IRQ/callback table in IWRAM (`sBlob_a5224_a5258`
     at 0x080A5224, moved by reorder) or a raw literal in intr/audio code.
   - no fix yet; BUG-011 stays DOING.
+- [DOING @dev2] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
+  - candidate `812d0090...` (BUG-008 fix) passes file-select, then native TAS
+    first CPU/IRQ divergence at **22923**:
+    normal callback `0809A2C9` (`CutsceneElevatorMonologueVblank`), shifted
+    `080967E0`; normal `CPSR=00000092`, shifted `40000092`; both `PC=1C`,
+    `IE=2401`, `DISPCNT=1500`.
+  - 22924 shifted `IE=2400`, PC `0809680C`; 22925 Undefined
+    (`CPSR=8000009B`), PC `00000068`; normal recovers at 22952 with
+    `DISPCNT=9700`, shifted stays `1500`.
+  - `080967E0` is an **even address inside shifted
+    `EndingProcessLeavingSmallShip` (`080967CC` + 0x14)**, not a valid Thumb
+    VBlank callback.  This is a callback/data corruption, not a legitimate
+    callback setter; same class as BUG-008 but a different write.
+  - prime suspect: the remaining raw pointer words inside
+    `sBlob_73421e_prefix` (`0x8056..0x80B6`, `0xC4DA..0xC592`) that were
+    identified as residual risk when BUG-008 was fixed.  The `0x8056` group
+    is referenced by the new-file/cutscene frame tables; the `0xC4DA` group is
+    a second embedded FrameData region.
+  - next: convert those 27 pointer words to relocatable expressions, preserve
+    normal SHA/layout, then re-run static/OAM/input gates; native EmuHawk
+    retest is required before closing.  If the writer is not in this prefix,
+    capture the write to `030019C4` at 22923 with the native MGBAHawk hook.
+  - do not patch the `CallbackSetVBlank` setter, IRQ vectors, or IWRAM tables
+    from the symptom alone.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
@@ -323,7 +364,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     use the same mGBA version and verify loader has no "different game" warning.
     Only then can BUG-010 be classified as source.
   - Do not call M0 PASS; no source patch from this unmatched phase.
-- [DOING @human] BUG-008 (shift/engine) — shifted IRQ/file-select undefined path
+- [DONE] BUG-008 (shift/engine) — shifted IRQ/file-select undefined path
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401
     immediately after the single-frame A at 400. normal/reordered go
