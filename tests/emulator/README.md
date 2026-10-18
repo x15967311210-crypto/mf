@@ -339,3 +339,11 @@ Use `--state` for the common Nintendo-Presents start point and the
 `*_from<frame>.input` fixture; `--state` is per-build (do not load a normal
 state into the shifted ROM).  Event frames are relative to the state, so offset
 absolute reference logs by the state frame before comparing.
+
+### Final checkpoint/dump (QA-012)
+
+`--final` prints `FINAL_EVENT`, `FINAL_OAM` and (with `--screen`)
+`FINAL_SCREEN` after the last replayed frame.  `--dump-prefix P` writes
+`P_{oam,pal,vram,io,iwram,ewram}.bin` and, with `--screen`, `P_screen.ppm`.
+The input and states remain local-only.  This makes end-of-route UI parity
+comparable without relying on Windows recorder artifacts.

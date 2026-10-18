@@ -147,6 +147,8 @@ typedef struct {
  * The buffer is only wired up with --screen, so ordinary replays pay nothing.
  */
 static int screen_enabled;
+static int final_enabled;
+static const char* dump_prefix;
 static mColor screen_buffer[SCREEN_PIXELS];
 
 static const size_t INPUT_CHECKPOINTS[] = {300, 600, 900, 1059, 4000, 30000};
@@ -163,6 +165,8 @@ static void usage(const char* argv0) {
         "       %s rom.gba --scenario input --input FILE [--frames N] "
         "[--expect FILE] [--screen] [--state FILE] [--save FILE]\n"
         "       --screen hashes the 240x160 framebuffer at input checkpoints\n"
+        "       --final prints final OAM/EVENT/SCREEN; --dump-prefix writes\n"
+        "       final OAM/PAL/VRAM/IO/IWRAM/EWRAM and screen PPM\n"
         "       --state loads an mGBA savestate before the input replay\n"
         "       --save loads a SaveRAM before reset\n",
         argv0, argv0, argv0, argv0
@@ -750,6 +754,82 @@ static void event_transition(
     );
 }
 
+static int dump_region(struct GBA* gba, const char* path, uint32_t address, size_t bytes) {
+    FILE* file = fopen(path, "wb");
+    if (!file) {
+        fprintf(stderr, "FAIL: cannot open dump %s\n", path);
+        return -1;
+    }
+    for (size_t i = 0; i < bytes; ++i) {
+        fputc(GBAView8(gba->cpu, address + (uint32_t)i), file);
+    }
+    fclose(file);
+    return 0;
+}
+
+static int dump_screen_ppm(const char* path) {
+    FILE* file = fopen(path, "wb");
+    if (!file) {
+        fprintf(stderr, "FAIL: cannot open screen dump %s\n", path);
+        return -1;
+    }
+    fprintf(file, "P6\n%d %d\n255\n", SCREEN_WIDTH, SCREEN_HEIGHT);
+    for (size_t i = 0; i < SCREEN_PIXELS; ++i) {
+        uint16_t pixel = screen_buffer[i];
+        unsigned r = (pixel >> 0) & 0x1F;
+        unsigned g = (pixel >> 5) & 0x1F;
+        unsigned b = (pixel >> 10) & 0x1F;
+        fputc((int)((r * 255) / 31), file);
+        fputc((int)((g * 255) / 31), file);
+        fputc((int)((b * 255) / 31), file);
+    }
+    fclose(file);
+    return 0;
+}
+
+static void final_report(struct GBA* gba, size_t frame) {
+    EventSample event = event_sample(gba);
+    OamSample oam = oam_sample(gba);
+    printf(
+        "FINAL_EVENT frame=%zu counter=%u area=%u room=%u nav=%u\n",
+        frame, (unsigned)event.counter, (unsigned)event.area,
+        (unsigned)event.room, (unsigned)event.nav
+    );
+    printf(
+        "FINAL_OAM frame=%zu count=%u hash=%016llx stage=%016llx\n",
+        frame, (unsigned)oam.count,
+        (unsigned long long)oam.hash,
+        (unsigned long long)oam.stage
+    );
+    if (screen_enabled) {
+        ScreenSample screen = screen_sample();
+        printf(
+            "FINAL_SCREEN frame=%zu hash=%016llx uniform=%d nonblack=%d\n",
+            frame, (unsigned long long)screen.hash,
+            screen.uniform, screen.nonblack
+        );
+    }
+    if (dump_prefix) {
+        char path[4096];
+        snprintf(path, sizeof(path), "%s_oam.bin", dump_prefix);
+        dump_region(gba, path, REG_OAM, OAM_BYTES);
+        snprintf(path, sizeof(path), "%s_pal.bin", dump_prefix);
+        dump_region(gba, path, 0x05000000, 0x400);
+        snprintf(path, sizeof(path), "%s_vram.bin", dump_prefix);
+        dump_region(gba, path, 0x06000000, 0x18000);
+        snprintf(path, sizeof(path), "%s_io.bin", dump_prefix);
+        dump_region(gba, path, 0x04000000, 0x400);
+        snprintf(path, sizeof(path), "%s_iwram.bin", dump_prefix);
+        dump_region(gba, path, 0x03000000, 0x8000);
+        snprintf(path, sizeof(path), "%s_ewram.bin", dump_prefix);
+        dump_region(gba, path, 0x02000000, 0x40000);
+        if (screen_enabled) {
+            snprintf(path, sizeof(path), "%s_screen.ppm", dump_prefix);
+            dump_screen_ppm(path);
+        }
+    }
+}
+
 /*
  * QA-002: replay `frame keys` lines in order.  setKeys is called before
  * runFrame, so line 0 is the first emulated frame.  Checkpoints are reported
@@ -833,6 +913,9 @@ static int run_input(
         }
     }
 
+    if (final_enabled) {
+        final_report(gba, limit);
+    }
     uint16_t counter = GBAView16(gba->cpu, IWRAM_FRAME_COUNTER);
     InputState state = input_read_state(gba);
     printf(
@@ -911,6 +994,7 @@ int main(int argc, char** argv) {
     const char* expect_path = NULL;
     const char* state_path = NULL;
     const char* save_path = NULL;
+    int final = 0;
     int scenario_set = 0;
     int frames = 0;
     int frames_set = 0;
@@ -958,6 +1042,15 @@ int main(int argc, char** argv) {
                 return 2;
             }
             save_path = argv[i];
+        } else if (strcmp(argv[i], "--final") == 0) {
+            final = 1;
+        } else if (strcmp(argv[i], "--dump-prefix") == 0) {
+            if (++i >= argc) {
+                usage(argv[0]);
+                return 2;
+            }
+            dump_prefix = argv[i];
+            final = 1;
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
             usage(argv[0]);
             return 0;
@@ -998,6 +1091,11 @@ int main(int argc, char** argv) {
         return 2;
     }
     screen_enabled = screen;
+    final_enabled = final;
+    if (final && strcmp(scenario, "input") != 0) {
+        fprintf(stderr, "FAIL: --final/--dump-prefix require --input\n");
+        return 2;
+    }
     if (!frames_set && strcmp(scenario, "input") != 0) {
         frames = strcmp(scenario, "start") == 0
             ? START_FRAMES
