@@ -62,7 +62,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     and fails too, so this cannot decide BUG-008.  mGBA 0.11 vs capture 0.10.5
     and the committed harness having no state option are contributing factors.
   - Do not use the mid-BIOS state or a per-build input offset as a gate.
-- [TODO] QA-011a (emulator) — cold-boot file-select parity, rebuilt artifacts
+- [DONE] QA-011a (emulator) — cold-boot file-select parity
   - rebuild normal/reordered/shifted in one tree with identical `data/Blob_*`
     inputs and record SHA1s; use the common SaveRAM and cold boot, not a
     cross-build BIOS state;
@@ -70,9 +70,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     (normal 600 vs shifted 600) and compare first divergence;
   - if shifted is exactly one frame ahead from the same boot/input, classify
     boot/frame alignment vs engine; do not close BUG-008 until this is proven.
-- [TODO] BUG-008 (shift/engine) — shifted file-select one-frame parity
-  - open and unconfirmed; do not mask with a per-build input offset and do not
-    call M0 PASS while it is open.
+- [DOING @dev1] BUG-008 (shift/engine) — shifted file-select input parity
+  - CONFIRMED cold-boot source parity, not boot/state offset: normal and
+    reordered are identical for 701 frames; first divergence at frame 401
+    immediately after the single-frame A at 400. normal/reordered go
+    `1C00 -> 1E00`; shifted stays `1C00 / 0007 / 0003 / 0000` through 700.
+    No k=-10..+10 shift matches; same SaveRAM `7E6591CD...`, no per-build
+    offset. Evidence:
+    `work/playtest/m0f-2026-10-17/tas/coldboot_parity/`.
+  - next: compare the file-select A handler/state machine and its data tables
+    in normal vs shifted; check for a pointer inside a raw blob or a branch
+    that only differs after relocation.  Do not mask with input offset.
+
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
   - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
     `disp=5F00 main=3 s1=0 s2=0`
