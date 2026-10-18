@@ -926,3 +926,14 @@ pointers, and their pFrame targets/counts are identical (1/26/6).  The OAM
 overrun is therefore not explained by that table alone; the next hook must log
 `r5/r7/r3/r9/sl/sb` and `gNextOamSlot` at the watched store to identify the
 entry/index that makes `r7` reach `0x030019C4`.
+
+### BUG-008 writer registers (2026-10-18)
+
+At the frame-385 writer: entry21 `r5=0x030016E8`, `r7=0x030019C6`,
+`r3=0x030019C0`, `r9=sb=0x160`, `sl=0x1F28`, `nextOamSlot=0x1B`;
+index `0x160+0x1B=0x17B` puts the destination at `0x030019C0`.  Entry21
+`pAnim` is `0x08740024` (pFrame `0x0873FC12`, count `0x1F28`), whereas the
+state-384 entry21 `pAnim` was the valid `0x087417E0`.  The pAnim is therefore
+changed/stale before DrawOam and likely missing the shifted `+0x1000` or written
+by another path; capture writes to the entry21 pAnim word at `0x030016FC`
+before the loop.

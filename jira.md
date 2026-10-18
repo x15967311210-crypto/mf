@@ -209,6 +209,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     makes `r7` reach 0x030019C4; add register logging to the MGBAHawk hook.
   - QA-017c: extend the native hook with r5/r7/r3/r9/sl/sb/gNextOamSlot at the
     watched store (and pAnim writes); capture the exact entry and count.
+  - full writer registers: `r5=030016E8` (entry21), `r7=030019C6`,
+    `r3=030019C0`, `r9=sb=0x160`, `sl=0x1F28`, `nextOamSlot=0x1B`;
+    index 0x160+0x1B=0x17B -> destination 0x030019C0.  Entry21 `p5_14`
+    (`pAnim`) is `0x08740024`, pFrame `0x0873FC12`, count `0x1F28`; at state
+    384 entry21 pAnim was the valid `0x087417E0`, so pAnim is changed/stale
+    before DrawOam.  Likely missing `+0x1000` in the pAnim/frame table or an
+    earlier write; need writer for entry21 `pAnim` (`0x030016FC`) in the 384→385
+    window.
+  - QA-017d: hook writes to `0x030016FC`/MenuOam entry pAnim and report
+    PC/LR/value; then fix the table.
   - next: capture the writer in BizHawk's VBA-Next/MGBAHawk path (the core that
     reproduces); mGBA standalone is not sufficient.  Do not source-patch until
     a reproducing core reports PC/LR/SP/value.
