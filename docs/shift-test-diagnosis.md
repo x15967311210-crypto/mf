@@ -532,3 +532,18 @@ shifted state is `s2=0x0100`, active_oam=96.  These are different UI states, so
 the reference is not yet a matched-state comparison.  Need a normal state at
 the same Navigation Room/computer dialogue (`s2=0x100`) or a word-level
 BG/tilemap comparison at matched state before patching source.
+
+### BUG-009 node located (2026-10-18)
+
+The slot2 savestate identifies the node without OCR:
+
+```text
+shifted slot2: area=0 room=0x10 (Navigation Room), navroom=1,
+               main=3, s2=0x0100, eventCounter=3, active_oam=96
+normal ref:    area=0 room=0, navroom=0, s2=0, active_oam=66
+```
+
+The normal reference is a different room/UI, so it is not a matched-state
+comparison.  The dialog image text is therefore not needed for node
+identification.  Capture normal area 0 room 0x10 Navigation Room at the same
+dialogue before comparing legend/BG tiles or patching source.

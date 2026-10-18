@@ -96,11 +96,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `gNextOamSlot=96` is the game's queued count; the **dialog text is correct**
     but the map legend/overlay tiles are wrong.  This is not the 501 OAM
     pointer table alone; likely a legend/BG tilemap descriptor table.
-  - **reference mismatch**: normal reference frame 26198 is `s2=0` and
-    `active_oam=66`; shifted slot2 is `s2=0x0100` and `active_oam=96`.  These
-    are not the same UI/state, so the normal reference may not be comparable.
-    Need a normal **same Navigation Room/computer-dialogue** state (`s2=0x100`,
-    active 96) or a matched-state BG/tilemap comparison before a source fix.
+  - **node located from the savestate**: shifted slot2 is
+    `gCurrentArea=0`, `gCurrentRoom=0x10` (16), `gCurrentNavigationRoom=1`,
+    `main=3`, `s2=0x0100`, `eventCounter=3`.  This is the Navigation Room
+    dialogue node; the dialogue image is not needed for identification.
+  - **reference mismatch confirmed**: the normal reference frame 26198 is
+    `gCurrentRoom=0`, `navroom=0`, `s2=0`, `active_oam=66`; it is a different
+    room/UI, so it cannot decide BUG-009.  Need a normal **room 16 Navigation
+    Room** state (`s2=0x100`, active ~96) for a matched comparison.
+  - next: capture normal area 0 room 16 Navigation Room at the same dialogue
+    node, then compare BG/legend/tilemap and OAM; no source fix from room 0.
   - M0f is BLOCKED again; controlled map PASS is path-specific only.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
