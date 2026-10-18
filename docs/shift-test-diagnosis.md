@@ -788,3 +788,13 @@ fails identically, and the normal reference is a different state version/size
 and route.  The state was captured after the black screen/mid-transition, not
 at a stable pre-transition point.  No source fix is justified until a valid
 pre-transition state or cold-boot route reproduces the elevator failure.
+
+### BUG-010 pre-entry state check (2026-10-18)
+
+`pre-transition.ss0` (SHA1 `A69878...`) is CPU-valid at load
+(`pc=0x1C4`, CPSR `0x2000001F`, frame 10452), but its t0 image already shows
+the elevator/platform moving.  It is a **post-entry** state, not a matched
+pre-entry state.  Shifted stops after t60; the normal `elevator_01.ss0`
+continues to t600, but normal/reordered use a different phase/route/SaveRAM.
+BUG-010 remains unconfirmed until all three builds have true pre-entry states
+from the same save/input/frame.

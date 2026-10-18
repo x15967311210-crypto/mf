@@ -149,11 +149,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `449C2591...`.  Fresh path, not the saved slot2.
   - pop-up table fix `b394ab3` is the resolution; BUG-009 closed.
   - evidence: `work/playtest/m0f-2026-10-17/matched_state/bug009_fresh_0bddba78/`.
-- [TODO] QA-014 (emulator) — valid elevator/pre-transition reproducer
-  - capture states **before** the black screen with the same mGBA version/build
-    and verify loader warnings/CPU mode; include a cold-boot route if needed.
-  - matched normal/shifted/reordered states at the same transition; otherwise
-    BUG-010 is not actionable.
+- [DOING @qa] QA-014 (emulator) — valid elevator/pre-entry reproducer
+  - `pre-transition.ss0` is CPU-valid but the t0 image already shows the moving
+    elevator/platform; it is post-entry and not matched to normal/reordered.
+  - capture true pre-entry states in all three builds from the same SaveRAM,
+    input and frame, before the platform starts; verify loader warnings/CPU
+    mode; only then is BUG-010 actionable.
 - [DOING @dev1] BUG-010 (playtest) — shifted elevator hard freeze / black screen
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
@@ -170,10 +171,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `a822...` fails identically.  The `.ss0` was captured after the black
     screen / mid-transition, not at a stable pre-transition frame.  Normal
     reference is a different state version/size and route.
-  - next: recapture a valid pre-transition state (or cold-boot route) in the
-    same emulator/build; verify `mCoreLoadStateNamed` has no "different game"
-    warning and CPU is at a game PC/Thumb state.  Only then classify source.
-  - Do not call M0 PASS; no source patch from the invalid state.
+  - second state `pre-transition.ss0` (SHA1 `A69878...`) is CPU-valid
+    (`pc=0x1C4`, CPSR `0x2000001F`, frame 10452) but its t0 screenshot already
+    shows the elevator moving; it is post-entry, not a pre-entry matched state.
+    Shifted stops after t60; normal `elevator_01.ss0` continues to t600, but
+    the normal/reordered states are a different phase/route/SaveRAM.
+  - next: capture true **pre-entry** matched states in normal/shifted/reordered
+    from the same SaveRAM, input and frame (before stepping onto the platform);
+    use the same mGBA version and verify loader has no "different game" warning.
+    Only then can BUG-010 be classified as source.
+  - Do not call M0 PASS; no source patch from this unmatched phase.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401
