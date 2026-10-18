@@ -186,6 +186,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Right/Up/A rows the callback stayed `0x0809F9E1` for 7 frames and no watched
     write fired (mGBA then segfaulted); normal/reordered controls stayed clean.
     Vanilla mGBA 0.7.2 does **not** reproduce the 384→385 corruption.
+  - **writer captured in the native MGBAHawk hook**: frame 385 writes
+    `0x030019C4` (low half `0xC70A`, then `0xC3`, then `0xC30A`) with
+    PC `080A2380`, LR `080A2227`, SP `03007DFC`, CPSR `0000003F`; final
+    callback becomes `0809C30A`.  This is inside the shifted
+    `FileSelectDrawOam` OAM loop (`0x080A2248`); the destination pointer
+    (`r7`/`r3`) overruns the 1024-byte `gOamData` buffer into
+    `gVBlankCallback` at `0x030019C4`.  Inspect `gNextOamSlot`/MenuOam frame
+    data/count and the `FileSelectDrawOam` destination calculation.
+  - mGBA standalone did not reproduce; VBA-Next/native MGBAHawk does.  The
+    source fix target is the OAM loop/count/pointer, not the callback setter.
   - next: capture the writer in BizHawk's VBA-Next/MGBAHawk path (the core that
     reproduces); mGBA standalone is not sufficient.  Do not source-patch until
     a reproducing core reports PC/LR/SP/value.

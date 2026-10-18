@@ -897,3 +897,14 @@ controls also stayed clean.  Vanilla mGBA 0.7.2 therefore does not reproduce
 the BizHawk/VBA-Next 384→385 callback corruption.  The writer must be captured
 in the reproducing BizHawk VBA-Next/MGBAHawk path; mGBA standalone cannot
 supply the writer.
+
+### BUG-008 writer found (2026-10-18)
+
+Native MGBAHawk store hook captured the shifted frame-385 writes to
+`0x030019C4`: values `0xC70A`, `0xC3`, `0xC30A`, final callback `0x0809C30A`;
+writer PC `080A2380`, LR `080A2227`, SP `03007DFC`, CPSR `0x3F`.  The shifted
+code is inside `FileSelectDrawOam` (`0x080A2248`); its OAM destination pointer
+overruns the 1024-byte `gOamData` buffer into `gVBlankCallback`.  mGBA standalone
+does not reproduce; native MGBAHawk/VBA path does.  Investigate
+`gNextOamSlot`/MenuOam frame count and the `FileSelectDrawOam` destination
+calculation, not `CallbackSetVBlank`.
