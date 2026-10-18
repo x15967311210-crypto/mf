@@ -834,3 +834,20 @@ This is a native TAS result, not headless input parity.  BUG-011 is the new
 reordered room-branch candidate; refine the 223201-223300 interval before
 changing source.  The shifted failure does not reach the elevator, so it does
 not close BUG-010.
+
+### BUG-011 fine trace (2026-10-18)
+
+Native BizHawk fine trace narrowed the reordered divergence:
+
+```text
+223200 loaded state: OAM/VRAM/IO already differ (PAL same)
+223214: normal s1=3, reordered s1=2
+223227: normal room=23, reordered room=14
+        normal   disp=1800 s1=0 LR=0x1238 CPSR=0x20000092
+        reordered disp=5F00 s1=2 LR=0x01B8 CPSR=0x00000092
+```
+
+Both PCs are in the BIOS (`0x1C`), so use the saved states for instruction-level
+inspection and first compare the loaded 223200 dumps to determine whether the
+resume states themselves are matched.  Saved states/dumps and
+`BUG011_FINE.md` are under `tas/bizhawk_fine/`.

@@ -165,7 +165,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     223201-223300.
   - normal reaches the ending state at 339001.  Event counter is not QA-013a
     story evidence.
-- [DOING @qa] QA-016 (emulator) — refine reordered TAS room branch
+- [DONE] QA-016 (emulator) — refine reordered TAS room branch
   - run native BizHawk single-frame/checkpoint trace 223201-223300 for normal
     and reordered; capture first differing frame, PC/LR/SP, room/transition,
     OAM/VRAM/IO and the last matching state.
@@ -174,11 +174,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     and first-diff dumps; the 100-frame coarse interval is not enough for a
     source patch.
 
-- [TODO] BUG-011 (shift/reorder) — reordered room branch at TAS frame ~223300 (active)
+- [DOING @dev1] BUG-011 (shift/reorder) — reordered room branch at TAS frame ~223227
   - native 100% TAS normal vs reordered: identical through 223200; at 223300
     normal `room=23`, reordered `room=14`; final state differs.
-  - not the shifted file-select BUG-008 and not the elevator state; reordered
-    is a data/layout parity bug.  Exact frame/PC/data table needs QA-016.
+  - exact fine trace: loaded state at 223200 already differs in OAM/VRAM/IO
+    (PAL same); first field divergence 223214 (normal s1=3, reordered s1=2);
+    first room divergence 223227 (normal room=23, reordered room=14).
+    At 223227 normal `disp=1800 s1=0 room=23`, reordered `disp=5F00 s1=2
+    room=14`; PC both 0x1C, LR `0x1238` vs `0x1B8`, CPSR `0x20000092` vs
+    `0x00000092`.  Saved per-frame dumps/states are in `tas/bizhawk_fine/`.
+  - likely reorder data/pointer or transition-table issue; state at 223200
+    may itself be unmatched (OAM/VRAM already differ), so prove before fixing.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
