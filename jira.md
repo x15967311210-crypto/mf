@@ -70,6 +70,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     (normal 600 vs shifted 600) and compare first divergence;
   - if shifted is exactly one frame ahead from the same boot/input, classify
     boot/frame alignment vs engine; do not close BUG-008 until this is proven.
+- [TODO] QA-011b (emulator) — BizHawk file-select A trace
+  - capture per-build BizHawk 2.3 states at 400/401 and CPU/PC trace around the
+    A handler; record the BizHawk mGBA core version; compare with the clean
+    mGBA 0.11 control.
+  - decide whether the gate is BizHawk-specific or whether mGBA 0.11 is
+    authoritative before changing source.
 - [DOING @dev1] BUG-008 (shift/engine) — shifted file-select input parity
   - CONFIRMED cold-boot source parity, not boot/state offset: normal and
     reordered are identical for 701 frames; first divergence at frame 401
@@ -78,9 +84,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     No k=-10..+10 shift matches; same SaveRAM `7E6591CD...`, no per-build
     offset. Evidence:
     `work/playtest/m0f-2026-10-17/tas/coldboot_parity/`.
-  - next: compare the file-select A handler/state machine and its data tables
-    in normal vs shifted; check for a pointer inside a raw blob or a branch
-    that only differs after relocation.  Do not mask with input offset.
+  - mGBA 0.11 control (same `common.SaveRAM`, BIOS, full baseline input)
+    does **not** reproduce: normal and shifted normalized traces are identical;
+    file-select A is at mGBA frame 824 and both transition `1C00 -> 1E00` at
+    mGBA frame 837.  So the BizHawk 2.3 failure is currently
+    emulator-core/timing-specific, not proven source; do not patch blindly.
+  - next: obtain a BizHawk 400/401 state or CPU/PC trace for normal and shifted
+    (per-build states are fine), and the BizHawk mGBA core version; compare the
+    A-handler branch at 401.  If the mGBA 0.11 control and BizHawk disagree,
+    decide which emulator is authoritative for the gate.
+  - keep BUG-008 open; do not mask with input offset.
 
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
   - fresh state `m0f_fresh_map_7806.state` (PNG savestate), frame 7806,
