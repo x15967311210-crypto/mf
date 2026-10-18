@@ -616,3 +616,30 @@ and offsets, `sExploredMinimapBitFlags+0x394/0xCC`.
 
 Next: instrument writes to `0x0600C800–0x0600CFFF` in the shifted run and
 record writer PC/LR/DMA/BitFill, then compare the normal path.
+
+### BUG-009 pop-up table candidate (2026-10-18)
+
+`sNavigationConversationPopUpGraphics` (baseline 0x0857BC50,
+`src/data/menus/pause_debug.c`) is 0x14 bytes of preamble followed by four
+0x18-byte records.  The record `pGraphics` fields are already relocated, but
+several pointer-like words remain raw:
+
+```text
+0x0857BBC4 = sBlob_5766D4_prefix + 0x54F0
+0x0857BBD0 = +0x54FC
+0x0857BBF0 = +0x551C
+0x08576804 = +0x130
+0x08576824 = +0x150
+0x08576844 = +0x170
+0x08576864 = +0x190
+0x08576884 = +0x1B0
+0x085768A4 = +0x1D0
+0x085768C4 = +0x1F0
+0x085768E4 = +0x210
+```
+
+The table chooses Navigation Conversation pop-up graphics/legend records; a
+raw normal address here can select/load the wrong legend stream while other
+graphics sources are correctly relocated.  Convert the preamble and record data
+pointer words to `sBlob_5766D4_prefix + offset` expressions, preserve the
+byte layout, and verify normal SHA1 plus shifted table bytes.

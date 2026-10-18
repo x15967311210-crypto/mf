@@ -123,8 +123,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Not a stale graphics pointer; likely pause/map-state descriptor selection
     (`StatusScreenDrawEverything` vs portrait path, `sDebugSectionInfo+...`,
     `sCharacterWidths+...`, `sExploredMinimapBitFlags+...`).
-  - next: instrument mGBA writes to `0x0600C800–0x0600CFFF` and compare the
-    normal/shifted call path; prove the descriptor/state index and fix.
+  - **likely root table**: `sNavigationConversationPopUpGraphics`
+    (`src/data/menus/pause_debug.c`) has relocated `pGraphics` on the four
+    records, but raw pointer-like words remain in the `preamble` and each
+    record's `data` (0x0857BBC4/0x0857BBD0/0x0857BBF0, 0x08576804/...+0x44/
+    +0x64/+0x84/+0xA4/+0xC4/+0xE4).  All are inside
+    `sBlob_5766D4_prefix` and need `+0x1000` in the shifted build.  Fix all of
+    them as `sBlob_5766D4_prefix + offset`, preserving the 0x14 preamble +
+    4x0x18 record layout.
+  - next: convert that table, verify normal SHA1/cold bytes and shifted table
+    entries, then rerun the matched room-16 path.  This is the current concrete
+    source candidate; no broad descriptor hunt.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401
