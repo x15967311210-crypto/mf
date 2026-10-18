@@ -887,3 +887,13 @@ normal/reordered stay `0x0809E9E1`.  The corrupting write is between 384 and
 385.  BizHawk's Lua memory-write API did not return a usable writer, so the next
 step is mGBA 0.6.3/0.7.2 or an instrumented core with a write watchpoint at
 `0x030019C4`.
+
+### QA-017b mGBA 0.7.2 non-reproduction (2026-10-18)
+
+An instrumented mGBA 0.7.2 build (store + DMA hooks) was run from the matched
+`state_shifted_384` with Right/Up/A input.  The callback stayed correct
+(`0x0809F9E1`) for seven frames and no watched write fired; normal/reordered
+controls also stayed clean.  Vanilla mGBA 0.7.2 therefore does not reproduce
+the BizHawk/VBA-Next 384→385 callback corruption.  The writer must be captured
+in the reproducing BizHawk VBA-Next/MGBAHawk path; mGBA standalone cannot
+supply the writer.

@@ -182,6 +182,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     captured yet.
   - QA-017b: finish instrumented build and input-correct run; do not source-patch
     until the writer is identified.
+  - QA-017b partial: instrumented mGBA 0.7.2 built; from shifted_384 with
+    Right/Up/A rows the callback stayed `0x0809F9E1` for 7 frames and no watched
+    write fired (mGBA then segfaulted); normal/reordered controls stayed clean.
+    Vanilla mGBA 0.7.2 does **not** reproduce the 384→385 corruption.
+  - next: capture the writer in BizHawk's VBA-Next/MGBAHawk path (the core that
+    reproduces); mGBA standalone is not sufficient.  Do not source-patch until
+    a reproducing core reports PC/LR/SP/value.
   - observed: shifted 384 callback `0x0809F9E1`, 385 `0x0809C30A`;
     normal/reordered remain `0x0809E9E1`.  Wrong write is between 384-385.
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
