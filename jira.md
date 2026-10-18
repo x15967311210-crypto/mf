@@ -104,14 +104,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     main=3 s2=0x0100 active_oam=96`); dump diff: OAM only 7 animation bytes,
     PAL 40, IO 175, VRAM 2511 starting 0xC80A/0x153B8.  Evidence:
     `work/playtest/m0f-2026-10-17/matched_state/`.
-  - **correction:** BGxCNT (`0x04000008/0A/0C/0E`) is identical in both
-    (`1800/1B03/1A0A/DC49`).  The earlier "room BGCNT" claim mistakenly read
-    **BGxHOFS/VOFS** (`0x10/0x12/0x14/0x16`): normal `0x0100`, shifted
-    `0x4A46`.  The current lead is the pause/map **BG scroll/offset setup**;
-    a wrong scroll can shift/garble the legend without a raw tilemap table.
-  - next: trace the pause/map BGxHOFS/VOFS writer and `gBackgroundPositions`;
-    prove the `0x4A46` source.  Do not patch the pop-up graphics table from the
-    old BGCNT claim.
+  - **scroll lead disproved:** the desktop IO `0x4A46` scroll is stale state
+    capture.  Loading the shifted slot2 state in mGBA 0.11 and running 180
+    frames gives normal `gBackgroundPositions` (`0,0,0,0x100,0,0,0x1F0,0x1F0`)
+    and normal-looking BG scroll registers, but the VRAM/PAL/OBJ differences
+    persist (VRAM 2507 bytes, PAL 50, OAM 28).  The corruption is in the
+    **BG tilemap/OBJ/graphics data**, not a scroll writer.
+  - BGxCNT is identical (`1800/1B03/1A0A/DC49`).  Focus VRAM `0xC800` and OBJ
+    blocks `0x14740/0x14B40/0x14F40/0x15340`; inspect
+    `sNavigationConversationPopUpGraphics` / `NavigationConversationLoadPopUpGraphics`
+    and the map/legend tilemap descriptor source for an unrelocated pointer.
+  - next: prove the wrong graphics/tilemap table and fix; do not patch BG
+    scroll or the 501 OAM pointers.
   - M0f is BLOCKED again; controlled map PASS is path-specific only.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701

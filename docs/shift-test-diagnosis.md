@@ -584,3 +584,19 @@ current lead is therefore the pause/map **BG scroll setup**, not the pop-up
 graphics table by itself.  A wrong scroll can shift the legend/map BG and
 produce the exact screenshot corruption while VRAM still contains the right
 tiles.  Trace the BGxHOFS/VOFS writer and `gBackgroundPositions` before patching.
+
+### BUG-009 stale-scroll correction (2026-10-18)
+
+The desktop slot2 IO dump showed `0x4A46` in the BG scroll registers, but this
+is a **stale state-capture value**.  Loading the same shifted slot2 state in
+mGBA 0.11 and running 180 frames yields:
+
+```text
+gBackgroundPositions = 0,0,0,0x100,0,0,0x1F0,0x1F0
+BG scroll registers  = normal pause-room values
+VRAM/PAL/OAM differences persist: 2507 / 50 / 28 bytes
+```
+
+So the corruption is not a scroll writer; it is in the **BG tilemap / OBJ /
+graphics data** (VRAM 0xC800 and 0x14740..0x15340).  The next candidate is the
+Navigation Conversation pop-up graphics/legend table, not the 501 OAM pointers.
