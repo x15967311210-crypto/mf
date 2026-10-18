@@ -430,3 +430,23 @@ remaining hypothesis is an mGBA 0.6-core-specific exception/timing behavior,
 not yet a proven source pointer bug.  Next: run the same shifted cold boot in
 BizHawk 2.3.2+ (mGBA 0.7.2) or mGBA standalone; if it passes, classify BUG-008
 as an old-core compatibility issue rather than an engine source bug.
+
+### BUG-008 VBlank/IE evidence (2026-10-18)
+
+Decoding the v2 state IO/IWRAM at the live-trace point:
+
+```text
+normal  f400: gFrameCounter=99  IE=0x2401 (VBlank enabled)
+              gVBlankCallback=0x0809E9E1 (FileSelectVblank+1)
+shifted f400: gFrameCounter=84  IE=0x2400 (VBlank bit cleared)
+              gVBlankCallback=0x0809C30A (not the shifted FileSelectVblank)
+```
+
+The shifted game is already in a different game state (counter 84), so the
+callback difference is not yet proof of a wrong table: normal has reached
+file-select (99), shifted has not.  The actionable next comparison is a normal
+state at `gFrameCounter=84` or a live trace around shifted game frames 78–90.
+If normal at 84 has VBlank enabled and a valid callback while shifted at 84
+does not, the freeze is in the cutscene/VBlank transition; otherwise it is an
+emulator-core timing difference.  Do not patch source from the 400/401 state
+difference alone.

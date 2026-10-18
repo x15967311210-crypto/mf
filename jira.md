@@ -110,9 +110,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `gInput=0xF077`, PC in BIOS context; normal advances 97..102 and receives A
     at 401.  This is a real BizHawk 2.3/mGBA 0.6 freeze, not a state-marking
     artifact.  mGBA 0.11 cold boot is clean.
-  - next: run the same shifted cold boot in BizHawk 2.3.2+ (mGBA 0.7.2) or
-    mGBA standalone.  If it passes, classify BUG-008 as old-core compatibility,
-    not an engine source bug; if it fails, continue the source/BIOS IRQ path.
+  - BizHawk 2.3.2/mGBA 0.7.2 also fails with the same frozen game counter 84;
+    mGBA 0.11 standalone passes.  The problem is in the BizHawk core path, not
+    an old-0.6-only issue.
+  - state IO at the trace point: normal IE=0x2401 (VBlank on), callback
+    FileSelectVblank+1; shifted IE=0x2400 (VBlank cleared), callback
+    0x0809C30A.  Shifted is at game frame 84, normal at 99, so this is not yet
+    a same-phase comparison.
+  - next: capture normal at `gFrameCounter=84` and/or a live trace around
+    shifted game frames 78-90, comparing IE/VBlank callback and PC.  If normal
+    at 84 also has VBlank off, this is a cutscene timing difference; if not,
+    the cutscene/VBlank transition is the bug.  Do not patch source from the
+    400/401 state difference alone.
   - keep BUG-008 open; do not mask with input offset.
 
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
