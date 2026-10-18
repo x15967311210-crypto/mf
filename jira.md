@@ -330,6 +330,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - full 259k baseline also has `gEventCounter=0` throughout: it is a movement/
     visual route, not a story-event route.  Need a story fixture that triggers
     the important events (e.g. matched normal recording ending at event=3).
+  - story-route first pass: normal and shifted (0bddba78) from the matched
+    4FD0 frame-139 states produce identical EVENT/EVENTCHG, OAM and SCREEN
+    checkpoints; final relative frame 21511 (`21649` absolute) event=3.
+  - gaps: reordered has no frame-139 state (a normal state is not portable);
+    harness only reports OAM/SCREEN at fixed checkpoints, not the story end;
+    pause/status, map/save/load, most rooms/dialogs, intro/ending/game-over are
+    not yet covered.  No M0 PASS from this first pass.
+  - next: add a final checkpoint/dump option, capture a reordered frame-139
+    state on the same `4FD0...` SaveRAM, and extend the route/UI matrix.
 - [DONE] QA-013a (emulator) — story-route event parity fixture
   - capture/replay a normal route that sets the key story/event IDs, then run
     shifted from the same save/route and compare `EVENTCHG` sequences, not just
@@ -344,7 +353,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `story_route/{normal,shifted}_start_4fd0_139.state` + from139 input.
   - baseline movement TAS still has event counter 0; do not use it for story
     coverage.
-- [TODO] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix
+- [DOING @qa] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix
   - run normal/shifted/reordered from matched saves/states through all rooms,
     Navigation Room dialogs, pause/map/status, save/load, intro/ending and
     game-over paths; compare OAM/PAL/VRAM/IO and normalized IWRAM/EWRAM.

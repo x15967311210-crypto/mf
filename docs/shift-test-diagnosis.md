@@ -725,3 +725,19 @@ End PNG/VRAM/PAL/OAM/IO are byte-identical to matched normal
 (`ED432C7A...` / `E25649D0...` / `1EA43B79...` / `B09CECD8...` /
 `449C2591...`).  The Navigation pop-up table relocation is confirmed; BUG-009
 is closed.  M0 still waits for the QA-012 room/dialog/UI coverage matrix.
+
+### QA-012 first pass (2026-10-18)
+
+Normal and shifted (`0bddba78...`) replay of the matched 4FD0 story route
+(frame-139 states, `story_route_normal_from139.input`) produces identical
+EVENT/EVENTCHG, OAM and SCREEN checkpoint telemetry; both end at relative
+21511.  This is not a full M0 coverage matrix:
+
+- no reordered frame-139 state exists; a normal state must not be used;
+- the harness has no end checkpoint/dump, so the event-3 end UI was not
+  re-measured headlessly (the Windows candidate run has the matched dumps);
+- pause/status, map/save/load, most rooms/dialogs, intro/ending and game-over
+  remain uncovered.
+
+M0 stays blocked until the matrix has explicit coverage and a matched
+reordered run.
