@@ -155,34 +155,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - capture true pre-entry states in all three builds from the same SaveRAM,
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
-- [DOING @human] QA-015 (BizHawk) — native TAS three-version parity
-  - Correction: all three builds can play the same `.bk2`; the input movie is
-    valid, but results may differ and must be compared.  Goal is identical
-    state at the same movie/checkpoint, with no per-build input offset.
-  - use `tools/bizhawk/parity_dump.lua` + `compare_parity.py`; compare
-    disp/main/s1/s2/event/area/room/nav, OAM/PAL/VRAM/IO/IWRAM/EWRAM and
-    screenshots.
-  - **headless TAS conversion remains invalid** (SkipBios/BIOS/core sync);
-    use native BizHawk for TAS parity/bisection.
-  - the 100% TAS is item-collection/event0; use it for elevator/visual/ending
-    reference, not story-event coverage.  Story events use QA-013a's manual
-    normal route.
-  - the 259k baseline was rechecked on all three builds: every final state is
-    `area=0 room=0 nav=0`, `eventCounter=0`, `main=1`; it does **not** reach
-    room 61/elevator.  It is not a usable elevator/story TAS.
-  - use a story route/TAS that reaches the elevator/event 4; matched
-    SaveRAM/start state is mandatory; normalize shifted ROM pointers/IWRAM.
-  - frame bisection: predicate = "normal and shifted state at frame N match"
-    (OAM/PAL/VRAM/IO/event/selected WRAM page bitset).  With full-run failure
-    known, binary-search the first failing N (lo=known pass, hi=total); if no
-    failure is known, exponential-double then binary-search.  Re-run from a
-    fresh state for each N, not from the previous trial's end.
-  - each trial uses the harness `--state --frames N --final` (optionally
-    `--dump-prefix`); retain N, N-1 and the state at the first differing frame.
-    If the mismatch can resynchronize, use a per-frame trace to find the first
-    mismatch before bisecting.
-  - feed BUG-010/BUG-009 regressions; no source change from a non-monotonic
-    mismatch without a per-frame trace.
+- [DOING @qa] QA-015 (emulator/tools) — native BizHawk TAS parity
+  - corrected: all three builds can load the `.bk2` in native BizHawk; results
+    may differ, so compare them for exact parity.  The normal-only statement in
+    the old workflow is withdrawn.
+  - use `tools/bizhawk/parity_dump.lua` with the same BIOS/SaveRAM/checkpoints
+    for normal/shifted/reordered, then `compare_parity.py`.  The 100% TAS
+    includes the elevator route; this is the authoritative TAS reference.
+  - headless conversion of the `.bk2` remains invalid (SkipBios/MGBAHawk/BIOS
+    mismatch); do not use `reseren-100.input` for parity.
+  - for a divergent TAS, use native checkpoint frames and bisection; retain
+    matched states only when the TAS itself cannot be loaded.
+
 - [DOING @dev1] BUG-010 (playtest) — shifted elevator hard freeze / black screen
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
@@ -401,9 +385,10 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     harness support landed (`4c61351`).
   - remaining coverage gaps: pause/status, map/save/load, other Navigation
     dialogs/rooms, intro beyond start, ending and game over.  BizHawk native
-    parity is authoritative for TAS/ending visual reference; all three builds
-    can play the same `.bk2` and must be compared, not assumed equal.  Headless
-    TAS conversion remains invalid.  No M0 PASS yet.
+    parity Lua is available and is authoritative for normal TAS/ending visual
+    reference; the 100% TAS is normal-only and cannot be replayed directly on
+    shifted/reordered.  Headless TAS conversion remains invalid for parity.
+    No M0 PASS yet.
   - next: extend the route/UI matrix for those paths; normalize IWRAM for the
     shift/reorder ROM pointers.
 - [DONE] QA-013a (emulator) — story-route event parity fixture

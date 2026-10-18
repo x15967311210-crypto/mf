@@ -814,18 +814,8 @@ proof.
 ### BizHawk native parity workflow (2026-10-18)
 
 WSL can launch the Windows BizHawk GUI and use `parity_dump.lua` plus
-`compare_parity.py`.  This is authoritative for native TAS/ending visual
-reference, but the 100% TAS is normal-only; it cannot be replayed directly on
-shifted/reordered.  Use it for normal elevator/ending reference and for
-manual matched-state comparison; keep the headless mGBA harness for automatic
-normal/shifted/reordered replay from matched states.
-
-### Native TAS parity correction (2026-10-18)
-
-All three builds can play the same `.bk2` input.  The earlier "normal-only"
-statement was wrong: the movie is valid input for shifted/reordered too, but the
-results may differ and must be compared.  Use the BizHawk-native
-`parity_dump.lua`/`compare_parity.py` workflow, with no per-build input offset;
-headless conversion of `.bk2` to `frame keys` remains invalid due to
-SkipBios/BIOS/core sync differences.  The 100% TAS is item-collection/event0;
-story-event coverage still comes from QA-013a's manual normal route.
+`compare_parity.py`.  This is authoritative for native TAS parity.  Correction: all three builds
+can load the `.bk2` in native BizHawk; results may differ and must be compared.
+Headless conversion of the `.bk2` remains invalid.  Use the native workflow for
+TAS/ending/elevator reference and matched-state comparison; keep the headless
+mGBA harness for automatic matched-state replay.
