@@ -271,7 +271,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - parity remains FAIL because of BUG-012, not BUG-008.
 - [DOING @human] QA-020 (emulator) — native TAS parity after BUG-012
   - native BizHawk 2.3.2, mGBA core, BIOS `300C20DF...`, normalized SaveRAM
-    `FB611BD6...`, same 100% TAS; candidate `25f92d3b...`.
+    `FB611BD6...`, same 100% TAS; candidate `a69334ee...` (bug012b).
   - require 22923 callbacks `0809A2C9`/`0809B2C9`, both `CPSR=92`; no Undefined
     at 22924/22925; 22952 `DISPCNT=9700`; final 339001
     `1900 0009 0002 0100 109 0 63 0`; file-select 385/401 still PASS.
@@ -353,8 +353,24 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     bytes identical; file-select pFrame `087403CA` count 6.
   - automatic gates PASS: audit, smoke, test, strict relocs, shift/start/input
     4k/30k, screen/OAM diff, shift-reorder.
+  - **native 22923 retest FAILED on `25f92d3b`**: callback still `080967E0`,
+    LR `0809DFA6`, then IE loss/Undefined.  The prefix sweep was a valid
+    relocation fix but not the 22923 root.
+  - **actual root found**: shifted `0809DFA6` is inside
+    `CutsceneMnologueDrawOam`; it reads a FrameData table at normal
+    `0x08663E5C` / `0x08663E74` inside `sBlob_6638a0_682fac`.  Those pFrame
+    words were still raw normal addresses.  In shifted the table at
+    `0x08664E5C` pointed at old `0x08663E08`, whose count is `0x7810`, not the
+    correct `0x0002`; the OAM loop overran into `gVBlankCallback`.
+  - **FIX LANDED `162ad9a`**: all eight pFrame words in those two tables are
+    relocatable fields; the surrounding 128,780-byte blob is preserved.
+    Normal SHA1 `ca33f434...`; shifted
+    `a69334ee1c367fada1aa388b8a889e14bb6cb0aa`.  Static: all eight words
+    normal+0x1000; correct target count 2 vs stale target `0x7810`.
+  - automatic gates PASS (audit/smoke/test/strict relocs, shift/start/input
+    4k/30k, screen/OAM diff, shift-reorder).
   - **native 22923 + full TAS retest is the remaining acceptance**; candidate
-    `work/playtest/m0f-2026-10-17/mgba-final-bug012/`.  Do not close BUG-012 or
+    `work/playtest/m0f-2026-10-17/mgba-final-bug012b/`.  Do not close BUG-012 or
     M0f until EmuHawk confirms 22923/22952 and the final checkpoint.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274

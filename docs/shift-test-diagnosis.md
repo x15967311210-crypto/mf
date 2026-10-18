@@ -1024,3 +1024,21 @@ Static checks: every pointer word is normal+0x1000 in shifted; file-select
 pFrame `0x087403CA` count 6.  All automatic gates pass.  Native 22923/full TAS
 retest is the remaining acceptance; candidate at
 `work/playtest/m0f-2026-10-17/mgba-final-bug012/`.
+
+### BUG-012 actual root: intro cutscene FrameData table (2026-10-19, `162ad9a`)
+
+The prefix sweep (`25f92d3b`) did not fix frame 22923.  The native LR
+`0809DFA6` is inside `CutsceneMnologueDrawOam`; the OAM loop reads the table at
+normal `0x08663E5C` / `0x08663E74` in `sBlob_6638a0_682fac`.  Its pFrame words
+were still raw normal addresses (`0x08663E08` etc.).  In the shifted ROM the
+table at `0x08664E5C` therefore read the stale target `0x08663E08`, where the
+count is `0x7810`; the correct target `0x08664E08` has count 2.  The oversized
+loop wrote through `gVBlankCallback`.
+
+`src/data/new_file_intro_data.c` now represents the 0x50-byte table region as
+a packed struct with eight relocatable pFrame fields; the surrounding 128,780
+bytes are byte-identical.  Normal SHA1 remains
+`ca33f4348c2c05dd330d37b97e2c5a69531dfe87`; shifted is
+`a69334ee1c367fada1aa388b8a889e14bb6cb0aa`.  All eight pointers are
+normal+0x1000 in shifted.  Automatic gates pass; native 22923/full TAS retest
+is the remaining acceptance.
