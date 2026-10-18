@@ -155,13 +155,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - capture true pre-entry states in all three builds from the same SaveRAM,
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
-- [PARK] QA-015 (emulator/tools) — full-route frame bitset differential
-  - **headless TAS input is invalid for TAS parity**: BizHawk `.bk2` uses
-    SkipBios/real BIOS/MGBAHawk sync state; our `reseren-100.input` has only
-    frame/keys and produced false EVENT=0/final frames.  Use BizHawk native
-    playback for TAS visual/ending reference.
-  - retain bitset/bisection only for a matched **normal recording/state route**
-    in the same headless core, not a converted TAS.
+- [DOING @human] QA-015 (BizHawk) — native TAS three-version parity
+  - Correction: all three builds can play the same `.bk2`; the input movie is
+    valid, but results may differ and must be compared.  Goal is identical
+    state at the same movie/checkpoint, with no per-build input offset.
+  - use `tools/bizhawk/parity_dump.lua` + `compare_parity.py`; compare
+    disp/main/s1/s2/event/area/room/nav, OAM/PAL/VRAM/IO/IWRAM/EWRAM and
+    screenshots.
+  - **headless TAS conversion remains invalid** (SkipBios/BIOS/core sync);
+    use native BizHawk for TAS parity/bisection.
+  - the 100% TAS is item-collection/event0; use it for elevator/visual/ending
+    reference, not story-event coverage.  Story events use QA-013a's manual
+    normal route.
   - the 259k baseline was rechecked on all three builds: every final state is
     `area=0 room=0 nav=0`, `eventCounter=0`, `main=1`; it does **not** reach
     room 61/elevator.  It is not a usable elevator/story TAS.
@@ -396,10 +401,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     harness support landed (`4c61351`).
   - remaining coverage gaps: pause/status, map/save/load, other Navigation
     dialogs/rooms, intro beyond start, ending and game over.  BizHawk native
-    parity Lua is available and is authoritative for normal TAS/ending visual
-    reference; the 100% TAS is normal-only and cannot be replayed directly on
-    shifted/reordered.  Headless TAS conversion remains invalid for parity.
-    No M0 PASS yet.
+    parity is authoritative for TAS/ending visual reference; all three builds
+    can play the same `.bk2` and must be compared, not assumed equal.  Headless
+    TAS conversion remains invalid.  No M0 PASS yet.
   - next: extend the route/UI matrix for those paths; normalize IWRAM for the
     shift/reorder ROM pointers.
 - [DONE] QA-013a (emulator) — story-route event parity fixture

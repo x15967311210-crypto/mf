@@ -819,3 +819,13 @@ reference, but the 100% TAS is normal-only; it cannot be replayed directly on
 shifted/reordered.  Use it for normal elevator/ending reference and for
 manual matched-state comparison; keep the headless mGBA harness for automatic
 normal/shifted/reordered replay from matched states.
+
+### Native TAS parity correction (2026-10-18)
+
+All three builds can play the same `.bk2` input.  The earlier "normal-only"
+statement was wrong: the movie is valid input for shifted/reordered too, but the
+results may differ and must be compared.  Use the BizHawk-native
+`parity_dump.lua`/`compare_parity.py` workflow, with no per-build input offset;
+headless conversion of `.bk2` to `frame keys` remains invalid due to
+SkipBios/BIOS/core sync differences.  The 100% TAS is item-collection/event0;
+story-event coverage still comes from QA-013a's manual normal route.
