@@ -306,6 +306,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - `0300d80` wrap-aware harness: full 259k normal/shifted/reordered exit 0,
     `INPUT_FINAL frame_counter=61634 disp=0x5F00 main=1 s1=2 s2=256`.
   - 4k/30k/screen/OAM gates pass after the change; full input remains local.
+- [TODO] QA-013 (emulator) — event-progress telemetry and parity
+  - `gEventCounter` (0x03000B87) is the saved u8 high-water event marker;
+    `sEventLocationAndNavigationInfo`/`sPauseDebugEventNames` define the
+    allowed event order and names.
+  - add `EVENT frame=... counter=... area=... room=... nav=...` at input
+    checkpoints and `EVENTCHG frame=... old=... new=...` on every event
+    transition; compare normal/shifted/reordered event sequences, not only
+    final state.
+  - event counter is monotonic, not a per-event flag set; document that logs
+    and independent flags cannot be inferred from it.
+  - run 30k committed and full 259k local; add an `event-diff` target.
 - [TODO] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix
   - run normal/shifted/reordered from matched saves/states through all rooms,
     Navigation Room dialogs, pause/map/status, save/load, intro/ending and
