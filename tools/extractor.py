@@ -96,6 +96,13 @@ def split_sa_x_close_up_blob() -> None:
         Path(DATA_PATH, "Blob_73421e_prefix.bin"),
         Path(DATA_PATH, "Blob_73421e_after.bin"),
     )
+    # The prefix contains two raw FrameData pFrame words at 0xC5A2 and
+    # 0xC5B2.  Split them out so the C representation can relocate the
+    # pointers; the surrounding bytes stay byte-identical.
+    prefix = blob_path.read_bytes()[:0xC5C2]
+    Path(DATA_PATH, "Blob_73421e_prefix_before.bin").write_bytes(prefix[:0xC5A2])
+    Path(DATA_PATH, "Blob_73421e_prefix_between.bin").write_bytes(prefix[0xC5A6:0xC5B2])
+    Path(DATA_PATH, "Blob_73421e_prefix_after.bin").write_bytes(prefix[0xC5B6:0xC5C2])
 
 
 def split_new_file_intro_frame_data_blob() -> None:
