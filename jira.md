@@ -219,6 +219,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     window.
   - QA-017d: hook writes to `0x030016FC`/MenuOam entry pAnim and report
     PC/LR/value; then fix the table.
+  - pAnim writer captured: setup writes `0x087417C0` (shifted, pc 080A103C),
+    then the OAM loop overwrites it.  But the **data at pAnim target** is
+    wrong: normal `0x087407C0` = pFrame `0x0873F3CA`, count 4; shifted
+    `0x087417C0` = `1f044500...`, not the normal record.  So this is not just
+    an OAM-slot boundary bug: the `sBlob_73421e_prefix`/frame-data mapping at
+    that target is wrong, producing `sl=0x1F28` and then the overrun.  Check
+    the prefix/frame-data blob at 0x087407C0 vs 0x087417C0 before changing
+    OAM code.
   - next: capture the writer in BizHawk's VBA-Next/MGBAHawk path (the core that
     reproduces); mGBA standalone is not sufficient.  Do not source-patch until
     a reproducing core reports PC/LR/SP/value.

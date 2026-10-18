@@ -937,3 +937,18 @@ state-384 entry21 `pAnim` was the valid `0x087417E0`.  The pAnim is therefore
 changed/stale before DrawOam and likely missing the shifted `+0x1000` or written
 by another path; capture writes to the entry21 pAnim word at `0x030016FC`
 before the loop.
+
+### BUG-008 pAnim target mismatch (2026-10-18)
+
+The setup writes the correct shifted pAnim pointer `0x087417C0`, but the data
+at that target is not the normal record at `0x087407C0`:
+
+```text
+normal 0x087407C0: ca f3 73 08 04 00 00 00 ...  (pFrame 0x0873F3CA, count 4)
+shifted 0x087417C0: 1f 04 45 00 ...             (not the normal record)
+```
+
+The shifted frame loop reads `sl=0x1F28` and overruns OAM into
+`gVBlankCallback`; the pAnim overwrite is a consequence.  Investigate the
+`sBlob_73421e_prefix`/frame-data mapping at 0x087407C0 vs 0x087417C0; this is
+not explained by OAM slot code alone.
