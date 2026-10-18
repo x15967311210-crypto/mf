@@ -93,10 +93,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `4109E16135B2F44A4E8EF046ACD99EAB8600AC4A` = mGBA 0.6.x branch (not
     0.10/0.11).  Per-build 400/401 states and logs are in
     `work/playtest/m0f-2026-10-17/tas/bizhawk_400_401/`.
-  - next: load each build's **own** f400/f401 state in the corresponding ROM
-    (no cross-build load), normalize shifted ROM pointers by +0x1000, and diff
-    PC/regs/IWRAM/EWRAM/IO at the A handler.  Identify the exact variable or
-    branch that differs; no source edit until that is proven.
+  - state decoder result: BizState 1.03 -> mGBA 0.6.3 state v2; frames/ROM CRCs
+    match, but normal and shifted snapshots are at **different CPU phases**.
+    normal f400/f401 PC=0x1C/CPSR=0x92 (IRQ); shifted PC=0x60/0x24,
+    CPSR=0x8000009B (SVC); masterCycles shifted +2 (`...88` vs `...8A`).
+    Same displayed state, different saved execution point; these snapshots
+    alone cannot prove a source branch.
+  - next: per-build BizHawk PC/GPR trace at frames 398-403, or an equivalent
+    state aligned by masterCycles.  mGBA 0.11 cold boot is clean; do not edit
+    source until the BizHawk 0.6 path is located.  Keep BUG-008 open.
   - keep BUG-008 open; do not mask with input offset.
 
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing

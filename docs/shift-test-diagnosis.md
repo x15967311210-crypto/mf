@@ -357,3 +357,31 @@ against `(frames % 65536) * 3 / 4`, preserving the short-run floor.  After the
 fix, all three 259k runs exit 0 with the identical final state and checkpoints
 above.  The full 259k input remains local (`work/playtest`) and is differential
 evidence, not a committed fixture; the committed automatic limit stays 30k.
+
+## BUG-008 state-container finding (2026-10-18)
+
+BizHawk 2.3.0.1 uses the mGBA 0.6.x core (`mgba.dll` SHA1
+`4109E161...`).  Its `.State` files are `BizState 1.03` ZIPs containing
+`Core.bin`; the core payload is mGBA 0.6.3 `GBASerializedState` version 2
+(`versionMagic=0x01000002`).  The six per-build states decode to the expected
+ROM CRCs and frames.
+
+The states are **not sampled at the same CPU phase**:
+
+```text
+normal  f400/f401: PC=0x1C  LR=0x1B8     CPSR=0x92 (IRQ), masterCycles 0x6B57688/0x6B9BFC8
+shifted f400/f401: PC=0x60/0x24, CPSR=0x8000009B (SVC), masterCycles 0x6B5768A/0x6B9BFCA
+```
+
+The shifted state is +2 master cycles and sits in a different BIOS exception
+context at the same displayed frame.  The visible `1C00 / main=7 / s1=3 / s2=0`
+matches, but the saved CPU/RAM contexts differ, so these two snapshots cannot
+be treated as the same instant or used alone to prove a source branch bug.
+
+mGBA 0.11 cold boot with the same `common.SaveRAM`, BIOS and full baseline
+input does **not** reproduce the divergence: normal/shifted normalized traces
+are identical, file-select A is at mGBA frame 824, and both transition
+`1C00 -> 1E00` at 837.  The remaining difference is BizHawk 0.6-core-specific
+or a cycle/layout-sensitive effect; a per-build PC/GPR trace at frames 398-403
+(or a state aligned to the same master cycle) is needed before changing source.
+Do not close BUG-008 or mask it with an input offset.
