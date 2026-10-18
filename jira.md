@@ -219,14 +219,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     window.
   - QA-017d: hook writes to `0x030016FC`/MenuOam entry pAnim and report
     PC/LR/value; then fix the table.
-  - pAnim writer captured: setup writes `0x087417C0` (shifted, pc 080A103C),
-    then the OAM loop overwrites it.  But the **data at pAnim target** is
-    wrong: normal `0x087407C0` = pFrame `0x0873F3CA`, count 4; shifted
-    `0x087417C0` = `1f044500...`, not the normal record.  So this is not just
-    an OAM-slot boundary bug: the `sBlob_73421e_prefix`/frame-data mapping at
-    that target is wrong, producing `sl=0x1F28` and then the overrun.  Check
-    the prefix/frame-data blob at 0x087407C0 vs 0x087417C0 before changing
-    OAM code.
+  - corrected pAnim-target check: shifted `0x087417C0` **does** contain the
+    normal prefix bytes (`caf37308...`), so pAnim/setup is correct.  But the
+    first word is the **pFrame pointer `0x0873F3CA`**, which was not relocated
+    inside raw `sBlob_73421e_prefix`; shifted should be `0x087403CA`.  At the
+    old address the frame count is garbage (`sl=0x1F28`), causing the OAM loop
+    to overrun into pAnim/callback.  This is a **prefix/blob pointer relocation
+    bug**, not OAM-slot code or the pAnim table.
+  - fix direction: model the pointer words inside
+    `sBlob_73421e_prefix` (at least the record at prefix+0xC5A2, plus other
+    frame records) as relocatable expressions while preserving the 2-byte
+    aligned prefix layout and normal SHA1.  Then re-check pFrame/count.
   - next: capture the writer in BizHawk's VBA-Next/MGBAHawk path (the core that
     reproduces); mGBA standalone is not sufficient.  Do not source-patch until
     a reproducing core reports PC/LR/SP/value.

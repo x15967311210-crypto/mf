@@ -952,3 +952,13 @@ The shifted frame loop reads `sl=0x1F28` and overruns OAM into
 `gVBlankCallback`; the pAnim overwrite is a consequence.  Investigate the
 `sBlob_73421e_prefix`/frame-data mapping at 0x087407C0 vs 0x087417C0; this is
 not explained by OAM slot code alone.
+
+### BUG-008 prefix pointer correction (2026-10-18)
+
+The shifted pAnim target `0x087417C0` is byte-identical to normal
+`0x087407C0` (`caf37308...`), so pAnim and setup are correct.  The first word is
+the **pFrame pointer `0x0873F3CA`**, still a normal-layout address because it
+lives inside raw `sBlob_73421e_prefix`.  In the shifted ROM that address points
+at the wrong frame data, giving `sl=0x1F28`, which then overruns OAM into
+`gVBlankCallback`.  Fix the prefix/frame-record pointer relocation, not the OAM
+slot code or the pAnim table.
