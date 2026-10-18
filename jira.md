@@ -279,6 +279,19 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - `0300d80` wrap-aware harness: full 259k normal/shifted/reordered exit 0,
     `INPUT_FINAL frame_counter=61634 disp=0x5F00 main=1 s1=2 s2=256`.
   - 4k/30k/screen/OAM gates pass after the change; full input remains local.
+- [TODO] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix
+  - run normal/shifted/reordered from matched saves/states through all rooms,
+    Navigation Room dialogs, pause/map/status, save/load, intro/ending and
+    game-over paths; compare OAM/PAL/VRAM/IO and normalized IWRAM/EWRAM.
+  - any shifted-only difference becomes a BUG; M0 sign-off requires this
+    matrix plus the fresh manual route, not only the controlled map.
+  - depends on BUG-009; run after the current fix lands.  Do not close M0 on a
+    single controlled path.
+- [TODO] QA-004 (tools) — scanner for 2-byte/4-byte pointer-like data in raw
+  blobs (the BUG-003/004/005/006/009 class); no raw pointer table may remain
+  hidden behind a `data` classification.
+- [TODO] QA-009 (emulator) — checkpoint memory parity (OAM/PAL/VRAM/IO exact;
+  IWRAM/EWRAM normalized); feeds QA-012.
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
