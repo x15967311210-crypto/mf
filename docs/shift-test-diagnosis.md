@@ -675,3 +675,21 @@ The committed 30k gate and full 259k baseline both report `gEventCounter=0`
 throughout: the baseline movement TAS does not trigger story events.  A
 story-route fixture is still needed to exercise the important event IDs; do not
 treat the 30k event pass as story-event coverage.
+
+### QA-013a story event route (2026-10-18)
+
+Harness support for `--state`/`--save` landed.  Running the normal story route
+from the Nintendo-Presents state produces:
+
+```text
+EVENTCHG relative 12610 old=0 new=1 area=0 room=16 nav=1
+EVENTCHG relative 16601 old=1 new=2 area=0 room=71 nav=0
+EVENTCHG relative 19039 old=2 new=3 area=0 room=16 nav=1
+```
+
+The shifted `matched_state/shifted_start_139.state` with the same input reaches
+events 1 and 2 but not 3 and ends `main=1`; this is not yet a valid parity
+result because the normal story route uses `story_route_normal.sav`
+(`4FD087E9...`) while the shifted start state's SaveRAM is not confirmed to be
+the same.  Capture a shifted state at the same start frame and same SaveRAM,
+then rerun the event comparison.
