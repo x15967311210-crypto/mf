@@ -330,15 +330,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - full 259k baseline also has `gEventCounter=0` throughout: it is a movement/
     visual route, not a story-event route.  Need a story fixture that triggers
     the important events (e.g. matched normal recording ending at event=3).
-  - story-route first pass: normal and shifted (0bddba78) from the matched
-    4FD0 frame-139 states produce identical EVENT/EVENTCHG, OAM and SCREEN
-    checkpoints; final relative frame 21511 (`21649` absolute) event=3.
-  - gaps: reordered has no frame-139 state (a normal state is not portable);
-    harness only reports OAM/SCREEN at fixed checkpoints, not the story end;
-    pause/status, map/save/load, most rooms/dialogs, intro/ending/game-over are
-    not yet covered.  No M0 PASS from this first pass.
-  - next: add a final checkpoint/dump option, capture a reordered frame-139
-    state on the same `4FD0...` SaveRAM, and extend the route/UI matrix.
+  - story-route three-version pass: normal/shifted/reordered frame-139 states
+    from SaveRAM `4FD0...` + same input all reach event=3 at relative 21511
+    (`21649` absolute), `FINAL_EVENT counter=3 area=0 room=16 nav=1`.
+    `FINAL_OAM count=96 hash=53ae6710c2f82951`, `FINAL_SCREEN
+    5ab8765608532bbf`; PAL/VRAM/IO/EWRAM final dumps byte-identical.
+    IWRAM differs only by code/ROM addresses (normalized diff still to file).
+  - reordered frame-139 state supplied and works; final `--final`/dump-prefix
+    harness support landed (`4c61351`).
+  - remaining coverage gaps: pause/status, map/save/load, other Navigation
+    dialogs/rooms, intro beyond start, ending and game over.  No M0 PASS yet.
+  - next: extend the route/UI matrix for those paths; normalize IWRAM for the
+    shift/reorder ROM pointers.
 - [DONE] QA-013a (emulator) — story-route event parity fixture
   - capture/replay a normal route that sets the key story/event IDs, then run
     shifted from the same save/route and compare `EVENTCHG` sequences, not just

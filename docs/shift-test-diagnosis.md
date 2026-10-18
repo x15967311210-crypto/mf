@@ -741,3 +741,21 @@ EVENT/EVENTCHG, OAM and SCREEN checkpoint telemetry; both end at relative
 
 M0 stays blocked until the matrix has explicit coverage and a matched
 reordered run.
+
+### QA-012 final checkpoint three-version pass (2026-10-18)
+
+With the reordered frame-139 state and the new `--final --dump-prefix` harness
+support, normal, shifted (`0bddba78...`) and reordered (`af62233e...`) replay
+the same 4FD0 story route and end identically:
+
+```text
+FINAL_EVENT counter=3 area=0 room=16 nav=1
+FINAL_OAM count=96 hash=53ae6710c2f82951
+FINAL_SCREEN hash=5ab8765608532bbf
+PAL/VRAM/IO/EWRAM final dumps: byte-identical
+```
+
+Raw IWRAM hashes differ because code/ROM addresses differ; normalize pointers
+before treating that as a defect.  The route covers the story rooms/event path,
+not pause/status, save/load, all dialogs/rooms, ending or game over; QA-012
+remains a coverage matrix task.
