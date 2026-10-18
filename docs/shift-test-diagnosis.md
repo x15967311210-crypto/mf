@@ -643,3 +643,20 @@ raw normal address here can select/load the wrong legend stream while other
 graphics sources are correctly relocated.  Convert the preamble and record data
 pointer words to `sBlob_5766D4_prefix + offset` expressions, preserve the
 byte layout, and verify normal SHA1 plus shifted table bytes.
+
+### BUG-009 pop-up table fix (2026-10-18)
+
+`src/data/menus/pause_debug.c` now models the Navigation Conversation pop-up
+table with pointer expressions:
+
+- preamble/record data pointers resolve through `sBlob_5766D4_prefix`
+  (`+0x54F0`, `+0x130`, `+0x150`, `+0x54FC`, `+0x170`, `+0x190`, `+0x551C`,
+  `+0x1B0`, `+0x1D0`, `+0x1F0`, `+0x210`);
+- record pGraphics remain `+0x230`, `+0x230`, `+0x950`, `+0x207C`;
+- layout is unchanged: 0x14 + 4×0x18 = 0x74; normal SHA1 stays
+  `ca33f434...`.
+
+The shifted table at file/ROM offset `0x57CC50` has all pointer words at
+baseline +0x1000.  New shifted artifact:
+`0bddba785137fe46c90c0b4f26ded6336890b886`.  The fresh matched room-16
+Navigation Conversation retest is still required before closing BUG-009.

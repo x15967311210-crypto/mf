@@ -131,9 +131,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `sBlob_5766D4_prefix` and need `+0x1000` in the shifted build.  Fix all of
     them as `sBlob_5766D4_prefix + offset`, preserving the 0x14 preamble +
     4x0x18 record layout.
-  - next: convert that table, verify normal SHA1/cold bytes and shifted table
-    entries, then rerun the matched room-16 path.  This is the current concrete
-    source candidate; no broad descriptor hunt.
+  - LANDED `b394ab3`: converted preamble/record data pointers to
+    `sBlob_5766D4_prefix + offset`; layout remains 0x14 + 4*0x18; normal SHA1
+    `ca33f434...` preserved.  Shifted table at 0x57CC50 has all pointers
+    +0x1000; shifted artifact is `0bddba78...`.
+  - automatic gates (4k/30k/screen/OAM/shift/boot/audit/strict/smoke) pass.
+  - fresh paired Navigation Room/computer-dialogue retest is pending; new
+    candidate at `work/playtest/m0f-2026-10-17/mgba-final-bug009/`.
+  - if fresh room-16 UI matches normal, close BUG-009; otherwise continue the
+    descriptor path.  Do not call M0 DONE yet.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401
