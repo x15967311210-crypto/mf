@@ -866,3 +866,14 @@ At frame 386 shifted enters Undefined mode (`CPSR=0x4000009B`), clears IE bit0,
 and later stops updating DISPCNT; normal stays in IRQ.  IRQ vector and IF/IME
 match.  Investigate the shifted IRQ entry/return path and the file-select
 callback/IE write; BUG-008 is now active source work, not a parked core issue.
+
+### BUG-008 callback corruption (2026-10-18)
+
+The failing artifact has the symbolic IWRAM literal and `sBlob_a5224_a5258`
+table correctly relocated (`0x080A6224`, all entries +0x1000).  The state still
+has `gVBlankCallback=0x0809C30A` (a normal-code address) and that value does not
+occur anywhere in the shifted ROM, so it is computed/stale/overflowed, not a
+simple raw table literal.  The 400/401 states are after the corruption; a
+pre-failure 384/385 state and a write watchpoint on `0x030019C4` are required to
+find the writer.  The earlier LR/SPSR difference at 385 is not by itself proof
+of corruption; the bad callback and Undefined at 386 are the actionable path.
