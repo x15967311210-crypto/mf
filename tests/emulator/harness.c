@@ -737,6 +737,13 @@ static int run_input(
     size_t screen_varied = 0;
     size_t screen_nonblack = 0;
     uint16_t last_keys = 0;
+    /*
+     * QA-010: gFrameCounter16Bit wraps every 65536 frames.  Record the start
+     * value so the liveness gate can compare the modulo-65536 delta against a
+     * floor derived from the wrapped frame count.  A 259k replay ends at a
+     * small raw counter and must not be compared against 3/4 of 259k.
+     */
+    uint16_t start_counter = GBAView16(gba->cpu, IWRAM_FRAME_COUNTER);
     for (size_t i = 0; i < limit; ++i) {
         uint16_t keys = replay->entries[i].keys;
         last_keys = keys;
@@ -790,12 +797,20 @@ static int run_input(
         }
     }
 
-    int min_counter = (int)(limit * 3 / 4);
-    if (counter < min_counter) {
+    /*
+     * The counter only has 16 bits, so both the delta and the floor are taken
+     * modulo 65536.  For a 4000-frame replay this is the old 3000-tick floor;
+     * for 259176 frames it is 3/4 of 62568 instead of an impossible 194382.
+     * An exact multiple of 65536 leaves a zero floor (the counter cannot prove
+     * liveness across a full wrap); checkpoint and screen guards still apply.
+     */
+    uint16_t counter_delta = (uint16_t)(counter - start_counter);
+    uint32_t min_counter = (uint32_t)(limit % 65536u) * 3u / 4u;
+    if (counter_delta < min_counter) {
         printf(
-            "FAIL: input replay frame counter %u is below the %d-frame "
-            "liveness floor\n",
-            counter, min_counter
+            "FAIL: input replay frame counter advanced %u "
+            "(start=%u end=%u) below the %u-frame liveness floor\n",
+            counter_delta, start_counter, counter, min_counter
         );
         failed = 1;
     }

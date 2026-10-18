@@ -127,8 +127,15 @@ The harness prints one `INPUT frame=... keys=... disp=... main=... s1=...
 s2=...` line after 300, 600, 900, 1059, 4000 and 30000 completed frames (the
 BizHawk frame-count convention), then `INPUT_FINAL ...`.  Every checkpoint also
 prints an `OAM frame=... count=... hash=... stage=...` telemetry line (QA-008).
-The verdict covers parse success, the requested frame count, and the same
-`gFrameCounter16Bit` liveness floor as `boot_smoke`.
+The verdict covers parse success, the requested frame count, and a
+`gFrameCounter16Bit` liveness floor.  The input gate captures the counter
+before the first replayed frame and compares the modulo-65536 delta against
+`(frames % 65536) * 3 / 4`, because the 16-bit counter wraps: a 259,176-frame
+TAS expects at least 46,926 counter ticks, not 3/4 of the raw frame count.
+Short replays keep the old floor (4,000 -> 3,000), so an early stall still
+fails.  An exact multiple of 65,536 frames leaves a zero floor, so liveness
+across a full wrap is left to the checkpoint/screen guards rather than this
+counter.  `INPUT_FINAL` still reports the raw wrapped counter.
 
 `--expect FILE` adds one `frame disp main s1 s2` line per checkpoint and
 prints `INPUT_CHECK frame=... status=pass|fail` plus a summary.  The committed
