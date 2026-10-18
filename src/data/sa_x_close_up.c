@@ -11,19 +11,127 @@ const u32 sSaXCloseUpTileTable2[305] = INCBIN_U32("data/sa_x_close_up/second.tt.
 const u8 sSaXCloseUpDurations[2] = { 25, 60 };
 
 struct SaXCloseUpPrefix {
-    u8 before[0xC5A2];
-    const u8 *pFileSelectFrame0; /* prefix+0xC5A2 -> prefix+0xB1AC */
-    u8 between[0xC];
-    const u8 *pFileSelectFrame1; /* prefix+0xC5B2 -> prefix+0xB1D2 */
-    u8 after[0xC];
+    u8 before[0x8056];
+    const u8 *p8056; /* prefix+0x8056 -> prefix+0x7FFA */
+    u8 after_8056[0x4];
+    const u8 *p805E; /* prefix+0x805E -> prefix+0x8044 */
+    u8 after_805E[0x4];
+    const u8 *p8066; /* prefix+0x8066 -> prefix+0x804C */
+    u8 after_8066[0x4];
+    const u8 *p806E; /* prefix+0x806E -> prefix+0x8044 */
+    u8 after_806E[0xC];
+    const u8 *p807E; /* prefix+0x807E -> prefix+0x7FFA */
+    u8 after_807E[0x4];
+    const u8 *p8086; /* prefix+0x8086 -> prefix+0x8002 */
+    u8 after_8086[0x4];
+    const u8 *p808E; /* prefix+0x808E -> prefix+0x800A */
+    u8 after_808E[0x4];
+    const u8 *p8096; /* prefix+0x8096 -> prefix+0x8012 */
+    u8 after_8096[0x4];
+    const u8 *p809E; /* prefix+0x809E -> prefix+0x801A */
+    u8 after_809E[0x4];
+    const u8 *p80A6; /* prefix+0x80A6 -> prefix+0x8028 */
+    u8 after_80A6[0x4];
+    const u8 *p80AE; /* prefix+0x80AE -> prefix+0x8036 */
+    u8 after_80AE[0x4];
+    const u8 *p80B6; /* prefix+0x80B6 -> prefix+0x8012 */
+    u8 after_80B6[0x4420];
+    const u8 *pC4DA; /* prefix+0xC4DA -> prefix+0xB016 */
+    u8 after_C4DA[0xC];
+    const u8 *pC4EA; /* prefix+0xC4EA -> prefix+0xB054 */
+    u8 after_C4EA[0xC];
+    const u8 *pC4FA; /* prefix+0xC4FA -> prefix+0xB092 */
+    u8 after_C4FA[0xC];
+    const u8 *pC50A; /* prefix+0xC50A -> prefix+0xB0D0 */
+    u8 after_C50A[0xC];
+    const u8 *pC51A; /* prefix+0xC51A -> prefix+0xB10E */
+    u8 after_C51A[0xC];
+    const u8 *pC52A; /* prefix+0xC52A -> prefix+0xB14C */
+    u8 after_C52A[0x4];
+    const u8 *pC532; /* prefix+0xC532 -> prefix+0xB4B2 */
+    u8 after_C532[0xC];
+    const u8 *pC542; /* prefix+0xC542 -> prefix+0xB15A */
+    u8 after_C542[0x4];
+    const u8 *pC54A; /* prefix+0xC54A -> prefix+0xB4B2 */
+    u8 after_C54A[0xC];
+    const u8 *pC55A; /* prefix+0xC55A -> prefix+0xB168 */
+    u8 after_C55A[0x4];
+    const u8 *pC562; /* prefix+0xC562 -> prefix+0xB4B2 */
+    u8 after_C562[0xC];
+    const u8 *pC572; /* prefix+0xC572 -> prefix+0xB176 */
+    u8 after_C572[0x4];
+    const u8 *pC57A; /* prefix+0xC57A -> prefix+0xB4B2 */
+    u8 after_C57A[0xC];
+    const u8 *pC58A; /* prefix+0xC58A -> prefix+0xB184 */
+    u8 after_C58A[0x4];
+    const u8 *pC592; /* prefix+0xC592 -> prefix+0xB4B2 */
+    u8 after_C592[0xC];
+    const u8 *pC5A2; /* prefix+0xC5A2 -> prefix+0xB1AC */
+    u8 after_C5A2[0xC];
+    const u8 *pC5B2; /* prefix+0xC5B2 -> prefix+0xB1D2 */
+    u8 after_C5B2[0xC];
 } __attribute__((packed));
 
 static const struct SaXCloseUpPrefix sBlob_73421e_prefix = {
-    .before = INCBIN_U8("data/Blob_73421e_prefix_before.bin"),
-    .pFileSelectFrame0 = (const u8*)&sBlob_73421e_prefix + 0xB1AC,
-    .between = INCBIN_U8("data/Blob_73421e_prefix_between.bin"),
-    .pFileSelectFrame1 = (const u8*)&sBlob_73421e_prefix + 0xB1D2,
-    .after = INCBIN_U8("data/Blob_73421e_prefix_after.bin"),
+    .before = INCBIN_U8("data/Blob_73421e_prefix_seg_0000.bin"),
+    .p8056 = (const u8*)&sBlob_73421e_prefix + 0x7FFA,
+    .after_8056 = INCBIN_U8("data/Blob_73421e_prefix_seg_805A.bin"),
+    .p805E = (const u8*)&sBlob_73421e_prefix + 0x8044,
+    .after_805E = INCBIN_U8("data/Blob_73421e_prefix_seg_8062.bin"),
+    .p8066 = (const u8*)&sBlob_73421e_prefix + 0x804C,
+    .after_8066 = INCBIN_U8("data/Blob_73421e_prefix_seg_806A.bin"),
+    .p806E = (const u8*)&sBlob_73421e_prefix + 0x8044,
+    .after_806E = INCBIN_U8("data/Blob_73421e_prefix_seg_8072.bin"),
+    .p807E = (const u8*)&sBlob_73421e_prefix + 0x7FFA,
+    .after_807E = INCBIN_U8("data/Blob_73421e_prefix_seg_8082.bin"),
+    .p8086 = (const u8*)&sBlob_73421e_prefix + 0x8002,
+    .after_8086 = INCBIN_U8("data/Blob_73421e_prefix_seg_808A.bin"),
+    .p808E = (const u8*)&sBlob_73421e_prefix + 0x800A,
+    .after_808E = INCBIN_U8("data/Blob_73421e_prefix_seg_8092.bin"),
+    .p8096 = (const u8*)&sBlob_73421e_prefix + 0x8012,
+    .after_8096 = INCBIN_U8("data/Blob_73421e_prefix_seg_809A.bin"),
+    .p809E = (const u8*)&sBlob_73421e_prefix + 0x801A,
+    .after_809E = INCBIN_U8("data/Blob_73421e_prefix_seg_80A2.bin"),
+    .p80A6 = (const u8*)&sBlob_73421e_prefix + 0x8028,
+    .after_80A6 = INCBIN_U8("data/Blob_73421e_prefix_seg_80AA.bin"),
+    .p80AE = (const u8*)&sBlob_73421e_prefix + 0x8036,
+    .after_80AE = INCBIN_U8("data/Blob_73421e_prefix_seg_80B2.bin"),
+    .p80B6 = (const u8*)&sBlob_73421e_prefix + 0x8012,
+    .after_80B6 = INCBIN_U8("data/Blob_73421e_prefix_seg_80BA.bin"),
+    .pC4DA = (const u8*)&sBlob_73421e_prefix + 0xB016,
+    .after_C4DA = INCBIN_U8("data/Blob_73421e_prefix_seg_C4DE.bin"),
+    .pC4EA = (const u8*)&sBlob_73421e_prefix + 0xB054,
+    .after_C4EA = INCBIN_U8("data/Blob_73421e_prefix_seg_C4EE.bin"),
+    .pC4FA = (const u8*)&sBlob_73421e_prefix + 0xB092,
+    .after_C4FA = INCBIN_U8("data/Blob_73421e_prefix_seg_C4FE.bin"),
+    .pC50A = (const u8*)&sBlob_73421e_prefix + 0xB0D0,
+    .after_C50A = INCBIN_U8("data/Blob_73421e_prefix_seg_C50E.bin"),
+    .pC51A = (const u8*)&sBlob_73421e_prefix + 0xB10E,
+    .after_C51A = INCBIN_U8("data/Blob_73421e_prefix_seg_C51E.bin"),
+    .pC52A = (const u8*)&sBlob_73421e_prefix + 0xB14C,
+    .after_C52A = INCBIN_U8("data/Blob_73421e_prefix_seg_C52E.bin"),
+    .pC532 = (const u8*)&sBlob_73421e_prefix + 0xB4B2,
+    .after_C532 = INCBIN_U8("data/Blob_73421e_prefix_seg_C536.bin"),
+    .pC542 = (const u8*)&sBlob_73421e_prefix + 0xB15A,
+    .after_C542 = INCBIN_U8("data/Blob_73421e_prefix_seg_C546.bin"),
+    .pC54A = (const u8*)&sBlob_73421e_prefix + 0xB4B2,
+    .after_C54A = INCBIN_U8("data/Blob_73421e_prefix_seg_C54E.bin"),
+    .pC55A = (const u8*)&sBlob_73421e_prefix + 0xB168,
+    .after_C55A = INCBIN_U8("data/Blob_73421e_prefix_seg_C55E.bin"),
+    .pC562 = (const u8*)&sBlob_73421e_prefix + 0xB4B2,
+    .after_C562 = INCBIN_U8("data/Blob_73421e_prefix_seg_C566.bin"),
+    .pC572 = (const u8*)&sBlob_73421e_prefix + 0xB176,
+    .after_C572 = INCBIN_U8("data/Blob_73421e_prefix_seg_C576.bin"),
+    .pC57A = (const u8*)&sBlob_73421e_prefix + 0xB4B2,
+    .after_C57A = INCBIN_U8("data/Blob_73421e_prefix_seg_C57E.bin"),
+    .pC58A = (const u8*)&sBlob_73421e_prefix + 0xB184,
+    .after_C58A = INCBIN_U8("data/Blob_73421e_prefix_seg_C58E.bin"),
+    .pC592 = (const u8*)&sBlob_73421e_prefix + 0xB4B2,
+    .after_C592 = INCBIN_U8("data/Blob_73421e_prefix_seg_C596.bin"),
+    .pC5A2 = (const u8*)&sBlob_73421e_prefix + 0xB1AC,
+    .after_C5A2 = INCBIN_U8("data/Blob_73421e_prefix_seg_C5A6.bin"),
+    .pC5B2 = (const u8*)&sBlob_73421e_prefix + 0xB1D2,
+    .after_C5B2 = INCBIN_U8("data/Blob_73421e_prefix_seg_C5B6.bin"),
 };
 
 static const struct FrameData sSaXCloseUpFileSelectFrames[39] = {

@@ -76,6 +76,20 @@ def split_intro_blob() -> None:
     )
 
 
+# Raw pointer words inside the Sa-X close-up prefix.  Every word is a ROM
+# address into the prefix itself, so keeping it in a raw blob would leave an
+# absolute pointer that breaks as soon as the prefix moves (BUG-008 and the
+# elevator callback corruption in BUG-012).
+SA_X_CLOSE_UP_PREFIX_SIZE = 0xC5C2
+SA_X_CLOSE_UP_PREFIX_POINTERS = (
+    0x8056, 0x805E, 0x8066, 0x806E, 0x807E, 0x8086, 0x808E, 0x8096,
+    0x809E, 0x80A6, 0x80AE, 0x80B6,
+    0xC4DA, 0xC4EA, 0xC4FA, 0xC50A, 0xC51A, 0xC52A, 0xC532, 0xC542,
+    0xC54A, 0xC55A, 0xC562, 0xC572, 0xC57A, 0xC58A, 0xC592,
+    0xC5A2, 0xC5B2,
+)
+
+
 def split_sa_x_close_up_blob() -> None:
     """Carve the three raw FrameData tables out of the Sa-X close-up blob.
 
@@ -87,6 +101,11 @@ def split_sa_x_close_up_blob() -> None:
     them.  Split the blob into the bytes before the first table and after the
     last table so the surrounding data stays byte-identical; the tables
     themselves are skipped.
+
+    The prefix before the first table also embeds pointer tables whose words
+    point inside the prefix.  Split every one of those pointers out so the C
+    representation can relocate the words; the segments between them stay
+    byte-identical.  The complete prefix is still written for audit evidence.
     """
     blob_path = Path(DATA_PATH, "Blob_73421e_7478a0.bin")
     if not blob_path.exists():
@@ -96,13 +115,21 @@ def split_sa_x_close_up_blob() -> None:
         Path(DATA_PATH, "Blob_73421e_prefix.bin"),
         Path(DATA_PATH, "Blob_73421e_after.bin"),
     )
-    # The prefix contains two raw FrameData pFrame words at 0xC5A2 and
-    # 0xC5B2.  Split them out so the C representation can relocate the
-    # pointers; the surrounding bytes stay byte-identical.
-    prefix = blob_path.read_bytes()[:0xC5C2]
-    Path(DATA_PATH, "Blob_73421e_prefix_before.bin").write_bytes(prefix[:0xC5A2])
-    Path(DATA_PATH, "Blob_73421e_prefix_between.bin").write_bytes(prefix[0xC5A6:0xC5B2])
-    Path(DATA_PATH, "Blob_73421e_prefix_after.bin").write_bytes(prefix[0xC5B6:0xC5C2])
+    prefix = blob_path.read_bytes()[:SA_X_CLOSE_UP_PREFIX_SIZE]
+    if len(prefix) != SA_X_CLOSE_UP_PREFIX_SIZE:
+        raise ValueError(
+            f"{blob_path} is too small for the 0x{SA_X_CLOSE_UP_PREFIX_SIZE:X}"
+            "-byte Sa-X close-up prefix")
+    start = 0
+    for pointer in SA_X_CLOSE_UP_PREFIX_POINTERS:
+        if pointer < start or pointer + 4 > len(prefix):
+            raise ValueError(
+                f"invalid Sa-X close-up prefix pointer offset 0x{pointer:X}")
+        Path(DATA_PATH, f"Blob_73421e_prefix_seg_{start:04X}.bin").write_bytes(
+            prefix[start:pointer])
+        start = pointer + 4
+    Path(DATA_PATH, f"Blob_73421e_prefix_seg_{start:04X}.bin").write_bytes(
+        prefix[start:])
 
 
 def split_new_file_intro_frame_data_blob() -> None:
