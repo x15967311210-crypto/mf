@@ -183,8 +183,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     At 223227 normal `disp=1800 s1=0 room=23`, reordered `disp=5F00 s1=2
     room=14`; PC both 0x1C, LR `0x1238` vs `0x1B8`, CPSR `0x20000092` vs
     `0x00000092`.  Saved per-frame dumps/states are in `tas/bizhawk_fine/`.
-  - likely reorder data/pointer or transition-table issue; state at 223200
-    may itself be unmatched (OAM/VRAM already differ), so prove before fixing.
+  - engine investigation: 223200 input/save/route match; OAM/VRAM dump
+    difference is not trustworthy (dump inside onframeend); first trustworthy
+    field diff is 223214 `s1`.  All word-aligned pointers into the reordered
+    `.rodata` range appear relocated (43 word diffs); the divergence is in the
+    BIOS IRQ/return path (`LR 0x1238` normal vs `0x01B8` reordered).  BIOS
+    checksum in the states differs; verify same BIOS before source chase.
+  - leading candidate: copied IRQ/callback table in IWRAM (`sBlob_a5224_a5258`
+    at 0x080A5224, moved by reorder) or a raw literal in intr/audio code.
+  - no fix yet; BUG-011 stays DOING.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
