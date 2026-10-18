@@ -100,18 +100,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `gCurrentArea=0`, `gCurrentRoom=0x10` (16), `gCurrentNavigationRoom=1`,
     `main=3`, `s2=0x0100`, `eventCounter=3`.  This is the Navigation Room
     dialogue node; the dialogue image is not needed for identification.
-  - **reference mismatch confirmed**: the normal reference frame 26198 is
-    `gCurrentRoom=0`, `navroom=0`, `s2=0`, `active_oam=66`; it is a different
-    room/UI, so it cannot decide BUG-009.  Need a normal **room 16 Navigation
-    Room** state (`s2=0x100`, active ~96) for a matched comparison.
-  - matched normal state now exists (`area=0 room=0x10 navroom=1 event=3
-    main=3 s2=0x0100 active_oam=96`).  Dump diff: OAM only 7 animation bytes;
-    PAL 40 bytes; IO 175; VRAM 2511 bytes starting 0xC80A/0x153B8.  The
-    corruption is BG tilemap/legend/OBJ data, not the OAM table; targeted
-    BG/legend descriptor investigation is next.  Evidence:
+  - matched normal state exists (`area=0 room=0x10 navroom=1 event=3
+    main=3 s2=0x0100 active_oam=96`); dump diff: OAM only 7 animation bytes,
+    PAL 40, IO 175, VRAM 2511 starting 0xC80A/0x153B8.  Evidence:
     `work/playtest/m0f-2026-10-17/matched_state/`.
-  - next: trace the room-16 Navigation Room BG/legend loader and find the
-    unrelocated pointer/table feeding VRAM 0xC800; no OAM table patch.
+  - **correction:** BGxCNT (`0x04000008/0A/0C/0E`) is identical in both
+    (`1800/1B03/1A0A/DC49`).  The earlier "room BGCNT" claim mistakenly read
+    **BGxHOFS/VOFS** (`0x10/0x12/0x14/0x16`): normal `0x0100`, shifted
+    `0x4A46`.  The current lead is the pause/map **BG scroll/offset setup**;
+    a wrong scroll can shift/garble the legend without a raw tilemap table.
+  - next: trace the pause/map BGxHOFS/VOFS writer and `gBackgroundPositions`;
+    prove the `0x4A46` source.  Do not patch the pop-up graphics table from the
+    old BGCNT claim.
   - M0f is BLOCKED again; controlled map PASS is path-specific only.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
