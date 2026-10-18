@@ -334,3 +334,22 @@ Verification:
 
 Secondary cleanup (outer-table spelling in `asm/disasm_0x080765f8.s`) remains
 optional and was not changed.
+
+## Full 259k differential (2026-10-18)
+
+The local full TAS input (`work/playtest/m0-2026-10-17/tas/baseline.input`,
+259176 frames) was replayed on normal, padded-shifted and reordered builds after
+the BUG-006 source fix.  All three produced identical telemetry:
+
+```text
+SCREEN/OAM 300,600,900,1059,4000,30000: identical
+INPUT_FINAL frames=259176 frame_counter=61634 keys=1 disp=0x5F00
+            main=1 s1=2 s2=256
+```
+
+The harness exits 1 because its liveness check compares the 16-bit
+`gFrameCounter16Bit` (`61634`) against 75% of 259176 (`194382`).  The counter
+wraps at 65536; this is a harness accounting bug, not a ROM divergence.  Until
+the check accounts for wrap (or a dedicated `full-input` target is added), the
+259k run is differential evidence only, not a green gate.  The 30k inputs
+remain the committed automatic limit.

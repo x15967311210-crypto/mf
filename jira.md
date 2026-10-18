@@ -133,6 +133,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     to normal; fixed candidate at
     `work/playtest/m0f-2026-10-17/fixed/mf_us_m0f_shifted_fixed.gba`.
   - M0f still needs the human retest; M0 is not DONE and M1 does not start.
+- [DONE] QA-010 (emulator) — full 259k local differential
+  - normal/shifted/reordered all match at SCREEN/OAM 300/600/900/1059/4000/
+    30000 and at `INPUT_FINAL` (`frame_counter=61634 disp=0x5F00 main=1 s1=2
+    s2=256`).
+  - Harness exits 1 on the 16-bit frame-counter liveness floor; follow-up
+    QA-010a should handle wrap or add a local `full-input` target.  The full
+    input stays local (`work/playtest`), not committed.
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
