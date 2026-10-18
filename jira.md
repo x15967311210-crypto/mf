@@ -166,6 +166,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     0.6.3/0.7.2 or an instrumented core from the 384 state.
   - observed: shifted 384 callback `0x0809F9E1`, 385 `0x0809C30A`;
     normal/reordered remain `0x0809E9E1`.  Wrong write is between 384-385.
+  - state loader reproduces all six states; shifted 385 also has
+    `gHBlankCallback=0x88045C4F` clobbered.  Two adjacent callback words are
+    overwritten -> multi-word overflow/copy, not a single setter; candidate
+    `gNonGameplayRam` end at 0x030019C4 plus oversized DMA/copy.  Writer still
+    not captured because the current libmgba lacks a usable store hook.
+  - QA-017a: build mGBA 0.7.2 with GBAStore8/16/32 + DMA range logging,
+    run shifted_384 one frame, normal/reordered controls; log writer PC/LR/SP.
+  - observed: shifted 384 callback `0x0809F9E1`, 385 `0x0809C30A`;
+    normal/reordered remain `0x0809E9E1`.  Wrong write is between 384-385.
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
   - native 100% TAS, normalized SaveRAM `FB611BD6...`: `PARITY: FAIL`.
   - shifted first behavior divergence frame 401 (`DISPCNT 1E00` vs `1C00`),
