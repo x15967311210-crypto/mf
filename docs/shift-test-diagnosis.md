@@ -563,3 +563,24 @@ VRAM: 2511 differing bytes, starting at 0xC80A and 0x153B8
 The OAM table is mostly aligned; the persistent visual difference is in the
 **BG tilemap/legend and OBJ tile data**, not the 501 OAM frame pointers.  This
 is now a targeted BG/legend descriptor/table investigation for BUG-009.
+
+### BUG-009 BGCNT correction (2026-10-18)
+
+The earlier engine report compared the wrong IO offsets.  Actual matched
+registers:
+
+```text
+BG0CNT/BG1CNT/BG2CNT/BG3CNT:
+  normal and shifted both 0x1800/0x1B03/0x1A0A/0xDC49
+
+BG0HOFS/.../BG3VOFS (0x10/0x12/0x14/0x16...):
+  normal 0x0100...
+  shifted 0x4A46...
+```
+
+`0x4A46` is a BG scroll/offset value, not BGCNT.  The pauseflag/room/submode
+are equal (`gPauseScreenFlag=3 main=3 s2=0x100 room=0x10 navroom=1`).  The
+current lead is therefore the pause/map **BG scroll setup**, not the pop-up
+graphics table by itself.  A wrong scroll can shift the legend/map BG and
+produce the exact screenshot corruption while VRAM still contains the right
+tiles.  Trace the BGxHOFS/VOFS writer and `gBackgroundPositions` before patching.
