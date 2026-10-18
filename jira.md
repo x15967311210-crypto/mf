@@ -173,6 +173,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     not captured because the current libmgba lacks a usable store hook.
   - QA-017a: build mGBA 0.7.2 with GBAStore8/16/32 + DMA range logging,
     run shifted_384 one frame, normal/reordered controls; log writer PC/LR/SP.
+  - QA-017a partial: states/BIOS validated; state trailer frame is one behind
+    the core counter.  One-frame probes with 0/Right/Down/R did not reproduce;
+    the write needs the real input rows 385 Right, 386 Up, 387 A and 4–8 frames.
+    The existing libmgba has no store hook; patch `src/gba/memory.c`
+    (`GBAStore8/16/32/Multiple`) and `src/gba/dma.c`, log
+    `0x030019C0..0x030019CC`, run shifted/normal/reordered controls.  No writer
+    captured yet.
+  - QA-017b: finish instrumented build and input-correct run; do not source-patch
+    until the writer is identified.
   - observed: shifted 384 callback `0x0809F9E1`, 385 `0x0809C30A`;
     normal/reordered remain `0x0809E9E1`.  Wrong write is between 384-385.
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
