@@ -117,6 +117,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - next: prove the wrong graphics/tilemap table and fix; do not patch BG
     scroll or the 501 OAM pointers.
   - M0f is BLOCKED again; controlled map PASS is path-specific only.
+  - graphics-source check: the minimap/pop-up LZ77 sources are byte-identical
+    normal vs shifted at +0x1000; shifted loads a **different legend stream**
+    into VRAM 0xC800 (L1–L4 panel) instead of normal's X-parasite portrait.
+    Not a stale graphics pointer; likely pause/map-state descriptor selection
+    (`StatusScreenDrawEverything` vs portrait path, `sDebugSectionInfo+...`,
+    `sCharacterWidths+...`, `sExploredMinimapBitFlags+...`).
+  - next: instrument mGBA writes to `0x0600C800–0x0600CFFF` and compare the
+    normal/shifted call path; prove the descriptor/state index and fix.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401

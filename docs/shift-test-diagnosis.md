@@ -600,3 +600,19 @@ VRAM/PAL/OAM differences persist: 2507 / 50 / 28 bytes
 So the corruption is not a scroll writer; it is in the **BG tilemap / OBJ /
 graphics data** (VRAM 0xC800 and 0x14740..0x15340).  The next candidate is the
 Navigation Conversation pop-up graphics/legend table, not the 501 OAM pointers.
+
+### BUG-009 legend-stream finding (2026-10-18)
+
+The minimap/pop-up graphics sources are correctly relocated: every LZ77
+source used by `PauseScreenInit`/`NavigationConversationLoadSpecialGraphics`
+is byte-identical between normal and shifted at `+0x1000`.
+
+The shifted state, however, has loaded a **different legend stream** at VRAM
+`0x0600C800` (the L1–L4 test panel) instead of normal's X-parasite portrait
+panel.  This is a pause/map **state/descriptor selection** issue, not a stale
+graphics pointer.  Prime candidates: `StatusScreenDrawEverything` vs the
+portrait path, `sDebugSectionInfo+0x60/0x97/0x63`, `sCharacterWidths+0x5A94`
+and offsets, `sExploredMinimapBitFlags+0x394/0xCC`.
+
+Next: instrument writes to `0x0600C800–0x0600CFFF` in the shifted run and
+record writer PC/LR/DMA/BitFill, then compare the normal path.
