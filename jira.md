@@ -199,7 +199,19 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - HACK-004a may now start with Test Area 1 rooms; still document bg3,
     palettes, composition/scripts and secondary-sprite tables as pipeline gaps.
 - [DONE] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
-- [TODO] HACK-004a (content) — blockout: 5 rooms, doors, camera, save pad  [deps: HACK-003]
+- [DONE] HACK-004a1 (content) — five-room blockout source assets
+  - `1d3d03a`: synthetic tileset + 5 Tiled maps/manifests under
+    `hack/content/tiled/`; 12 doors, 12 spawns, camera scrolls; all rooms
+    ≤450 blocks; `check_blockout.py` and `content-check` PASS.
+  - generated `hack/gen/rooms/` stays ignored; README has the HACK-004a2
+    integration checklist. Door IDs 10/11 are a provisional post-boss return
+    pair and need design sign-off before the 13-entry door table is committed.
+- [TODO] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms
+  - extend `sTest1RoomEntries` to 5 and `sTest1Doors` to 13; room/door data
+    promotion needs an ADR because `src/data` is baseline-owned
+  - resolve tileset 0, bg0/dark-room handling, spawn tables, entry warp
+  - fix broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1
+
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a]
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
 - [TODO] PLAYTEST-002 (human) — M2 pulse playtest  [deps: HACK-004b]
