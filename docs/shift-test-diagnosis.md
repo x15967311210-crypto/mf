@@ -409,3 +409,24 @@ the cold-boot frame log (401 divergence) is still the valid observation, and
 mGBA 0.11 cold boot remains clean.  Re-capture states with the core-frame
 counter/input logged at capture time, or provide a live BizHawk PC/GPR trace at
 the actual 400/401 file-select frames.
+
+### BUG-008 live trace (2026-10-18)
+
+BizHawk 2.3.0.1 live trace (core `gFrameCounter16`/`gInput`/`gChangedInput`):
+
+```text
+normal 398-403: counter 97..102, input A only at 401, PC=0x1C/CPSR=0x92 (IRQ)
+shifted 398-403: counter stays 84, input=0xF077, changed=0xFC03,
+                 PC in BIOS context (0x68/0x60/0x24/0x08)
+```
+
+This is a live observation, not a state-marking artifact.  The shifted game
+does not advance its frame counter under BizHawk 2.3/mGBA 0.6 while normal and
+reordered do.  The state/trace set `bizhawk_400_401` is superseded by
+`bizhawk_400_401_v2`.
+
+mGBA 0.11 cold boot with the same SaveRAM/BIOS/input remains clean.  The
+remaining hypothesis is an mGBA 0.6-core-specific exception/timing behavior,
+not yet a proven source pointer bug.  Next: run the same shifted cold boot in
+BizHawk 2.3.2+ (mGBA 0.7.2) or mGBA standalone; if it passes, classify BUG-008
+as an old-core compatibility issue rather than an engine source bug.

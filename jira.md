@@ -106,9 +106,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     core game frame for the shifted states, so the 398-403 register trace is
     not at the A-handler decision.  This invalidates the state/trace
     comparison; no source conclusion.
-  - next: re-capture per-build states with core `gFrameCounter`/input logged at
-    capture time, or provide a **live** BizHawk PC/GPR trace at the actual
-    frames 400/401.  mGBA 0.11 cold boot remains clean.  Keep BUG-008 open.
+  - live trace v2 confirms shifted `gFrameCounter=84` frozen from emu 398-403,
+    `gInput=0xF077`, PC in BIOS context; normal advances 97..102 and receives A
+    at 401.  This is a real BizHawk 2.3/mGBA 0.6 freeze, not a state-marking
+    artifact.  mGBA 0.11 cold boot is clean.
+  - next: run the same shifted cold boot in BizHawk 2.3.2+ (mGBA 0.7.2) or
+    mGBA standalone.  If it passes, classify BUG-008 as old-core compatibility,
+    not an engine source bug; if it fails, continue the source/BIOS IRQ path.
   - keep BUG-008 open; do not mask with input offset.
 
 - [DONE] BUG-006 (playtest) — shifted fresh map objective UI missing
