@@ -137,9 +137,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - normal/shifted/reordered all match at SCREEN/OAM 300/600/900/1059/4000/
     30000 and at `INPUT_FINAL` (`frame_counter=61634 disp=0x5F00 main=1 s1=2
     s2=256`).
-  - Harness exits 1 on the 16-bit frame-counter liveness floor; follow-up
-    QA-010a should handle wrap or add a local `full-input` target.  The full
-    input stays local (`work/playtest`), not committed.
+  - QA-010a landed `0300d80`: modulo-65536 liveness delta; normal/shifted/
+    reordered full 259k now exit 0 with identical checkpoints/final state.
+    The full input stays local (`work/playtest`), not committed.
+- [DONE] QA-010a (emulator) — long-input liveness and full differential
+  - `0300d80` wrap-aware harness: full 259k normal/shifted/reordered exit 0,
+    `INPUT_FINAL frame_counter=61634 disp=0x5F00 main=1 s1=2 s2=256`.
+  - 4k/30k/screen/OAM gates pass after the change; full input remains local.
 - [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
   - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
     map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,

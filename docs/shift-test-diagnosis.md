@@ -347,9 +347,13 @@ INPUT_FINAL frames=259176 frame_counter=61634 keys=1 disp=0x5F00
             main=1 s1=2 s2=256
 ```
 
-The harness exits 1 because its liveness check compares the 16-bit
+The first run exited 1 because the harness compared the 16-bit
 `gFrameCounter16Bit` (`61634`) against 75% of 259176 (`194382`).  The counter
-wraps at 65536; this is a harness accounting bug, not a ROM divergence.  Until
-the check accounts for wrap (or a dedicated `full-input` target is added), the
-259k run is differential evidence only, not a green gate.  The 30k inputs
-remain the committed automatic limit.
+wraps at 65536; this was a harness accounting bug, not a ROM divergence.
+
+QA-010a fixed the liveness check in `tests/emulator/harness.c` (commit
+`0300d80`): it records the start counter and compares the modulo-65536 delta
+against `(frames % 65536) * 3 / 4`, preserving the short-run floor.  After the
+fix, all three 259k runs exit 0 with the identical final state and checkpoints
+above.  The full 259k input remains local (`work/playtest`) and is differential
+evidence, not a committed fixture; the committed automatic limit stays 30k.
