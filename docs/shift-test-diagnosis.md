@@ -908,3 +908,11 @@ overruns the 1024-byte `gOamData` buffer into `gVBlankCallback`.  mGBA standalon
 does not reproduce; native MGBAHawk/VBA path does.  Investigate
 `gNextOamSlot`/MenuOam frame count and the `FileSelectDrawOam` destination
 calculation, not `CallbackSetVBlank`.
+
+### BUG-008 core attribution correction (2026-10-18)
+
+The writer was captured in the native BizHawk `mgba.dll` (MGBAHawk/mGBA) path.
+A later VBA-Next control did **not** reproduce the callback corruption.
+Therefore BUG-008 is an mGBA/MGBAHawk-path-parity bug with a real shifted OAM
+overrun, not a universal emulator-core bug.  The FileSelectDrawOam overrun is
+the source target.

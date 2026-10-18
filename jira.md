@@ -306,8 +306,10 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     the same PC/GPR/IRQ trace and 400/401 dumps as mGBA, so this is **not
     mGBA-core-only**.
   - core matrix: BizHawk 2.3/2.3.1 ship mGBA 0.6 (fork updated 2018-09-10);
-    BizHawk 2.3.2 ships mGBA 0.7.2; native 2.3.2 fails, and VBA-Next fails on
-    the same state/dumps.  Do not treat this as a 0.6-only core artifact.
+    BizHawk 2.3.2 ships mGBA 0.7.2.  The actual reproducer is the
+    **MGBAHawk/mGBA path** (native `mgba.dll`); the later VBA-Next control did
+    **not** reproduce the callback corruption.  Do not call this a universal
+    core bug.
   - first IRQ anomaly at frame 385: shifted `LR=0x080A2334`, `SPSR=0x3F`
     (normal `LR=0x1B8`, `SPSR=0x1F`); frame 386 shifted enters Undefined mode
     (`CPSR=0x4000009B`) and clears IE bit0; normal stays in IRQ.  IRQ vector
