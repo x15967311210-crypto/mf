@@ -80,7 +80,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     mGBA 0.11 control.
   - decide whether the gate is BizHawk-specific or whether mGBA 0.11 is
     authoritative before changing source.
-- [DOING @dev1] BUG-009 (playtest) — shifted Navigation Room computer-dialogue corruption
+- [DONE] BUG-009 (playtest) — shifted Navigation Room computer-dialogue corruption
   - final shifted fixed `a822b2d8...` fresh manual path: slot1 Navigation Room
     frame 18171 `disp=5E00 main=1 s2=0100 active_oam=40` clean; slot2 computer
     dialogue frame 24263 `disp=5F00 main=3 s2=0100 active_oam=96` corrupted,
@@ -140,6 +140,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     candidate at `work/playtest/m0f-2026-10-17/mgba-final-bug009/`.
   - if fresh room-16 UI matches normal, close BUG-009; otherwise continue the
     descriptor path.  Do not call M0 DONE yet.
+  - **PASS**: fresh room-16 candidate `0bddba78...` from the 4FD087E9 SaveRAM,
+    Nintendo Presents frame 139, `story_route_normal_from139.input`, ends
+    frame 21649 `event=3 disp=5F00 main=3 s1=0 s2=0x100 active_oam=96`.
+    End PNG/VRAM/PAL/OAM/IO all byte-identical to matched normal:
+    `ED432C7A...` / `E25649D0...` / `1EA43B79...` / `B09CECD8...` /
+    `449C2591...`.  Fresh path, not the saved slot2.
+  - pop-up table fix `b394ab3` is the resolution; BUG-009 closed.
+  - evidence: `work/playtest/m0f-2026-10-17/matched_state/bug009_fresh_0bddba78/`.
 - [PARK] BUG-008 (shift/engine) — BizHawk file-select/VBlank compatibility
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401

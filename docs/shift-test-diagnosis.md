@@ -709,3 +709,19 @@ EVENTCHG 2 -> 3
 Both logs SHA1 `643E1FC9DA960CAB5BB0FB29C59D1DF5CE985F7F`;
 `event_diff.py` reports `PASS (checkpoints=74 transitions=3)`.  The earlier
 shifted miss was due to using a start state from a different SaveRAM.
+
+### BUG-009 PASS (2026-10-18)
+
+Fresh room-16 candidate `0bddba785137fe46c90c0b4f26ded6336890b886`:
+
+```text
+SaveRAM 4FD087E9...
+start Nintendo Presents frame 139
+input story_route_normal_from139.input
+end frame 21649 event=3 disp=5F00 main=3 s1=0 s2=0x100 active_oam=96
+```
+
+End PNG/VRAM/PAL/OAM/IO are byte-identical to matched normal
+(`ED432C7A...` / `E25649D0...` / `1EA43B79...` / `B09CECD8...` /
+`449C2591...`).  The Navigation pop-up table relocation is confirmed; BUG-009
+is closed.  M0 still waits for the QA-012 room/dialog/UI coverage matrix.
