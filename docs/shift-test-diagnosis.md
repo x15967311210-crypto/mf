@@ -962,3 +962,24 @@ lives inside raw `sBlob_73421e_prefix`.  In the shifted ROM that address points
 at the wrong frame data, giving `sl=0x1F28`, which then overruns OAM into
 `gVBlankCallback`.  Fix the prefix/frame-record pointer relocation, not the OAM
 slot code or the pAnim table.
+
+### BUG-008 landed fix (2026-10-18, `1d5e422`)
+
+`src/data/sa_x_close_up.c` now represents `sBlob_73421e_prefix` as a packed
+struct with two relocatable `const u8 *` fields at prefix offsets `0xC5A2` and
+`0xC5B2`.  The surrounding bytes are unchanged.  `tools/extractor.py` emits
+`Blob_73421e_prefix_before/between/after.bin` so a clean extraction reproduces
+the layout.
+
+Verification:
+
+```text
+normal SHA1    ca33f4348c2c05dd330d37b97e2c5a69531dfe87  (unchanged)
+shifted SHA1   812d0090da1a1a28d8242a55ec355c6f2779b5ad
+0x087417C0      ca037408  -> pFrame 0x087403CA
+0x087403CA      0600...    -> frame count 6 (was 0x1F28 at the stale address)
+```
+
+Automatic gates pass: audit, smoke, test, strict relocs, shift-check,
+shift-start, shift-input 4k/30k, screen-diff, oam-diff and shift-reorder.
+The native BizHawk 384/385 and full 100% TAS retest remains the acceptance gate.

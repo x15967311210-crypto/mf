@@ -155,7 +155,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - capture true pre-entry states in all three builds from the same SaveRAM,
     input and frame, before the platform starts; verify loader warnings/CPU
     mode; only then is BUG-010 actionable.
-- [DOING @dev2] QA-017 (emulator) — pre-failure IRQ state/watchpoint
+- [DONE] QA-017 (emulator) — pre-failure IRQ state/watchpoint
   - capture normal/shifted/reordered state at frame 384/385 (before
     `gVBlankCallback` corruption) from the native TAS, same BIOS/state.
   - use mGBA 0.6.3/0.7.2 (BizHawk BIOS) or an instrumented core to watch writes
@@ -235,6 +235,31 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     a reproducing core reports PC/LR/SP/value.
   - observed: shifted 384 callback `0x0809F9E1`, 385 `0x0809C30A`;
     normal/reordered remain `0x0809E9E1`.  Wrong write is between 384-385.
+  - **FIX LANDED `1d5e422`**: `sBlob_73421e_prefix` is now a packed C
+    struct with relocatable `pFileSelectFrame0`/`pFileSelectFrame1` fields at
+    prefix+0xC5A2/0xC5B2; `tools/extractor.py` emits the matching split blobs.
+    Normal SHA1 stays `ca33f434...`; shifted is `812d0090...`.
+  - shifted prefix+0xC5A2 now holds `0x087403CA` (was `0x0873F3CA`); the
+    pFrame target starts with count `6`, so the `sl=0x1F28` OAM-loop overrun
+    can no longer reach `gVBlankCallback`.
+  - automatic gates on the integration tree: audit, smoke, test, strict
+    relocs, shift/start/input 4k/30k, screen/OAM diff, reorder all PASS.
+  - **native 384/385 + 100% TAS retest is the remaining acceptance**; candidate
+    `work/playtest/m0f-2026-10-17/mgba-final-bug008/`.  Do not mark M0 DONE
+    until EmuHawk confirms no frame-385 callback corruption and the shifted
+    final checkpoint matches normal.
+- [DOING @human] QA-018 (emulator) — native TAS parity after BUG-008
+  - run native Windows BizHawk 2.3.2, mGBA core, BIOS `300C20DF...`, normalized
+    SaveRAM `FB611BD6...`, 100% TAS movie; no converted `.bk2` input and no
+    per-build offsets.
+  - builds in `work/playtest/m0f-2026-10-17/mgba-final-bug008/`: normal
+    `ca33f434...`, shifted `812d0090...`, reordered `af62233e...`.
+  - expected: frames 384/385 callback `0809F9E1`, no write to `030019C4`, no
+    Undefined at 386, frame 401 `DISPCNT=1E00`, final 339001 normal/shifted
+    `1900 0009 0002 0100 109 0 63 0`.
+  - reordered still needs the separate BUG-011 room 23/14 check; do not gate it
+    on BUG-008.
+  - only after this passes can M0f/PLAYTEST-000 advance.
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
   - native 100% TAS, normalized SaveRAM `FB611BD6...`: `PARITY: FAIL`.
   - shifted first behavior divergence frame 401 (`DISPCNT 1E00` vs `1C00`),
@@ -298,7 +323,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     use the same mGBA version and verify loader has no "different game" warning.
     Only then can BUG-010 be classified as source.
   - Do not call M0 PASS; no source patch from this unmatched phase.
-- [DOING @dev2] BUG-008 (shift/engine) — shifted IRQ/file-select undefined path
+- [DOING @human] BUG-008 (shift/engine) — shifted IRQ/file-select undefined path
   - Observed BizHawk-only: normal and reordered are identical for 701
     frames; first divergence at frame 401
     immediately after the single-frame A at 400. normal/reordered go
