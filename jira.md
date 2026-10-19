@@ -269,14 +269,35 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     full final checkpoint not reached.  Evidence:
     `tas/bug008_candidate_fine/BUG008_CANDIDATE_FINE.md` and logs.
   - parity remains FAIL because of BUG-012, not BUG-008.
-- [TODO @windows] QA-020 (emulator) — full native TAS parity after BUG-013
-  - candidate `012a2c95089485ebd37d19e86717b666ccc00e09` (merged `424fd7f`),
-    BIOS `300C20DF...`, normalized SaveRAM `FB611BD6...`, same 100% TAS.
-  - BUG-013 native idle/focused PASS on 2026-10-19; the full 339001 run has
-    not been executed yet.
+- [DOING @windows] QA-020 (emulator) — full native TAS parity after BUG-013
+  - current candidate `012a2c95089485ebd37d19e86717b666ccc00e09` (merged
+    `424fd7f`), BIOS `300C20DF...`, normalized SaveRAM `FB611BD6...`,
+    same 100% TAS.
+  - BUG-013 native idle/focused PASS on 2026-10-19.
+  - **partial run on `2447dfb7...`**: 384/385/386 callback `0809F9E1`,
+    401 `DISPCNT=1E00`, 22922/22923/22924/22925 `0809B2C9`, 22952
+    `DISPCNT=9700`, 30000 state fields normal/shifted match.  This confirms
+    BUG-012's 22923 fix in the full movie.
+  - after 30000 the shifted display went black and the run was stopped before
+    the next checkpoint; **no first-black frame or 30000 state was saved**.
+    That partial run predates the BUG-013 merge, so it must be repeated on
+    `012a2c95` before treating the black as a current regression.
   - require 22923 callbacks `0809A2C9`/`0809B2C9`, both `CPSR=92`; no Undefined
     at 22924/22925; 22952 `DISPCNT=9700`; final 339001
     `1900 0009 0002 0100 109 0 63 0`; file-select 385/401 still PASS.
+  - **local converted-input triage (not a gate)**: replaying
+    `reseren-100.input` on `012a2c95` reaches 339001 with no persistent black.
+    The only black frames after 30000 are 1-3 frame fades at
+    55146, 55921-55923, 89885, 90392-90394, 125731, 126163-126165, etc.;
+    normal shows the same black frames at the same positions with callback
+    normal `080768A5` / shifted `080778A5` (the usual `+0x1000` shift).  Local
+    final state is still gameplay (`DISPCNT=5F00` at 339000), so this does
+    **not** prove TAS parity; it only suggests the native stop was a normal
+    fade, not a persistent shifted black screen.
+  - next run: do not stop on a single black frame; require a continuous
+    black run (e.g. >60 frames) or compare normal at the same frame, and save
+    a state at 30000 plus the last healthy/first-long-black frames.
+  - evidence: `tas/bug012c_full/` (`BUG012C_PARTIAL.md`, logs, states).
   - reordered still needs BUG-011 room 23/14; do not gate it on BUG-012.
 - [DONE] QA-022 (emulator) — BUG-013b native verification
   - candidate `012a2c95089485ebd37d19e86717b666ccc00e09`; native BizHawk 2.3.2,
@@ -575,6 +596,25 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Do not auto-whitelist; do not wire strict into the main gate until the
     list is zero or explicitly justified.
   - this is a shiftability P0 but does not block the BUG-013 native gate.
+- [TODO] BUG-015 (emulator) — full TAS shifted black after frame 30000
+  - partial native run on shifted `2447dfb7...` (pre-BUG-013 merge) passed
+    file-select, 22922-22952 and 30000 (normal/shifted fields match), then
+    shifted went black after 30000; the run was stopped before the next
+    checkpoint, so there is no first-black frame or 30000 state.
+  - must first reproduce on the current merged candidate `012a2c95...`;
+    the old black may already be fixed by BUG-013.
+  - **local converted-input triage**: on `012a2c95` the full input reaches
+    339001; the only black frames after 30000 are 1-3 frame fades
+    (55146, 55921-55923, 89885, 90392-90394, ...) and normal has the same
+    frames.  This suggests the native stop was a normal transition, not a
+    persistent shifted black screen.  Local final state is not the ending,
+    so native QA-020 is still required.
+  - next: repeat on `012a2c95`, do not stop on one black frame; save a state
+    at 30000 and at any continuous black run (>60 frames), then capture
+    DISPCNT/callback/IE/PC/LR/CPSR + screenshot + pOam/VRAM.
+  - suspected link: BUG-014 latent raw-pointer runs (large graphics blobs);
+    do not patch callback/IRQ or whitelist a table just to clear the screen.
+  - evidence: `tas/bug012c_full/` (`BUG012C_PARTIAL.md`, logs).
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`

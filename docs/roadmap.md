@@ -84,12 +84,15 @@ Gate **S4**: playable slice sign-off, then content production.
 ## Current status
 
 **M0 shiftable-boot gate: BLOCKED** — BUG-013 native idle and focused checks
-pass on shifted `012a2c95…` (merged `424fd7f`), but the full 339001 TAS
-(QA-020) has not run and `PLAYTEST-000` human sign-off is still pending.
-BUG-010's elevator state is parked as an invalid post-entry capture; QA-012
-coverage is paused.  The new post-link scan reports 74 latent pointer runs
-(BUG-014); those need triage before full shiftability is claimed, although the
-BUG-013 `sBlob_64e470` run is gone.  M1 blockout is paused; see `jira.md`.
+pass on shifted `012a2c95…` (merged `424fd7f`).  QA-020 now reaches frame
+30000 with the BUG-012 22923 fix confirmed, but a partial run on the older
+`2447dfb7…` candidate black-screened after 30000; the first-black frame was
+not captured, so QA-020/BUG-015 must repeat it on the current candidate.
+`PLAYTEST-000` human sign-off is still pending.  BUG-010's elevator state is
+parked as an invalid post-entry capture; QA-012 coverage is paused.  The new
+post-link scan reports 74 latent pointer runs (BUG-014); those need triage
+before full shiftability is claimed, although the BUG-013 `sBlob_64e470` run
+is gone.  M1 blockout is paused; see `jira.md`.
 
 Baseline evidence (2026-10-17):
 
