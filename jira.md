@@ -269,14 +269,29 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     full final checkpoint not reached.  Evidence:
     `tas/bug008_candidate_fine/BUG008_CANDIDATE_FINE.md` and logs.
   - parity remains FAIL because of BUG-012, not BUG-008.
-- [BLOCKED] QA-020 (emulator) — native TAS parity after BUG-012  [deps: BUG-013]
-  - native BizHawk 2.3.2, mGBA core, BIOS `300C20DF...`, normalized SaveRAM
-    `FB611BD6...`, same 100% TAS; candidate `c4b62c65...` (bug013).
+- [TODO @windows] QA-020 (emulator) — full native TAS parity after BUG-013
+  - candidate `012a2c95089485ebd37d19e86717b666ccc00e09` (merged `424fd7f`),
+    BIOS `300C20DF...`, normalized SaveRAM `FB611BD6...`, same 100% TAS.
+  - BUG-013 native idle/focused PASS on 2026-10-19; the full 339001 run has
+    not been executed yet.
   - require 22923 callbacks `0809A2C9`/`0809B2C9`, both `CPSR=92`; no Undefined
     at 22924/22925; 22952 `DISPCNT=9700`; final 339001
     `1900 0009 0002 0100 109 0 63 0`; file-select 385/401 still PASS.
   - reordered still needs BUG-011 room 23/14; do not gate it on BUG-012.
-- [DOING @windows] QA-022 (emulator) — BUG-013 2332 pOam/count capture
+- [DONE] QA-022 (emulator) — BUG-013b native verification
+  - candidate `012a2c95089485ebd37d19e86717b666ccc00e09`; native BizHawk 2.3.2,
+    BIOS `300C20DF...`, normalized SaveRAM `FB611BD6...`.
+  - **PASS**: 2331 state -> 5000 clean (`callback=08094901`, `IE=2401`);
+    idle 2238/2331/2332/2333/2400/5000 clean; 2238/2332 pOam counts sane
+    (1..11, no 25100/61443/1008); focused 384/385/386/401 PASS;
+    22923/22924/22925 `0809B2C9`/`CPSR=92`; 22952 `DISPCNT=9700`.
+  - 2238/2239 screenshots are 242 bytes, but normal is also 242 at those
+    frames; baseline transition, not a regression.
+  - evidence: `tas/bug013b_state/`, `tas/bug013b_idle/`,
+    `tas/bug013b_focus/`, `tas/bug013b_probe/`;
+    `tas/bug013b_state/BUG013B_NATIVE_RESULT.md`.
+  - no full 339001 TAS; that is QA-020.
+  - pre-fix capture notes retained below for history.
   - candidate `c4b62c65378602b03f7144913fbf9d45140720fd`; state
     `tas/bug013_crash/shifted_2331.State`; no movie; same BIOS/SaveRAM.
   - run `work/playtest/m0f-2026-10-17/tools/bizhawk/bug013_2332_probe.lua`
@@ -292,16 +307,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     offsets `0x0D6C8..0x0DDE8` = 229 8-byte records: 31 were fixed by
     `da248e3`, 10 are zero, and **188 are still raw** (including slot 0
     frame 15 and every table from `0865CE00` onward).
-  - a throwaway ROM patch adding `+0x1000` to exactly those 188 words makes
+  - a throwaway ROM patch adding `+0x1000` to exactly those 188 words made
     idle frames 2332..2351 healthy (`callback=08094901`, no IE loss, no
-    invalid jump) and field-identical to normal.  Windows native post-fix
-    confirmation is still required; do not treat the headless run as the gate.
+    invalid jump) and field-identical to normal.  This headless result was
+    later confirmed by the native BUG-013b run above.
   - **post-fix candidate staged**: `mgba-final-bug013b/` shifted
     `012a2c95089485ebd37d19e86717b666ccc00e09` (source build from dev4
-    `32d3513`), state `shifted_2331.State`.  Local mGBA 0.7.2 replay is
-    clean through 120 frames; `BUG013B_RESULT.md` has the native checklist.
-  - remaining QA-022 scope is now **native post-fix confirmation**, not the
-    pre-fix table capture.
+    `424fd7f`, originally `32d3513`), state `shifted_2331.State`.  Local
+    mGBA 0.7.2 replay is clean through 120 frames; `BUG013B_RESULT.md` has
+    the native checklist.
 - [DONE] QA-019 (emulator) — capture 22923 gVBlankCallback writer
   - use the native MGBAHawk/BizHawk 2.3.2 path that reproduced BUG-008; watch
     `0x030019C4` and `0x030019C0..0x030019CC` over frames 22920-22930, same
@@ -426,7 +440,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `0809B2C9`, LR `000001B8`, CPSR `00000092`; 22952 `DISPCNT=9700`;
     file-select 384/385/386/401 still PASS.
   - full 100% TAS remains QA-020; M0f stays BLOCKED until it reaches 339001.
-- [DOING @dev4] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
+- [DONE] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
   - independent of BUG-008/385 and BUG-012/22923.  Native BizHawk 2.3.2,
     no movie/no input, same BIOS/SaveRAM: normal/reordered OK; shifted first
     diverges at 2238:
@@ -523,18 +537,25 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - pre-fix proof: a throwaway ROM patch adding `+0x1000` to those 188 words
     is healthy from 2331 through 2351 and matches normal's DISPCNT/callback
     (`08094901` is normal `08093901 + 0x1000`).
-  - **FIX COMMITTED on `dev4` `32d3513`** (base `f3c3637`): all 219 nonzero
-    pFrame words in `0x0D6C8..0x0DDE8` are relocatable fields; extractor now
-    generates the full 229-record layout and self-checks the C struct.
-    Normal SHA1 `ca33f434...`; shifted
+  - **FIX COMMITTED on `dev4` `424fd7f`** (rebased onto `b8fe9c2`; original
+    `32d3513`): all 219 nonzero pFrame words in `0x0D6C8..0x0DDE8` are
+    relocatable fields; extractor now generates the full 229-record layout and
+    self-checks the C struct.  Normal SHA1 `ca33f434...`; shifted
     `012a2c95089485ebd37d19e86717b666ccc00e09`.
   - dev4 gates: audit/smoke/check-relocs-strict/shift-build PASS;
     normal `make check` PASS; `test`/`shift-start`/`shift-input`/
     `shift-reorder` dynamic stages SKIP (77, no harness in worktree).
   - candidate staged in `mgba-final-bug013b/` with the 2331 state and
-    `BUG013B_RESULT.md`.  **Not merged**; waiting for QA-022 Windows native.
-  - full 100% TAS remains QA-020, but is blocked by this 2332 regression.
-- [TODO] BUG-014 (shift/engine) — post-link scan: 90 raw pointer runs remain
+    `BUG013B_RESULT.md`.
+  - **native BUG-013b PASS 2026-10-19** (QA-022): 2331 state -> 5000 clean;
+    idle 2238/2331/2332/2333/2400/5000 clean; pOam counts 1..11; focused
+    384/385/386/401 and 22923/22924/22925/22952 PASS.  Merged fast-forward
+    as `424fd7f`.
+  - integrated `hack` rebuild: normal `ca33f434...`, shifted `012a2c95...`;
+    post-link scan reports 74 runs but **no** `sBlob_64e470` run.
+  - full 100% TAS is QA-020, now unblocked; M0f still waits on QA-020 and
+    `PLAYTEST-000`.
+- [TODO] BUG-014 (shift/engine) — post-link scan: 74 raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
     relocated words, and fails only on structured pointer runs
@@ -542,9 +563,10 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - targets: `make -f Makefile.shift postlink-scan` (report) and
     `postlink-scan-strict` (exit 1).  Not wired into `check-relocs-strict`
     until triage; normal SHA stays `ca33f434...`.
-  - self-check 4/4; known-bad old ELF reports 90 runs including the BUG-013
-    `sBlob_64e470_662804` run `0x0865BB98..0x0865BCF0` (44 words);
-    known-good dev4 removes that run (74 remain).
+  - self-check 4/4; known-bad old ELF reported 90 runs including the BUG-013
+    `sBlob_64e470_662804` run `0x0865BB98..0x0865BCF0` (44 words).
+    After merging the BUG-013 fix, the integrated tree reports **74 runs** and
+    **no `sBlob_64e470` run**; normal `ca33f434...`, shifted `012a2c95...`.
   - top remaining groups: `sBlob_6131c8_63a19c` (many runs),
     `sBlob_6638a0_682fac`, `sBlob_582288_58b3cc`, `sBlob_5766D4_prefix`,
     `sBlob_39aa34_39f4b0`, `DirectSoundData_080BE5B8`.

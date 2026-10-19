@@ -83,11 +83,13 @@ Gate **S4**: playable slice sign-off, then content production.
 
 ## Current status
 
-**M0 shiftable-boot gate: BLOCKED** — decision A uses mGBA 0.11 standalone as
-authoritative.  BUG-009/room-16 and story event parity pass, but the candidate
-hard-freezes on a room-61 elevator state (BUG-010, black screen, frame loop
-stops).  QA-012 coverage is paused until the elevator fix.  BizHawk 2.3.x is
-parked as BUG-008.  M1 blockout is paused; see `jira.md`.
+**M0 shiftable-boot gate: BLOCKED** — BUG-013 native idle and focused checks
+pass on shifted `012a2c95…` (merged `424fd7f`), but the full 339001 TAS
+(QA-020) has not run and `PLAYTEST-000` human sign-off is still pending.
+BUG-010's elevator state is parked as an invalid post-entry capture; QA-012
+coverage is paused.  The new post-link scan reports 74 latent pointer runs
+(BUG-014); those need triage before full shiftability is claimed, although the
+BUG-013 `sBlob_64e470` run is gone.  M1 blockout is paused; see `jira.md`.
 
 Baseline evidence (2026-10-17):
 
