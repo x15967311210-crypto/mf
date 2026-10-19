@@ -400,7 +400,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     acceptance**; candidate
     `work/playtest/m0f-2026-10-17/mgba-final-bug012c/`.  Do not close BUG-012 or
     M0f until EmuHawk reaches 339001 with the expected final state.
-- [DOING @dev2] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
+- [TODO] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
   - independent of BUG-008/385 and BUG-012/22923.  Native BizHawk 2.3.2,
     no movie/no input, same BIOS/SaveRAM: normal/reordered OK; shifted first
     diverges at 2238:
@@ -416,9 +416,21 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     table, not the BUG-012 tables.
   - evidence: `tas/idle_black_fine/` (`shifted_2200_bug013.txt`,
     `shifted_2238_store.log`, `BUG013_WRITER.md`); hook `mgba_store.log`.
-  - next: identify the table/base that produces `0865A2E4` and relocate it;
-    preserve normal SHA1 and all existing gates.  Do not patch the callback
-    setter, IRQ vector, or IWRAM.
+  - deeper trace: the writer is `SpecialCutsceneDrawOam`; `pOam` is
+    `entry+0x1C`; the animation frame record at `pOam+3*8` gives
+    `pFrame=0865A2E2` (normal).  `0865A2E2` is inside
+    `sBlob_64e470_662804` at +0xBE72; normal data there is populated, shifted
+    data at the unrelocated target is zero.  The count halfword is 0x40 (64),
+    and the 22nd 0x24-byte OAM entry starts at 0x030019B8, whose `pOam` field
+    at +0xC is exactly `0x030019C4`; this explains the callback overwrite.
+  - the raw value `0865A2E2` is **not** a 4-byte literal in normal/shifted
+    ROM, so the fix is a base+offset pointer/table, not a simple literal.
+    Likely source is the `sBlob_64e470` base/record table; decode the
+    `shifted_2200`/`normal_2200` state or the writer `pOam` to locate the
+    record.
+  - next: identify the table/base that produces `0865A2E2` (target shifted
+    `0865B2E2`) and relocate it; preserve normal SHA1 and all gates.  Do not
+    patch the callback setter, IRQ vector, or IWRAM.
   - **M0f is blocked by this idle regression** even if the 22923 state check
     passes.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
