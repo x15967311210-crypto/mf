@@ -440,10 +440,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     slot pOam store).
   - pOam field logging at `entry+0x10/0x14/0x18/0x1C` found no CPU store of
     `0865A2CA`; the value is not in the slot pOam fields before the overflow.
-    It is either a computed base+offset or a DMA/setup-selected table, not a
-    direct pOam store.
-  - next: log DMA writes/transfer descriptors, or trace the `SpecialCutscene`
-    caller that passes the `A2CA` table; then relocate that table/pointer.
+    DMA logging showed the `SpecialCutsceneOam` copy uses stack source
+    `0x03007DEC` to `gNonGameplayRam`; stack writes do not contain `0865A2CA`
+    either.  It is not a direct slot field or stack store; it is a computed
+    base+offset or caller-selected table.
+  - next: add a call-stack/pOam argument hook around
+    `SpecialCutsceneDrawAllOam`/`DrawOam`, or disassemble the caller that passes
+    the `A2CA` table; then relocate that table/pointer.
     Preserve normal SHA1 and all gates.  Do not patch the callback setter, IRQ
     vector, or IWRAM.
   - **M0f is blocked by this idle regression** even if the 22923 state check
