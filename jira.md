@@ -438,9 +438,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     active source is definitely the `A2CA` table, but its owner is still
     unidentified (likely computed/base+offset or DMA-selected, not a direct
     slot pOam store).
-  - next: log/DMA-watch the pOam field writes for all slots and find who sets
-    `0865A2CA`; then relocate that table/pointer.  Preserve normal SHA1 and all
-    gates.  Do not patch the callback setter, IRQ vector, or IWRAM.
+  - pOam field logging at `entry+0x10/0x14/0x18/0x1C` found no CPU store of
+    `0865A2CA`; the value is not in the slot pOam fields before the overflow.
+    It is either a computed base+offset or a DMA/setup-selected table, not a
+    direct pOam store.
+  - next: log DMA writes/transfer descriptors, or trace the `SpecialCutscene`
+    caller that passes the `A2CA` table; then relocate that table/pointer.
+    Preserve normal SHA1 and all gates.  Do not patch the callback setter, IRQ
+    vector, or IWRAM.
   - **M0f is blocked by this idle regression** even if the 22923 state check
     passes.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
