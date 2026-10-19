@@ -1,0 +1,83 @@
+{
+  "core": "mGBA 0.6.1 / TASVideos/mgba db0041340ff260424f38772df4f286fc3907c1c8 (bizhawk-0.6)",
+  "bizhawk": "2.3.0.1 / mgba.dll 4109E16135B2F44A4E8EF046ACD99EAB8600AC4A",
+  "rom_sha1": "ca33f4348c2c05dd330d37b97e2c5a69531dfe87",
+  "bios_sha1": "300c20df6731a33952ded8c436f7f186d25d3492",
+  "movie_sha1": "3c259c3e4c6f8e9ad3b7e8212b9d6eb0a2958d68",
+  "log_sha1": "65572a4cf6c24611f2263e418fe436520fe623ff",
+  "regions": [
+    "oam",
+    "pal",
+    "vram",
+    "io",
+    "iwram",
+    "ewram"
+  ],
+  "checkpoints": {
+    "300": {
+      "oam": "5635e3efa182658c5fa5771c1228fd122a2a78c6",
+      "pal": "b160710050cfe13c8ae0ecf8667801d5a1b5a469",
+      "vram": "1ed0ab70c635c5fc68c2c6a354d7451da1641c14",
+      "io": "b1b997ec8265763f095a52b457b4585e115c7241",
+      "iwram": "da2c7bff46581a6db1357811c6ff6c41b46d8d2f",
+      "ewram": "bd283fff8794f25f5a4a8d5113ca788cf30b693f"
+    },
+    "600": {
+      "oam": "16b9a2b5d974674f8589aa10031203d162b77ef6",
+      "pal": "35255754c4e65db99f0ea5c115760537a1309ab1",
+      "vram": "58a3405a8f08499120b8aabc61c735a604237a66",
+      "io": "6a691965f0e6811f949053ec12bc6f91b6664ad8",
+      "iwram": "e13156176735ae576e967b8e4940972980af0ca2",
+      "ewram": "13ef0bf0e7d0d7a0de094b64edefc1efd97eb898"
+    },
+    "900": {
+      "oam": "cca8ea8cb91901644c9bfd33ba86f57d07e499d5",
+      "pal": "35255754c4e65db99f0ea5c115760537a1309ab1",
+      "vram": "e29c9f8071cfdb6c4157517129c72a291791094c",
+      "io": "1354103a58dbbdf1a912b427c1e48d709b8f2109",
+      "iwram": "4fa7d48b36fc9bd6ac51f68b7eea639d476bb9e0",
+      "ewram": "14cbbf2fd0b26f7be62a0d8b3ef82018b20aed2e"
+    },
+    "1059": {
+      "oam": "976d10b9c490d75d4031827fb55ac028ce16d214",
+      "pal": "35255754c4e65db99f0ea5c115760537a1309ab1",
+      "vram": "58a3405a8f08499120b8aabc61c735a604237a66",
+      "io": "1f46deb9deae9cb8c20101d6ef022b31b9f8f3f1",
+      "iwram": "8202173234a447b5f3a028a683b503437b46efed",
+      "ewram": "509428a468cbf909de97a7408c7ddeea9a5f8774"
+    },
+    "4000": {
+      "oam": "a8bef222e5b3f7d18eb601b9c071a24b0b8d4409",
+      "pal": "fcedd746cb3134379bb14bf8be274942a206a1ef",
+      "vram": "8ceb89bbf4c82d1a3bb905fb3aa5076c34344d1b",
+      "io": "d364132514f48e760123cd9503f574846a81668a",
+      "iwram": "739ebded3701ef8f31a43b5bf6f314dfcd82856d",
+      "ewram": "7eac4658a71268d3bc5347727c4c0ca66ea67684"
+    },
+    "30000": {
+      "oam": "d21cbcb3a6cb34d9f1cfac05788c71e1c9e5e349",
+      "pal": "8e7930dc9388df35d445982c212cf414066e4a90",
+      "vram": "c0afcd7a72b4c3b7e60492c2f1582213b50ff1c9",
+      "io": "75c562cce9c07ab5c50f1750bd7a071a8d58ce74",
+      "iwram": "be1e449dd44eaad69604d4fcf1a36b8f3cfeacd4",
+      "ewram": "a342d6e8c53b1e5d5ef1fa33167f6077cbcd1d6d"
+    },
+    "339001": {
+      "oam": "a729d63cf35d30faedf2834c81f70c35985938db",
+      "pal": "817e9063e46ab17e1b92a0c9b5149b22814157aa",
+      "vram": "32e975368a83f073832c490065c76912a1356ae2",
+      "io": "ae9e4ffc431054b56e2443c99b4e12d7b077a4ac",
+      "iwram": "d8ded0d3133ad8ad8d12752dbf769bc3ba35ca72",
+      "ewram": "319dca515ae313975fbfcb15ff670e65e05dab89"
+    }
+  },
+  "log_lines": {
+    "300": "300 1A00 0000 0002 0004 0 0 0 0",
+    "600": "600 1C00 0007 0002 0001 0 0 0 0",
+    "900": "900 1D00 0007 0002 0001 0 0 0 0",
+    "1059": "1059 1F00 0007 0002 0001 0 0 0 0",
+    "4000": "4000 1C00 0007 0006 0001 0 0 0 0",
+    "30000": "30000 5F00 0001 0002 0100 9 0 38 0",
+    "339001": "339001 1900 0009 0002 0100 109 0 63 0"
+  }
+}

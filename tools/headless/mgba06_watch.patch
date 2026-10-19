@@ -1,0 +1,204 @@
+diff --git a/include/mgba/internal/gba/mf_watch.h b/include/mgba/internal/gba/mf_watch.h
+new file mode 100644
+index 0000000..8f4cdd8
+--- /dev/null
++++ b/include/mgba/internal/gba/mf_watch.h
+@@ -0,0 +1,17 @@
++#ifndef GBA_MF_WATCH_H
++#define GBA_MF_WATCH_H
++
++#include <mgba-util/common.h>
++
++CXX_GUARD_START
++
++struct GBA;
++
++typedef void (*mFStoreTraceFn)(struct GBA* gba, uint32_t address, uint32_t value,
++	int size, uint32_t pc);
++
++extern mFStoreTraceFn mfStoreTrace;
++
++CXX_GUARD_END
++
++#endif
+diff --git a/src/gba/memory.c b/src/gba/memory.c
+index 4f7cd6c..60d17df 100644
+--- a/src/gba/memory.c
++++ b/src/gba/memory.c
+@@ -11,6 +11,7 @@
+ #include <mgba/internal/gba/dma.h>
+ #include <mgba/internal/gba/io.h>
+ #include <mgba/internal/gba/serialize.h>
++#include <mgba/internal/gba/mf_watch.h>
+ #include "gba/hle-bios.h"
+ 
+ #include <mgba-util/math.h>
+@@ -19,6 +20,18 @@
+ 
+ #define IDLE_LOOP_THRESHOLD 10000
+ 
++#define MF_WATCH_STORE(gba, address, value, size) \
++	do { \
++		if (mfStoreTrace && \
++			(((address) >= 0x05000000 && (address) < 0x05000400) || \
++			 ((address) >= 0x06000000 && (address) < 0x06018000) || \
++			 ((address) >= 0x07000000 && (address) < 0x07000400) || \
++			 ((address) >= 0x03000DE8 && (address) < 0x030011F0))) { \
++			mfStoreTrace((gba), (address), (uint32_t) (value), (size), \
++				(uint32_t) (gba)->cpu->gprs[15]); \
++		} \
++	} while (0)
++
+ mLOG_DEFINE_CATEGORY(GBA_MEM, "GBA Memory", "gba.memory");
+ 
+ static void _pristineCow(struct GBA* gba);
+@@ -729,6 +742,8 @@ void GBAStore32(struct ARMCore* cpu, uint32_t address, int32_t value, int* cycle
+ 	int wait = 0;
+ 	char* waitstatesRegion = memory->waitstatesNonseq32;
+ 
++	MF_WATCH_STORE(gba, address, value, 4);
++
+ 	switch (address >> BASE_OFFSET) {
+ 	case REGION_WORKING_RAM:
+ 		STORE_WORKING_RAM;
+@@ -779,6 +794,8 @@ void GBAStore16(struct ARMCore* cpu, uint32_t address, int16_t value, int* cycle
+ 	struct GBAMemory* memory = &gba->memory;
+ 	int wait = 0;
+ 
++	MF_WATCH_STORE(gba, address, value, 2);
++
+ 	switch (address >> BASE_OFFSET) {
+ 	case REGION_WORKING_RAM:
+ 		STORE_16(value, address & (SIZE_WORKING_RAM - 2), memory->wram);
+@@ -846,6 +863,8 @@ void GBAStore8(struct ARMCore* cpu, uint32_t address, int8_t value, int* cycleCo
+ 	struct GBAMemory* memory = &gba->memory;
+ 	int wait = 0;
+ 
++	MF_WATCH_STORE(gba, address, value, 1);
++
+ 	switch (address >> BASE_OFFSET) {
+ 	case REGION_WORKING_RAM:
+ 		((int8_t*) memory->wram)[address & (SIZE_WORKING_RAM - 1)] = value;
+diff --git a/src/gba/mf_watch.c b/src/gba/mf_watch.c
+new file mode 100644
+index 0000000..6dfa7a1
+--- /dev/null
++++ b/src/gba/mf_watch.c
+@@ -0,0 +1,3 @@
++#include <mgba/internal/gba/mf_watch.h>
++
++mFStoreTraceFn mfStoreTrace = NULL;
+diff --git a/src/platform/bizhawk/bizinterface.c b/src/platform/bizhawk/bizinterface.c
+index dc55ed9..5bd38ba 100644
+--- a/src/platform/bizhawk/bizinterface.c
++++ b/src/platform/bizhawk/bizinterface.c
+@@ -1,7 +1,9 @@
+ #include <stdlib.h>
+ #include <stdint.h>
++#include <stdio.h>
+ #include "mgba/core/core.h"
+ #include "mgba/core/log.h"
++#include "mgba/core/timing.h"
+ #include "mgba-util/common.h"
+ #include "mgba/gba/core.h"
+ #include "mgba/gba/interface.h"
+@@ -9,6 +11,7 @@
+ #include "mgba/internal/gba/video.h"
+ #include "mgba/internal/gba/audio.h"
+ #include "mgba/internal/gba/memory.h"
++#include "mgba/internal/gba/mf_watch.h"
+ #include "mgba/debugger/debugger.h"
+ #include "mgba/internal/gba/overrides.h"
+ #include "mgba-util/vfs.h"
+@@ -18,7 +21,11 @@
+ const char* const binaryName = "mgba";
+ const uint32_t DEBUGGER_ID = 0xFEEDFACE;
+ 
++#ifdef _WIN32
+ #define EXP __declspec(dllexport)
++#else
++#define EXP
++#endif
+ 
+ /**
+  * container_of - cast a member of a structure out to the containing structure
+@@ -107,6 +114,25 @@ static void logdebug(struct mLogger* logger, int category, enum mLogLevel level,
+ 
+ }
+ 
++static FILE* mfWatchLog;
++static int mfWatchFrameMin = -1;
++static int mfWatchFrameMax = -1;
++
++static void mfWatchCallback(struct GBA* gba, uint32_t address, uint32_t value,
++	int size, uint32_t pc) {
++	if (!mfWatchLog) return;
++	int frame = gba->video.frameCounter;
++	if (mfWatchFrameMin >= 0 && frame < mfWatchFrameMin) return;
++	if (mfWatchFrameMax >= 0 && frame > mfWatchFrameMax) return;
++	struct ARMCore* cpu = gba->cpu;
++	fprintf(mfWatchLog, "%d %d %d %08X %08X %08X %08X %08X %08X %d %d %d\n",
++		frame, gba->video.vcount, mTimingCurrentTime(&gba->timing),
++		(uint32_t) cpu->gprs[15], (uint32_t) cpu->gprs[14],
++		(uint32_t) cpu->gprs[13], (uint32_t) cpu->cpsr.packed,
++		address, value, size, gba->performingDMA, gba->memory.activeDMA);
++	fflush(mfWatchLog);
++}
++
+ static void resetinternal(bizctx* ctx)
+ {
+ 	ctx->core->reset(ctx->core);
+@@ -119,6 +145,11 @@ EXP void BizDestroy(bizctx* ctx)
+ 	ctx->core->deinit(ctx->core);
+ 	free(ctx->rom);
+ 	free(ctx);
++	if (mfWatchLog) {
++		fclose(mfWatchLog);
++		mfWatchLog = NULL;
++		mfStoreTrace = NULL;
++	}
+ }
+ 
+ typedef struct
+@@ -166,6 +197,18 @@ EXP bizctx* BizCreate(const void* bios, const void* data, int length, const over
+ 	}
+ 	ctx->gba = ctx->core->board;
+ 
++	const char* watchPath = getenv("MF_WATCH_TRACE");
++	if (watchPath) {
++		if (!mfWatchLog) {
++			mfWatchLog = fopen(watchPath, "w");
++		}
++		const char* minFrame = getenv("MF_WATCH_FRAME_MIN");
++		const char* maxFrame = getenv("MF_WATCH_FRAME_MAX");
++		if (minFrame) mfWatchFrameMin = atoi(minFrame);
++		if (maxFrame) mfWatchFrameMax = atoi(maxFrame);
++		mfStoreTrace = mfWatchCallback;
++	}
++
+ 	ctx->core->setVideoBuffer(ctx->core, ctx->vbuff, VIDEO_HORIZONTAL_PIXELS);
+ 	ctx->core->setAudioBufferSize(ctx->core, 1024);
+ 
+diff --git a/src/platform/bizhawk/mingw/Makefile b/src/platform/bizhawk/mingw/Makefile
+index 0afcf9d..558551a 100644
+--- a/src/platform/bizhawk/mingw/Makefile
++++ b/src/platform/bizhawk/mingw/Makefile
+@@ -23,7 +23,9 @@ CXXFLAGS = \
+ 	-I../../../../include -Wall -std=gnu99 -fgnu89-inline \
+ 	-I../../.. \
+ 	-DRESAMPLE_LIBRARY=RESAMPLE_BLIP_BUF -DHAVE_LOCALTIME_R \
+-	-DMINIMAL_CORE=2 -DDISABLE_THREADING -DM_CORE_GBA -DCOLOR_16_BIT
++	-DMINIMAL_CORE=2 -DDISABLE_THREADING -DM_CORE_GBA -DCOLOR_16_BIT \
++	-Wno-error=incompatible-pointer-types -Wno-error=implicit-function-declaration \
++	-Wno-error=int-conversion -Wno-error=return-mismatch
+ 
+ TARGET = mgba.dll
+ 
+@@ -71,6 +73,7 @@ SRCS = \
+ 	$(ROOT_DIR)/gba/hle-bios.c \
+ 	$(ROOT_DIR)/gba/io.c \
+ 	$(ROOT_DIR)/gba/memory.c \
++	$(ROOT_DIR)/gba/mf_watch.c \
+ 	$(ROOT_DIR)/gba/overrides.c \
+ 	$(ROOT_DIR)/gba/renderers/software-bg.c \
+ 	$(ROOT_DIR)/gba/renderers/software-mode0.c \

@@ -34,3 +34,6 @@ __pycache__/
 
 # Generated content pipeline output (HACK-003/004a)
 /hack/gen/
+/tools/headless/.cache/
+/tools/headless/build06/
+/tools/headless/out/

@@ -1,0 +1,112 @@
+name: headless-parity
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "smoke / early / full"
+        required: true
+        type: choice
+        options: [smoke, early, full]
+        default: smoke
+  schedule:
+    # Nightly full-TAS check (03:00 UTC).
+    - cron: "0 3 * * *"
+
+concurrency:
+  group: headless-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    # Self-hosted Linux runner: needs agbcc, baserom, BIOS and the movie.
+    # Standard runner labels include self-hosted/linux/x64.
+    runs-on: [self-hosted, linux, x64]
+    timeout-minutes: 45
+    # Do not run untrusted fork PR code on a self-hosted runner.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Select tier
+        id: tier
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "tier=full" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tier=${{ inputs.tier }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            case "${{ github.ref }}" in
+              refs/heads/main|refs/heads/master|refs/heads/hack)
+                echo "tier=early" >> "$GITHUB_OUTPUT" ;;
+              *)
+                echo "tier=smoke" >> "$GITHUB_OUTPUT" ;;
+            esac
+          else
+            echo "tier=smoke" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check assets and toolchain
+        shell: bash
+        env:
+          MF_BASEROM: ${{ vars.MF_BASEROM }}
+          HEADLESS_BIOS: ${{ vars.HEADLESS_BIOS }}
+          HEADLESS_MOVIE: ${{ vars.HEADLESS_MOVIE }}
+        run: |
+          for name in MF_BASEROM HEADLESS_BIOS HEADLESS_MOVIE; do
+            value="${!name}"
+            if [ -z "$value" ] || [ ! -f "$value" ]; then
+              echo "::error::$name is not set to an existing file (got '$value')"
+              exit 1
+            fi
+          done
+          for tool in cmake ninja gcc make python3; do
+            command -v "$tool" >/dev/null || { echo "::error::$tool is missing"; exit 1; }
+          done
+
+      - name: Extract data
+        shell: bash
+        env:
+          MF_BASEROM: ${{ vars.MF_BASEROM }}
+        run: |
+          ln -sf "$MF_BASEROM" mf_us_baserom.gba
+          python3 tools/extractor.py
+
+      - name: Build ROM
+        run: make -j"$(nproc)"
+
+      - name: Cache mGBA 0.6 source/build
+        uses: actions/cache@v4
+        with:
+          path: |
+            tools/headless/.cache
+            tools/headless/build06
+          key: mgba06-${{ runner.os }}-${{ hashFiles('tools/headless/mgba06_watch.patch', 'tools/headless/mf_bizhawk_dll.c', 'tools/headless/build06.sh', 'tools/headless/linux_shim/**') }}
+          restore-keys: |
+            mgba06-${{ runner.os }}-
+
+      - name: Headless parity gate
+        env:
+          HEADLESS_BIOS: ${{ vars.HEADLESS_BIOS }}
+          HEADLESS_MOVIE: ${{ vars.HEADLESS_MOVIE }}
+          HEADLESS_ROM: ${{ github.workspace }}/mf_us.gba
+          HEADLESS_TIER: ${{ steps.tier.outputs.tier }}
+        run: bash tools/headless/ci_gate.sh
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: headless-${{ steps.tier.outputs.tier || 'unknown' }}-${{ github.run_id }}
+          path: |
+            tools/headless/out
+          if-no-files-found: ignore
