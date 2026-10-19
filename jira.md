@@ -271,12 +271,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - parity remains FAIL because of BUG-012, not BUG-008.
 - [DOING @human] QA-020 (emulator) — native TAS parity after BUG-012
   - native BizHawk 2.3.2, mGBA core, BIOS `300C20DF...`, normalized SaveRAM
-    `FB611BD6...`, same 100% TAS; candidate `a69334ee...` (bug012b).
+    `FB611BD6...`, same 100% TAS; candidate `2447dfb7...` (bug012c).
   - require 22923 callbacks `0809A2C9`/`0809B2C9`, both `CPSR=92`; no Undefined
     at 22924/22925; 22952 `DISPCNT=9700`; final 339001
     `1900 0009 0002 0100 109 0 63 0`; file-select 385/401 still PASS.
   - reordered still needs BUG-011 room 23/14; do not gate it on BUG-012.
-- [DOING @human] QA-019 (emulator) — capture 22923 gVBlankCallback writer
+- [DONE] QA-019 (emulator) — capture 22923 gVBlankCallback writer
   - use the native MGBAHawk/BizHawk 2.3.2 path that reproduced BUG-008; watch
     `0x030019C4` and `0x030019C0..0x030019CC` over frames 22920-22930, same
     BIOS/SaveRAM/movie and candidate `812d0090...`.
@@ -284,6 +284,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     compare normal and shifted.  Do not use a converted headless input.
   - if the write is an OAM/copy overflow, identify source table and hand it to
     BUG-012; do not patch IWRAM or the callback setter.
+  - **closed by state inspection, not a write hook**: loading the native 22922
+    state showed `R10=0xF164`, `R6=08664460`; the pOam table at
+    `0x08663DD0` was the source.  Fixed by `df60f8f`.
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
   - native 100% TAS, normalized SaveRAM `FB611BD6...`: `PARITY: FAIL`.
   - shifted first behavior divergence frame 401 (`DISPCNT 1E00` vs `1C00`),
@@ -369,9 +372,29 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     normal+0x1000; correct target count 2 vs stale target `0x7810`.
   - automatic gates PASS (audit/smoke/test/strict relocs, shift/start/input
     4k/30k, screen/OAM diff, shift-reorder).
-  - **native 22923 + full TAS retest is the remaining acceptance**; candidate
-    `work/playtest/m0f-2026-10-17/mgba-final-bug012b/`.  Do not close BUG-012 or
-    M0f until EmuHawk confirms 22923/22952 and the final checkpoint.
+  - **native 22923 retest FAILED on `a69334ee`**: callback still wrong
+    (`0809A823`), then NewFileIntroVblank/IE loss/Undefined.  The two simple
+    FrameData tables were not the only raw pointers.
+  - **actual pOam table found by loading the native 22922 state**: shifted
+    `R6=08664460`, `R5=030016B0`, `R10/sl=0xF164`.  The pOam table at
+    `0x08663DD0` still had raw pFrame words.  Its first word points at old
+    `0x08663AE0`, whose count is `0xF164`; the correct shifted target
+    `0x08664AE0` has count `0x38`.  The loop therefore still overflowed into
+    `gVBlankCallback`.
+  - **FIX LANDED `df60f8f`**: the five pFrame words at
+    `0x08663DD0/DD8/DE0/DE8/DF8` are now relocatable; the surrounding blob is
+    byte-identical.  Normal SHA1 `ca33f434...`; shifted
+    `2447dfb772077ce3d627e7a279e4cc1536d996b6`.
+  - **native state check PASSED**: loading the existing
+    `tas/bug012b_focus/shifted_22922.State` into the new ROM gives
+    22923/22924/22925 `callback=0809B2C9`, `LR=000001B8`, `CPSR=92`, `PC=1C`;
+    no IE loss and no Undefined.
+  - automatic gates PASS (audit/smoke/test/strict relocs, shift/start/input
+    4k/30k, screen/OAM diff, shift-reorder).
+  - **full 100% TAS from the normal starting point is the remaining
+    acceptance**; candidate
+    `work/playtest/m0f-2026-10-17/mgba-final-bug012c/`.  Do not close BUG-012 or
+    M0f until EmuHawk reaches 339001 with the expected final state.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`

@@ -1042,3 +1042,28 @@ bytes are byte-identical.  Normal SHA1 remains
 `a69334ee1c367fada1aa388b8a889e14bb6cb0aa`.  All eight pointers are
 normal+0x1000 in shifted.  Automatic gates pass; native 22923/full TAS retest
 is the remaining acceptance.
+
+### BUG-012 pOam table fix (2026-10-19, `df60f8f`)
+
+Loading the native 22922 state into the new ROM exposed the remaining pOam
+pointer table at `0x08663DD0`:
+
+```text
+R5=030016B0  R6=08664460  R10/sl=0xF164
+table 0x08663DD0 -> 0x08663AE0 (raw normal)
+old target 0x08663AE0 count = 0xF164
+correct   0x08664AE0 count = 0x0038
+```
+
+`src/data/new_file_intro_data.c` now also relocates the five pFrame words at
+0x530/0x538/0x540/0x548/0x558 in `sBlob_6638a0_682fac`; the normal SHA1 is
+unchanged and shifted is `2447dfb772077ce3d627e7a279e4cc1536d996b6`.
+
+Native state check on the same BizHawk 2.3.2/mGBA setup:
+
+```text
+22923/22924/22925 callback=0809B2C9, LR=000001B8, CPSR=00000092, PC=1C
+```
+
+No IE loss, no Undefined.  Full 100% TAS from the normal starting point is the
+remaining acceptance.
