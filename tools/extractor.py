@@ -43,6 +43,7 @@ def extract_data(region: str, debug: bool, quiet: bool = False) -> None:
     split_sa_x_close_up_blob()
     split_new_file_intro_frame_data_blob()
     split_new_file_intro_data_pointer_tables()
+    split_new_file_intro_gfx_pointer_tables()
     split_navigation_pop_up_graphics_blob()
 
 
@@ -201,6 +202,39 @@ def split_new_file_intro_data_pointer_tables() -> None:
     )
     for start, end, name in spans:
         Path(DATA_PATH, name).write_bytes(blob[start:end])
+
+
+def split_new_file_intro_gfx_pointer_tables() -> None:
+    """Split the raw pFrame pointer tables out of the intro graphics blob.
+
+    `Blob_64e470_662804.bin` contains three overlapping SpecialCutscene pOam
+    tables whose pFrame words still point at normal-layout addresses.  Split
+    the blob at the 31 unique pointer offsets so the C representation can
+    relocate them; the surrounding bytes stay byte-identical.
+    """
+    blob_path = Path(DATA_PATH, "Blob_64e470_662804.bin")
+    if not blob_path.exists():
+        return
+    blob = blob_path.read_bytes()
+    if len(blob) != 0x14394:
+        raise ValueError(f"{blob_path} is {len(blob)} bytes, expected 0x14394")
+    starts = (0x0D6C8, 0x0D890, 0x0D8D8)
+    pointers = sorted({
+        base + i * 8
+        for base in starts
+        for i in range(12)
+    })
+    prev = 0
+    for pointer in pointers:
+        if pointer < prev or pointer + 4 > len(blob):
+            raise ValueError(f"invalid intro pOam pointer offset 0x{pointer:X}")
+        if pointer > prev:
+            Path(DATA_PATH, f"Blob_64e470_seg_{prev:04X}_{pointer:04X}.bin").write_bytes(
+                blob[prev:pointer])
+        prev = pointer + 4
+    if prev < len(blob):
+        Path(DATA_PATH, f"Blob_64e470_seg_{prev:04X}_{len(blob):04X}.bin").write_bytes(
+            blob[prev:])
 
 
 def split_navigation_pop_up_graphics_blob() -> None:
