@@ -34,6 +34,22 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 - [TODO] QA-004 (tools) — scanner for 2-byte-aligned embedded
   `FrameData`/pointer tables; prototype found the BUG-003/004 tables but the
   tool/report is not committed yet
+- [DONE] QA-024 (tools) — host-side RoomRleDecompress unit-test harness
+  - `tests/host/test.h`, `tests/host/room_rle_test.c`, `make host-test`
+    (also `make -f Makefile.shift host-test`); 33/33 checks in ~1s, no
+    emulator, baserom, data/ or ARM toolchain.
+  - links the real `RoomRleDecompress` from `src/room.c` using host cc,
+    `-ffunction-sections -fdata-sections -Wl,--gc-sections`; no algorithm
+    duplication, synthetic vectors only.
+  - coverage: type 0 size codes, type 1/type>1 headers, 8/16-bit literal
+    and run modes, two-pass interleaving.
+  - normal SHA stays `ca33f434...`; landed `904831c`.
+- [TODO] QA-025 (tools) — extend host harness to spawn/save pure logic
+  - next candidates: `SpriteSpawnPrimary/Secondary` with fake `gSpriteData`
+    setup; save validation/checksum after extracting the pure part of
+    `SramCheckInternal` (currently static and GBA-register bound).
+  - keep host tests as a fast pre-gate; native/behavior suite remains the
+    authority.
 
 ## Phase S2 — relocatable build
 
