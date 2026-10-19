@@ -59,7 +59,7 @@ POSTLINK_RELINK = $(MAKE) -f Makefile ELF=$(POSTLINK_ELF) \
 
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit \
         check-relocs check-relocs-strict check-linker smoke test test-input \
-        input-smoke emulator-harness shift-build shift-test shift-check \
+        host-test input-smoke emulator-harness shift-build shift-test shift-check \
         shift-reorder shift-start shift-input shift-input-30k shift-screen \
         screen-diff oam-diff event-diff shift-check-all content-check \
         postlink-scan postlink-scan-strict help
@@ -126,6 +126,11 @@ smoke:
 content-check:
 	$(PYTHON) tools/content/fixtures/generate_fixture.py --check
 	$(PYTHON) tools/content/tiled_to_room.py --self-check
+
+# Fast host-compiler unit tests for pure engine code.  No emulator, baserom,
+# data/ directory, or ARM toolchain required.
+host-test:
+	$(MAKE) -f Makefile host-test
 
 emulator-harness:
 	MGBA_SRC=$(MGBA_SRC) MGBA_BUILD=$(MGBA_BUILD) \
@@ -531,6 +536,7 @@ help:
 	@echo "  postlink-scan-strict fail on any unwhitelisted structured pointer run"
 	@echo "  smoke               static ROM/header smoke"
 	@echo "  content-check       synthetic Tiled/PNG room-pipeline check (no ROM)"
+	@echo "  host-test           host-compiler unit tests for pure engine code"
 	@echo "  emulator-harness    build tests/emulator/bin/mgba-harness (MGBA_SRC/MGBA_BUILD)"
 	@echo "  test                static + headless boot smoke + 4k input replay (exit 77 if no harness)"
 	@echo "  test-input          normal-ROM 4k input replay + checkpoint assertion"

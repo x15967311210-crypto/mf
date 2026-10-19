@@ -80,6 +80,9 @@ CC = agbcc
 
 DIFF = diff -u
 HOSTCC = cc
+HOST_CFLAGS = -std=gnu11 -O2 -ffunction-sections -fdata-sections -Iinclude
+HOST_TEST_DIR = tests/host/bin
+HOST_TEST_BIN = $(HOST_TEST_DIR)/room_rle_test
 MKDIR = mkdir -p
 RM = rm -f
 SHA1SUM = sha1sum
@@ -129,7 +132,7 @@ else
 endif
 
 # Rules that do not require scanning for dependencies
-RULES_NO_SCAN += dump diff extract clean tidy
+RULES_NO_SCAN += dump diff extract clean tidy host-test
 
 # Generate tools before building anything
 SETUP_PREREQS ?= 1
@@ -196,11 +199,20 @@ endif
 	$(MSG) RM linker.ld.pp
 	$Q$(RM) linker.ld.pp
 
+.PHONY: host-test
+host-test:
+	$(MSG) HOSTCC $(HOST_TEST_BIN)
+	$Q$(MKDIR) $(HOST_TEST_DIR)
+	$Q$(HOSTCC) $(HOST_CFLAGS) tests/host/room_rle_test.c src/room.c \
+		-Wl,--gc-sections -o $(HOST_TEST_BIN)
+	$Q$(HOST_TEST_BIN)
+
 .PHONY: help
 help:
 	@echo 'Targets:'
 	@echo '  all: build the ROM'
 	@echo '  check: checksum the ROM'
+	@echo '  host-test: build and run host-side unit tests (no emulator/toolchain)'
 	@echo '  dump: dump the ROMs'
 	@echo '  diff: compare the ROM with the original'
 	@echo '  clean: remove the ROM and intermediate files'

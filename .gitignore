@@ -24,6 +24,7 @@ tools/agbcc
 # Shift/decomp scratch: audit ledgers, Ghidra projects, shifted ROMs, logs.
 /work/
 /tests/emulator/bin/
+/tests/host/bin/
 
 err.log
 
