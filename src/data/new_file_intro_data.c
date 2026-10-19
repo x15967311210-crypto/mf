@@ -22199,7 +22199,95 @@ struct NewFileIntroGfxBlob {
     const u16 *pD718; /* +0xD718 -> +0xBE6C */
     u8 seg_D71C_D720[0x4];
     const u16 *pD720; /* +0xD720 -> +0xBE8C */
-    u8 seg_D724_D890[0x16C];
+    u8 seg_D724_D728[0x4];
+    const u16 *pD728; /* +0xD728 -> +0xBEB8 */
+    u8 seg_D72C_D730[0x4];
+    const u16 *pD730; /* +0xD730 -> +0xBEE4 */
+    u8 seg_D734_D738[0x4];
+    const u16 *pD738; /* +0xD738 -> +0xBF10 */
+    u8 seg_D73C_D740[0x4];
+    const u16 *pD740; /* +0xD740 -> +0xBF3C */
+    u8 seg_D744_D748[0x4];
+    const u16 *pD748; /* +0xD748 -> +0xBF68 */
+    u8 seg_D74C_D750[0x4];
+    const u16 *pD750; /* +0xD750 -> +0xBF94 */
+    u8 seg_D754_D758[0x4];
+    const u16 *pD758; /* +0xD758 -> +0xBFC0 */
+    u8 seg_D75C_D760[0x4];
+    const u16 *pD760; /* +0xD760 -> +0xBFF2 */
+    u8 seg_D764_D768[0x4];
+    const u16 *pD768; /* +0xD768 -> +0xC02A */
+    u8 seg_D76C_D770[0x4];
+    const u16 *pD770; /* +0xD770 -> +0xC062 */
+    u8 seg_D774_D778[0x4];
+    const u16 *pD778; /* +0xD778 -> +0xC09A */
+    u8 seg_D77C_D780[0x4];
+    const u16 *pD780; /* +0xD780 -> +0xC0D2 */
+    u8 seg_D784_D788[0x4];
+    const u16 *pD788; /* +0xD788 -> +0xC10A */
+    u8 seg_D78C_D790[0x4];
+    const u16 *pD790; /* +0xD790 -> +0xC142 */
+    u8 seg_D794_D798[0x4];
+    const u16 *pD798; /* +0xD798 -> +0xC180 */
+    u8 seg_D79C_D7A0[0x4];
+    const u16 *pD7A0; /* +0xD7A0 -> +0xC1C4 */
+    u8 seg_D7A4_D7A8[0x4];
+    const u16 *pD7A8; /* +0xD7A8 -> +0xC208 */
+    u8 seg_D7AC_D7B0[0x4];
+    const u16 *pD7B0; /* +0xD7B0 -> +0xC24C */
+    u8 seg_D7B4_D7B8[0x4];
+    const u16 *pD7B8; /* +0xD7B8 -> +0xC290 */
+    u8 seg_D7BC_D7C0[0x4];
+    const u16 *pD7C0; /* +0xD7C0 -> +0xC2D4 */
+    u8 seg_D7C4_D7C8[0x4];
+    const u16 *pD7C8; /* +0xD7C8 -> +0xC318 */
+    u8 seg_D7CC_D7D0[0x4];
+    const u16 *pD7D0; /* +0xD7D0 -> +0xC35C */
+    u8 seg_D7D4_D7D8[0x4];
+    const u16 *pD7D8; /* +0xD7D8 -> +0xC3A6 */
+    u8 seg_D7DC_D7E0[0x4];
+    const u16 *pD7E0; /* +0xD7E0 -> +0xC3F6 */
+    u8 seg_D7E4_D7E8[0x4];
+    const u16 *pD7E8; /* +0xD7E8 -> +0xC446 */
+    u8 seg_D7EC_D7F0[0x4];
+    const u16 *pD7F0; /* +0xD7F0 -> +0xC496 */
+    u8 seg_D7F4_D7F8[0x4];
+    const u16 *pD7F8; /* +0xD7F8 -> +0xC4E6 */
+    u8 seg_D7FC_D800[0x4];
+    const u16 *pD800; /* +0xD800 -> +0xD6BE */
+    u8 seg_D804_D808[0x4];
+    const u16 *pD808; /* +0xD808 -> +0xC4E6 */
+    u8 seg_D80C_D810[0x4];
+    const u16 *pD810; /* +0xD810 -> +0xD6BE */
+    u8 seg_D814_D818[0x4];
+    const u16 *pD818; /* +0xD818 -> +0xC4E6 */
+    u8 seg_D81C_D820[0x4];
+    const u16 *pD820; /* +0xD820 -> +0xD6BE */
+    u8 seg_D824_D828[0x4];
+    const u16 *pD828; /* +0xD828 -> +0xC536 */
+    u8 seg_D82C_D830[0x4];
+    const u16 *pD830; /* +0xD830 -> +0xC58C */
+    u8 seg_D834_D838[0x4];
+    const u16 *pD838; /* +0xD838 -> +0xC5E8 */
+    u8 seg_D83C_D840[0x4];
+    const u16 *pD840; /* +0xD840 -> +0xC64A */
+    u8 seg_D844_D848[0x4];
+    const u16 *pD848; /* +0xD848 -> +0xC6B2 */
+    u8 seg_D84C_D850[0x4];
+    const u16 *pD850; /* +0xD850 -> +0xC720 */
+    u8 seg_D854_D858[0x4];
+    const u16 *pD858; /* +0xD858 -> +0xC782 */
+    u8 seg_D85C_D860[0x4];
+    const u16 *pD860; /* +0xD860 -> +0xC7F0 */
+    u8 seg_D864_D868[0x4];
+    const u16 *pD868; /* +0xD868 -> +0xC876 */
+    u8 seg_D86C_D870[0x4];
+    const u16 *pD870; /* +0xD870 -> +0xC876 */
+    u8 seg_D874_D878[0x4];
+    const u16 *pD878; /* +0xD878 -> +0xC876 */
+    u8 seg_D87C_D880[0x4];
+    const u16 *pD880; /* +0xD880 -> +0xC876 */
+    u8 seg_D884_D890[0xC];
     const u16 *pD890; /* +0xD890 -> +0xB780 */
     u8 seg_D894_D898[0x4];
     const u16 *pD898; /* +0xD898 -> +0xB7C4 */
@@ -22237,7 +22325,295 @@ struct NewFileIntroGfxBlob {
     const u16 *pD928; /* +0xD928 -> +0xB9A0 */
     u8 seg_D92C_D930[0x4];
     const u16 *pD930; /* +0xD930 -> +0xB9A8 */
-    u8 seg_D934_14394[0x6A60];
+    u8 seg_D934_D938[0x4];
+    const u16 *pD938; /* +0xD938 -> +0xB9C2 */
+    u8 seg_D93C_D940[0x4];
+    const u16 *pD940; /* +0xD940 -> +0xB9EE */
+    u8 seg_D944_D948[0x4];
+    const u16 *pD948; /* +0xD948 -> +0xBA20 */
+    u8 seg_D94C_D950[0x4];
+    const u16 *pD950; /* +0xD950 -> +0xBA58 */
+    u8 seg_D954_D958[0x4];
+    const u16 *pD958; /* +0xD958 -> +0xBAAE */
+    u8 seg_D95C_D960[0x4];
+    const u16 *pD960; /* +0xD960 -> +0xBB16 */
+    u8 seg_D964_D968[0x4];
+    const u16 *pD968; /* +0xD968 -> +0xBB84 */
+    u8 seg_D96C_D970[0x4];
+    const u16 *pD970; /* +0xD970 -> +0xBB84 */
+    u8 seg_D974_D978[0x4];
+    const u16 *pD978; /* +0xD978 -> +0xBB84 */
+    u8 seg_D97C_D980[0x4];
+    const u16 *pD980; /* +0xD980 -> +0xBB84 */
+    u8 seg_D984_D990[0xC];
+    const u16 *pD990; /* +0xD990 -> +0xD6BE */
+    u8 seg_D994_D998[0x4];
+    const u16 *pD998; /* +0xD998 -> +0xD69E */
+    u8 seg_D99C_D9A0[0x4];
+    const u16 *pD9A0; /* +0xD9A0 -> +0xD67E */
+    u8 seg_D9A4_D9A8[0x4];
+    const u16 *pD9A8; /* +0xD9A8 -> +0xD658 */
+    u8 seg_D9AC_D9B0[0x4];
+    const u16 *pD9B0; /* +0xD9B0 -> +0xD638 */
+    u8 seg_D9B4_D9B8[0x4];
+    const u16 *pD9B8; /* +0xD9B8 -> +0xD618 */
+    u8 seg_D9BC_D9C0[0x4];
+    const u16 *pD9C0; /* +0xD9C0 -> +0xD5EC */
+    u8 seg_D9C4_D9C8[0x4];
+    const u16 *pD9C8; /* +0xD9C8 -> +0xD5C0 */
+    u8 seg_D9CC_D9D0[0x4];
+    const u16 *pD9D0; /* +0xD9D0 -> +0xD594 */
+    u8 seg_D9D4_D9D8[0x4];
+    const u16 *pD9D8; /* +0xD9D8 -> +0xD568 */
+    u8 seg_D9DC_D9E0[0x4];
+    const u16 *pD9E0; /* +0xD9E0 -> +0xD53C */
+    u8 seg_D9E4_D9E8[0x4];
+    const u16 *pD9E8; /* +0xD9E8 -> +0xD516 */
+    u8 seg_D9EC_D9F0[0x4];
+    const u16 *pD9F0; /* +0xD9F0 -> +0xD4F0 */
+    u8 seg_D9F4_D9F8[0x4];
+    const u16 *pD9F8; /* +0xD9F8 -> +0xD4C4 */
+    u8 seg_D9FC_DA00[0x4];
+    const u16 *pDA00; /* +0xDA00 -> +0xD498 */
+    u8 seg_DA04_DA08[0x4];
+    const u16 *pDA08; /* +0xDA08 -> +0xD46C */
+    u8 seg_DA0C_DA10[0x4];
+    const u16 *pDA10; /* +0xDA10 -> +0xD440 */
+    u8 seg_DA14_DA18[0x4];
+    const u16 *pDA18; /* +0xDA18 -> +0xD414 */
+    u8 seg_DA1C_DA20[0x4];
+    const u16 *pDA20; /* +0xDA20 -> +0xD3EE */
+    u8 seg_DA24_DA28[0x4];
+    const u16 *pDA28; /* +0xDA28 -> +0xD3C2 */
+    u8 seg_DA2C_DA30[0x4];
+    const u16 *pDA30; /* +0xDA30 -> +0xD39C */
+    u8 seg_DA34_DA38[0x4];
+    const u16 *pDA38; /* +0xDA38 -> +0xD37C */
+    u8 seg_DA3C_DA40[0x4];
+    const u16 *pDA40; /* +0xDA40 -> +0xD350 */
+    u8 seg_DA44_DA48[0x4];
+    const u16 *pDA48; /* +0xDA48 -> +0xD324 */
+    u8 seg_DA4C_DA50[0x4];
+    const u16 *pDA50; /* +0xDA50 -> +0xD2F8 */
+    u8 seg_DA54_DA58[0x4];
+    const u16 *pDA58; /* +0xDA58 -> +0xD2CC */
+    u8 seg_DA5C_DA60[0x4];
+    const u16 *pDA60; /* +0xDA60 -> +0xD2A0 */
+    u8 seg_DA64_DA68[0x4];
+    const u16 *pDA68; /* +0xDA68 -> +0xD27A */
+    u8 seg_DA6C_DA70[0x4];
+    const u16 *pDA70; /* +0xDA70 -> +0xD254 */
+    u8 seg_DA74_DA78[0x4];
+    const u16 *pDA78; /* +0xDA78 -> +0xD234 */
+    u8 seg_DA7C_DA80[0x4];
+    const u16 *pDA80; /* +0xDA80 -> +0xD214 */
+    u8 seg_DA84_DA88[0x4];
+    const u16 *pDA88; /* +0xDA88 -> +0xD1E8 */
+    u8 seg_DA8C_DA90[0x4];
+    const u16 *pDA90; /* +0xDA90 -> +0xD1BC */
+    u8 seg_DA94_DAA0[0xC];
+    const u16 *pDAA0; /* +0xDAA0 -> +0xD190 */
+    u8 seg_DAA4_DAA8[0x4];
+    const u16 *pDAA8; /* +0xDAA8 -> +0xD164 */
+    u8 seg_DAAC_DAB0[0x4];
+    const u16 *pDAB0; /* +0xDAB0 -> +0xD138 */
+    u8 seg_DAB4_DAB8[0x4];
+    const u16 *pDAB8; /* +0xDAB8 -> +0xD10C */
+    u8 seg_DABC_DAC0[0x4];
+    const u16 *pDAC0; /* +0xDAC0 -> +0xD0E6 */
+    u8 seg_DAC4_DAC8[0x4];
+    const u16 *pDAC8; /* +0xDAC8 -> +0xD0C0 */
+    u8 seg_DACC_DAD0[0x4];
+    const u16 *pDAD0; /* +0xDAD0 -> +0xD0A0 */
+    u8 seg_DAD4_DAD8[0x4];
+    const u16 *pDAD8; /* +0xDAD8 -> +0xD080 */
+    u8 seg_DADC_DAE0[0x4];
+    const u16 *pDAE0; /* +0xDAE0 -> +0xD04E */
+    u8 seg_DAE4_DAE8[0x4];
+    const u16 *pDAE8; /* +0xDAE8 -> +0xD01C */
+    u8 seg_DAEC_DAF0[0x4];
+    const u16 *pDAF0; /* +0xDAF0 -> +0xCFEA */
+    u8 seg_DAF4_DAF8[0x4];
+    const u16 *pDAF8; /* +0xDAF8 -> +0xCFB8 */
+    u8 seg_DAFC_DB00[0x4];
+    const u16 *pDB00; /* +0xDB00 -> +0xCF92 */
+    u8 seg_DB04_DB08[0x4];
+    const u16 *pDB08; /* +0xDB08 -> +0xCF66 */
+    u8 seg_DB0C_DB10[0x4];
+    const u16 *pDB10; /* +0xDB10 -> +0xCF40 */
+    u8 seg_DB14_DB18[0x4];
+    const u16 *pDB18; /* +0xDB18 -> +0xCF1A */
+    u8 seg_DB1C_DB20[0x4];
+    const u16 *pDB20; /* +0xDB20 -> +0xCEFA */
+    u8 seg_DB24_DB28[0x4];
+    const u16 *pDB28; /* +0xDB28 -> +0xCEDA */
+    u8 seg_DB2C_DB30[0x4];
+    const u16 *pDB30; /* +0xDB30 -> +0xCEAE */
+    u8 seg_DB34_DB38[0x4];
+    const u16 *pDB38; /* +0xDB38 -> +0xCE82 */
+    u8 seg_DB3C_DB40[0x4];
+    const u16 *pDB40; /* +0xDB40 -> +0xCE56 */
+    u8 seg_DB44_DB48[0x4];
+    const u16 *pDB48; /* +0xDB48 -> +0xCE2A */
+    u8 seg_DB4C_DB50[0x4];
+    const u16 *pDB50; /* +0xDB50 -> +0xCDFE */
+    u8 seg_DB54_DB58[0x4];
+    const u16 *pDB58; /* +0xDB58 -> +0xCDD8 */
+    u8 seg_DB5C_DB60[0x4];
+    const u16 *pDB60; /* +0xDB60 -> +0xCDB2 */
+    u8 seg_DB64_DB68[0x4];
+    const u16 *pDB68; /* +0xDB68 -> +0xCD92 */
+    u8 seg_DB6C_DB70[0x4];
+    const u16 *pDB70; /* +0xDB70 -> +0xCD72 */
+    u8 seg_DB74_DB78[0x4];
+    const u16 *pDB78; /* +0xDB78 -> +0xCD4C */
+    u8 seg_DB7C_DB80[0x4];
+    const u16 *pDB80; /* +0xDB80 -> +0xCD26 */
+    u8 seg_DB84_DB88[0x4];
+    const u16 *pDB88; /* +0xDB88 -> +0xCD00 */
+    u8 seg_DB8C_DB90[0x4];
+    const u16 *pDB90; /* +0xDB90 -> +0xCCDA */
+    u8 seg_DB94_DB98[0x4];
+    const u16 *pDB98; /* +0xDB98 -> +0xCCB4 */
+    u8 seg_DB9C_DBA0[0x4];
+    const u16 *pDBA0; /* +0xDBA0 -> +0xCC94 */
+    u8 seg_DBA4_DBA8[0x4];
+    const u16 *pDBA8; /* +0xDBA8 -> +0xCC74 */
+    u8 seg_DBAC_DBB0[0x4];
+    const u16 *pDBB0; /* +0xDBB0 -> +0xCC42 */
+    u8 seg_DBB4_DBB8[0x4];
+    const u16 *pDBB8; /* +0xDBB8 -> +0xCC10 */
+    u8 seg_DBBC_DBC0[0x4];
+    const u16 *pDBC0; /* +0xDBC0 -> +0xCBDE */
+    u8 seg_DBC4_DBC8[0x4];
+    const u16 *pDBC8; /* +0xDBC8 -> +0xCBAC */
+    u8 seg_DBCC_DBD0[0x4];
+    const u16 *pDBD0; /* +0xDBD0 -> +0xCB86 */
+    u8 seg_DBD4_DBD8[0x4];
+    const u16 *pDBD8; /* +0xDBD8 -> +0xCB5A */
+    u8 seg_DBDC_DBE0[0x4];
+    const u16 *pDBE0; /* +0xDBE0 -> +0xCB34 */
+    u8 seg_DBE4_DBE8[0x4];
+    const u16 *pDBE8; /* +0xDBE8 -> +0xCB0E */
+    u8 seg_DBEC_DBF0[0x4];
+    const u16 *pDBF0; /* +0xDBF0 -> +0xCAEE */
+    u8 seg_DBF4_DBF8[0x4];
+    const u16 *pDBF8; /* +0xDBF8 -> +0xCACE */
+    u8 seg_DBFC_DC00[0x4];
+    const u16 *pDC00; /* +0xDC00 -> +0xCAA2 */
+    u8 seg_DC04_DC08[0x4];
+    const u16 *pDC08; /* +0xDC08 -> +0xCA76 */
+    u8 seg_DC0C_DC10[0x4];
+    const u16 *pDC10; /* +0xDC10 -> +0xCA4A */
+    u8 seg_DC14_DC18[0x4];
+    const u16 *pDC18; /* +0xDC18 -> +0xCA1E */
+    u8 seg_DC1C_DC20[0x4];
+    const u16 *pDC20; /* +0xDC20 -> +0xC9F2 */
+    u8 seg_DC24_DC28[0x4];
+    const u16 *pDC28; /* +0xDC28 -> +0xC9CC */
+    u8 seg_DC2C_DC30[0x4];
+    const u16 *pDC30; /* +0xDC30 -> +0xC9A6 */
+    u8 seg_DC34_DC38[0x4];
+    const u16 *pDC38; /* +0xDC38 -> +0xC986 */
+    u8 seg_DC3C_DC40[0x4];
+    const u16 *pDC40; /* +0xDC40 -> +0xC966 */
+    u8 seg_DC44_DC48[0x4];
+    const u16 *pDC48; /* +0xDC48 -> +0xC93A */
+    u8 seg_DC4C_DC50[0x4];
+    const u16 *pDC50; /* +0xDC50 -> +0xC90E */
+    u8 seg_DC54_DC60[0xC];
+    const u16 *pDC60; /* +0xDC60 -> +0xBC10 */
+    u8 seg_DC64_DC68[0x4];
+    const u16 *pDC68; /* +0xDC68 -> +0xBC2A */
+    u8 seg_DC6C_DC70[0x4];
+    const u16 *pDC70; /* +0xDC70 -> +0xBC44 */
+    u8 seg_DC74_DC78[0x4];
+    const u16 *pDC78; /* +0xDC78 -> +0xBC5E */
+    u8 seg_DC7C_DC80[0x4];
+    const u16 *pDC80; /* +0xDC80 -> +0xBC78 */
+    u8 seg_DC84_DC88[0x4];
+    const u16 *pDC88; /* +0xDC88 -> +0xBC92 */
+    u8 seg_DC8C_DC90[0x4];
+    const u16 *pDC90; /* +0xDC90 -> +0xBCAC */
+    u8 seg_DC94_DC98[0x4];
+    const u16 *pDC98; /* +0xDC98 -> +0xBCC6 */
+    u8 seg_DC9C_DCA0[0x4];
+    const u16 *pDCA0; /* +0xDCA0 -> +0xBCE0 */
+    u8 seg_DCA4_DCA8[0x4];
+    const u16 *pDCA8; /* +0xDCA8 -> +0xBCFA */
+    u8 seg_DCAC_DCB8[0xC];
+    const u16 *pDCB8; /* +0xDCB8 -> +0xBD3C */
+    u8 seg_DCBC_DCC0[0x4];
+    const u16 *pDCC0; /* +0xDCC0 -> +0xBD34 */
+    u8 seg_DCC4_DCC8[0x4];
+    const u16 *pDCC8; /* +0xDCC8 -> +0xBD2C */
+    u8 seg_DCCC_DCD0[0x4];
+    const u16 *pDCD0; /* +0xDCD0 -> +0xBD24 */
+    u8 seg_DCD4_DCD8[0x4];
+    const u16 *pDCD8; /* +0xDCD8 -> +0xBD1C */
+    u8 seg_DCDC_DCE0[0x4];
+    const u16 *pDCE0; /* +0xDCE0 -> +0xBD14 */
+    u8 seg_DCE4_DCE8[0x4];
+    const u16 *pDCE8; /* +0xDCE8 -> +0xBD5C */
+    u8 seg_DCEC_DCF0[0x4];
+    const u16 *pDCF0; /* +0xDCF0 -> +0xBD54 */
+    u8 seg_DCF4_DCF8[0x4];
+    const u16 *pDCF8; /* +0xDCF8 -> +0xBD4C */
+    u8 seg_DCFC_DD00[0x4];
+    const u16 *pDD00; /* +0xDD00 -> +0xBD44 */
+    u8 seg_DD04_DD10[0xC];
+    const u16 *pDD10; /* +0xDD10 -> +0xBD5C */
+    u8 seg_DD14_DD18[0x4];
+    const u16 *pDD18; /* +0xDD18 -> +0xBD54 */
+    u8 seg_DD1C_DD20[0x4];
+    const u16 *pDD20; /* +0xDD20 -> +0xBD4C */
+    u8 seg_DD24_DD28[0x4];
+    const u16 *pDD28; /* +0xDD28 -> +0xBD44 */
+    u8 seg_DD2C_DD30[0x4];
+    const u16 *pDD30; /* +0xDD30 -> +0xBD3C */
+    u8 seg_DD34_DD38[0x4];
+    const u16 *pDD38; /* +0xDD38 -> +0xBD34 */
+    u8 seg_DD3C_DD40[0x4];
+    const u16 *pDD40; /* +0xDD40 -> +0xBD2C */
+    u8 seg_DD44_DD48[0x4];
+    const u16 *pDD48; /* +0xDD48 -> +0xBD24 */
+    u8 seg_DD4C_DD50[0x4];
+    const u16 *pDD50; /* +0xDD50 -> +0xBD1C */
+    u8 seg_DD54_DD58[0x4];
+    const u16 *pDD58; /* +0xDD58 -> +0xBD14 */
+    u8 seg_DD5C_DD68[0xC];
+    const u16 *pDD68; /* +0xDD68 -> +0xBD44 */
+    u8 seg_DD6C_DD70[0x4];
+    const u16 *pDD70; /* +0xDD70 -> +0xBD3C */
+    u8 seg_DD74_DD78[0x4];
+    const u16 *pDD78; /* +0xDD78 -> +0xBD34 */
+    u8 seg_DD7C_DD80[0x4];
+    const u16 *pDD80; /* +0xDD80 -> +0xBD2C */
+    u8 seg_DD84_DD88[0x4];
+    const u16 *pDD88; /* +0xDD88 -> +0xBD24 */
+    u8 seg_DD8C_DD90[0x4];
+    const u16 *pDD90; /* +0xDD90 -> +0xBD1C */
+    u8 seg_DD94_DD98[0x4];
+    const u16 *pDD98; /* +0xDD98 -> +0xBD14 */
+    u8 seg_DD9C_DDA0[0x4];
+    const u16 *pDDA0; /* +0xDDA0 -> +0xBD5C */
+    u8 seg_DDA4_DDA8[0x4];
+    const u16 *pDDA8; /* +0xDDA8 -> +0xBD54 */
+    u8 seg_DDAC_DDB0[0x4];
+    const u16 *pDDB0; /* +0xDDB0 -> +0xBD4C */
+    u8 seg_DDB4_DDC0[0xC];
+    const u16 *pDDC0; /* +0xDDC0 -> +0xBD34 */
+    u8 seg_DDC4_DDC8[0x4];
+    const u16 *pDDC8; /* +0xDDC8 -> +0xBD34 */
+    u8 seg_DDCC_DDD0[0x4];
+    const u16 *pDDD0; /* +0xDDD0 -> +0xBD34 */
+    u8 seg_DDD4_DDD8[0x4];
+    const u16 *pDDD8; /* +0xDDD8 -> +0xBD2C */
+    u8 seg_DDDC_DDE0[0x4];
+    const u16 *pDDE0; /* +0xDDE0 -> +0xBD2C */
+    u8 seg_DDE4_DDE8[0x4];
+    const u16 *pDDE8; /* +0xDDE8 -> +0xBD2C */
+    u8 seg_DDEC_14394[0x65A8];
 } __attribute__((packed));
 
 static const struct NewFileIntroGfxBlob sBlob_64e470_662804 = {
@@ -22265,7 +22641,95 @@ static const struct NewFileIntroGfxBlob sBlob_64e470_662804 = {
     .pD718 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBE6C),
     .seg_D71C_D720 = INCBIN_U8("data/Blob_64e470_seg_D71C_D720.bin"),
     .pD720 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBE8C),
-    .seg_D724_D890 = INCBIN_U8("data/Blob_64e470_seg_D724_D890.bin"),
+    .seg_D724_D728 = INCBIN_U8("data/Blob_64e470_seg_D724_D728.bin"),
+    .pD728 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBEB8),
+    .seg_D72C_D730 = INCBIN_U8("data/Blob_64e470_seg_D72C_D730.bin"),
+    .pD730 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBEE4),
+    .seg_D734_D738 = INCBIN_U8("data/Blob_64e470_seg_D734_D738.bin"),
+    .pD738 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBF10),
+    .seg_D73C_D740 = INCBIN_U8("data/Blob_64e470_seg_D73C_D740.bin"),
+    .pD740 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBF3C),
+    .seg_D744_D748 = INCBIN_U8("data/Blob_64e470_seg_D744_D748.bin"),
+    .pD748 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBF68),
+    .seg_D74C_D750 = INCBIN_U8("data/Blob_64e470_seg_D74C_D750.bin"),
+    .pD750 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBF94),
+    .seg_D754_D758 = INCBIN_U8("data/Blob_64e470_seg_D754_D758.bin"),
+    .pD758 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBFC0),
+    .seg_D75C_D760 = INCBIN_U8("data/Blob_64e470_seg_D75C_D760.bin"),
+    .pD760 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBFF2),
+    .seg_D764_D768 = INCBIN_U8("data/Blob_64e470_seg_D764_D768.bin"),
+    .pD768 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC02A),
+    .seg_D76C_D770 = INCBIN_U8("data/Blob_64e470_seg_D76C_D770.bin"),
+    .pD770 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC062),
+    .seg_D774_D778 = INCBIN_U8("data/Blob_64e470_seg_D774_D778.bin"),
+    .pD778 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC09A),
+    .seg_D77C_D780 = INCBIN_U8("data/Blob_64e470_seg_D77C_D780.bin"),
+    .pD780 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC0D2),
+    .seg_D784_D788 = INCBIN_U8("data/Blob_64e470_seg_D784_D788.bin"),
+    .pD788 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC10A),
+    .seg_D78C_D790 = INCBIN_U8("data/Blob_64e470_seg_D78C_D790.bin"),
+    .pD790 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC142),
+    .seg_D794_D798 = INCBIN_U8("data/Blob_64e470_seg_D794_D798.bin"),
+    .pD798 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC180),
+    .seg_D79C_D7A0 = INCBIN_U8("data/Blob_64e470_seg_D79C_D7A0.bin"),
+    .pD7A0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC1C4),
+    .seg_D7A4_D7A8 = INCBIN_U8("data/Blob_64e470_seg_D7A4_D7A8.bin"),
+    .pD7A8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC208),
+    .seg_D7AC_D7B0 = INCBIN_U8("data/Blob_64e470_seg_D7AC_D7B0.bin"),
+    .pD7B0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC24C),
+    .seg_D7B4_D7B8 = INCBIN_U8("data/Blob_64e470_seg_D7B4_D7B8.bin"),
+    .pD7B8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC290),
+    .seg_D7BC_D7C0 = INCBIN_U8("data/Blob_64e470_seg_D7BC_D7C0.bin"),
+    .pD7C0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC2D4),
+    .seg_D7C4_D7C8 = INCBIN_U8("data/Blob_64e470_seg_D7C4_D7C8.bin"),
+    .pD7C8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC318),
+    .seg_D7CC_D7D0 = INCBIN_U8("data/Blob_64e470_seg_D7CC_D7D0.bin"),
+    .pD7D0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC35C),
+    .seg_D7D4_D7D8 = INCBIN_U8("data/Blob_64e470_seg_D7D4_D7D8.bin"),
+    .pD7D8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC3A6),
+    .seg_D7DC_D7E0 = INCBIN_U8("data/Blob_64e470_seg_D7DC_D7E0.bin"),
+    .pD7E0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC3F6),
+    .seg_D7E4_D7E8 = INCBIN_U8("data/Blob_64e470_seg_D7E4_D7E8.bin"),
+    .pD7E8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC446),
+    .seg_D7EC_D7F0 = INCBIN_U8("data/Blob_64e470_seg_D7EC_D7F0.bin"),
+    .pD7F0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC496),
+    .seg_D7F4_D7F8 = INCBIN_U8("data/Blob_64e470_seg_D7F4_D7F8.bin"),
+    .pD7F8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC4E6),
+    .seg_D7FC_D800 = INCBIN_U8("data/Blob_64e470_seg_D7FC_D800.bin"),
+    .pD800 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD6BE),
+    .seg_D804_D808 = INCBIN_U8("data/Blob_64e470_seg_D804_D808.bin"),
+    .pD808 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC4E6),
+    .seg_D80C_D810 = INCBIN_U8("data/Blob_64e470_seg_D80C_D810.bin"),
+    .pD810 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD6BE),
+    .seg_D814_D818 = INCBIN_U8("data/Blob_64e470_seg_D814_D818.bin"),
+    .pD818 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC4E6),
+    .seg_D81C_D820 = INCBIN_U8("data/Blob_64e470_seg_D81C_D820.bin"),
+    .pD820 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD6BE),
+    .seg_D824_D828 = INCBIN_U8("data/Blob_64e470_seg_D824_D828.bin"),
+    .pD828 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC536),
+    .seg_D82C_D830 = INCBIN_U8("data/Blob_64e470_seg_D82C_D830.bin"),
+    .pD830 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC58C),
+    .seg_D834_D838 = INCBIN_U8("data/Blob_64e470_seg_D834_D838.bin"),
+    .pD838 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC5E8),
+    .seg_D83C_D840 = INCBIN_U8("data/Blob_64e470_seg_D83C_D840.bin"),
+    .pD840 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC64A),
+    .seg_D844_D848 = INCBIN_U8("data/Blob_64e470_seg_D844_D848.bin"),
+    .pD848 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC6B2),
+    .seg_D84C_D850 = INCBIN_U8("data/Blob_64e470_seg_D84C_D850.bin"),
+    .pD850 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC720),
+    .seg_D854_D858 = INCBIN_U8("data/Blob_64e470_seg_D854_D858.bin"),
+    .pD858 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC782),
+    .seg_D85C_D860 = INCBIN_U8("data/Blob_64e470_seg_D85C_D860.bin"),
+    .pD860 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC7F0),
+    .seg_D864_D868 = INCBIN_U8("data/Blob_64e470_seg_D864_D868.bin"),
+    .pD868 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC876),
+    .seg_D86C_D870 = INCBIN_U8("data/Blob_64e470_seg_D86C_D870.bin"),
+    .pD870 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC876),
+    .seg_D874_D878 = INCBIN_U8("data/Blob_64e470_seg_D874_D878.bin"),
+    .pD878 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC876),
+    .seg_D87C_D880 = INCBIN_U8("data/Blob_64e470_seg_D87C_D880.bin"),
+    .pD880 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC876),
+    .seg_D884_D890 = INCBIN_U8("data/Blob_64e470_seg_D884_D890.bin"),
     .pD890 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xB780),
     .seg_D894_D898 = INCBIN_U8("data/Blob_64e470_seg_D894_D898.bin"),
     .pD898 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xB7C4),
@@ -22303,7 +22767,295 @@ static const struct NewFileIntroGfxBlob sBlob_64e470_662804 = {
     .pD928 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xB9A0),
     .seg_D92C_D930 = INCBIN_U8("data/Blob_64e470_seg_D92C_D930.bin"),
     .pD930 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xB9A8),
-    .seg_D934_14394 = INCBIN_U8("data/Blob_64e470_seg_D934_14394.bin"),
+    .seg_D934_D938 = INCBIN_U8("data/Blob_64e470_seg_D934_D938.bin"),
+    .pD938 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xB9C2),
+    .seg_D93C_D940 = INCBIN_U8("data/Blob_64e470_seg_D93C_D940.bin"),
+    .pD940 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xB9EE),
+    .seg_D944_D948 = INCBIN_U8("data/Blob_64e470_seg_D944_D948.bin"),
+    .pD948 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBA20),
+    .seg_D94C_D950 = INCBIN_U8("data/Blob_64e470_seg_D94C_D950.bin"),
+    .pD950 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBA58),
+    .seg_D954_D958 = INCBIN_U8("data/Blob_64e470_seg_D954_D958.bin"),
+    .pD958 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBAAE),
+    .seg_D95C_D960 = INCBIN_U8("data/Blob_64e470_seg_D95C_D960.bin"),
+    .pD960 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBB16),
+    .seg_D964_D968 = INCBIN_U8("data/Blob_64e470_seg_D964_D968.bin"),
+    .pD968 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBB84),
+    .seg_D96C_D970 = INCBIN_U8("data/Blob_64e470_seg_D96C_D970.bin"),
+    .pD970 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBB84),
+    .seg_D974_D978 = INCBIN_U8("data/Blob_64e470_seg_D974_D978.bin"),
+    .pD978 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBB84),
+    .seg_D97C_D980 = INCBIN_U8("data/Blob_64e470_seg_D97C_D980.bin"),
+    .pD980 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBB84),
+    .seg_D984_D990 = INCBIN_U8("data/Blob_64e470_seg_D984_D990.bin"),
+    .pD990 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD6BE),
+    .seg_D994_D998 = INCBIN_U8("data/Blob_64e470_seg_D994_D998.bin"),
+    .pD998 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD69E),
+    .seg_D99C_D9A0 = INCBIN_U8("data/Blob_64e470_seg_D99C_D9A0.bin"),
+    .pD9A0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD67E),
+    .seg_D9A4_D9A8 = INCBIN_U8("data/Blob_64e470_seg_D9A4_D9A8.bin"),
+    .pD9A8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD658),
+    .seg_D9AC_D9B0 = INCBIN_U8("data/Blob_64e470_seg_D9AC_D9B0.bin"),
+    .pD9B0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD638),
+    .seg_D9B4_D9B8 = INCBIN_U8("data/Blob_64e470_seg_D9B4_D9B8.bin"),
+    .pD9B8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD618),
+    .seg_D9BC_D9C0 = INCBIN_U8("data/Blob_64e470_seg_D9BC_D9C0.bin"),
+    .pD9C0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD5EC),
+    .seg_D9C4_D9C8 = INCBIN_U8("data/Blob_64e470_seg_D9C4_D9C8.bin"),
+    .pD9C8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD5C0),
+    .seg_D9CC_D9D0 = INCBIN_U8("data/Blob_64e470_seg_D9CC_D9D0.bin"),
+    .pD9D0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD594),
+    .seg_D9D4_D9D8 = INCBIN_U8("data/Blob_64e470_seg_D9D4_D9D8.bin"),
+    .pD9D8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD568),
+    .seg_D9DC_D9E0 = INCBIN_U8("data/Blob_64e470_seg_D9DC_D9E0.bin"),
+    .pD9E0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD53C),
+    .seg_D9E4_D9E8 = INCBIN_U8("data/Blob_64e470_seg_D9E4_D9E8.bin"),
+    .pD9E8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD516),
+    .seg_D9EC_D9F0 = INCBIN_U8("data/Blob_64e470_seg_D9EC_D9F0.bin"),
+    .pD9F0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD4F0),
+    .seg_D9F4_D9F8 = INCBIN_U8("data/Blob_64e470_seg_D9F4_D9F8.bin"),
+    .pD9F8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD4C4),
+    .seg_D9FC_DA00 = INCBIN_U8("data/Blob_64e470_seg_D9FC_DA00.bin"),
+    .pDA00 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD498),
+    .seg_DA04_DA08 = INCBIN_U8("data/Blob_64e470_seg_DA04_DA08.bin"),
+    .pDA08 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD46C),
+    .seg_DA0C_DA10 = INCBIN_U8("data/Blob_64e470_seg_DA0C_DA10.bin"),
+    .pDA10 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD440),
+    .seg_DA14_DA18 = INCBIN_U8("data/Blob_64e470_seg_DA14_DA18.bin"),
+    .pDA18 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD414),
+    .seg_DA1C_DA20 = INCBIN_U8("data/Blob_64e470_seg_DA1C_DA20.bin"),
+    .pDA20 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD3EE),
+    .seg_DA24_DA28 = INCBIN_U8("data/Blob_64e470_seg_DA24_DA28.bin"),
+    .pDA28 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD3C2),
+    .seg_DA2C_DA30 = INCBIN_U8("data/Blob_64e470_seg_DA2C_DA30.bin"),
+    .pDA30 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD39C),
+    .seg_DA34_DA38 = INCBIN_U8("data/Blob_64e470_seg_DA34_DA38.bin"),
+    .pDA38 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD37C),
+    .seg_DA3C_DA40 = INCBIN_U8("data/Blob_64e470_seg_DA3C_DA40.bin"),
+    .pDA40 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD350),
+    .seg_DA44_DA48 = INCBIN_U8("data/Blob_64e470_seg_DA44_DA48.bin"),
+    .pDA48 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD324),
+    .seg_DA4C_DA50 = INCBIN_U8("data/Blob_64e470_seg_DA4C_DA50.bin"),
+    .pDA50 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD2F8),
+    .seg_DA54_DA58 = INCBIN_U8("data/Blob_64e470_seg_DA54_DA58.bin"),
+    .pDA58 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD2CC),
+    .seg_DA5C_DA60 = INCBIN_U8("data/Blob_64e470_seg_DA5C_DA60.bin"),
+    .pDA60 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD2A0),
+    .seg_DA64_DA68 = INCBIN_U8("data/Blob_64e470_seg_DA64_DA68.bin"),
+    .pDA68 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD27A),
+    .seg_DA6C_DA70 = INCBIN_U8("data/Blob_64e470_seg_DA6C_DA70.bin"),
+    .pDA70 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD254),
+    .seg_DA74_DA78 = INCBIN_U8("data/Blob_64e470_seg_DA74_DA78.bin"),
+    .pDA78 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD234),
+    .seg_DA7C_DA80 = INCBIN_U8("data/Blob_64e470_seg_DA7C_DA80.bin"),
+    .pDA80 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD214),
+    .seg_DA84_DA88 = INCBIN_U8("data/Blob_64e470_seg_DA84_DA88.bin"),
+    .pDA88 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD1E8),
+    .seg_DA8C_DA90 = INCBIN_U8("data/Blob_64e470_seg_DA8C_DA90.bin"),
+    .pDA90 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD1BC),
+    .seg_DA94_DAA0 = INCBIN_U8("data/Blob_64e470_seg_DA94_DAA0.bin"),
+    .pDAA0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD190),
+    .seg_DAA4_DAA8 = INCBIN_U8("data/Blob_64e470_seg_DAA4_DAA8.bin"),
+    .pDAA8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD164),
+    .seg_DAAC_DAB0 = INCBIN_U8("data/Blob_64e470_seg_DAAC_DAB0.bin"),
+    .pDAB0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD138),
+    .seg_DAB4_DAB8 = INCBIN_U8("data/Blob_64e470_seg_DAB4_DAB8.bin"),
+    .pDAB8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD10C),
+    .seg_DABC_DAC0 = INCBIN_U8("data/Blob_64e470_seg_DABC_DAC0.bin"),
+    .pDAC0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD0E6),
+    .seg_DAC4_DAC8 = INCBIN_U8("data/Blob_64e470_seg_DAC4_DAC8.bin"),
+    .pDAC8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD0C0),
+    .seg_DACC_DAD0 = INCBIN_U8("data/Blob_64e470_seg_DACC_DAD0.bin"),
+    .pDAD0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD0A0),
+    .seg_DAD4_DAD8 = INCBIN_U8("data/Blob_64e470_seg_DAD4_DAD8.bin"),
+    .pDAD8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD080),
+    .seg_DADC_DAE0 = INCBIN_U8("data/Blob_64e470_seg_DADC_DAE0.bin"),
+    .pDAE0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD04E),
+    .seg_DAE4_DAE8 = INCBIN_U8("data/Blob_64e470_seg_DAE4_DAE8.bin"),
+    .pDAE8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xD01C),
+    .seg_DAEC_DAF0 = INCBIN_U8("data/Blob_64e470_seg_DAEC_DAF0.bin"),
+    .pDAF0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCFEA),
+    .seg_DAF4_DAF8 = INCBIN_U8("data/Blob_64e470_seg_DAF4_DAF8.bin"),
+    .pDAF8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCFB8),
+    .seg_DAFC_DB00 = INCBIN_U8("data/Blob_64e470_seg_DAFC_DB00.bin"),
+    .pDB00 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCF92),
+    .seg_DB04_DB08 = INCBIN_U8("data/Blob_64e470_seg_DB04_DB08.bin"),
+    .pDB08 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCF66),
+    .seg_DB0C_DB10 = INCBIN_U8("data/Blob_64e470_seg_DB0C_DB10.bin"),
+    .pDB10 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCF40),
+    .seg_DB14_DB18 = INCBIN_U8("data/Blob_64e470_seg_DB14_DB18.bin"),
+    .pDB18 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCF1A),
+    .seg_DB1C_DB20 = INCBIN_U8("data/Blob_64e470_seg_DB1C_DB20.bin"),
+    .pDB20 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCEFA),
+    .seg_DB24_DB28 = INCBIN_U8("data/Blob_64e470_seg_DB24_DB28.bin"),
+    .pDB28 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCEDA),
+    .seg_DB2C_DB30 = INCBIN_U8("data/Blob_64e470_seg_DB2C_DB30.bin"),
+    .pDB30 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCEAE),
+    .seg_DB34_DB38 = INCBIN_U8("data/Blob_64e470_seg_DB34_DB38.bin"),
+    .pDB38 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCE82),
+    .seg_DB3C_DB40 = INCBIN_U8("data/Blob_64e470_seg_DB3C_DB40.bin"),
+    .pDB40 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCE56),
+    .seg_DB44_DB48 = INCBIN_U8("data/Blob_64e470_seg_DB44_DB48.bin"),
+    .pDB48 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCE2A),
+    .seg_DB4C_DB50 = INCBIN_U8("data/Blob_64e470_seg_DB4C_DB50.bin"),
+    .pDB50 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCDFE),
+    .seg_DB54_DB58 = INCBIN_U8("data/Blob_64e470_seg_DB54_DB58.bin"),
+    .pDB58 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCDD8),
+    .seg_DB5C_DB60 = INCBIN_U8("data/Blob_64e470_seg_DB5C_DB60.bin"),
+    .pDB60 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCDB2),
+    .seg_DB64_DB68 = INCBIN_U8("data/Blob_64e470_seg_DB64_DB68.bin"),
+    .pDB68 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCD92),
+    .seg_DB6C_DB70 = INCBIN_U8("data/Blob_64e470_seg_DB6C_DB70.bin"),
+    .pDB70 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCD72),
+    .seg_DB74_DB78 = INCBIN_U8("data/Blob_64e470_seg_DB74_DB78.bin"),
+    .pDB78 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCD4C),
+    .seg_DB7C_DB80 = INCBIN_U8("data/Blob_64e470_seg_DB7C_DB80.bin"),
+    .pDB80 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCD26),
+    .seg_DB84_DB88 = INCBIN_U8("data/Blob_64e470_seg_DB84_DB88.bin"),
+    .pDB88 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCD00),
+    .seg_DB8C_DB90 = INCBIN_U8("data/Blob_64e470_seg_DB8C_DB90.bin"),
+    .pDB90 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCCDA),
+    .seg_DB94_DB98 = INCBIN_U8("data/Blob_64e470_seg_DB94_DB98.bin"),
+    .pDB98 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCCB4),
+    .seg_DB9C_DBA0 = INCBIN_U8("data/Blob_64e470_seg_DB9C_DBA0.bin"),
+    .pDBA0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCC94),
+    .seg_DBA4_DBA8 = INCBIN_U8("data/Blob_64e470_seg_DBA4_DBA8.bin"),
+    .pDBA8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCC74),
+    .seg_DBAC_DBB0 = INCBIN_U8("data/Blob_64e470_seg_DBAC_DBB0.bin"),
+    .pDBB0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCC42),
+    .seg_DBB4_DBB8 = INCBIN_U8("data/Blob_64e470_seg_DBB4_DBB8.bin"),
+    .pDBB8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCC10),
+    .seg_DBBC_DBC0 = INCBIN_U8("data/Blob_64e470_seg_DBBC_DBC0.bin"),
+    .pDBC0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCBDE),
+    .seg_DBC4_DBC8 = INCBIN_U8("data/Blob_64e470_seg_DBC4_DBC8.bin"),
+    .pDBC8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCBAC),
+    .seg_DBCC_DBD0 = INCBIN_U8("data/Blob_64e470_seg_DBCC_DBD0.bin"),
+    .pDBD0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCB86),
+    .seg_DBD4_DBD8 = INCBIN_U8("data/Blob_64e470_seg_DBD4_DBD8.bin"),
+    .pDBD8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCB5A),
+    .seg_DBDC_DBE0 = INCBIN_U8("data/Blob_64e470_seg_DBDC_DBE0.bin"),
+    .pDBE0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCB34),
+    .seg_DBE4_DBE8 = INCBIN_U8("data/Blob_64e470_seg_DBE4_DBE8.bin"),
+    .pDBE8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCB0E),
+    .seg_DBEC_DBF0 = INCBIN_U8("data/Blob_64e470_seg_DBEC_DBF0.bin"),
+    .pDBF0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCAEE),
+    .seg_DBF4_DBF8 = INCBIN_U8("data/Blob_64e470_seg_DBF4_DBF8.bin"),
+    .pDBF8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCACE),
+    .seg_DBFC_DC00 = INCBIN_U8("data/Blob_64e470_seg_DBFC_DC00.bin"),
+    .pDC00 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCAA2),
+    .seg_DC04_DC08 = INCBIN_U8("data/Blob_64e470_seg_DC04_DC08.bin"),
+    .pDC08 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCA76),
+    .seg_DC0C_DC10 = INCBIN_U8("data/Blob_64e470_seg_DC0C_DC10.bin"),
+    .pDC10 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCA4A),
+    .seg_DC14_DC18 = INCBIN_U8("data/Blob_64e470_seg_DC14_DC18.bin"),
+    .pDC18 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xCA1E),
+    .seg_DC1C_DC20 = INCBIN_U8("data/Blob_64e470_seg_DC1C_DC20.bin"),
+    .pDC20 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC9F2),
+    .seg_DC24_DC28 = INCBIN_U8("data/Blob_64e470_seg_DC24_DC28.bin"),
+    .pDC28 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC9CC),
+    .seg_DC2C_DC30 = INCBIN_U8("data/Blob_64e470_seg_DC2C_DC30.bin"),
+    .pDC30 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC9A6),
+    .seg_DC34_DC38 = INCBIN_U8("data/Blob_64e470_seg_DC34_DC38.bin"),
+    .pDC38 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC986),
+    .seg_DC3C_DC40 = INCBIN_U8("data/Blob_64e470_seg_DC3C_DC40.bin"),
+    .pDC40 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC966),
+    .seg_DC44_DC48 = INCBIN_U8("data/Blob_64e470_seg_DC44_DC48.bin"),
+    .pDC48 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC93A),
+    .seg_DC4C_DC50 = INCBIN_U8("data/Blob_64e470_seg_DC4C_DC50.bin"),
+    .pDC50 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xC90E),
+    .seg_DC54_DC60 = INCBIN_U8("data/Blob_64e470_seg_DC54_DC60.bin"),
+    .pDC60 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBC10),
+    .seg_DC64_DC68 = INCBIN_U8("data/Blob_64e470_seg_DC64_DC68.bin"),
+    .pDC68 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBC2A),
+    .seg_DC6C_DC70 = INCBIN_U8("data/Blob_64e470_seg_DC6C_DC70.bin"),
+    .pDC70 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBC44),
+    .seg_DC74_DC78 = INCBIN_U8("data/Blob_64e470_seg_DC74_DC78.bin"),
+    .pDC78 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBC5E),
+    .seg_DC7C_DC80 = INCBIN_U8("data/Blob_64e470_seg_DC7C_DC80.bin"),
+    .pDC80 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBC78),
+    .seg_DC84_DC88 = INCBIN_U8("data/Blob_64e470_seg_DC84_DC88.bin"),
+    .pDC88 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBC92),
+    .seg_DC8C_DC90 = INCBIN_U8("data/Blob_64e470_seg_DC8C_DC90.bin"),
+    .pDC90 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBCAC),
+    .seg_DC94_DC98 = INCBIN_U8("data/Blob_64e470_seg_DC94_DC98.bin"),
+    .pDC98 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBCC6),
+    .seg_DC9C_DCA0 = INCBIN_U8("data/Blob_64e470_seg_DC9C_DCA0.bin"),
+    .pDCA0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBCE0),
+    .seg_DCA4_DCA8 = INCBIN_U8("data/Blob_64e470_seg_DCA4_DCA8.bin"),
+    .pDCA8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBCFA),
+    .seg_DCAC_DCB8 = INCBIN_U8("data/Blob_64e470_seg_DCAC_DCB8.bin"),
+    .pDCB8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD3C),
+    .seg_DCBC_DCC0 = INCBIN_U8("data/Blob_64e470_seg_DCBC_DCC0.bin"),
+    .pDCC0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD34),
+    .seg_DCC4_DCC8 = INCBIN_U8("data/Blob_64e470_seg_DCC4_DCC8.bin"),
+    .pDCC8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD2C),
+    .seg_DCCC_DCD0 = INCBIN_U8("data/Blob_64e470_seg_DCCC_DCD0.bin"),
+    .pDCD0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD24),
+    .seg_DCD4_DCD8 = INCBIN_U8("data/Blob_64e470_seg_DCD4_DCD8.bin"),
+    .pDCD8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD1C),
+    .seg_DCDC_DCE0 = INCBIN_U8("data/Blob_64e470_seg_DCDC_DCE0.bin"),
+    .pDCE0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD14),
+    .seg_DCE4_DCE8 = INCBIN_U8("data/Blob_64e470_seg_DCE4_DCE8.bin"),
+    .pDCE8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD5C),
+    .seg_DCEC_DCF0 = INCBIN_U8("data/Blob_64e470_seg_DCEC_DCF0.bin"),
+    .pDCF0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD54),
+    .seg_DCF4_DCF8 = INCBIN_U8("data/Blob_64e470_seg_DCF4_DCF8.bin"),
+    .pDCF8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD4C),
+    .seg_DCFC_DD00 = INCBIN_U8("data/Blob_64e470_seg_DCFC_DD00.bin"),
+    .pDD00 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD44),
+    .seg_DD04_DD10 = INCBIN_U8("data/Blob_64e470_seg_DD04_DD10.bin"),
+    .pDD10 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD5C),
+    .seg_DD14_DD18 = INCBIN_U8("data/Blob_64e470_seg_DD14_DD18.bin"),
+    .pDD18 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD54),
+    .seg_DD1C_DD20 = INCBIN_U8("data/Blob_64e470_seg_DD1C_DD20.bin"),
+    .pDD20 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD4C),
+    .seg_DD24_DD28 = INCBIN_U8("data/Blob_64e470_seg_DD24_DD28.bin"),
+    .pDD28 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD44),
+    .seg_DD2C_DD30 = INCBIN_U8("data/Blob_64e470_seg_DD2C_DD30.bin"),
+    .pDD30 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD3C),
+    .seg_DD34_DD38 = INCBIN_U8("data/Blob_64e470_seg_DD34_DD38.bin"),
+    .pDD38 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD34),
+    .seg_DD3C_DD40 = INCBIN_U8("data/Blob_64e470_seg_DD3C_DD40.bin"),
+    .pDD40 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD2C),
+    .seg_DD44_DD48 = INCBIN_U8("data/Blob_64e470_seg_DD44_DD48.bin"),
+    .pDD48 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD24),
+    .seg_DD4C_DD50 = INCBIN_U8("data/Blob_64e470_seg_DD4C_DD50.bin"),
+    .pDD50 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD1C),
+    .seg_DD54_DD58 = INCBIN_U8("data/Blob_64e470_seg_DD54_DD58.bin"),
+    .pDD58 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD14),
+    .seg_DD5C_DD68 = INCBIN_U8("data/Blob_64e470_seg_DD5C_DD68.bin"),
+    .pDD68 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD44),
+    .seg_DD6C_DD70 = INCBIN_U8("data/Blob_64e470_seg_DD6C_DD70.bin"),
+    .pDD70 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD3C),
+    .seg_DD74_DD78 = INCBIN_U8("data/Blob_64e470_seg_DD74_DD78.bin"),
+    .pDD78 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD34),
+    .seg_DD7C_DD80 = INCBIN_U8("data/Blob_64e470_seg_DD7C_DD80.bin"),
+    .pDD80 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD2C),
+    .seg_DD84_DD88 = INCBIN_U8("data/Blob_64e470_seg_DD84_DD88.bin"),
+    .pDD88 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD24),
+    .seg_DD8C_DD90 = INCBIN_U8("data/Blob_64e470_seg_DD8C_DD90.bin"),
+    .pDD90 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD1C),
+    .seg_DD94_DD98 = INCBIN_U8("data/Blob_64e470_seg_DD94_DD98.bin"),
+    .pDD98 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD14),
+    .seg_DD9C_DDA0 = INCBIN_U8("data/Blob_64e470_seg_DD9C_DDA0.bin"),
+    .pDDA0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD5C),
+    .seg_DDA4_DDA8 = INCBIN_U8("data/Blob_64e470_seg_DDA4_DDA8.bin"),
+    .pDDA8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD54),
+    .seg_DDAC_DDB0 = INCBIN_U8("data/Blob_64e470_seg_DDAC_DDB0.bin"),
+    .pDDB0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD4C),
+    .seg_DDB4_DDC0 = INCBIN_U8("data/Blob_64e470_seg_DDB4_DDC0.bin"),
+    .pDDC0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD34),
+    .seg_DDC4_DDC8 = INCBIN_U8("data/Blob_64e470_seg_DDC4_DDC8.bin"),
+    .pDDC8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD34),
+    .seg_DDCC_DDD0 = INCBIN_U8("data/Blob_64e470_seg_DDCC_DDD0.bin"),
+    .pDDD0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD34),
+    .seg_DDD4_DDD8 = INCBIN_U8("data/Blob_64e470_seg_DDD4_DDD8.bin"),
+    .pDDD8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD2C),
+    .seg_DDDC_DDE0 = INCBIN_U8("data/Blob_64e470_seg_DDDC_DDE0.bin"),
+    .pDDE0 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD2C),
+    .seg_DDE4_DDE8 = INCBIN_U8("data/Blob_64e470_seg_DDE4_DDE8.bin"),
+    .pDDE8 = (const u16*)((const u8*)&sBlob_64e470_662804 + 0xBD2C),
+    .seg_DDEC_14394 = INCBIN_U8("data/Blob_64e470_seg_DDEC_14394.bin"),
 };
 
 const u32 sIntroTilemap_662804[318] = INCBIN_U32("data/new_file_intro/662804.tm.lz");

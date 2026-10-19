@@ -204,37 +204,142 @@ def split_new_file_intro_data_pointer_tables() -> None:
         Path(DATA_PATH, name).write_bytes(blob[start:end])
 
 
-def split_new_file_intro_gfx_pointer_tables() -> None:
-    """Split the raw pFrame pointer tables out of the intro graphics blob.
+# `Blob_64e470_662804.bin` is the normal-ROM image of the intro graphics blob.
+# Its SpecialCutscene `struct FrameData` array starts at +0xD6C8 and holds 229
+# 8-byte records: a pFrame word followed by four metadata bytes.  Every nonzero
+# pFrame word is a normal-layout ROM address into this same blob.
+INTRO_GFX_BLOB_ADDR = 0x0864E470
+INTRO_GFX_BLOB_SIZE = 0x14394
+INTRO_GFX_FRAME_DATA_OFFSET = 0x0D6C8
+INTRO_GFX_FRAME_DATA_COUNT = 229
+INTRO_GFX_FRAME_DATA_POINTER_COUNT = 219
+INTRO_GFX_STRUCT_PATH = Path("src/data/new_file_intro_data.c")
 
-    `Blob_64e470_662804.bin` contains three overlapping SpecialCutscene pOam
-    tables whose pFrame words still point at normal-layout addresses.  Split
-    the blob at the 31 unique pointer offsets so the C representation can
-    relocate them; the surrounding bytes stay byte-identical.
+
+def new_file_intro_gfx_pointers(blob: bytes) -> list:
+    """Return the (field offset, target blob offset) of every nonzero pFrame.
+
+    Zero pFrame records are terminators, not pointers; they must stay inside
+    the surrounding byte segments so the linked blob keeps its exact layout.
+    """
+    if len(blob) != INTRO_GFX_BLOB_SIZE:
+        raise ValueError(
+            f"intro graphics blob is {len(blob)} bytes, "
+            f"expected 0x{INTRO_GFX_BLOB_SIZE:X}")
+    pointers = []
+    for i in range(INTRO_GFX_FRAME_DATA_COUNT):
+        offset = INTRO_GFX_FRAME_DATA_OFFSET + i * 8
+        word = int.from_bytes(blob[offset:offset + 4], "little")
+        if word == 0:
+            continue
+        if not (INTRO_GFX_BLOB_ADDR
+                <= word < INTRO_GFX_BLOB_ADDR + INTRO_GFX_BLOB_SIZE):
+            raise ValueError(
+                f"intro pFrame at +0x{offset:04X} is 0x{word:08X}, outside "
+                f"0x{INTRO_GFX_BLOB_ADDR:08X}.."
+                f"0x{INTRO_GFX_BLOB_ADDR + INTRO_GFX_BLOB_SIZE:08X}")
+        pointers.append((offset, word - INTRO_GFX_BLOB_ADDR))
+    if len(pointers) != INTRO_GFX_FRAME_DATA_POINTER_COUNT:
+        raise ValueError(
+            f"intro graphics blob has {len(pointers)} nonzero pFrame words, "
+            f"expected {INTRO_GFX_FRAME_DATA_POINTER_COUNT}")
+    return pointers
+
+
+def new_file_intro_gfx_fields(blob: bytes) -> list:
+    """Return the blob layout as interleaved ('seg'|'ptr', start, end) fields.
+
+    A 'seg' field copies bytes verbatim; a 'ptr' field is a relocatable
+    `const u16 *` whose end is the target blob offset.  Splitting only at
+    pointer fields keeps zero terminator records inside their segment.
+    """
+    fields = []
+    prev = 0
+    for offset, target in new_file_intro_gfx_pointers(blob):
+        if offset < prev:
+            raise ValueError(f"overlapping intro pFrame offset 0x{offset:04X}")
+        if offset > prev:
+            fields.append(("seg", prev, offset))
+        fields.append(("ptr", offset, target))
+        prev = offset + 4
+    if prev < len(blob):
+        fields.append(("seg", prev, len(blob)))
+    total = sum(
+        end - start if kind == "seg" else 4
+        for kind, start, end in fields)
+    if total != len(blob):
+        raise ValueError("intro graphics blob layout does not sum to its size")
+    return fields
+
+
+def emit_new_file_intro_gfx_struct(blob: bytes) -> str:
+    """Emit the C struct/initializer matching the extractor's segment files.
+
+    `src/data/new_file_intro_data.c` embeds this exact text so the pointer
+    field list and the generated `data/Blob_64e470_seg_*.bin` files cannot
+    drift apart.
+    """
+    fields = new_file_intro_gfx_fields(blob)
+    lines = ["struct NewFileIntroGfxBlob {"]
+    for kind, start, end in fields:
+        if kind == "seg":
+            lines.append(
+                f"    u8 seg_{start:04X}_{end:04X}[0x{end - start:X}];")
+        else:
+            lines.append(
+                f"    const u16 *p{start:04X}; "
+                f"/* +0x{start:04X} -> +0x{end:04X} */")
+    lines.append("} __attribute__((packed));")
+    lines.append("")
+    lines.append(
+        "static const struct NewFileIntroGfxBlob sBlob_64e470_662804 = {")
+    for kind, start, end in fields:
+        if kind == "seg":
+            name = f"seg_{start:04X}_{end:04X}"
+            lines.append(
+                f'    .{name} = INCBIN_U8("data/Blob_64e470_{name}.bin"),')
+        else:
+            lines.append(
+                f"    .p{start:04X} = "
+                f"(const u16*)((const u8*)&sBlob_64e470_662804 + 0x{end:04X}),")
+    lines.append("};")
+    return "\n".join(lines) + "\n"
+
+
+def check_new_file_intro_gfx_struct(blob: bytes) -> None:
+    """Fail extraction if the committed C struct does not match this blob."""
+    if not INTRO_GFX_STRUCT_PATH.exists():
+        return
+    expected = emit_new_file_intro_gfx_struct(blob)
+    if expected not in INTRO_GFX_STRUCT_PATH.read_text():
+        raise ValueError(
+            f"{INTRO_GFX_STRUCT_PATH} does not match the generated "
+            "NewFileIntroGfxBlob; regenerate it with "
+            "`python3 tools/extractor.py --emit-intro-gfx-struct`")
+
+
+def split_new_file_intro_gfx_pointer_tables() -> None:
+    """Split the raw pFrame pointer table out of the intro graphics blob.
+
+    `Blob_64e470_662804.bin` contains one 229-record SpecialCutscene
+    `struct FrameData` array at +0xD6C8.  Its 219 nonzero pFrame words are
+    normal-layout ROM addresses, so they must become relocatable C pointers;
+    the 10 zero terminators and all metadata bytes stay in the segment files.
+    Split only at the nonzero pFrame offsets so the linked blob keeps its
+    original 0x14394-byte layout.
     """
     blob_path = Path(DATA_PATH, "Blob_64e470_662804.bin")
     if not blob_path.exists():
         return
     blob = blob_path.read_bytes()
-    if len(blob) != 0x14394:
-        raise ValueError(f"{blob_path} is {len(blob)} bytes, expected 0x14394")
-    starts = (0x0D6C8, 0x0D890, 0x0D8D8)
-    pointers = sorted({
-        base + i * 8
-        for base in starts
-        for i in range(12)
-    })
-    prev = 0
-    for pointer in pointers:
-        if pointer < prev or pointer + 4 > len(blob):
-            raise ValueError(f"invalid intro pOam pointer offset 0x{pointer:X}")
-        if pointer > prev:
-            Path(DATA_PATH, f"Blob_64e470_seg_{prev:04X}_{pointer:04X}.bin").write_bytes(
-                blob[prev:pointer])
-        prev = pointer + 4
-    if prev < len(blob):
-        Path(DATA_PATH, f"Blob_64e470_seg_{prev:04X}_{len(blob):04X}.bin").write_bytes(
-            blob[prev:])
+    for kind, start, end in new_file_intro_gfx_fields(blob):
+        if kind != "seg":
+            continue
+        Path(
+            DATA_PATH,
+            f"Blob_64e470_seg_{start:04X}_{end:04X}.bin").write_bytes(
+                blob[start:end])
+    check_new_file_intro_gfx_struct(blob)
 
 
 def split_navigation_pop_up_graphics_blob() -> None:
@@ -327,6 +432,9 @@ if __name__ == "__main__":
     # group.add_argument("-d", "--debug", action="store_true",
     #     help="Extract debug data from the EU beta rom")
     group.add_argument("-b", "--blob", action="store_true", help="Compute total blob size")
+    group.add_argument("--emit-intro-gfx-struct", action="store_true",
+        help="Print the NewFileIntroGfxBlob C definition generated from the "
+             "extracted intro graphics blob")
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output")
     parser.add_argument("--sort", action="store_true",
         help="Sort database entries by address")
@@ -338,6 +446,11 @@ if __name__ == "__main__":
 
     if args.blob:
         total_blob_size()
+    elif args.emit_intro_gfx_struct:
+        blob_path = Path(DATA_PATH, "Blob_64e470_662804.bin")
+        if not blob_path.exists():
+            parser.error(f"{blob_path} does not exist; run the extractor first")
+        print(emit_new_file_intro_gfx_struct(blob_path.read_bytes()), end="")
     elif args.sort:
         sort_by_address(args.debug, args.quiet)
     else:
