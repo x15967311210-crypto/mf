@@ -85,6 +85,8 @@ HOST_CFLAGS = -std=gnu11 -O2 -ffunction-sections -fdata-sections -Iinclude \
 HOST_TEST_DIR = tests/host/bin
 HOST_TEST_ROOM_BIN = $(HOST_TEST_DIR)/room_rle_test
 HOST_TEST_SPRITE_BIN = $(HOST_TEST_DIR)/sprite_spawn_test
+HOST_TEST_TIMER_BIN = $(HOST_TEST_DIR)/timer_test
+HOST_TEST_FIXED_BIN = $(HOST_TEST_DIR)/fixed_point_test
 MKDIR = mkdir -p
 RM = rm -f
 SHA1SUM = sha1sum
@@ -210,8 +212,16 @@ host-test:
 	$(MSG) HOSTCC $(HOST_TEST_SPRITE_BIN)
 	$Q$(HOSTCC) $(HOST_CFLAGS) tests/host/sprite_spawn_test.c src/sprite.c \
 		-Wl,--gc-sections -o $(HOST_TEST_SPRITE_BIN)
+	$(MSG) HOSTCC $(HOST_TEST_TIMER_BIN)
+	$Q$(HOSTCC) $(HOST_CFLAGS) tests/host/timer_test.c src/in_game_timer.c \
+		-Wl,--gc-sections -o $(HOST_TEST_TIMER_BIN)
+	$(MSG) HOSTCC $(HOST_TEST_FIXED_BIN)
+	$Q$(HOSTCC) $(HOST_CFLAGS) tests/host/fixed_point_test.c src/fixed_point.c \
+		-Wl,--gc-sections -o $(HOST_TEST_FIXED_BIN)
 	$Q$(HOST_TEST_ROOM_BIN)
 	$Q$(HOST_TEST_SPRITE_BIN)
+	$Q$(HOST_TEST_TIMER_BIN)
+	$Q$(HOST_TEST_FIXED_BIN)
 	@echo 'host-test: all suites passed'
 
 .PHONY: help
