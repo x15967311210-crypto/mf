@@ -1090,3 +1090,25 @@ The source pointer `0865A2E4` is inside `sBlob_64e470_662804`; its shifted
 target is zero-filled while the normal source at `0x0865A2E4` is populated.
 This is another OAM-loop overflow, with a different source table.  M0f is
 blocked by BUG-013 even if the 22923 state check passes.
+
+### BUG-013 source fix landed (2026-10-19, `da248e3`)
+
+The native execution hook at `SpecialCutsceneDrawOam` showed the 2238 idle
+failure selecting pOam `0865CD48`; its first record still contained the normal
+pFrame `08659BA4` (count `0x2803`), while the correct shifted target
+`0865ABA4` has count 7.
+
+`src/data/new_file_intro_data.c` now represents `sBlob_64e470_662804` as a
+packed struct with the 31 raw pFrame words in the three pOam tables at
+`0865CB38..0865CB90`, `0865CD00..0865CD38`, `0865CD48..0865CDA0` as
+relocatable fields.  `tools/extractor.py` emits 32 byte-identical segments.
+
+```text
+normal  ca33f4348c2c05dd330d37b97e2c5a69531dfe87
+shifted c4b62c65378602b03f7144913fbf9d45140720fd
+```
+
+Native idle: 2239 pOam `0865CD48 -> 0865ABA4` count 7; 2299/2300
+`DISPCNT=1300 callback=08094901`; 2300 screenshot 14274 bytes (old black 242).
+Focused: 384/385/386/401 PASS, 22923/22924/22925 callback `0809B2C9`,
+22952 `DISPCNT=9700`.  Full 100% TAS remains QA-020.

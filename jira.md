@@ -271,7 +271,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - parity remains FAIL because of BUG-012, not BUG-008.
 - [DOING @human] QA-020 (emulator) — native TAS parity after BUG-012
   - native BizHawk 2.3.2, mGBA core, BIOS `300C20DF...`, normalized SaveRAM
-    `FB611BD6...`, same 100% TAS; candidate `2447dfb7...` (bug012c).
+    `FB611BD6...`, same 100% TAS; candidate `c4b62c65...` (bug013).
   - require 22923 callbacks `0809A2C9`/`0809B2C9`, both `CPSR=92`; no Undefined
     at 22924/22925; 22952 `DISPCNT=9700`; final 339001
     `1900 0009 0002 0100 109 0 63 0`; file-select 385/401 still PASS.
@@ -329,7 +329,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - leading candidate: copied IRQ/callback table in IWRAM (`sBlob_a5224_a5258`
     at 0x080A5224, moved by reorder) or a raw literal in intr/audio code.
   - no fix yet; BUG-011 stays DOING.
-- [DOING @human] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
+- [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
   - candidate `812d0090...` (BUG-008 fix) passes file-select, then native TAS
     first CPU/IRQ divergence at **22923**:
     normal callback `0809A2C9` (`CutsceneElevatorMonologueVblank`), shifted
@@ -396,11 +396,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     no IE loss and no Undefined.
   - automatic gates PASS (audit/smoke/test/strict relocs, shift/start/input
     4k/30k, screen/OAM diff, shift-reorder).
-  - **full 100% TAS from the normal starting point is the remaining
-    acceptance**; candidate
-    `work/playtest/m0f-2026-10-17/mgba-final-bug012c/`.  Do not close BUG-012 or
-    M0f until EmuHawk reaches 339001 with the expected final state.
-- [TODO] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
+  - **native focused PASS on `c4b62c65`**: 22923/22924/22925 callback
+    `0809B2C9`, LR `000001B8`, CPSR `00000092`; 22952 `DISPCNT=9700`;
+    file-select 384/385/386/401 still PASS.
+  - full 100% TAS remains QA-020; M0f stays BLOCKED until it reaches 339001.
+- [DONE] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
   - independent of BUG-008/385 and BUG-012/22923.  Native BizHawk 2.3.2,
     no movie/no input, same BIOS/SaveRAM: normal/reordered OK; shifted first
     diverges at 2238:
@@ -459,6 +459,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     vector, or IWRAM.
   - **M0f is blocked by this idle regression** even if the 22923 state check
     passes.
+  - **FIX LANDED `da248e3`**: 31 raw pFrame words in the three pOam tables
+    `0865CB38..0865CB90`, `0865CD00..0865CD38`, `0865CD48..0865CDA0` are now
+    relocatable fields in `sBlob_64e470_662804`; `tools/extractor.py` emits
+    32 byte-identical segments.  Normal SHA1 `ca33f434...`; shifted
+    `c4b62c65378602b03f7144913fbf9d45140720fd`.
+  - native idle PASS: 2239 `pOam=0865CD48 -> 0865ABA4 count=7`; 2299/2300
+    `DISPCNT=1300 callback=08094901`; 2300 screenshot 14274 bytes (old black
+    242 bytes).  Focused 384/385/386/401 and 22923/22924/22925 all PASS.
+  - automatic gates PASS (audit/smoke/test/strict relocs, shift/start/input
+    4k/30k, screen/OAM diff, shift-reorder).
+  - full 100% TAS remains QA-020.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
