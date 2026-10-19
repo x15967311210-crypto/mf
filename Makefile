@@ -83,7 +83,8 @@ HOSTCC = cc
 HOST_CFLAGS = -std=gnu11 -O2 -ffunction-sections -fdata-sections -Iinclude \
 	-Wno-implicit-function-declaration -Wno-pointer-to-int-cast
 HOST_TEST_DIR = tests/host/bin
-HOST_TEST_BIN = $(HOST_TEST_DIR)/room_rle_test
+HOST_TEST_ROOM_BIN = $(HOST_TEST_DIR)/room_rle_test
+HOST_TEST_SPRITE_BIN = $(HOST_TEST_DIR)/sprite_spawn_test
 MKDIR = mkdir -p
 RM = rm -f
 SHA1SUM = sha1sum
@@ -202,11 +203,16 @@ endif
 
 .PHONY: host-test
 host-test:
-	$(MSG) HOSTCC $(HOST_TEST_BIN)
+	$(MSG) HOSTCC $(HOST_TEST_ROOM_BIN)
 	$Q$(MKDIR) $(HOST_TEST_DIR)
 	$Q$(HOSTCC) $(HOST_CFLAGS) tests/host/room_rle_test.c src/room.c \
-		-Wl,--gc-sections -o $(HOST_TEST_BIN)
-	$Q$(HOST_TEST_BIN)
+		-Wl,--gc-sections -o $(HOST_TEST_ROOM_BIN)
+	$(MSG) HOSTCC $(HOST_TEST_SPRITE_BIN)
+	$Q$(HOSTCC) $(HOST_CFLAGS) tests/host/sprite_spawn_test.c src/sprite.c \
+		-Wl,--gc-sections -o $(HOST_TEST_SPRITE_BIN)
+	$Q$(HOST_TEST_ROOM_BIN)
+	$Q$(HOST_TEST_SPRITE_BIN)
+	@echo 'host-test: all suites passed'
 
 .PHONY: help
 help:
