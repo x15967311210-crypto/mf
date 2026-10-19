@@ -449,9 +449,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     No DMA writes the stack source `03007D00..03007E00` and no CPU store of
     `0865A2CA` is present.  The active `A2CA` table is therefore not a direct
     pOam field/DMA source; it is selected/computed one level earlier.
-  - next: native call-stack/argument hook at the `SpecialCutsceneDrawAllOam`
-    call (not more slot pOam field scanning); then relocate the selected
-    table/pointer.
+  - attempted function-entry store hooks at `SpecialCutsceneDrawOam`
+    (`08099DA0`/`08098DA0` + PC+2) did not fire in the current hook, so a
+    normal store hook is not sufficient for the call-entry trace.
+  - next: use an execution/PC hook (`on_bus_exec` or mGBA debugger) at
+    `SpecialCutsceneDrawAllOam`/`DrawOam` to capture the pOam argument and
+    caller; then relocate the selected table/pointer.
     Preserve normal SHA1 and all gates.  Do not patch the callback setter, IRQ
     vector, or IWRAM.
   - **M0f is blocked by this idle regression** even if the 22923 state check
