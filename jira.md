@@ -44,10 +44,23 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - coverage: type 0 size codes, type 1/type>1 headers, 8/16-bit literal
     and run modes, two-pass interleaving.
   - normal SHA stays `ca33f434...`; landed `904831c`.
-- [TODO] QA-025 (tools) — extend host harness to spawn/save pure logic
-  - next candidates: `SpriteSpawnPrimary/Secondary` with fake `gSpriteData`
-    setup; save validation/checksum after extracting the pure part of
-    `SramCheckInternal` (currently static and GBA-register bound).
+- [DONE] QA-025 (tools) — host harness: sprite spawn pure logic
+  - `tests/host/sprite_spawn_test.c`; 148/148 checks, linked against the real
+    `src/sprite.c` with host cc + `--gc-sections`; only fixture globals
+    (`gSpriteData`, spriteset id/gfx arrays) are defined by the test.
+  - covers `SpriteSpawnPrimary`, `SpriteSpawnSecondary` and
+    `SpriteInitPrimary`: exact fields, `statusToAdd`, hidden `0x80`,
+    spriteset index `>0x10`, first-free/full-table, no clobber.
+  - engine note: `SpriteSpawnPrimary` stores explicit id/gfx verbatim and does
+    **no** spriteset lookup; the `0x80`/`>0x10` rules live in
+    `SpriteInitPrimary`, so both are tested.
+  - `make host-test` now runs both suites: `33/33` + `148/148`, ~1.4s;
+    normal SHA stays `ca33f434...`; landed `ba737b4`.
+- [TODO] QA-026 (tools) — host harness: save validation/checksum
+  - `SramCheckInternal` is static and GBA-register bound; first isolate the
+    pure compare/checksum part (or add a thin pure helper) without changing
+    normal ROM behavior, then add `tests/host/save_test.c`.
+  - do not duplicate the algorithm in the test; synthetic buffers only.
   - keep host tests as a fast pre-gate; native/behavior suite remains the
     authority.
 
