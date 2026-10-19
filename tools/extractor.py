@@ -178,7 +178,15 @@ def split_new_file_intro_data_pointer_tables() -> None:
         raise ValueError(
             f"{blob_path} is {len(blob)} bytes, expected 0x1F70C")
     spans = (
-        (0x0000, 0x05BC, "Blob_6638a0_before.bin"),
+        (0x0000, 0x0530, "Blob_6638a0_before0.bin"),
+        (0x0534, 0x0538, "Blob_6638a0_gap_0530.bin"),
+        (0x053C, 0x0540, "Blob_6638a0_gap_0538.bin"),
+        (0x0544, 0x0548, "Blob_6638a0_gap_0540.bin"),
+        (0x054C, 0x0550, "Blob_6638a0_gap_0548.bin"),
+        (0x0550, 0x0558, "Blob_6638a0_term_0550.bin"),
+        (0x055C, 0x0560, "Blob_6638a0_gap_0558.bin"),
+        (0x0560, 0x0568, "Blob_6638a0_term_0560.bin"),
+        (0x0568, 0x05BC, "Blob_6638a0_before2.bin"),
         (0x05C0, 0x05C4, "Blob_6638a0_gap_05C0.bin"),
         (0x05C8, 0x05CC, "Blob_6638a0_gap_05C8.bin"),
         (0x05CC, 0x05D4, "Blob_6638a0_term_05CC.bin"),
