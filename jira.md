@@ -269,13 +269,21 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     full final checkpoint not reached.  Evidence:
     `tas/bug008_candidate_fine/BUG008_CANDIDATE_FINE.md` and logs.
   - parity remains FAIL because of BUG-012, not BUG-008.
-- [DOING @human] QA-020 (emulator) — native TAS parity after BUG-012
+- [BLOCKED] QA-020 (emulator) — native TAS parity after BUG-012  [deps: BUG-013]
   - native BizHawk 2.3.2, mGBA core, BIOS `300C20DF...`, normalized SaveRAM
     `FB611BD6...`, same 100% TAS; candidate `c4b62c65...` (bug013).
   - require 22923 callbacks `0809A2C9`/`0809B2C9`, both `CPSR=92`; no Undefined
     at 22924/22925; 22952 `DISPCNT=9700`; final 339001
     `1900 0009 0002 0100 109 0 63 0`; file-select 385/401 still PASS.
   - reordered still needs BUG-011 room 23/14; do not gate it on BUG-012.
+- [DOING @windows] QA-022 (emulator) — BUG-013 2332 pOam/count capture
+  - candidate `c4b62c65378602b03f7144913fbf9d45140720fd`; state
+    `tas/bug013_crash/shifted_2331.State`; no movie; same BIOS/SaveRAM.
+  - run `work/playtest/m0f-2026-10-17/tools/bizhawk/bug013_2332_probe.lua`
+    and return the 20-entry pOam/frame/pFrame/count table at 2331/2332/2333;
+    identify the active table with count >20 and its pOam address.
+  - save states 2332/2333 and screenshots; report the first pOam/count that
+    pushes `gNextOamSlot` past 19; do not patch source.
 - [DONE] QA-019 (emulator) — capture 22923 gVBlankCallback writer
   - use the native MGBAHawk/BizHawk 2.3.2 path that reproduced BUG-008; watch
     `0x030019C4` and `0x030019C0..0x030019CC` over frames 22920-22930, same
@@ -400,7 +408,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `0809B2C9`, LR `000001B8`, CPSR `00000092`; 22952 `DISPCNT=9700`;
     file-select 384/385/386/401 still PASS.
   - full 100% TAS remains QA-020; M0f stays BLOCKED until it reaches 339001.
-- [DONE] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
+- [DOING @dev2] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
   - independent of BUG-008/385 and BUG-012/22923.  Native BizHawk 2.3.2,
     no movie/no input, same BIOS/SaveRAM: normal/reordered OK; shifted first
     diverges at 2238:
@@ -469,7 +477,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     242 bytes).  Focused 384/385/386/401 and 22923/22924/22925 all PASS.
   - automatic gates PASS (audit/smoke/test/strict relocs, shift/start/input
     4k/30k, screen/OAM diff, shift-reorder).
-  - full 100% TAS remains QA-020.
+  - **candidate c4b62 idle 2300-2331 healthy, but frame 2332 still crashes**:
+    callback becomes `0809C021`, 2333 IE lost / PC `0000002C` / CPSR
+    `FFFFFFFF8000009B`; invalid jump target `69626082`.
+  - `030014E0 = gOamData + 0x6F8` = OAM slot 223; the 8-byte OAM entry wrote
+    into `gNonGameplayRam+0x5C` and corrupted the `CutsceneProcessOam` function
+    pointer.  This is another pOam/count overflow, later than 2238.
+  - **QA-022 (Windows BizHawk)** assigned: load
+    `tas/bug013_crash/shifted_2331.State` with candidate `c4b62c65`, run
+    `bug013_2332_probe.lua`, return all 20 pOam/frame/pFrame/count rows for
+    frames 2331-2333 and the active pOam table with count >20.
+  - full 100% TAS remains QA-020, but is blocked by this 2332 regression.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
