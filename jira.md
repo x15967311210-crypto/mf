@@ -287,6 +287,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - **closed by state inspection, not a write hook**: loading the native 22922
     state showed `R10=0xF164`, `R6=08664460`; the pOam table at
     `0x08663DD0` was the source.  Fixed by `df60f8f`.
+- [DONE] QA-021 (emulator) — idle 2238 writer capture
+  - native MGBAHawk store hook on `0x030019C4`, no movie/no input, state
+    `shifted_2200`: writer `PC=08099F28`, `LR=08099D75`, value `0000C1A2`,
+    `r3=030019C0`, `sl=0865A2E4`, `nextOamSlot=0x47`.
+  - filed as BUG-013; callback setter/IRQ not patched.
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
   - native 100% TAS, normalized SaveRAM `FB611BD6...`: `PARITY: FAIL`.
   - shifted first behavior divergence frame 401 (`DISPCNT 1E00` vs `1C00`),
@@ -395,6 +400,27 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     acceptance**; candidate
     `work/playtest/m0f-2026-10-17/mgba-final-bug012c/`.  Do not close BUG-012 or
     M0f until EmuHawk reaches 339001 with the expected final state.
+- [DOING @dev2] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
+  - independent of BUG-008/385 and BUG-012/22923.  Native BizHawk 2.3.2,
+    no movie/no input, same BIOS/SaveRAM: normal/reordered OK; shifted first
+    diverges at 2238:
+    normal `DISPCNT=1300 callback=08093901`; shifted `DISPCNT=1B00
+    callback=0809C1A2`; 2239 shifted IE=2400 and enters the exception path.
+  - native MGBAHawk writer: final write to `0x030019C4` at PC `08099F28`,
+    LR `08099D75`, value `0000C1A2`; `r3=030019C0`, `r9=030016E8`,
+    `sl=0865A2E4`, `sb=030016E8`, `nextOamSlot=0x47`.  Another OAM-loop
+    overflow into the VBlank callback.
+  - source pointer `sl=0865A2E4` is in `sBlob_64e470_662804`; the shifted
+    source target is zero-filled while the normal source at `0x0865A2E4` is
+    populated.  Prime suspect: a raw source/base pointer for that intro frame
+    table, not the BUG-012 tables.
+  - evidence: `tas/idle_black_fine/` (`shifted_2200_bug013.txt`,
+    `shifted_2238_store.log`, `BUG013_WRITER.md`); hook `mgba_store.log`.
+  - next: identify the table/base that produces `0865A2E4` and relocate it;
+    preserve normal SHA1 and all existing gates.  Do not patch the callback
+    setter, IRQ vector, or IWRAM.
+  - **M0f is blocked by this idle regression** even if the 22923 state check
+    passes.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`

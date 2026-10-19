@@ -1067,3 +1067,26 @@ Native state check on the same BizHawk 2.3.2/mGBA setup:
 
 No IE loss, no Undefined.  Full 100% TAS from the normal starting point is the
 remaining acceptance.
+
+### BUG-013 idle/no-movie black at 2238 (2026-10-19)
+
+This is independent of BUG-008/385 and BUG-012/22923.  With no movie and no
+input, normal/reordered remain healthy, while shifted first diverges at 2238:
+
+```text
+normal  2238 DISPCNT=1300 callback=08093901
+shifted 2238 DISPCNT=1B00 callback=0809C1A2
+shifted 2239 IE=2400, exception path, then black
+```
+
+Native MGBAHawk store hook captured the final callback write:
+
+```text
+PC=08099F28 LR=08099D75 value=0000C1A2
+r3=030019C0 r9=030016E8 sl=0865A2E4 sb=030016E8 nextOamSlot=0047
+```
+
+The source pointer `0865A2E4` is inside `sBlob_64e470_662804`; its shifted
+target is zero-filled while the normal source at `0x0865A2E4` is populated.
+This is another OAM-loop overflow, with a different source table.  M0f is
+blocked by BUG-013 even if the 22923 state check passes.
