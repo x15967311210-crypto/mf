@@ -534,6 +534,25 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - candidate staged in `mgba-final-bug013b/` with the 2331 state and
     `BUG013B_RESULT.md`.  **Not merged**; waiting for QA-022 Windows native.
   - full 100% TAS remains QA-020, but is blocked by this 2332 regression.
+- [TODO] BUG-014 (shift/engine) — post-link scan: 90 raw pointer runs remain
+  - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
+    relinks with `--emit-relocs`, scans non-executable ROM data, ignores
+    relocated words, and fails only on structured pointer runs
+    (stride 0x4/0x8/0xC/0x18/0x24 with unique/known/alignment filters).
+  - targets: `make -f Makefile.shift postlink-scan` (report) and
+    `postlink-scan-strict` (exit 1).  Not wired into `check-relocs-strict`
+    until triage; normal SHA stays `ca33f434...`.
+  - self-check 4/4; known-bad old ELF reports 90 runs including the BUG-013
+    `sBlob_64e470_662804` run `0x0865BB98..0x0865BCF0` (44 words);
+    known-good dev4 removes that run (74 remain).
+  - top remaining groups: `sBlob_6131c8_63a19c` (many runs),
+    `sBlob_6638a0_682fac`, `sBlob_582288_58b3cc`, `sBlob_5766D4_prefix`,
+    `sBlob_39aa34_39f4b0`, `DirectSoundData_080BE5B8`.
+  - next: triage each group as either a real unrelocated FrameData/pointer
+    table (convert) or a reviewed false positive (whitelist with evidence).
+    Do not auto-whitelist; do not wire strict into the main gate until the
+    list is zero or explicitly justified.
+  - this is a shiftability P0 but does not block the BUG-013 native gate.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
