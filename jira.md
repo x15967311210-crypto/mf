@@ -296,6 +296,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     idle frames 2332..2351 healthy (`callback=08094901`, no IE loss, no
     invalid jump) and field-identical to normal.  Windows native post-fix
     confirmation is still required; do not treat the headless run as the gate.
+  - **post-fix candidate staged**: `mgba-final-bug013b/` shifted
+    `012a2c95089485ebd37d19e86717b666ccc00e09` (source build from dev4
+    `32d3513`), state `shifted_2331.State`.  Local mGBA 0.7.2 replay is
+    clean through 120 frames; `BUG013B_RESULT.md` has the native checklist.
+  - remaining QA-022 scope is now **native post-fix confirmation**, not the
+    pre-fix table capture.
 - [DONE] QA-019 (emulator) — capture 22923 gVBlankCallback writer
   - use the native MGBAHawk/BizHawk 2.3.2 path that reproduced BUG-008; watch
     `0x030019C4` and `0x030019C0..0x030019CC` over frames 22920-22930, same
@@ -517,8 +523,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - pre-fix proof: a throwaway ROM patch adding `+0x1000` to those 188 words
     is healthy from 2331 through 2351 and matches normal's DISPCNT/callback
     (`08094901` is normal `08093901 + 0x1000`).
-  - assigned to engine-dev in a fresh worktree from `hack` tip `dc04012`;
-    do not continue on stale `dev2`.
+  - **FIX COMMITTED on `dev4` `32d3513`** (base `f3c3637`): all 219 nonzero
+    pFrame words in `0x0D6C8..0x0DDE8` are relocatable fields; extractor now
+    generates the full 229-record layout and self-checks the C struct.
+    Normal SHA1 `ca33f434...`; shifted
+    `012a2c95089485ebd37d19e86717b666ccc00e09`.
+  - dev4 gates: audit/smoke/check-relocs-strict/shift-build PASS;
+    normal `make check` PASS; `test`/`shift-start`/`shift-input`/
+    `shift-reorder` dynamic stages SKIP (77, no harness in worktree).
+  - candidate staged in `mgba-final-bug013b/` with the 2331 state and
+    `BUG013B_RESULT.md`.  **Not merged**; waiting for QA-022 Windows native.
   - full 100% TAS remains QA-020, but is blocked by this 2332 regression.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
