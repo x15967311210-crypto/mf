@@ -428,9 +428,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Likely source is the `sBlob_64e470` base/record table; decode the
     `shifted_2200`/`normal_2200` state or the writer `pOam` to locate the
     record.
-  - next: identify the table/base that produces `0865A2E2` (target shifted
-    `0865B2E2`) and relocate it; preserve normal SHA1 and all gates.  Do not
-    patch the callback setter, IRQ vector, or IWRAM.
+  - **pOam write trace (MGBAHawk hook)**: slot 2's pOam at `0x03001704` is
+    correctly written `0865CD48` (normal `0865BD48` +0x1000), but the active
+    writer source is still `0865A2E2`, which corresponds to a different table
+    at `0865A2CA`; that pOam value is not found as a 4-byte literal.  It is
+    likely DMA-copied/setup-generated, not the slot-2 CPU store.  The OAM
+    all-write trace shows the overflow walking `0865A216..0865A2D8`, confirming
+    the active source table is the `A2CA` one.
+  - next: log/DMA-watch the pOam field writes for all slots and find who sets
+    `0865A2CA`; then relocate that table/pointer.  Preserve normal SHA1 and all
+    gates.  Do not patch the callback setter, IRQ vector, or IWRAM.
   - **M0f is blocked by this idle regression** even if the 22923 state check
     passes.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
