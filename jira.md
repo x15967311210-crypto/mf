@@ -56,10 +56,21 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `SpriteInitPrimary`, so both are tested.
   - `make host-test` now runs both suites: `33/33` + `148/148`, ~1.4s;
     normal SHA stays `ca33f434...`; landed `ba737b4`.
-- [TODO] QA-026 (tools) — host harness: save validation/checksum
-  - `SramCheckInternal` is static and GBA-register bound; first isolate the
-    pure compare/checksum part (or add a thin pure helper) without changing
-    normal ROM behavior, then add `tests/host/save_test.c`.
+- [DONE] QA-026 (tools) — host harness: timer state machine + fixed-point
+  - `tests/host/timer_test.c` (47/47) and `tests/host/fixed_point_test.c`
+    (27/27), linked against the real `src/in_game_timer.c` and
+    `src/fixed_point.c` with host cc + `--gc-sections`; test-only globals.
+  - `make host-test` now runs four suites: 33 + 148 + 47 + 27 = 255 checks,
+    ~1.5s; normal SHA stays `ca33f434...`; landed `15170df`.
+  - engine note: `InGameTimerUpdate` adds an extra frame in the hour-rollover
+    path, so `00:59:59:63 -> 01:00:00:01`, not `01:00:00:00`.  The test
+    locks the current behavior; review before changing it (normal ROM is the
+    baseline).  The 99-hour cap clamps to `99:59:59:59` and sets the flag.
+- [TODO] QA-027 (tools) — host harness: save validation/checksum
+  - `Sram_CheckLoadSaveFile` / `Sram_ChecLoadSaveFileWithBlank` are still in
+    `asm/disasm_0x0807e678.s`; `SramCheckInternal` is static and
+    GBA-register bound.  This needs a C decomp/pure helper first, without
+    changing normal ROM behavior; then add `tests/host/save_test.c`.
   - do not duplicate the algorithm in the test; synthetic buffers only.
   - keep host tests as a fast pre-gate; native/behavior suite remains the
     authority.
