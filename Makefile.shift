@@ -44,12 +44,25 @@ SYMBOLS ?= $(SHIFT_WORK)/symbols.json
 ABS_REFS ?= $(SHIFT_WORK)/abs_refs.json
 BLOB_SCAN ?= $(SHIFT_WORK)/blob_scan.json
 REWRITE_REPORT ?= $(SHIFT_WORK)/rewrite_suggestions.md
+POSTLINK_ELF ?= $(SHIFT_WORK)/mf_us_postlink.elf
+POSTLINK_MAP ?= $(SHIFT_WORK)/mf_us_postlink.map
+POSTLINK_JSON ?= $(SHIFT_WORK)/postlink_scan.json
+POSTLINK_WHITELIST ?=
+POSTLINK_SCAN = $(PYTHON) tools/shift/postlink_pointer_scan.py \
+	--elf $(POSTLINK_ELF) --map $(POSTLINK_MAP) \
+	$(if $(POSTLINK_WHITELIST),--whitelist $(POSTLINK_WHITELIST)) \
+	--json-out $(POSTLINK_JSON)
+# Relink only into work/: the normal mf_us.elf/mf_us.gba and the ROM SHA are
+# never touched.  --emit-relocs records the words that are already pointers.
+POSTLINK_RELINK = $(MAKE) -f Makefile ELF=$(POSTLINK_ELF) \
+	MAP=$(POSTLINK_MAP) LDFLAGS=--emit-relocs $(POSTLINK_ELF)
 
 .PHONY: all symbols audit-asm audit-blobs rewrite report audit \
         check-relocs check-relocs-strict check-linker smoke test test-input \
         input-smoke emulator-harness shift-build shift-test shift-check \
         shift-reorder shift-start shift-input shift-input-30k shift-screen \
-        screen-diff oam-diff event-diff shift-check-all content-check help
+        screen-diff oam-diff event-diff shift-check-all content-check \
+        postlink-scan postlink-scan-strict help
 
 all: audit
 
@@ -73,6 +86,22 @@ report: symbols audit-asm audit-blobs
 		--out docs/shiftability-audit.md
 
 audit: symbols audit-asm audit-blobs rewrite report check-relocs
+
+# Post-link scan: find raw ROM pointer words that survived a partial
+# conversion.  The ELF is relinked into work/ with --emit-relocs so the normal
+# mf_us.gba/mf_us.elf and the ROM SHA stay untouched.  Report mode exits 0;
+# the strict target exits 1 on any structured run that is not whitelisted.
+# Not part of check-relocs-strict/shift-check yet: the current tree has latent
+# findings that need triage.
+postlink-scan:
+	@mkdir -p $(SHIFT_WORK)
+	$(POSTLINK_RELINK)
+	$(POSTLINK_SCAN) --report
+
+postlink-scan-strict:
+	@mkdir -p $(SHIFT_WORK)
+	$(POSTLINK_RELINK)
+	$(POSTLINK_SCAN) --strict
 
 # Informational: regenerate the evidence and report what would fail the gate.
 check-relocs: audit-asm audit-blobs
@@ -498,6 +527,8 @@ help:
 	@echo "  check-relocs        report remaining hardcoded ROM refs and raw blobs"
 	@echo "  check-relocs-strict fail on literals, C ROM refs, or raw pointer-like blobs"
 	@echo "  check-linker        verify linker.ld has no fixed ROM addresses"
+	@echo "  postlink-scan       report raw pointer runs in --emit-relocs data sections"
+	@echo "  postlink-scan-strict fail on any unwhitelisted structured pointer run"
 	@echo "  smoke               static ROM/header smoke"
 	@echo "  content-check       synthetic Tiled/PNG room-pipeline check (no ROM)"
 	@echo "  emulator-harness    build tests/emulator/bin/mgba-harness (MGBA_SRC/MGBA_BUILD)"
@@ -516,4 +547,4 @@ help:
 	@echo "  event-diff          normal/shifted 30k event-counter/context parity (QA-013)"
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
-	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, INPUT_30K, INPUT_30K_EXPECT, INPUT_30K_FRAMES, OAM_CHECKPOINTS, PAD_BYTES, SHIFT_WORK"
+	@echo "Variables: MAP, ROM, DATA_ROOT, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, INPUT_30K, INPUT_30K_EXPECT, INPUT_30K_FRAMES, OAM_CHECKPOINTS, PAD_BYTES, SHIFT_WORK, POSTLINK_ELF, POSTLINK_MAP, POSTLINK_JSON, POSTLINK_WHITELIST"

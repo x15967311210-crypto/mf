@@ -154,6 +154,70 @@ PASS: no unclassified ROM references (report mode)
 converted/raw grouping without touching the tree; `check-relocs-strict` runs it
 before the gate.
 
+## Post-link pointer scan
+
+`postlink_pointer_scan.py` finds the pointers that source-level audits cannot
+see: a partially converted table may leave raw `0x08xxxxxx` words in `.rodata`
+or `.data` while its neighbours are relocations.  Those stale absolute
+addresses survive a repositioned link (BUG-009/BUG-013 class).
+
+```sh
+make -f Makefile.shift postlink-scan          # report: exit 0 with findings
+make -f Makefile.shift postlink-scan-strict   # fails on any non-whitelisted run
+
+# Direct use on any linked --emit-relocs ELF:
+python3 tools/shift/postlink_pointer_scan.py --elf mf_us.elf --map mf_us.map \
+    --report
+python3 tools/shift/postlink_pointer_scan.py --elf mf_us.elf --map mf_us.map \
+    --strict --json-out work/shift/postlink_scan.json
+python3 tools/shift/postlink_pointer_scan.py --self-check
+```
+
+The make targets relink only into `work/shift/mf_us_postlink.elf`/
+`.map` with `--emit-relocs`; `mf_us.gba`, `mf_us.elf`, `mf_us.map` and the
+normal ROM SHA are not touched.  A normal build has no relocation sections, so
+strict mode fails closed until the ELF is relinked with `--emit-relocs`.
+`POSTLINK_ELF`, `POSTLINK_MAP`, `POSTLINK_JSON` and `POSTLINK_WHITELIST`
+override the defaults.
+
+The scan reads only allocated non-executable PROGBITS sections in ROM
+(`.rodata`, `.data`; never code), skips words covered by a relocation, the
+fixed header `0x08000000..0x080000C0`, and whitelisted addresses.  A single
+look-alike word is not a finding.  Only maximal structured runs pass:
+
+| stride | minimum entries |
+|---:|---:|
+| `0x4` | 8 |
+| `0x8` | 6 |
+| `0xC` | 4 |
+| `0x18` | 4 |
+| `0x24` | 4 |
+
+A run must also have at least 75% unique targets, at least 90% of targets in a
+known ELF section, and at least 90% plausibly aligned targets (data pointers
+halfword-aligned; Thumb code pointers with bit 0 set).  These thresholds are
+what drops the isolated graphics/tileset coincidences, `sCharacterWidths` and
+`sMissileHatchGfx` noise while keeping the real tables.
+
+Report mode prints a Markdown table (section, range, stride, count, unique
+ratio, nearest source symbol, target sections, first four target addresses and
+nearest target symbols) and can also write JSON.  Findings are sorted by count
+descending.  `--write-whitelist FILE` writes the current runs as a reviewable
+JSON list; it does not accept them and does not change the exit status.  A
+whitelist entry is an inclusive ROM range:
+
+```json
+[
+  {"start": "0x0865BB98", "end": "0x0865BCF0", "reason": "known table"}
+]
+```
+
+`postlink-scan-strict` is intentionally **not** part of `check-relocs-strict`
+or `shift-check` yet: after the BUG-013 fix the `sBlob_64e470_662804` pFrame
+runs are gone, but the tree still has latent runs in other blobs that need
+triage.  Wire it into the gate only after that triage (or a reviewed
+whitelist) is committed.
+
 ## Linker layout audit
 
 `linker.ld` checked (SHIFT-007): the only fixed ROM address is the `rom` MEMORY
