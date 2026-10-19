@@ -284,6 +284,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     identify the active table with count >20 and its pOam address.
   - save states 2332/2333 and screenshots; report the first pOam/count that
     pushes `gNextOamSlot` past 19; do not patch source.
+  - **pre-fix capture done locally** (mGBA 0.7.2 core, same native state; the
+    BizHawk `.State` is a zip whose `Core.bin` has a 4-byte BizHawk prefix):
+    frame 2331 active slots 0..10 have pOam `0865CB38..0865D230`; the huge
+    counts (`66`, `70`, `25100`, `61443`, `1008`) are not animation counts but
+    **unrelocated pFrame pointers**.  The whole FrameData array is blob
+    offsets `0x0D6C8..0x0DDE8` = 229 8-byte records: 31 were fixed by
+    `da248e3`, 10 are zero, and **188 are still raw** (including slot 0
+    frame 15 and every table from `0865CE00` onward).
+  - a throwaway ROM patch adding `+0x1000` to exactly those 188 words makes
+    idle frames 2332..2351 healthy (`callback=08094901`, no IE loss, no
+    invalid jump) and field-identical to normal.  Windows native post-fix
+    confirmation is still required; do not treat the headless run as the gate.
 - [DONE] QA-019 (emulator) — capture 22923 gVBlankCallback writer
   - use the native MGBAHawk/BizHawk 2.3.2 path that reproduced BUG-008; watch
     `0x030019C4` and `0x030019C0..0x030019CC` over frames 22920-22930, same
@@ -408,7 +420,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `0809B2C9`, LR `000001B8`, CPSR `00000092`; 22952 `DISPCNT=9700`;
     file-select 384/385/386/401 still PASS.
   - full 100% TAS remains QA-020; M0f stays BLOCKED until it reaches 339001.
-- [DOING @dev2] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
+- [DOING @dev4] BUG-013 (shift/engine) — idle/no-movie shifted black at frame 2238
   - independent of BUG-008/385 and BUG-012/22923.  Native BizHawk 2.3.2,
     no movie/no input, same BIOS/SaveRAM: normal/reordered OK; shifted first
     diverges at 2238:
@@ -487,6 +499,26 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `tas/bug013_crash/shifted_2331.State` with candidate `c4b62c65`, run
     `bug013_2332_probe.lua`, return all 20 pOam/frame/pFrame/count rows for
     frames 2331-2333 and the active pOam table with count >20.
+  - **ROOT CAUSE 2332 (local state replay, 2026-10-19)**: the pOam targets are
+    correct (`+0x1000`), but their **pFrame words are still raw**.  The
+    SpecialCutscene FrameData array spans blob offsets `0x0D6C8..0x0DDE8`
+    (`sBlob_64e470_662804`, 229 records).  `da248e3` converted only the first
+    12 records for three bases (31 unique words); it missed the rest of the
+    same array.  At 2331, slot 4 points at `0865BB2E` (normal) instead of
+    `0865CB2E`; shifted ROM at `0865BB2E` holds unrelated graphics, so the
+    count halfword reads `66` instead of `1`; slots 6/7/9/10 read
+    `25100/61443/1008/61443`.  Drawing those slots pushes `gNextOamSlot` to
+    223 and overwrites `gNextOamSlot`/`CutsceneProcessOam` at
+    `gNonGameplayRam+0x5C`.
+  - fix scope: convert **all 188 remaining raw pFrame words** in
+    `0x0D6C8..0x0DDE8` (not just the 3 x 12 windows) into relocatable
+    `sBlob_64e470_662804 + offset` fields; keep the 10 zero records and all
+    bytes byte-identical.  Normal SHA1 must stay `ca33f434...`.
+  - pre-fix proof: a throwaway ROM patch adding `+0x1000` to those 188 words
+    is healthy from 2331 through 2351 and matches normal's DISPCNT/callback
+    (`08094901` is normal `08093901 + 0x1000`).
+  - assigned to engine-dev in a fresh worktree from `hack` tip `dc04012`;
+    do not continue on stale `dev2`.
   - full 100% TAS remains QA-020, but is blocked by this 2332 regression.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
