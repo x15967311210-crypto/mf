@@ -80,7 +80,8 @@ CC = agbcc
 
 DIFF = diff -u
 HOSTCC = cc
-HOST_CFLAGS = -std=gnu11 -O2 -ffunction-sections -fdata-sections -Iinclude
+HOST_CFLAGS = -std=gnu11 -O2 -ffunction-sections -fdata-sections -Iinclude \
+	-Wno-implicit-function-declaration -Wno-pointer-to-int-cast
 HOST_TEST_DIR = tests/host/bin
 HOST_TEST_BIN = $(HOST_TEST_DIR)/room_rle_test
 MKDIR = mkdir -p
