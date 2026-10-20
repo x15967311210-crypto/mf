@@ -98,12 +98,20 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Normal therefore completes `EndingHandler`/`EndingBslCrashingInit` and
     resets OAM, while shifted starts `SpecialCutsceneDrawAllOam` from slot
     20 and overflows `gOamData` at 0x11E8.
-  - traced, not fixed: the minimal reset would be at
-    `EndingBslCrashingInit`/before `SpecialCutsceneDrawAllOam`, but that is
-    normal-layout code and would change the baseline normal SHA.  Next
-    decision is a shift-only/behavior-preserving guard or accepting the
-    one-frame transition lag; do not add a normal-ROM-only patch without a
-    baseline decision.
+  - **timing conclusion (2026-10-20)**: at 332883 both states are still
+    identical (`frame16=65409`, `gNextOamSlot=6`, audio channels identical).
+    At 332884 normal completes the ending init/draw and reaches
+    `EndingBslCrashingVblank` with `gNextOamSlot=0`; shifted is still inside
+    `SpecialCutsceneDrawAllOam`/`DrawOam` with `gNextOamSlot=20`.  The OAM
+    frame data at the active slot pointers is byte-identical normal/+0x1000,
+    so this is **not a data relocation**.  At 332885 shifted `frame16` is
+    still 65409 while normal is 65410: the shifted main-loop iteration
+    overruns the video frame at the ending transition.
+  - root is a loop/cycle-budget overrun; the OAM overflow and callback lag
+    are downstream.  Next should be a cycle/VCOUNT trace of
+    `EndingBslCrashingInit` + the VBlank/audio work, or a shift-only
+    behavior-preserving guard; do not add a normal-ROM-only patch without a
+    baseline decision and do not chase another blob pointer.
 - [DONE] BUILD-001 (tools) — reproducible toolchain checks
   - `tools/doctor.py` (full / `--source-only` / `--self-check`),
     `tools/setup_agbcc.sh`, `tools/agbcc-version` pinned at
