@@ -669,7 +669,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     normal is black at the same frames.  The real first shifted divergence is
     **BUG-016 at 114671**, not a persistent black after 30000.
   - evidence: `tas/bug012c_full/`, `tools/headless/out/full/`.
-- [DOING @dev7] BUG-016 (shift/engine) — full TAS shifted divergence at 114671
+- [TODO] BUG-016 (shift/engine) — full TAS shifted divergence at 114671
   - headless movie-native mGBA 0.6, current `012a2c95...`, 339001 frames:
     first diff **114671**, OAM offset 0, a=`80` b=`02`; state
     `1600 0004 0002 0100 43 0 20 0` (disp 1600, main 4, s1 2, s2 0100,
