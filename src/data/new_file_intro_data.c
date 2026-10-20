@@ -23097,9 +23097,24 @@ struct NewFileIntroDataBlob {
     const u8 *p05FC;
     u8 gap0600[4];
     u8 term0604[8];
-    u8 beforeCutscene[0x159E0 - 0x060C];
+    u8 seg_060C_7190[0x7190 - 0x060C];
+    // BUG-018: pOam tables used by CutsceneElevatorMonologueSetupOam.  The
+    // nested pFrame words were raw normal-layout addresses; model them as
+    // relocatable C records so the shifted build follows the moved frames.
+    struct FrameData elevatorMonologueFrameData[5]; /* +0x7190..+0x71B8 */
+    struct FrameData elevatorMonologueTailFrameData[2]; /* +0x71B8..+0x71C8 */
+    u8 seg_71C8_E12C[0xE12C - 0x71C8];
+    // Same monologue layout for the sIntroPal+0xE1AC/+0xE1D4 pOam tables.
+    struct FrameData monologueAltFrameData[5]; /* +0xE12C..+0xE154 */
+    struct FrameData monologueAltTailFrameData[2]; /* +0xE154..+0xE164 */
+    u8 seg_E164_159E0[0x159E0 - 0xE164];
     struct FrameData cutsceneFrameData[52]; /* +0x159E0..+0x15B80 */
-    u8 after[0x1F70C - 0x15B80];
+    u8 seg_15B80_1D4B4[0x1D4B4 - 0x15B80];
+    // Contiguous run of small pOam tables for the restricted-lab / BSL
+    // cutscene family (first table sIntroPal+0x1D534); every nonzero pFrame
+    // is a normal-layout pointer into this blob and must relocate with it.
+    struct FrameData restrictedLabFrameData[89]; /* +0x1D4B4..+0x1D77C */
+    u8 seg_1D77C_1F70C[0x1F70C - 0x1D77C];
 } __attribute__((packed));
 
 static const struct NewFileIntroDataBlob sBlob_6638a0_682fac = {
@@ -23135,7 +23150,31 @@ static const struct NewFileIntroDataBlob sBlob_6638a0_682fac = {
     .p05FC = (const u8*)&sBlob_6638a0_682fac + 0x592,
     .gap0600 = INCBIN_U8("data/Blob_6638a0_gap_0600.bin"),
     .term0604 = INCBIN_U8("data/Blob_6638a0_term_0604.bin"),
-    .beforeCutscene = INCBIN_U8("data/Blob_6638a0_seg_060C_159E0.bin"),
+    .seg_060C_7190 = INCBIN_U8("data/Blob_6638a0_seg_060C_7190.bin"),
+    .elevatorMonologueFrameData = {
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x6EC4), .timer = 0x78 }, /* +0x7190 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x7004), .timer = 0x04 }, /* +0x7198 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x6EC4), .timer = 0x04 }, /* +0x71A0 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x7004), .timer = 0x04 }, /* +0x71A8 */
+        FRAME_DATA_TERMINATOR, /* +0x71B0 */
+    },
+    .elevatorMonologueTailFrameData = {
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x7144), .timer = 0xFF }, /* +0x71B8 */
+        FRAME_DATA_TERMINATOR, /* +0x71C0 */
+    },
+    .seg_71C8_E12C = INCBIN_U8("data/Blob_6638a0_seg_71C8_E12C.bin"),
+    .monologueAltFrameData = {
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0xDEC0), .timer = 0x78 }, /* +0xE12C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0xDFD0), .timer = 0x04 }, /* +0xE134 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0xDEC0), .timer = 0x04 }, /* +0xE13C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0xDFD0), .timer = 0x04 }, /* +0xE144 */
+        FRAME_DATA_TERMINATOR, /* +0xE14C */
+    },
+    .monologueAltTailFrameData = {
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0xE0E0), .timer = 0xFF }, /* +0xE154 */
+        FRAME_DATA_TERMINATOR, /* +0xE15C */
+    },
+    .seg_E164_159E0 = INCBIN_U8("data/Blob_6638a0_seg_E164_159E0.bin"),
     .cutsceneFrameData = {
         { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x152E8), .timer = 0x10 }, /* +0x159E0 */
         { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x15302), .timer = 0x10 }, /* +0x159E8 */
@@ -23190,5 +23229,97 @@ static const struct NewFileIntroDataBlob sBlob_6638a0_682fac = {
         { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x150E2), .timer = 0x06 }, /* +0x15B70 */
         FRAME_DATA_TERMINATOR, /* +0x15B78 */
     },
-    .after = INCBIN_U8("data/Blob_6638a0_seg_15B80_1F70C.bin"),
+    .seg_15B80_1D4B4 = INCBIN_U8("data/Blob_6638a0_seg_15B80_1D4B4.bin"),
+    .restrictedLabFrameData = {
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D24E), .timer = 0xFF }, /* +0x1D4B4 */
+        FRAME_DATA_TERMINATOR, /* +0x1D4BC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D268), .timer = 0xFF }, /* +0x1D4C4 */
+        FRAME_DATA_TERMINATOR, /* +0x1D4CC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D27C), .timer = 0xFF }, /* +0x1D4D4 */
+        FRAME_DATA_TERMINATOR, /* +0x1D4DC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D284), .timer = 0x04 }, /* +0x1D4E4 */
+        FRAME_DATA_TERMINATOR, /* +0x1D4EC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D28C), .timer = 0x04 }, /* +0x1D4F4 */
+        FRAME_DATA_TERMINATOR, /* +0x1D4FC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D294), .timer = 0x02 }, /* +0x1D504 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D29C), .timer = 0x02 }, /* +0x1D50C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2A4), .timer = 0x02 }, /* +0x1D514 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2AC), .timer = 0x02 }, /* +0x1D51C */
+        FRAME_DATA_TERMINATOR, /* +0x1D524 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D324), .timer = 0x08 }, /* +0x1D52C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D334), .timer = 0x08 }, /* +0x1D534 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D33C), .timer = 0x08 }, /* +0x1D53C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D344), .timer = 0x08 }, /* +0x1D544 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D34C), .timer = 0x08 }, /* +0x1D54C */
+        FRAME_DATA_TERMINATOR, /* +0x1D554 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2DC), .timer = 0x04 }, /* +0x1D55C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2E4), .timer = 0x04 }, /* +0x1D564 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2EC), .timer = 0x04 }, /* +0x1D56C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2F4), .timer = 0x04 }, /* +0x1D574 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2FC), .timer = 0x04 }, /* +0x1D57C */
+        FRAME_DATA_TERMINATOR, /* +0x1D584 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2B4), .timer = 0x04 }, /* +0x1D58C */
+        FRAME_DATA_TERMINATOR, /* +0x1D594 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2BC), .timer = 0x04 }, /* +0x1D59C */
+        FRAME_DATA_TERMINATOR, /* +0x1D5A4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2C4), .timer = 0x04 }, /* +0x1D5AC */
+        FRAME_DATA_TERMINATOR, /* +0x1D5B4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2CC), .timer = 0x04 }, /* +0x1D5BC */
+        FRAME_DATA_TERMINATOR, /* +0x1D5C4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D2D4), .timer = 0x04 }, /* +0x1D5CC */
+        FRAME_DATA_TERMINATOR, /* +0x1D5D4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D304), .timer = 0x04 }, /* +0x1D5DC */
+        FRAME_DATA_TERMINATOR, /* +0x1D5E4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D30C), .timer = 0x04 }, /* +0x1D5EC */
+        FRAME_DATA_TERMINATOR, /* +0x1D5F4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D314), .timer = 0x04 }, /* +0x1D5FC */
+        FRAME_DATA_TERMINATOR, /* +0x1D604 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D31C), .timer = 0x04 }, /* +0x1D60C */
+        FRAME_DATA_TERMINATOR, /* +0x1D614 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D32C), .timer = 0x04 }, /* +0x1D61C */
+        FRAME_DATA_TERMINATOR, /* +0x1D624 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D014), .timer = 0x04 }, /* +0x1D62C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D01C), .timer = 0x04 }, /* +0x1D634 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D03C), .timer = 0x04 }, /* +0x1D63C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D074), .timer = 0x04 }, /* +0x1D644 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D0BE), .timer = 0x04 }, /* +0x1D64C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D10E), .timer = 0x04 }, /* +0x1D654 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D164), .timer = 0x06 }, /* +0x1D65C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D1AE), .timer = 0x07 }, /* +0x1D664 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D1E6), .timer = 0x08 }, /* +0x1D66C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D200), .timer = 0x09 }, /* +0x1D674 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D214), .timer = 0x0A }, /* +0x1D67C */
+        FRAME_DATA_TERMINATOR, /* +0x1D684 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D00C), .timer = 0x04 }, /* +0x1D68C */
+        FRAME_DATA_TERMINATOR, /* +0x1D694 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D3F2), .timer = 0x05 }, /* +0x1D69C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D3FA), .timer = 0x05 }, /* +0x1D6A4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D402), .timer = 0x05 }, /* +0x1D6AC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D40A), .timer = 0x05 }, /* +0x1D6B4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D412), .timer = 0x05 }, /* +0x1D6BC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D41A), .timer = 0x05 }, /* +0x1D6C4 */
+        FRAME_DATA_TERMINATOR, /* +0x1D6CC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D422), .timer = 0x04 }, /* +0x1D6D4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D42A), .timer = 0x04 }, /* +0x1D6DC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D432), .timer = 0x04 }, /* +0x1D6E4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D43A), .timer = 0x04 }, /* +0x1D6EC */
+        FRAME_DATA_TERMINATOR, /* +0x1D6F4 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D442), .timer = 0x04 }, /* +0x1D6FC */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D44A), .timer = 0x04 }, /* +0x1D704 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D452), .timer = 0x04 }, /* +0x1D70C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D45A), .timer = 0x04 }, /* +0x1D714 */
+        FRAME_DATA_TERMINATOR, /* +0x1D71C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D462), .timer = 0x04 }, /* +0x1D724 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D46A), .timer = 0x04 }, /* +0x1D72C */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D472), .timer = 0x04 }, /* +0x1D734 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D47A), .timer = 0x04 }, /* +0x1D73C */
+        FRAME_DATA_TERMINATOR, /* +0x1D744 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D482), .timer = 0x04 }, /* +0x1D74C */
+        FRAME_DATA_TERMINATOR, /* +0x1D754 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D492), .timer = 0x04 }, /* +0x1D75C */
+        FRAME_DATA_TERMINATOR, /* +0x1D764 */
+        { .pFrame = (const u16*)((const u8*)&sBlob_6638a0_682fac + 0x1D48A), .timer = 0x04 }, /* +0x1D76C */
+        FRAME_DATA_TERMINATOR, /* +0x1D774 */
+    },
+    .seg_1D77C_1F70C = INCBIN_U8("data/Blob_6638a0_seg_1D77C_1F70C.bin"),
 };

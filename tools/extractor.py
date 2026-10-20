@@ -247,6 +247,111 @@ def check_new_file_intro_cutscene_table(blob: bytes) -> None:
             "`python3 tools/extractor.py --emit-intro-cutscene-table`")
 
 
+# `struct FrameData` tables nested directly in the intro data blob.  Their
+# pFrame words are raw normal-layout ROM addresses, so they must be rebuilt as
+# C data or the shifted ROM keeps following the stale normal-layout targets
+# (BUG-016 and BUG-018: the OAM loop then overruns gOamData).  Offsets are
+# relative to the blob start; counts include the trailing FRAME_DATA_TERMINATOR.
+INTRO_FRAME_DATA_TABLES = (
+    # CutsceneElevatorMonologueSetupOam pOam tables (sIntroPal + 0x7210 /
+    # +0x7238).
+    ("elevatorMonologueFrameData", 0x7190, 5),
+    ("elevatorMonologueTailFrameData", 0x71B8, 2),
+    # Other monologue pOam tables (sIntroPal + 0xE1AC / +0xE1D4).
+    ("monologueAltFrameData", 0xE12C, 5),
+    ("monologueAltTailFrameData", 0xE154, 2),
+    # Contiguous run of small FrameData tables used by the restricted-lab
+    # detaching / BSL cutscene family (first pOam sIntroPal + 0x1D534).
+    ("restrictedLabFrameData", 0x1D4B4, 89),
+)
+
+
+def new_file_intro_frame_data_records(blob: bytes, table_offset: int,
+                                      count: int) -> list:
+    """Return (offset, target blob offset or None, timer) for one table.
+
+    A zero pFrame is a `FRAME_DATA_TERMINATOR` and stays a NULL initializer.
+    Every other pFrame must point inside this blob, and the record's upper
+    three metadata bytes must be zero so a C `struct FrameData` initializer
+    reproduces them exactly.
+    """
+    if len(blob) != INTRO_DATA_BLOB_SIZE:
+        raise ValueError(
+            f"intro data blob is {len(blob)} bytes, "
+            f"expected 0x{INTRO_DATA_BLOB_SIZE:X}")
+    records = []
+    for offset in range(table_offset, table_offset + count * 8, 8):
+        word = int.from_bytes(blob[offset:offset + 4], "little")
+        rest = int.from_bytes(blob[offset + 4:offset + 8], "little")
+        if rest > 0xFF:
+            raise ValueError(
+                f"intro FrameData record at +0x{offset:04X} has nonzero "
+                f"padding 0x{rest:08X}")
+        if word == 0:
+            if rest != 0:
+                raise ValueError(
+                    f"intro FrameData terminator at +0x{offset:04X} has "
+                    f"timer 0x{rest:02X}")
+            records.append((offset, None, 0))
+            continue
+        if not (INTRO_DATA_BLOB_ADDR
+                <= word < INTRO_DATA_BLOB_ADDR + INTRO_DATA_BLOB_SIZE):
+            raise ValueError(
+                f"intro FrameData pFrame at +0x{offset:04X} is "
+                f"0x{word:08X}, outside 0x{INTRO_DATA_BLOB_ADDR:08X}.."
+                f"0x{INTRO_DATA_BLOB_ADDR + INTRO_DATA_BLOB_SIZE:08X}")
+        records.append((offset, word - INTRO_DATA_BLOB_ADDR, rest))
+    return records
+
+
+def emit_new_file_intro_frame_data_table(blob: bytes, field: str,
+                                         table_offset: int, count: int) -> str:
+    """Emit one nested FrameData table initializer."""
+    lines = [f"    .{field} = {{"]
+    for offset, target, timer in new_file_intro_frame_data_records(
+            blob, table_offset, count):
+        if target is None:
+            lines.append(
+                f"        FRAME_DATA_TERMINATOR, "
+                f"/* +0x{offset:04X} */")
+        else:
+            lines.append(
+                f"        {{ .pFrame = (const u16*)((const u8*)"
+                f"&sBlob_6638a0_682fac + 0x{target:04X}), "
+                f".timer = 0x{timer:02X} }}, /* +0x{offset:04X} */")
+    lines.append("    },")
+    return "\n".join(lines)
+
+
+def emit_new_file_intro_frame_data_tables(blob: bytes) -> str:
+    """Emit the C initializers for every nested FrameData table.
+
+    `src/data/new_file_intro_data.c` embeds these exact blocks so the extractor
+    and the committed tables cannot drift apart.  Each block is checked
+    separately so the initializer may keep the struct's field order even where
+    it differs from the blob order.
+    """
+    return "\n".join(
+        emit_new_file_intro_frame_data_table(
+            blob, field, table_offset, count)
+        for field, table_offset, count in INTRO_FRAME_DATA_TABLES)
+
+
+def check_new_file_intro_frame_data_tables(blob: bytes) -> None:
+    """Fail extraction if the committed C tables do not match this blob."""
+    if not INTRO_DATA_STRUCT_PATH.exists():
+        return
+    text = INTRO_DATA_STRUCT_PATH.read_text()
+    for field, table_offset, count in INTRO_FRAME_DATA_TABLES:
+        expected = emit_new_file_intro_frame_data_table(
+            blob, field, table_offset, count)
+        if expected not in text:
+            raise ValueError(
+                f"{INTRO_DATA_STRUCT_PATH} does not match the generated "
+                f"`{field}` table; regenerate it with "
+                "`python3 tools/extractor.py --emit-intro-frame-data-tables`")
+
+
 def split_new_file_intro_data_pointer_tables() -> None:
     """Split the raw FrameData pointer tables out of the intro data blob.
 
@@ -257,10 +362,10 @@ def split_new_file_intro_data_pointer_tables() -> None:
     at their original offsets because the cutscene code references the tables
     by absolute address.
 
-    The 52-record cutscene table at 0x159E0 is also rebuilt in C (BUG-016), so
-    the blob is split before it and resumed after it; the table bytes stay at
-    their original offsets and the two surrounding segments keep the blob
-    byte-identical.
+    The 52-record cutscene table at 0x159E0 (BUG-016) and the nested tables in
+    INTRO_FRAME_DATA_TABLES (BUG-018) are rebuilt in C too, so the blob is
+    split around every one of them; the table bytes stay at their original
+    offsets and the surrounding segments keep the blob byte-identical.
     """
     blob_path = Path(DATA_PATH, "Blob_6638a0_682fac.bin")
     if not blob_path.exists():
@@ -289,13 +394,18 @@ def split_new_file_intro_data_pointer_tables() -> None:
         (0x05F8, 0x05FC, "Blob_6638a0_gap_05F8.bin"),
         (0x0600, 0x0604, "Blob_6638a0_gap_0600.bin"),
         (0x0604, 0x060C, "Blob_6638a0_term_0604.bin"),
-        (0x060C, INTRO_CUTSCENE_TABLE_OFFSET,
-         "Blob_6638a0_seg_060C_159E0.bin"),
-        (INTRO_CUTSCENE_TABLE_END, INTRO_DATA_BLOB_SIZE,
-         "Blob_6638a0_seg_15B80_1F70C.bin"),
+        (0x060C, 0x7190, "Blob_6638a0_seg_060C_7190.bin"),
+        (0x71C8, 0xE12C, "Blob_6638a0_seg_71C8_E12C.bin"),
+        (0xE164, INTRO_CUTSCENE_TABLE_OFFSET,
+         "Blob_6638a0_seg_E164_159E0.bin"),
+        (INTRO_CUTSCENE_TABLE_END, 0x1D4B4,
+         "Blob_6638a0_seg_15B80_1D4B4.bin"),
+        (0x1D77C, INTRO_DATA_BLOB_SIZE,
+         "Blob_6638a0_seg_1D77C_1F70C.bin"),
     )
     for start, end, name in spans:
         Path(DATA_PATH, name).write_bytes(blob[start:end])
+    check_new_file_intro_frame_data_tables(blob)
     check_new_file_intro_cutscene_table(blob)
 
 
@@ -535,6 +645,9 @@ if __name__ == "__main__":
     group.add_argument("--emit-intro-cutscene-table", action="store_true",
         help="Print the cutscene FrameData initializer generated from the "
              "extracted new-file intro data blob")
+    group.add_argument("--emit-intro-frame-data-tables", action="store_true",
+        help="Print the nested FrameData initializers generated from the "
+             "extracted new-file intro data blob")
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output")
     parser.add_argument("--sort", action="store_true",
         help="Sort database entries by address")
@@ -558,6 +671,13 @@ if __name__ == "__main__":
         print(
             emit_new_file_intro_cutscene_table(blob_path.read_bytes()),
             end="")
+    elif args.emit_intro_frame_data_tables:
+        blob_path = Path(DATA_PATH, "Blob_6638a0_682fac.bin")
+        if not blob_path.exists():
+            parser.error(f"{blob_path} does not exist; run the extractor first")
+        print(
+            emit_new_file_intro_frame_data_tables(blob_path.read_bytes()) +
+            "\n", end="")
     elif args.sort:
         sort_by_address(args.debug, args.quiet)
     else:
