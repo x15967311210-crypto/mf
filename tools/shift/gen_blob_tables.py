@@ -150,6 +150,10 @@ class BlobSpec:
     # fixed-size records rendered as a struct array instead.
     struct_name: str = ""
     fields: tuple[StructField, ...] = ()
+    # A mostly-byte blob that embeds a few pointers to itself.  Emit every
+    # word as a literal except the ROM pointers, which become symbol+offset
+    # expressions so the linker can relocate them.
+    sparse_pointers: bool = False
 
 
 # The seven confirmed flat pointer tables plus the 74dc48 struct table from
@@ -204,6 +208,18 @@ BLOBS = (
         "src/new_file_intro.c",
         0x438,
         False,
+    ),
+    # SHIFT-006b4: Omega Metroid OAM frame data and part FrameData tables.
+    # The first 0x5134 bytes are modelled C arrays; this tail is an extracted
+    # mixed blob.  Its only relocatable words are 34 self-pointers used as
+    # FrameData.pFrame, so keep the bytes flat and relocate just those words.
+    BlobSpec(
+        "sBlob_39aa34_39f4b0",
+        "Blob_39aa34_39f4b0.bin",
+        "src/data/sprites/omega_metroid.c",
+        0x4A7C,
+        True,
+        sparse_pointers=True,
     ),
     # SHIFT-006b2: 210 x 12-byte ending-image line records.  The consumer
     # (EndingImageLoadTextOam / EndingImageDisplayLinePermanently) reads bytes
@@ -291,9 +307,11 @@ class RecordArrayBlobSpec:
 
 # SHIFT-006b3: 1135 x 12-byte voice records plus a 152-byte raw tail.  The
 # record layout mirrors struct Voice: instrumentType/pitch/unk_2/unk_3 at +0,
-# pSample at +4, and the four envelope bytes at +8.  Evidence: AudioCommand_Voice
-# indexes pTrack->pVoice[index], and every track header that points into this
-# blob points to a record boundary; the largest absolute index used is 1134.
+# pSample at +4, and either four envelope bytes or, for layered 0x40 voices,
+# a pointer to another voice record at +8.  Evidence: AudioCommand_Voice
+# indexes pTrack->pVoice[index]; unk_481c treats +8 as an index-table pointer
+# for the 0x40 branch; every track header that points into this blob points to
+# a record boundary; the largest absolute index used is 1134.
 RECORD_ARRAY_BLOBS = (
     RecordArrayBlobSpec(
         "sBlob_a5710_a8cdc",
@@ -309,7 +327,7 @@ RECORD_ARRAY_BLOBS = (
             StructField("u8", "unk_2"),
             StructField("u8", "unk_3"),
             StructField("const u32*", "pSample"),
-            StructField("struct Envelope", "envelope"),
+            StructField("const u32*", "envelope"),
         ),
         record_count=1135,
         tail_count=152,
@@ -591,8 +609,29 @@ def render_flat_block(
         f"static {qualifier}u32 {spec.symbol}[{count}] = {{",
     ]
     thumb_blob = spec.symbol in THUMB_BLOBS
+    blob_addr = None
+    if spec.sparse_pointers:
+        for symbol in sm.symbols:
+            if symbol.name == spec.symbol:
+                blob_addr = symbol.addr
+                break
+        if blob_addr is None:
+            raise GenError(f"{spec.symbol}: no linked address in mf_us.map")
     for off in range(0, len(data), 4):
         value = struct.unpack_from("<I", data, off)[0]
+        if spec.sparse_pointers and not (0x08000000 <= value < 0x0A000000):
+            lines.append(f"    0x{value:08X},")
+            continue
+        if (
+            spec.sparse_pointers
+            and blob_addr is not None
+            and blob_addr <= value < blob_addr + len(data)
+        ):
+            delta = value - blob_addr
+            lines.append(
+                f"    (u32)((const u8*){spec.symbol} + 0x{delta:X}),"
+            )
+            continue
         expr = pointer_expression(sm, elf, value, thumb_blob)
         lines.append(f"    {expr},")
     lines.append("};")
@@ -673,6 +712,13 @@ def render_record_array_block(
 
     owner_object = Path(spec.source).with_suffix(".o").as_posix()
     objects = symbol_objects(sm)
+    blob_addr = None
+    for symbol in sm.symbols:
+        if symbol.name == spec.symbol:
+            blob_addr = symbol.addr
+            break
+    if blob_addr is None:
+        raise GenError(f"{spec.symbol}: no linked address in mf_us.map")
     externs: set[str] = set()
     record_lines: list[str] = []
     for index in range(spec.record_count):
@@ -699,7 +745,18 @@ def render_record_array_block(
                             f"{spec.file}: entry {index} field {field.name} "
                             f"0x{raw:08X} has the low bit set"
                         )
-                    expr = resolve_expression(sm, elf, raw)
+                    # A layered voice can point at another record in this
+                    # same blob; that target has no ELF symbol of its own.
+                    if blob_addr <= raw < blob_addr + len(data):
+                        delta = raw - blob_addr
+                        if delta % record_size == 0:
+                            expr = (
+                                f"&{spec.symbol}.records[{delta // record_size}]"
+                            )
+                        else:
+                            expr = f"(u8*)&{spec.symbol}+0x{delta:X}"
+                    else:
+                        expr = resolve_expression(sm, elf, raw)
                     root = re.match(r"[A-Za-z_.$][\w.$@]*", expr)
                     if root is not None and objects.get(root.group(0)) != owner_object:
                         externs.add(root.group(0))

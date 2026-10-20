@@ -13,7 +13,7 @@ Line format: `- [STATE] ID (source, …) — title  [deps: …]  @dev`.
 Sources: `baseline` (measured in this tree), `REA` (Ghidra/REA evidence),
 `emulator` (behavior run), `playtest`, `GDD`.
 
-Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006c/007/008,
+Last landed: SHIFT-001/002/003/004/005/005b/005c/006a/006b1/006b2/006b3/006b4/006b5/006b6/006b7/006c/007/008,
 QA-001/002/003/005/006, BUG-001/002/003/004/005/006 (harness, audit, symbol
 map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
@@ -531,7 +531,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     and first-diff dumps; the 100-frame coarse interval is not enough for a
     source patch.
 
-- [DOING @dev17] BUG-011 (shift/reorder) — room-14 branch at TAS frame ~223045
+- [DONE @dev17] BUG-011 (shift/reorder) — room-14 branch at TAS frame ~223045
   - native 100% TAS normal vs reordered: identical through 223200; at 223300
     normal `room=23`, reordered `room=14`; final state differs.
   - exact fine trace: loaded state at 223200 already differs in OAM/VRAM/IO
@@ -616,16 +616,23 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     selection differs (`pSample1` normal `080CA0BC` vs shifted `080A6560`).
     No raw pointer was found in the track/voice tables; the suspected
     `sBlob_a5710` word at +0x62C is Envelope data, not pSample.
-  - this points to an audio voice/timing phase, not a simple stale table.
-    Recommend **B**: document/accept the one-frame timing difference (or
-    investigate `AudioCommand_Voice` timing separately) rather than patching
-    waits or IRQ vectors.  A full run remains out of scope.
-  - 223040/223100 checkpoint states are in
-    `work/playtest/m0f-2026-10-17/tas/checkpoints/`.
-  - 223100 checkpoint states are in
-    `work/playtest/m0f-2026-10-17/tas/checkpoints/{n,s}_223100.state`.
-  - fast repro from checkpoint 200000 takes ~50 s; do not run full.
-  - no fix yet; BUG-011 stays DOING.
+  - **FIXED 2026-10-20 (A continued)**: the suspected `sBlob_a5710` word is a
+    real pointer after all, just at record **131 +8**, not +0x62C.  Record 131
+    is a layered 0x40 voice: `unk_481c` reads +8 as a byte index-table pointer.
+    The generated C had copied the bytes `20 8C 0A 08` as `struct Envelope`,
+    so shifted kept `0x080A8C20` instead of `0x080A9C20`; the note at 222334
+    then picked record 129 (normal) vs 126 (shifted).
+  - fix: `tools/shift/gen_blob_tables.py` models the +8 field as
+    `const u32*`, emits `&sBlob_a5710_a8cdc.records[1132]` for the intra-blob
+    target, and relocates it.  Normal SHA stays `ca33f434...`.
+  - verified with fresh shifted states: 200000 -> 222340 PASS, 222340 ->
+    223300 PASS, 223300 -> 260000 PASS, 260000 -> 300000 PASS (settle 8).
+    The 223048 one-frame phase and room 23/14 branch are gone.  The BUG-011
+    audio-only shifted SHA was `934d0cf0...`.
+  - 223040/223100 checkpoint states remain in
+    `work/playtest/m0f-2026-10-17/tas/checkpoints/`; new states are under
+    `audio_fix_diff/`, `audio_fix_diff2/` and `audio_fix_ladder/`.
+  - fast repro from checkpoint 200000 takes ~50 s; do not rerun full.
 - [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
   - candidate `812d0090...` (BUG-008 fix) passes file-select, then native TAS
     first CPU/IRQ divergence at **22923**:
@@ -812,7 +819,30 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     post-link scan reports 74 runs but **no** `sBlob_64e470` run.
   - full 100% TAS is QA-020, now unblocked; M0f still waits on QA-020 and
     `PLAYTEST-000`.
-- [TODO] BUG-014 (shift/engine) — post-link scan: 74 raw pointer runs remain
+- [DONE] BUG-019 (shift/engine) — Omega Metroid FrameData pFrame pointers
+  - at TAS 331860 (room 63, PLAYING) normal OAM had 41 slots, shifted 12;
+    `gNextOamSlot` and the Omega sprites diverged while game state matched.
+  - root: `sBlob_39aa34_39f4b0` is a 19 KB extracted tail that embeds **34
+    FrameData.pFrame pointers**.  `gSpriteData.pOam` was relocated, but each
+    frame table's `pFrame` still pointed at normal addresses; shifted read
+    shifted bytes through a normal pointer.
+  - fix `tools/shift/gen_blob_tables.py`: sparse pointer blob mode keeps the
+    bytes flat but emits the 34 intra-blob pointers as
+    `(const u8*)sBlob...+offset`; normal SHA stays `ca33f434...`.
+  - shifted SHA is now `d30310a634e83626e830cc0f481d9d8fece79488`; parity
+    300000 -> 332883 PASS.  `gen_blob_tables --check`, `make smoke` and
+    `make audit` pass; post-link runs drop 60 -> 56.
+- [TODO] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
+  - after BUG-019, first diff is frame 332884 `VRAM 0xD000` a=`00` b=`8A`,
+    then OAM slot 0 (`3C` vs `02`) and `gNextOamSlot` (`0` vs `16`).
+  - game state still room 63, `gSubGameMode1=2`; only sprite 196 is active at
+    332955, and its `pFrame` is correctly `+0x1000`.  A 60-frame settle still
+    fails, so this is not just the old transient copy window.
+  - likely a separate late-game graphics/VRAM effect or another embedded
+    pointer; save states at `work/playtest/.../tas/checkpoints/omega_fix1/`
+    (332894) and `omega_fix2/` (332955).
+  - do not weaken OAM/VRAM durable checks; continue checkpoint-first.
+- [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
     relocated words, and fails only on structured pointer runs
@@ -826,7 +856,8 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     **no `sBlob_64e470` run**; normal `ca33f434...`, shifted `012a2c95...`.
   - top remaining groups: `sBlob_6131c8_63a19c` (many runs),
     `sBlob_6638a0_682fac`, `sBlob_582288_58b3cc`, `sBlob_5766D4_prefix`,
-    `sBlob_39aa34_39f4b0`, `DirectSoundData_080BE5B8`.
+    `DirectSoundData_080BE5B8`.  `sBlob_39aa34_39f4b0` was a real
+    FrameData-pFrame group and is fixed by BUG-019; runs are now 56.
   - **concrete hit fixed by BUG-016 `1f01180`**: the
     `sBlob_6638a0_682fac` run `0x086792E0..0x086793A0` is gone; postlink is
     now 67 runs.  The next full-TAS failure (BUG-017 at 117234) is **not**

@@ -145,7 +145,7 @@ No table structure; zero or only isolated hits.
 | Blob | Bytes | Hits | Density | Max run | Target sections | Class | Evidence |
 |---|---:|---:|---:|---:|---|---|---|
 | `Blob_2e6382_2e6ba4.bin` | 2082 | 0 | 0.000 | 0 | — | `data` | Sprite target data (`target.c`); 86% zero words, no pointer-like words. |
-| `Blob_39aa34_39f4b0.bin` | 19068 | 35 | 0.007 | 1 | `.rodata` 34, `ewram` 1 | `data` | Omega Metroid sprite data; 35 isolated hits in 19 KB (0.7%), no run. |
+| `Blob_39aa34_39f4b0.bin` | 19068 | 35 | 0.007 | 1 | `.rodata` 34, `ewram` 1 | `mixed` | Omega Metroid OAM/frame data; the 34 `.rodata` hits are FrameData `pFrame` self-pointers, converted by SHIFT-006b7. |
 | `Blob_40a310_40afa8.bin` | 3224 | 0 | 0.000 | 0 | — | `data` | Common palette data (`common_pals.c`); no pointer-like words. |
 | `Blob_458df0_4597c0.bin` | 2512 | 2 | 0.003 | 1 | `.rodata` 2 | `data` | Tileset_1 graphics; 2 isolated hits in 2.5 KB. |
 | `Blob_462610_462be8.bin` | 1496 | 0 | 0.000 | 0 | — | `data` | Tileset_1 graphics; no pointer-like words. |
@@ -258,6 +258,9 @@ converting them.
 - `Blob_79c170_79c27c` — **converted by SHIFT-006b1**: the blob is the
   268-byte struct `sBlob_79c170_79c27c` in `src/text.c` (3 code pointers,
   glyph/coordinate data, 21-entry anchored pointer run).
+- `Blob_39aa34_39f4b0` — **converted by SHIFT-006b7**: mostly OAM frame
+  bytes, with 34 intra-blob `FrameData.pFrame` pointers; kept as a flat
+  `u32[]` with only those words emitted as `sBlob+offset` expressions.
 
 ### Next task: SHIFT-006
 
