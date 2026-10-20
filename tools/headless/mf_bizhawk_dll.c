@@ -77,6 +77,12 @@ typedef void (__cdecl* BizGetMemoryAreasFn)(void* ctx, MemoryAreas* dst);
 typedef void (__cdecl* BizPutSaveRamFn)(void* ctx, const void* data, int size);
 typedef void (__cdecl* BizGetRegistersFn)(void* ctx, int* dest);
 typedef uint8_t (__cdecl* BizReadBusFn)(void* ctx, uint32_t addr);
+/* mGBA 0.6 bizinterface.c: BizStartGetState serializes the core into a
+ * VFileMemChunk, BizFinishGetState copies it out and closes the chunk, and
+ * BizPutState loads a state with SAVESTATE_SAVEDATA. */
+typedef int (__cdecl* BizStartGetStateFn)(void* ctx, void** vfile, int* size);
+typedef void (__cdecl* BizFinishGetStateFn)(void* vfile, void* data, int size);
+typedef int (__cdecl* BizPutStateFn)(void* ctx, const void* data, int size);
 
 typedef struct {
     const void* a;
@@ -136,6 +142,11 @@ typedef struct {
     const char* prefix;
     const char* map;
     const char* diffMap;
+    const char* stateIn;
+    const char* diffStateIn;
+    const char* stateOut;
+    const char* diffStateOut;
+    long startFrame;
     long frames;
     int history;
     bool diff;
@@ -383,7 +394,16 @@ static void usage(const char* argv0) {
     fprintf(stderr,
         "usage: %s --dll mgba.dll --rom FILE --bios FILE --movie FILE [options]\n"
         "  --save FILE          initial 128 KiB SaveRAM (0xFF padded)\n"
-        "  --frames N           frames to run (default: all movie frames)\n"
+        "  --frames N           movie frames to process, starting at --start-frame\n"
+        "                       (default: all remaining movie frames)\n"
+        "  --start-frame N      skip the first N movie input entries; the first\n"
+        "                       processed input is index N (frame N+1)\n"
+        "  --state-in FILE      load the A/normal savestate before the loop\n"
+        "  --diff-state-in FILE load the B/candidate savestate before the loop (--diff)\n"
+        "  --state-out FILE     save the A/normal savestate after the final frame\n"
+        "  --diff-state-out FILE save the B/candidate savestate after the final frame\n"
+        "                       (--diff). A state saved at the end of --frames N\n"
+        "                       resumes with --start-frame N.\n"
         "  --checkpoint LIST    comma separated frame numbers to dump\n"
         "  --dump-dir DIR       output directory\n"
         "  --prefix NAME        log/dump prefix (default: normal)\n"
@@ -440,6 +460,20 @@ static bool parseArgs(int argc, char** argv, Options* opt) {
         else if (!strcmp(a, "--stack-scan")) { opt->stackScan = true; }
         else if (!strcmp(a, "--stack-depth") && v) { opt->stackDepth = (size_t) strtoul(v, NULL, 0); ++i; }
         else if (!strcmp(a, "--frames") && v) { opt->frames = atol(v); ++i; }
+        else if (!strcmp(a, "--start-frame") && v) {
+            char* end = NULL;
+            long value = strtol(v, &end, 0);
+            if (end == v || *end || value < 0) {
+                fprintf(stderr, "error: invalid --start-frame '%s' (expected a non-negative integer)\n", v);
+                return false;
+            }
+            opt->startFrame = value;
+            ++i;
+        }
+        else if (!strcmp(a, "--state-in") && v) { opt->stateIn = v; ++i; }
+        else if (!strcmp(a, "--diff-state-in") && v) { opt->diffStateIn = v; ++i; }
+        else if (!strcmp(a, "--state-out") && v) { opt->stateOut = v; ++i; }
+        else if (!strcmp(a, "--diff-state-out") && v) { opt->diffStateOut = v; ++i; }
         else if (!strcmp(a, "--checkpoint") && v) { if (!parseCheckpoints(opt, v)) return false; ++i; }
         else if (!strcmp(a, "--help") || !strcmp(a, "-h")) { usage(argv[0]); return false; }
         else { fprintf(stderr, "error: unknown argument %s\n", a); return false; }
@@ -452,6 +486,29 @@ static bool parseArgs(int argc, char** argv, Options* opt) {
         fprintf(stderr, "error: --diff requires --diff-rom\n");
         return false;
     }
+    if (opt->diff) {
+        bool haveA = opt->stateIn != NULL;
+        bool haveB = opt->diffStateIn != NULL;
+        if (haveA != haveB) {
+            fprintf(stderr, "error: --diff resume needs both --state-in (A/normal) and "
+                "--diff-state-in (B/candidate); got only %s\n",
+                haveA ? "--state-in" : "--diff-state-in");
+            return false;
+        }
+        if (opt->startFrame > 0 && !haveA) {
+            fprintf(stderr, "warning: --diff --start-frame %ld without state inputs; "
+                "both cores start from reset while the movie timeline is shifted\n",
+                opt->startFrame);
+        }
+    } else if (opt->diffStateIn || opt->diffStateOut) {
+        fprintf(stderr, "error: --diff-state-in/--diff-state-out require --diff "
+            "(use --state-in/--state-out for a single core)\n");
+        return false;
+    }
+    if (opt->stateIn && opt->startFrame == 0) {
+        fprintf(stderr, "warning: --state-in without --start-frame; the movie timeline "
+            "may not match the loaded state\n");
+    }
     return true;
 }
 
@@ -463,7 +520,62 @@ static bool writeBlob(const char* path, const void* data, size_t size) {
     }
     bool ok = fwrite(data, 1, size, f) == size;
     fclose(f);
+    if (!ok) fprintf(stderr, "error: short write to %s\n", path);
     return ok;
+}
+
+/* Serialize one core with BizStartGetState/BizFinishGetState (internally
+ * mCoreSaveStateNamed(..., SAVESTATE_SAVEDATA)) and write it to path. */
+static bool saveStateFile(void* ctx, const char* path, const char* label, long frame,
+    BizStartGetStateFn startGetState, BizFinishGetStateFn finishGetState) {
+    void* vf = NULL;
+    int size = 0;
+    if (!startGetState(ctx, &vf, &size) || !vf || size <= 0) {
+        fprintf(stderr, "error: cannot serialize %s savestate\n", label);
+        return false;
+    }
+    uint8_t* data = malloc((size_t) size);
+    if (!data) {
+        fprintf(stderr, "error: out of memory saving %s savestate\n", label);
+        return false;
+    }
+    finishGetState(vf, data, size);
+    bool ok = writeBlob(path, data, (size_t) size);
+    free(data);
+    if (ok) {
+        fprintf(stderr, "saved %s state at frame %ld: %s (%d bytes)\n",
+            label, frame, path, size);
+    }
+    return ok;
+}
+
+/* Load a savestate with BizPutState (mCoreLoadStateNamed(...)). */
+static bool loadStateFile(void* ctx, const char* path, const char* label, BizPutStateFn putState) {
+    uint8_t* data = NULL;
+    size_t size = 0;
+    if (!readFile(path, &data, &size)) {
+        fprintf(stderr, "error: cannot read %s savestate %s\n", label, path);
+        return false;
+    }
+    if (size == 0) {
+        free(data);
+        fprintf(stderr, "error: %s savestate %s is empty\n", label, path);
+        return false;
+    }
+    if (size > INT32_MAX) {
+        free(data);
+        fprintf(stderr, "error: %s savestate %s is too large (%zu bytes)\n", label, path, size);
+        return false;
+    }
+    int ok = putState(ctx, data, (int) size);
+    free(data);
+    if (!ok) {
+        fprintf(stderr, "error: %s savestate %s is corrupt or incompatible with this ROM/core\n",
+            label, path);
+        return false;
+    }
+    fprintf(stderr, "loaded %s state: %s (%zu bytes)\n", label, path, size);
+    return true;
 }
 
 static void logState(const MemoryAreas* mem, FILE* log, int frame) {
@@ -753,7 +865,21 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    if (opt.frames < 0 || (size_t) opt.frames > movie.count) opt.frames = (long) movie.count;
+    if (opt.startFrame > (long) movie.count) {
+        fprintf(stderr, "error: --start-frame %ld is past the end of the movie (%zu inputs)\n",
+            opt.startFrame, movie.count);
+        return 1;
+    }
+    {
+        long available = (long) movie.count - opt.startFrame;
+        if (opt.frames < 0) {
+            opt.frames = available;
+        } else if (opt.frames > available) {
+            fprintf(stderr, "warning: --frames %ld exceeds %ld remaining movie inputs; "
+                "clamping\n", opt.frames, available);
+            opt.frames = available;
+        }
+    }
 
     HMODULE dll = LoadLibraryA(opt.dll);
     if (!dll) {
@@ -768,10 +894,20 @@ int main(int argc, char** argv) {
     BizPutSaveRamFn BizPutSaveRam = (BizPutSaveRamFn) GetProcAddress(dll, "BizPutSaveRam");
     BizGetRegistersFn BizGetRegisters = (BizGetRegistersFn) GetProcAddress(dll, "BizGetRegisters");
     BizReadBusFn BizReadBus = (BizReadBusFn) GetProcAddress(dll, "BizReadBus");
+    BizStartGetStateFn BizStartGetState = (BizStartGetStateFn) GetProcAddress(dll, "BizStartGetState");
+    BizFinishGetStateFn BizFinishGetState = (BizFinishGetStateFn) GetProcAddress(dll, "BizFinishGetState");
+    BizPutStateFn BizPutState = (BizPutStateFn) GetProcAddress(dll, "BizPutState");
+    bool needsState = opt.stateIn || opt.diffStateIn || opt.stateOut || opt.diffStateOut;
+    bool haveState = BizStartGetState && BizFinishGetState && BizPutState;
     if (!BizCreate || !BizReset || !BizAdvance || !BizDestroy || !BizGetMemoryAreas ||
         !BizPutSaveRam || (opt.diff && !BizGetRegisters) ||
         (opt.stackScan && !BizReadBus)) {
         fprintf(stderr, "error: mgba.dll is missing Biz* exports\n");
+        return 1;
+    }
+    if (needsState && !haveState) {
+        fprintf(stderr, "error: state I/O requested but the core is missing "
+            "BizStartGetState/BizFinishGetState/BizPutState\n");
         return 1;
     }
 
@@ -817,6 +953,13 @@ int main(int argc, char** argv) {
         }
         BizPutSaveRam(ctxB, diffSaveRam, sizeof(diffSaveRam));
 
+        if (opt.stateIn && opt.diffStateIn) {
+            if (!loadStateFile(ctx, opt.stateIn, "A/normal", BizPutState) ||
+                !loadStateFile(ctxB, opt.diffStateIn, "B/candidate", BizPutState)) {
+                return 1;
+            }
+        }
+
         MemoryAreas memA;
         MemoryAreas memB;
         BizGetMemoryAreas(ctx, &memA);
@@ -846,10 +989,12 @@ int main(int argc, char** argv) {
         snprintf(prefixB, sizeof(prefixB), "%s_b", opt.prefix);
 
         bool failed = false;
+        long lastFrame = opt.startFrame;
         clock_t started = clock();
-        for (long i = 0; i < opt.frames; ++i) {
+        for (long i = opt.startFrame; i < opt.startFrame + opt.frames; ++i) {
             FrameInput* in = &movie.frames[i];
             long frame = i + 1;
+            lastFrame = frame;
             uint32_t keys = in->keys & 0x3FF;
             if (in->keys & POWER_KEY) {
                 BizReset(ctx);
@@ -922,6 +1067,15 @@ int main(int argc, char** argv) {
             fprintf(stderr, "PARITY: PASS (%ld frames)\n", opt.frames);
         }
 
+        if (opt.stateOut && !saveStateFile(ctx, opt.stateOut, "A/normal", lastFrame,
+                BizStartGetState, BizFinishGetState)) {
+            return 1;
+        }
+        if (opt.diffStateOut && !saveStateFile(ctxB, opt.diffStateOut, "B/candidate", lastFrame,
+                BizStartGetState, BizFinishGetState)) {
+            return 1;
+        }
+
         free(vbuffA);
         free(vbuffB);
         free(sbuffA);
@@ -941,6 +1095,7 @@ int main(int argc, char** argv) {
     }
 
     MemoryAreas mem;
+    if (opt.stateIn && !loadStateFile(ctx, opt.stateIn, "A/normal", BizPutState)) return 1;
     BizGetMemoryAreas(ctx, &mem);
     SymbolTable map;
     loadMap(opt.map, &map);
@@ -969,9 +1124,11 @@ int main(int argc, char** argv) {
     if (!vbuff || !sbuff) return 1;
 
     clock_t started = clock();
-    for (long i = 0; i < opt.frames; ++i) {
+    long lastFrame = opt.startFrame;
+    for (long i = opt.startFrame; i < opt.startFrame + opt.frames; ++i) {
         FrameInput* in = &movie.frames[i];
         long frame = i + 1;
+        lastFrame = frame;
         uint32_t keys = in->keys & 0x3FF;
         if (in->keys & POWER_KEY) {
             BizReset(ctx);
@@ -993,6 +1150,11 @@ int main(int argc, char** argv) {
     double seconds = (double) (clock() - started) / CLOCKS_PER_SEC;
     fprintf(stderr, "ran %ld frames in %.3f s (%.1f fps)\n",
         opt.frames, seconds, seconds > 0 ? opt.frames / seconds : 0.0);
+
+    if (opt.stateOut && !saveStateFile(ctx, opt.stateOut, "A/normal", lastFrame,
+            BizStartGetState, BizFinishGetState)) {
+        return 1;
+    }
 
     if (history.count) {
         historyWrite(&history, &opt, opt.prefix, &map);

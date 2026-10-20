@@ -20,6 +20,10 @@ extern void BizGetMemoryAreas(void* ctx, void* dst);
 extern void BizPutSaveRam(void* ctx, const void* data, int size);
 extern void BizGetRegisters(void* ctx, int* dest);
 extern uint8_t BizReadBus(void* ctx, uint32_t addr);
+/* mGBA 0.6 BizHawk savestate interface (bizinterface.c). */
+extern int BizStartGetState(void* ctx, void** file, int* size);
+extern void BizFinishGetState(void* file, void* data, int size);
+extern int BizPutState(void* ctx, const void* data, int size);
 
 HMODULE LoadLibraryA(const char* path) {
     (void) path;
@@ -36,6 +40,9 @@ FARPROC GetProcAddress(HMODULE module, const char* name) {
     if (!strcmp(name, "BizPutSaveRam")) return (FARPROC) BizPutSaveRam;
     if (!strcmp(name, "BizGetRegisters")) return (FARPROC) BizGetRegisters;
     if (!strcmp(name, "BizReadBus")) return (FARPROC) BizReadBus;
+    if (!strcmp(name, "BizStartGetState")) return (FARPROC) BizStartGetState;
+    if (!strcmp(name, "BizFinishGetState")) return (FARPROC) BizFinishGetState;
+    if (!strcmp(name, "BizPutState")) return (FARPROC) BizPutState;
     return NULL;
 }
 

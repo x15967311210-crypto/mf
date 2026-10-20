@@ -68,6 +68,94 @@ HEADLESS GOLDEN: PASS
 The full tier takes about 5 minutes on WSL (measured 298.9 s, ~1,134 fps); the
 smoke tier takes about 2-3 s after the build is cached.
 
+## Checkpoint states (`--state-in` / `--state-out`)
+
+A long movie run can be resumed from a saved core state instead of replaying
+every frame. The state is mGBA's own `SAVESTATE_SAVEDATA` blob, taken through
+the same `BizStartGetState` / `BizFinishGetState` / `BizPutState` entry points
+BizHawk uses. It therefore round-trips exactly between runs of the same core
+build.
+
+| Option | Meaning |
+|---|---|
+| `--state-in FILE` | load the A/normal savestate before the movie loop |
+| `--diff-state-in FILE` | load the B/candidate savestate before the movie loop (`--diff` only) |
+| `--state-out FILE` | save the A/normal savestate after the final frame |
+| `--diff-state-out FILE` | save the B/candidate savestate after the final frame (`--diff` only) |
+| `--start-frame N` | skip the first N movie input entries; the first processed input is index N (frame N+1) |
+
+`--frames` is a **count from `--start-frame`**, not an absolute end frame:
+`--start-frame 115000 --frames 3000` processes movie inputs 115000..117999,
+i.e. frames 115001..118000.
+
+`--start-frame` defaults to 0 and `--frames` defaults to "all remaining movie
+inputs". A `--frames` value past the end of the movie is clamped with a warning,
+and a `--start-frame` past the end of the movie is an error.
+
+State load happens after `BizCreate` / `BizReset` / `BizPutSaveRam` and before
+the first `BizAdvance`. State save happens after the last `BizAdvance`, before
+the cores are destroyed, and the log line names the frame it was taken at:
+
+```text
+saved A/normal state at frame 115000: /tmp/n_115000.state (430112 bytes)
+```
+
+The RTC value and checkpoint numbers are derived from the absolute frame
+number, so a resumed run sees exactly the same timeline as an uninterrupted one.
+
+### Resume workflow (diff gate)
+
+Run 0..115000 once and keep both cores' states:
+
+```bash
+tools/headless/build06/mf_bizhawk_linux \
+  --dll mgba.dll \
+  --rom mf_us.gba --diff-rom ../work/shift/mf_us_shift.gba \
+  --bios gba_bios.bin --movie reserenv2-metroidfusion-100.bk2 \
+  --diff --diff-regions OAM,PAL,VRAM,EWRAM --frames 115000 \
+  --state-out /tmp/n_115000.state \
+  --diff-state-out /tmp/s_115000.state
+```
+
+`--diff-regions OAM,PAL,VRAM,EWRAM` is the same set `ci_gate.sh` uses. IO is
+excluded because relocated ROM pointers and in-flight DMA source addresses
+differ by design (for example `DMA3SAD` at IO offset `0xD5` differs by one
+`PAD_BYTES` step during boot); the default `--diff` set includes IO, so a raw
+`--diff` run reports that expected difference at frame 295.
+
+Then resume at the checkpoint. `--diff` requires **both** state inputs; passing
+only one is an error, because a normal state loaded into the shifted core would
+compare two unrelated timelines. Resuming mid-movie with no states is accepted
+with a warning, but both cores then start from reset.
+
+```bash
+tools/headless/build06/mf_bizhawk_linux \
+  --dll mgba.dll \
+  --rom mf_us.gba --diff-rom ../work/shift/mf_us_shift.gba \
+  --bios gba_bios.bin --movie reserenv2-metroidfusion-100.bk2 \
+  --diff --diff-regions OAM,PAL,VRAM,EWRAM \
+  --start-frame 115000 --frames 3000 \
+  --state-in /tmp/n_115000.state \
+  --diff-state-in /tmp/s_115000.state
+```
+
+This reproduces the known BUG-017 first diff (`frame=117234`, EWRAM
+`offset=0x0 a=FF b=00`) in a few seconds instead of re-running 117k frames.
+
+Single-core use is the same minus the `--diff*` variants: `--state-out` after
+one run, then `--state-in FILE --start-frame N`. `--state-in` without
+`--start-frame` is accepted but prints a warning: the movie timeline is not
+shifted to match the loaded state, so the run is only meaningful if the state
+was taken at frame 0.
+
+Errors are fatal and explicit: missing file, empty file, and a state the core
+rejects (wrong version, different BIOS, or truncated) all print an `error:` line
+and exit non-zero.
+
+State files are local scratch data (`/tmp`). They contain game RAM, so they are
+never committed; `.gitignore` does not need to cover them because they live
+outside the repository.
+
 ## Watchpoint (optional)
 
 The 0.6 build includes `mgba06_watch.patch`:
