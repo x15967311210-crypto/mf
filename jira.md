@@ -835,13 +835,22 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 - [TODO] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
   - after BUG-019, first diff is frame 332884 `VRAM 0xD000` a=`00` b=`8A`,
     then OAM slot 0 (`3C` vs `02`) and `gNextOamSlot` (`0` vs `16`).
-  - game state still room 63, `gSubGameMode1=2`; only sprite 196 is active at
-    332955, and its `pFrame` is correctly `+0x1000`.  A 60-frame settle still
-    fails, so this is not just the old transient copy window.
-  - likely a separate late-game graphics/VRAM effect or another embedded
-    pointer; save states at `work/playtest/.../tas/checkpoints/omega_fix1/`
-    (332894) and `omega_fix2/` (332955).
-  - do not weaken OAM/VRAM durable checks; continue checkpoint-first.
+  - the first non-pointer IWRAM divergence is also 332884: normal starts the
+    ending/cutscene and sets `gNonGameplayRam+0x1484 = 0x0863A19C`
+    (`sCutsceneTextNone`); shifted leaves it 0 and has `gChangedInput
+    0x00140000`.  By 332885 shifted IWRAM from 0x11E8 onward is garbage
+    (`0x08E81DBD`, `0x00004EB9`, ...); at 339001 normal is `sub1=2` (playing)
+    while shifted is still `sub1=1` (transition) — a softlock.
+  - prime suspect: the cutscene/ending data `sBlob_6131c8_63a19c`, the
+    top remaining post-link raw-pointer group (56 runs).  Normal reaches
+    `sCutsceneTextNone` at 0x0863A19C; shifted never initializes the cutscene
+    pointer and appears to copy from a stale/wrong cutscene pointer.
+  - save states: `tas/checkpoints/corrupt_narrow/` (332880..332890),
+    `clean_332500/` (valid final-ROM 332500), `omega_fix1/` (332894) and
+    `omega_fix2/` (332955).  Old `oam_probe/s_332500` is contaminated by the
+    pre-Omega-fix ROM; use `clean_332500/s_332500`.
+  - do not weaken OAM/VRAM durable checks; next is cutscene-data pointer
+    conversion, not a gate exception.
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
