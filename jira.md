@@ -406,6 +406,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     diff moved to **117234** (BUG-017, EWRAM `0x02000000` zero-fill).
     Re-run full after BUG-017; reordered remains at 223045 (BUG-011).
   - BUG-013 native idle/focused PASS on 2026-10-19.
+  - **D-012 checkpoint ladder (2026-10-20)**: 115000 -> 150000 PASS;
+    150000 -> 200000 PASS after BUG-018; 200000 -> 223045 stops at BUG-011
+    (shared room-14/gDecompBg3Map).  Full 339001 not run.
   - **partial run on `2447dfb7...`**: 384/385/386 callback `0809F9E1`,
     401 `DISPCNT=1E00`, 22922/22923/22924/22925 `0809B2C9`, 22952
     `DISPCNT=9700`, 30000 state fields normal/shifted match.  This confirms
@@ -504,7 +507,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     and first-diff dumps; the 100-frame coarse interval is not enough for a
     source patch.
 
-- [DOING @dev1] BUG-011 (shift/reorder) — reordered room branch at TAS frame ~223227
+- [DOING @dev17] BUG-011 (shift/reorder) — room-14 branch at TAS frame ~223045
   - native 100% TAS normal vs reordered: identical through 223200; at 223300
     normal `room=23`, reordered `room=14`; final state differs.
   - exact fine trace: loaded state at 223200 already differs in OAM/VRAM/IO
@@ -530,6 +533,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - evidence: `tools/headless/out/full/diff_reorder/reorder_{a,b}_223045_*`.
   - the EWRAM `0x32290` diff lands in `gDecompBg3Map` (0x02032000..0x02035D20)
     in both maps; first inspect the room-14 BG3 decompression/copy path.
+  - **headless shifted also hits it after BUG-018** (`6f71b687`): 200000 ->
+    223045 first diff EWRAM `0x32290` a=`41` b=`72`, same state
+    `1800 0001 0000 0100 81 4 14 0` (main 1, s1 0, s2 0100, event 0x81,
+    area 4, room 0x14); normal LR `0x11E0`, shifted LR `0x1258`, CPSR
+    `60000092` both.  This is shared, not reorder-only.
+  - evidence: `work/playtest/m0f-2026-10-17/tas/bug011_223045/`
+    (`BUG011_RESULT.md`, `diff_200k/`, 200k/223045 states).
+  - fast repro from checkpoint 200000 takes ~50 s; do not run full.
   - no fix yet; BUG-011 stays DOING.
 - [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
   - candidate `812d0090...` (BUG-008 fix) passes file-select, then native TAS
@@ -817,7 +828,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `ca33f434...`, shifted `26f1f4223d06844851999d5a3417cb38653b6961`;
     gates PASS; postlink 67 (unchanged).  Checkpoint 115000 -> 130000 PASS
     (29.7 s); 339001 not run, per D-012.
-- [TODO] BUG-018 (shift/engine) — shifted OAM overflow at frame 168582
+- [DONE] BUG-018 (shift/engine) — shifted OAM overflow at frame 168582
   - chunk ladder on `26f1f422...`: 115000 -> 150000 PASS; 150000 -> 168582
     first diff.
   - first diff frame 168582, OAM offset 0 a=`08` b=`02`; state
@@ -841,8 +852,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - evidence: `work/playtest/m0f-2026-10-17/tas/bug018_168582/`
     (`repro.log`, states, `diff_168582/`, `pre168581/`); scratch watch
     `/tmp/opencode/bug018_watch/`.
-  - next: fix, then resume 150000 -> 200000 (D-012); stop on a new diff,
-    do not run 339001 yet.
+  - **FIX LANDED `80d04d1`**: all monologue/BSL nested FrameData tables in
+    `sBlob_6638a0_682fac` are relocatable C (`+0x7190`, `+0x71B8`, `+0xE12C`,
+    `+0xE154`, `+0x1D4B4`); normal `ca33f434...`, shifted
+    `6f71b687530a4a123aba615cc6542a0ba500ee9d`; postlink 67 -> 60.
+  - checkpoint 150000 -> 200000 PASS (50k, no diff at 168582); 200000 ->
+    250000 stops at 223045 = BUG-011 (shared room-14/gDecompBg3Map).
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
