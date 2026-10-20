@@ -563,14 +563,19 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     has no persistent EWRAM diff (diffs at 223046/47/48, 0 at 223049-52,
     transient at 223053/54, etc.).  Do not treat this as a source bug.
   - the native reordered room 23/14 at 223227 remains the real BUG-011.
-  - **settle-aware result**: 200k -> 226200 with `--settle 8` reports a
-    durable diff at **226117**, OAM offset `0x30` a=`21` b=`42`; normal
-    `room=40`/event `0x83`, shifted `room=24`/event `0x81`.  Diffs run
-    continuously from the 223045 phase window to 226117; this is a real
-    room/event transition divergence, not a copy artifact.
-  - next: use `--history` + checkpoint 200000 to find the first frame where
-    the room/event fields diverge, then trace the room-connection/event table
-    (area 4).  Do not patch IRQ/callback; do not run full.
+  - **settle-aware + history result**: the 223045 EWRAM diff is transient.
+    The first durable field divergence is **223214**: normal `s1=3`,
+    shifted `s1=2`; at **223227** normal `room=23`, shifted `room=14`;
+    normal LR `0x1238`, shifted LR `0x1B8`, CPSR `0x20000092` vs `0x92`.
+    This is the exact native BUG-011 signature, now reproduced in headless
+    shifted.
+  - the settle run eventually reports OAM at 226117 (normal room 40/event 83,
+    shifted room 24/event 81), a downstream consequence of the room-23/14
+    transition divergence.
+  - next: save a 223210 checkpoint from the 200k states, trace the
+    transition/IRQ/callback path around 223214-223227 (the native notes point
+    at the copied IWRAM callback table `sBlob_a5224_a5258` / audio-intr
+    literals), and fix the raw pointer.  No full run.
   - fast repro from checkpoint 200000 takes ~50 s; do not run full.
   - no fix yet; BUG-011 stays DOING.
 - [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
