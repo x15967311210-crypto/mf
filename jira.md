@@ -103,14 +103,20 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - self-check 14/14; clean extractor output verifies; normal SHA
     `ca33f434...`; landed `0f2bce1`.
   - do not commit `data/`, `sound/direct_sound_samples/` or baserom.
-- [TODO] BUILD-004 (ci/tools) — public/protected CI layers + symbols
-  - public layer: `make doctor-source`, host tests, Python self-checks,
-    source-only relocation scans; no baserom.
-  - protected layer: private runner with baserom/BIOS/movie, restore/verify
-    `data/` from BUILD-003, then run ROM/headless gates.
-  - publish `mf_us.map` / `work/shift/symbols.json` as a symbols artifact
-    (or symbols branch) for REA/debug tooling.
-  - do not commit baserom, BIOS, movie, `data/` or ROMs.
+- [DONE] BUILD-004 (ci/tools) — public/protected CI layers + symbols
+  - public: `tools/ci/public_gate.sh` + `.github/workflows/public.yml`
+    (ubuntu-latest, no baserom/agbcc/toolchain); runs doctor-source,
+    host-test, content-check and all Python self-checks.  `PUBLIC-CI: PASS`.
+  - protected: `tools/ci/protected_gate.sh` runs doctor, `data-verify`,
+    `make check`, strict relocs, host tests, postlink report and optionally
+    `tools/headless/ci_gate.sh`; `tools/ci/collect_symbols.sh` emits a
+    text-only artifact (`mf_us.map`, `symbols.json`, `abs_refs.json`,
+    `SHA256SUMS`, `BUILD.txt`).  `make public-gate`, `make protected-gate`,
+    `make collect-symbols`; docs in `tools/ci/README.md`.
+  - `data-verify` uses the BUILD-003 manifest/cache key; no silent
+    regeneration.  `headless.yml` remains the human-owned self-hosted job and
+    was not modified.
+  - normal SHA `ca33f434...`; landed `4eaa1d6`.
 
 ## Phase S2 — relocatable build
 
