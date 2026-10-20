@@ -141,3 +141,27 @@ original ROM addresses.  Relocation happens in the link, not in the extractor.
 add risk with no benefit.
 
 **Forbids.** Changing `database.json` addresses to follow the current build.
+
+---
+
+## D-012 — Checkpoint-first parity iteration, full TAS only at the end
+
+**Decision.** Do not run the 339,001-frame native/headless movie after every
+BUG fix.  Start each iteration from the last confirmed PASS checkpoint state,
+reproduce the first diff in a few seconds, fix it, and extend the run in
+chunks from that checkpoint.  Run the full 339,001 tier only after the
+incremental chunks pass the previous failure point without exposing a new
+diff.
+
+**Reason.** A full run is ~10-15 minutes; a checkpoint resume is seconds.  The
+checkpoint states are exact mGBA `SAVESTATE_SAVEDATA` blobs, so the CPU,
+memory and movie timeline are reproduced, not approximated.
+
+**Forbids.** Treating a chunk PASS as a full-TAS PASS; running full after every
+fix; using a state from a different core/ROM build without verifying a short
+overlap (or recapturing the checkpoint).
+
+**Requires.** Keep normal + shifted (+ reordered when relevant) states at the
+last PASS node in `work/` (ignored), record their SHA256 and the ROM SHA1s in
+the task evidence, and recapture them after a ROM-changing fix when the old
+state no longer loads cleanly.

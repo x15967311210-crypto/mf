@@ -156,6 +156,20 @@ State files are local scratch data (`/tmp`). They contain game RAM, so they are
 never committed; `.gitignore` does not need to cover them because they live
 outside the repository.
 
+### Checkpoint-first test policy
+
+Bug-fix iteration does **not** re-run the full 339001-frame movie after every
+change.  Use the last known-PASS checkpoint (for example the 115000-frame
+states above), reproduce the failure in a few seconds, fix it, then extend the
+run in chunks from that checkpoint.  Run the full 339001 tier only after the
+incremental chunks pass through the previous failure point without finding a
+new diff.
+
+A chunk PASS is not a full-TAS PASS.  Checkpoints are tied to the core/ROM
+build that produced them; after a ROM-changing fix, verify the state loads and
+overlaps a short known-good window, or recapture the checkpoint from the last
+confirmed PASS node.
+
 ## Watchpoint (optional)
 
 The 0.6 build includes `mgba06_watch.patch`:

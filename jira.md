@@ -138,6 +138,19 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - `gh` in this checkout defaults to upstream `metroidret/mf`; use
     `-R x15967311210-crypto/mf` or `gh repo set-default` for fork runs.
   - `tests/emulator/harness.c` remains uncommitted and was not touched.
+- [DONE] BUILD-006 (tools) — headless checkpoint state save/load/resume
+  - runner flags `--state-in`, `--diff-state-in`, `--state-out`,
+    `--diff-state-out`, `--start-frame`; real mGBA `SAVESTATE_SAVEDATA` via
+    `BizStartGetState`/`BizFinishGetState`/`BizPutState`; commit `097dbf1`.
+  - 0..115000 diff PASS in 208.5 s with A/B states saved; resume at 115000
+    reproduces BUG-017 frame 117234 in **3.85 s** (56x).  Single-core resume
+    matches an uninterrupted run byte-for-byte in all dumped regions.
+  - states + evidence: `work/playtest/m0f-2026-10-17/tas/bug017_117234/`
+    (`states/n_115000.state`, `states/s_115000.state`,
+    `BUG017_RESULT.md`, `diff_117234/`).  Shifted state is tied to
+    `e5d202c8...`; recapture after ROM-changing fixes if needed.
+  - policy D-012: checkpoint-first iteration, full 339001 only after the
+    incremental chunks pass the previous failure point.
 
 ## Phase S2 — relocatable build
 
@@ -777,7 +790,10 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     already relocated, so inspect the destination/length words.
   - not the remaining `sBlob_6638a0_682fac+0x1D0xx` run; do not whitelist.
   - next: reproduce with headless 117k, compare EWRAM source writes, find the
-    writer/length, convert the stale constant, then rerun full 339001.
+    writer/length, convert the stale constant, then extend from the 115000
+    checkpoint and only run full 339001 after the chunks are clean.
+  - fast repro: `work/playtest/m0f-2026-10-17/tas/bug017_117234/`
+    `BUG017_RESULT.md`; states n/s_115000; 3.85 s resume to 117234.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
