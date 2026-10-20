@@ -116,9 +116,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
       `+0x82` 128 stores, then `SpecialCutsceneDrawOam`; no init completion;
       frame is **+13,649 cycles** and still active.
     - next frame starts at cycle 281065 normal vs 314526 shifted (+33,461).
+    - normal init runs the `+0x82` palette fill (0x05000000..0x050001FC,
+      128 stores, cycles 250338..251104), then draw, then the `+0x14A`
+      VRAM fill (0x0600D000..0x0600DFFC, 1024 stores, cycles
+      264168..267239).  Shifted runs the same palette fill, then gets stuck
+      in `SpecialCutsceneDrawOam` and **never reaches +0x14A**.
     - shifted OAM writes 462 vs normal 403 in that frame; first OAM values
       differ (normal 0 vs shifted 15), and shifted's only `gNextOamSlot` write
       is 20; it overflows before `DrawAll` resets.
+  - the direct cause is the draw loop overrun before the init's final VRAM
+    clear; data at slot `+0x1c` and its target is identical normal/+0x1000,
+    so inspect slot `+0x11/+0x12/+0x14/+0x15`/index state at draw entry or
+    add a shift-only guard, not another pointer relocation.
   - this is a timing/control-flow overrun, not a data relocation.  The
     shifted init does not execute the same `+0x14A` store loop as normal;
     inspect `EndingBslCrashingInit` +0x82/+0x14A branch/IRQ interaction, or
