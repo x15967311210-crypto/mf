@@ -794,18 +794,25 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     checkpoint and only run full 339001 after the chunks are clean.
   - fast repro: `work/playtest/m0f-2026-10-17/tas/bug017_117234/`
     `BUG017_RESULT.md`; states n/s_115000; 3.85 s resume to 117234.
-  - **store-trace finding (2026-10-20)**: the first differing EWRAM store is
-    in the BIOS LZ77 decoder at frame 117234 (`pc 0x11EC`); normal and shifted
-    differ in decoder state, not in a direct table literal.  The earlier
-    `NavigationConversationLoadPopUpGraphics` hypothesis is **disproved**:
-    its two asm constants are already symbols
-    (`sCharacterWidths+0x5A94` / `+0x5A1C`), and the shifted table at
-    `0x0857CC50` has rec2 pGraphics `0x08578024` (correct +0x1000), matching
-    the shifted blob.  Do not edit that asm.
-  - next: capture the **caller** of the LZ77 SWI (read/watch at the source
-    range or SWI-entry stack), not the decoder's internal registers; identify
-    the actual source pointer/record selection at 117234.  The decoder r8/r0
-    values are internal state and were misread as call arguments.
+  - **caller trace (2026-10-20)**: SWI 0x12 at frame 117234 has
+    caller LR `0x0807BCF1` (`NavigationConversationLoadPopUpGraphics+0x59`)
+    in both builds; `r0=0x08577024`, `r1=0x02000000` in both; `r2` relocates
+    correctly (`0x0857BC64` -> `0x0857CC64`).  The caller and all earlier 36
+    LZ77 calls are fine; only this call's `r0` is stale.
+  - exact field: the consumer reads `pGraphics` at
+    `table + 0x14 + id*0x18`.  For `id=4` that is `table+0x74`, which is
+    **outside** the C `records[4]` table and is the first word of the opaque
+    `sBlob_5766D4_after` blob: normal `0x08577024` (= `prefix+0x950`),
+    shifted still `0x08577024` instead of `0x08578024`.
+  - LZ77 evidence: normal at `0x08577024` has header `0x00200010` (type 0x10,
+    size `0x2000`); shifted at the stale address has `0x01200000`
+    (type 0x00, size `0x12000`), so it decompresses garbage.  The correctly
+    relocated `0x08578024` is byte-identical to normal.
+  - fix scope: model the id-4 pGraphics at table `+0x74` as a relocatable
+    `const u8 *` = `sBlob_5766D4_prefix + 0x950`; start the opaque
+    `sBlob_5766D4_after` at `+0x78` (4 bytes later) and update
+    `tools/extractor.py` to skip the pointer.  No asm change, no LZ77 data
+    change.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
