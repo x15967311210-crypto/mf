@@ -82,7 +82,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - use a duration/state-field criterion (e.g. compare disp/main/event/room
     or require the same byte pair to persist) instead of only "no new pair".
   - do not weaken OAM/PAL/VRAM durable checks.
-- [DOING @qa] QA-029 (emulator) — BUG-020 cutscene callback/state trace at 332884
+- [DONE @qa] QA-029 (emulator) — BUG-020 cutscene callback/state trace at 332884
   - normal: `disp=1800`, `nextOam=0`, LR BIOS; shifted: `disp=4000`,
     `nextOam=20`, executing `SpecialCutsceneDrawOam` at 332884.
   - `gOamData` ends at `0x030011E8`, exactly where shifted IWRAM corrupts at
@@ -91,8 +91,19 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     at the ending transition; compare `gCurrentCutscene=0x80`,
     `gSubGameMode1/2`, `gMainGameMode`, callback pointers and the
     `CutsceneElevatorMonologue` entry/exit.  Do not chase data pointers.
-  - deliverable: state/callback trace report + one actionable root/fix
-    recommendation; no feature code, no jira edits, no commit.
+  - **result**: VBlank callback at 332883 is `unk_99940` in both;
+    at 332884 normal switches to `EndingBslCrashingVblank`
+    (`0x08095C55`), shifted stays `unk_99940` (shifted `0x0809A941`).
+    `gNextOamSlot` is 6 in both at 332883; at 332884 normal 0, shifted 20.
+    Normal therefore completes `EndingHandler`/`EndingBslCrashingInit` and
+    resets OAM, while shifted starts `SpecialCutsceneDrawAllOam` from slot
+    20 and overflows `gOamData` at 0x11E8.
+  - traced, not fixed: the minimal reset would be at
+    `EndingBslCrashingInit`/before `SpecialCutsceneDrawAllOam`, but that is
+    normal-layout code and would change the baseline normal SHA.  Next
+    decision is a shift-only/behavior-preserving guard or accepting the
+    one-frame transition lag; do not add a normal-ROM-only patch without a
+    baseline decision.
 - [DONE] BUILD-001 (tools) — reproducible toolchain checks
   - `tools/doctor.py` (full / `--source-only` / `--self-check`),
     `tools/setup_agbcc.sh`, `tools/agbcc-version` pinned at
