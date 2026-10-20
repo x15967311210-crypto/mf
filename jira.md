@@ -117,6 +117,20 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     regeneration.  `headless.yml` remains the human-owned self-hosted job and
     was not modified.
   - normal SHA `ca33f434...`; landed `4eaa1d6`.
+  - **2026-10-20 push status**: fork `x15967311210-crypto/mf` `hack` is at
+    `b068c53`; `public-gate` run 39413631873 **success** (12s, PUBLIC-CI
+    PASS).  `headless-parity` run 39413631823 is **queued**: no self-hosted
+    linux/x64 runner picked it up.  The local `headless.yml`/`tools/headless`
+    changes are still uncommitted, so the remote run uses the committed
+    `94c78c9` version, not `HEADLESS_SHIFT_FRAMES=339001`.
+- [TODO] BUILD-005 (ci) — bring up the protected runner
+  - register a self-hosted linux/x64 runner; set `MF_BASEROM`,
+    `HEADLESS_BIOS`, `HEADLESS_MOVIE`, `MF_TOOLCHAIN` repository variables.
+  - commit/push the local `headless.yml` + `tools/headless` changes; set
+    `HEADLESS_SHIFT_FRAMES=339001` for the nightly full tier so BUG-016
+    (114671) and BUG-011 (223045) are not missed by the 100k default.
+  - `gh` in this checkout defaults to upstream `metroidret/mf`; use
+    `-R x15967311210-crypto/mf` or `gh repo set-default` for fork runs.
 
 ## Phase S2 — relocatable build
 
