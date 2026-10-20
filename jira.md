@@ -133,12 +133,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - normal writes `+0x12` for slots 16/17/18 at cycles
     `256029/258555/261089`; shifted writes only slot 16 at `260241`, then the
     frame ends inside `SpecialCutsceneDrawOam` before slots 17/18.
-  - direct cause: shifted's per-slot draw/animation loop does not reach all
-    active slots before the frame boundary; the missing `+0x12` updates then
-    change the next frame's frame selection.  This remains a timing/loop
-    overrun, not a data relocation.  Inspect `SpecialCutsceneDrawOam`'s
-    per-slot loop/`+0x12` update or add a shift-only guard; do not chase
-    another pointer.
+  - **actual data root found (2026-10-20)**: the pOam table at
+    `0x08636050` (slot 16) is inside `sBlob_6131c8_63a19c`.  Its nested
+    `FrameData.pFrame` words are still normal addresses in shifted
+    (`0x08635A5A` ...), should be `+0x1000`; `SpecialCutsceneDrawOam` follows
+    the raw pFrame to normal-layout data, reads different OAM bytes, and
+    loops/overruns.  The pOam pointer itself is correctly `+0x1000`; the
+    earlier slot `+0x12`/cycle differences are downstream of this.
+  - fix: add `sBlob_6131c8_63a19c` to the sparse-pointer generator with
+    **inside-blob-only** relocation (leave non-pointer outside words
+    literal), preserving normal SHA; then test 332880 -> 339001.  This is the
+    same class as BUG-019, not a timing-only bug.
   - this is a timing/control-flow overrun, not a data relocation.  The
     shifted init does not execute the same `+0x14A` store loop as normal;
     inspect `EndingBslCrashingInit` +0x82/+0x14A branch/IRQ interaction, or
@@ -894,7 +899,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - shifted SHA is now `d30310a634e83626e830cc0f481d9d8fece79488`; parity
     300000 -> 332883 PASS.  `gen_blob_tables --check`, `make smoke` and
     `make audit` pass; post-link runs drop 60 -> 56.
-- [TODO] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
+- [DOING @dev23] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
   - after BUG-019, first diff is frame 332884 `VRAM 0xD000` a=`00` b=`8A`,
     then OAM slot 0 (`3C` vs `02`) and `gNextOamSlot` (`0` vs `16`).
   - the first non-pointer IWRAM divergence is also 332884: normal starts the
