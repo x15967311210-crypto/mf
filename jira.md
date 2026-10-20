@@ -123,14 +123,21 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     linux/x64 runner picked it up.  The local `headless.yml`/`tools/headless`
     changes are still uncommitted, so the remote run uses the committed
     `94c78c9` version, not `HEADLESS_SHIFT_FRAMES=339001`.
-- [TODO] BUILD-005 (ci) — bring up the protected runner
-  - register a self-hosted linux/x64 runner; set `MF_BASEROM`,
-    `HEADLESS_BIOS`, `HEADLESS_MOVIE`, `MF_TOOLCHAIN` repository variables.
-  - commit/push the local `headless.yml` + `tools/headless` changes; set
-    `HEADLESS_SHIFT_FRAMES=339001` for the nightly full tier so BUG-016
-    (114671) and BUG-011 (223045) are not missed by the 100k default.
+- [DONE] BUILD-005 (ci) — protected runner online and validated
+  - runner `mf-wsl-01` is online (`self-hosted,linux,x64`); repository
+    variables set: `MF_BASEROM`, `HEADLESS_BIOS`, `HEADLESS_MOVIE`,
+    `MF_TOOLCHAIN=/home/x1596/.local/bin`, `HEADLESS_SHIFT_FRAMES=339001`.
+  - workflow fixed to check ARM `as/ld/objcopy` (not `arm-none-eabi-gcc`),
+    install pinned agbcc via `make setup-agbcc`, verify `data/` via
+    `make data-verify`, and invoke `build06.sh` with bash; commits
+    `2b4f465` / `c864a45`.
+  - validation: `public-gate` success 13s; `headless-parity` push (early 30k)
+    success 4m17s; `workflow_dispatch` full 339001 normal golden PASS and
+    shifted first diff **114671** (BUG-016), as expected.  The gate is red
+    until BUG-016 is fixed; that is correct, not a CI setup failure.
   - `gh` in this checkout defaults to upstream `metroidret/mf`; use
     `-R x15967311210-crypto/mf` or `gh repo set-default` for fork runs.
+  - `tests/emulator/harness.c` remains uncommitted and was not touched.
 
 ## Phase S2 — relocatable build
 

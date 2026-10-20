@@ -105,12 +105,16 @@ on the runner:
 MF_BASEROM      /opt/mf-assets/mf_us_baserom.gba
 HEADLESS_BIOS   /opt/mf-assets/gba_bios.bin
 HEADLESS_MOVIE  /opt/mf-assets/reserenv2-metroidfusion-100.bk2
-MF_TOOLCHAIN    /opt/gcc-arm-none-eabi/bin       # optional if on PATH
+MF_TOOLCHAIN    /opt/arm/bin                    # ARM binutils dir or prefix
+HEADLESS_SHIFT_FRAMES 339001                    # full tier shift/reorder frames
 ```
 
-The runner also needs `cmake`, `ninja`, `gcc`, `make`, `python3`, zlib headers,
-agbcc, and network access on the first build (to clone the pinned mGBA 0.6
-source).
+The runner needs host `cmake`, `ninja`, `gcc`, `make`, `python3`, zlib headers,
+and ARM binutils (`arm-none-eabi-as`, `arm-none-eabi-ld`,
+`arm-none-eabi-objcopy`).  It does **not** need `arm-none-eabi-gcc`: the game
+C code is built with the pinned `agbcc`, which the workflow installs with
+`make setup-agbcc`.  The workflow also runs `make data-verify` against the
+committed `tools/data-manifest.json` before building.
 
 Tiers:
 
@@ -122,18 +126,17 @@ Tiers:
   - shifted + reordered lockstep diff at 30k
 - nightly schedule: `full`
   - normal golden at 339,001
-  - shifted + reordered lockstep diff at 100k by default
-  - set `HEADLESS_SHIFT_FRAMES=339001` to run them full too
+  - shifted + reordered lockstep diff at `HEADLESS_SHIFT_FRAMES`
+    (set the repository variable to `339001`; the script default is 100k)
 - `workflow_dispatch`: choose `smoke` / `early` / `full`
 
 The shifted/reordered gate is strict: `--diff-regions OAM,PAL,VRAM,EWRAM`
 must report `PARITY: PASS`. IWRAM/IO are intentionally excluded because
 relocated pointers and DMA addresses differ by design.
 
-The current `hack` branch passes shifted/reordered at 4k, 30k and 100k in WSL.
-Requires an ARM toolchain (`arm-none-eabi-gcc` on `PATH`, or set
-`MF_TOOLCHAIN` to its bin directory/prefix) so `tools/shift/shift_test.py` can
-build `work/shift/mf_us_shift.gba` and `mf_us_reorder.gba`.
+`hack` passes shifted/reordered at 4k, 30k and 100k, but a true 339001 run
+currently fails at shifted frame **114671** (BUG-016); the full tier must not
+be reported as PASS until that table is converted.
 
 `actions/cache` caches `tools/headless/.cache` and `tools/headless/build06`,
 keyed on the watchpoint patch, harness, build script and `linux_shim`.
