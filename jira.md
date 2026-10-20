@@ -107,11 +107,23 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     so this is **not a data relocation**.  At 332885 shifted `frame16` is
     still 65409 while normal is 65410: the shifted main-loop iteration
     overruns the video frame at the ending transition.
-  - root is a loop/cycle-budget overrun; the OAM overflow and callback lag
-    are downstream.  Next should be a cycle/VCOUNT trace of
-    `EndingBslCrashingInit` + the VBlank/audio work, or a shift-only
-    behavior-preserving guard; do not add a normal-ROM-only patch without a
-    baseline decision and do not chase another blob pointer.
+  - **cycle/VCOUNT trace (2026-10-20)**: mGBA watch trace from the 332883
+    states (frame 332884):
+    - normal: cycles `36845..267239`, VCOUNT `189..148`, 5645 stores;
+      `EndingBslCrashingInit+0x14A` 1024 stores; ends with callback switched
+      and `gNextOamSlot=0`.
+    - shifted: cycles `36845..280888`, VCOUNT `189..159`, 4680 stores;
+      `+0x82` 128 stores, then `SpecialCutsceneDrawOam`; no init completion;
+      frame is **+13,649 cycles** and still active.
+    - next frame starts at cycle 281065 normal vs 314526 shifted (+33,461).
+    - shifted OAM writes 462 vs normal 403 in that frame; first OAM values
+      differ (normal 0 vs shifted 15), and shifted's only `gNextOamSlot` write
+      is 20; it overflows before `DrawAll` resets.
+  - this is a timing/control-flow overrun, not a data relocation.  The
+    shifted init does not execute the same `+0x14A` store loop as normal;
+    inspect `EndingBslCrashingInit` +0x82/+0x14A branch/IRQ interaction, or
+    add a shift-only OAM-slot guard.  Do not add a normal-ROM-only patch
+    without a baseline decision and do not chase another blob pointer.
 - [DONE] BUILD-001 (tools) — reproducible toolchain checks
   - `tools/doctor.py` (full / `--source-only` / `--self-check`),
     `tools/setup_agbcc.sh`, `tools/agbcc-version` pinned at
