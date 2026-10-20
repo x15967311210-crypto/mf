@@ -94,13 +94,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - acceptance: doctor-source, host-test, audit, smoke, wrapper
     audit/smoke/check-relocs-strict, shift-build, `make -j20 check` all pass;
     normal SHA `ca33f434...`; landed `0e8b738`.
-- [TODO] BUILD-003 (tools) — data tree manifest + cache verifier
-  - generate a deterministic manifest (path/size/SHA256) for `data/` (and
-    `sound/direct_sound_samples/` if needed) after `extractor.py`;
-    `make data-manifest` / `make data-verify` targets.
-  - CI can cache the extracted tree keyed by baserom SHA1 + manifest version
-    and fail if a cache restore does not match the manifest.
-  - do not commit `data/` or baserom; the manifest is text-only.
+- [DONE] BUILD-003 (tools) — data tree manifest + cache verifier
+  - `tools/data_manifest.py` + committed `tools/data-manifest.json`
+    (3735 files, 6,947,008 bytes, schema 1, relative POSIX paths).
+  - `make data-manifest`, `make data-verify` (fails on missing/extra/size/
+    SHA256), `make data-cache-key`
+    (`<baserom-sha1>-<manifest-sha256>`).
+  - self-check 14/14; clean extractor output verifies; normal SHA
+    `ca33f434...`; landed `0f2bce1`.
+  - do not commit `data/`, `sound/direct_sound_samples/` or baserom.
 - [TODO] BUILD-004 (ci/tools) — public/protected CI layers + symbols
   - public layer: `make doctor-source`, host tests, Python self-checks,
     source-only relocation scans; no baserom.
