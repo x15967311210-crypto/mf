@@ -135,7 +135,7 @@ palette/tile/sprite pairs or graphics byte noise, not pointers.  They stay raw.
 | `Blob_5dfd6c_5e116c.bin` | 5120 | 40 | 0.031 | 1 | unmapped 28, `.rodata` 12 | `data` | Intro palette data; 28/40 hits land in unmapped ROM, longest run 1; classic BGR555 artifact. |
 | `Blob_5f6990_60093c.bin` | 40876 | 219 | 0.021 | 2 | `.rodata` 115, unmapped 44, `iwram` 36, `.text` 22, `ewram` 2 | `data` | Intro graphics/palette data; 219 isolated hits (longest run 2), 20% unmapped. |
 | `Blob_6094d0_60b148.bin` | 7288 | 153 | 0.084 | 1 | `.rodata` 145, `iwram` 7, `.text` 1 | `data` | Intro space tilemap (`new_file_intro_data.c`); tile pairs such as `0x03000002` and `0x0800A207` fake RAM/ROM pointers; longest run 1. |
-| `Blob_6131c8_63a19c.bin` | 159700 | 1042 | 0.026 | 2 | `.rodata` 605, unmapped 216, `iwram` 137, `.text` 70, `ewram` 12, `.data` 1, `.bss` 1 | `data` | Cutscene background graphics; 1027 isolated hits, 21% unmapped, no run. |
+| `Blob_6131c8_63a19c.bin` | 159700 | 1042 | 0.026 | 2 | `.rodata` 605, unmapped 216, `iwram` 137, `.text` 70, `ewram` 12, `.data` 1, `.bss` 1 | `mixed` | Cutscene OAM/frame tables inside the graphics blob; 506 inside-blob `FrameData.pFrame`-style pointers are relocated by SHIFT-006b7. The 382 outside ROM-like words are text/graphics false positives and stay literal. |
 | `Blob_64e470_662804.bin` | 82836 | 511 | 0.025 | 3 | `.rodata` 269, `iwram` 135, unmapped 62, `.text` 34, `ewram` 11 | `data` | Intro graphics indexed by table `79c448`; 511 isolated hits (longest run 3), 12% unmapped. |
 
 ### Clean data (29) — high confidence
@@ -203,7 +203,7 @@ All seven are graphics/palette/tilemap data and are now `data`:
 | `Blob_5dfd6c_5e116c.bin` | **data** | Intro palette; 70% of hits unmapped. |
 | `Blob_5f6990_60093c.bin` | **data** | Intro graphics/palette; isolated hits only. |
 | `Blob_6094d0_60b148.bin` | **data** | Intro tilemap; tile pairs fake RAM/ROM addresses. |
-| `Blob_6131c8_63a19c.bin` | **data** | Cutscene graphics; isolated hits only. |
+| `Blob_6131c8_63a19c.bin` | **mixed** | Cutscene graphics + 506 inside-blob pFrame/pointer words; inside-only sparse conversion. |
 | `Blob_64e470_662804.bin` | **data** | Intro graphics; isolated hits only. |
 
 **Uncertain cases:** only the three `possible` blobs above.  Their pointer

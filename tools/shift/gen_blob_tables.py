@@ -154,6 +154,12 @@ class BlobSpec:
     # word as a literal except the ROM pointers, which become symbol+offset
     # expressions so the linker can relocate them.
     sparse_pointers: bool = False
+    # A larger mixed blob (OAM frame data + graphics) whose only confirmed
+    # relocatable words are pointers into the blob itself, e.g. FrameData
+    # pFrame tables.  Inside-range words become self+offset expressions; every
+    # other word stays a literal, including ROM-looking words that are really
+    # graphics/text bytes (relocating those would corrupt the data).
+    sparse_inside_only: bool = False
 
 
 # The seven confirmed flat pointer tables plus the 74dc48 struct table from
@@ -220,6 +226,18 @@ BLOBS = (
         0x4A7C,
         True,
         sparse_pointers=True,
+    ),
+    # BUG-020: intro/cutscene OAM container.  The blob mixes graphics with
+    # FrameData tables whose pFrame words point back into the blob (506
+    # inside-range words).  The other 382 ROM-looking words are text/graphics
+    # false positives, so only inside pointers may become relocatable.
+    BlobSpec(
+        "sBlob_6131c8_63a19c",
+        "Blob_6131c8_63a19c.bin",
+        "src/data/new_file_intro_data.c",
+        0x26FD4,
+        True,
+        sparse_inside_only=True,
     ),
     # SHIFT-006b2: 210 x 12-byte ending-image line records.  The consumer
     # (EndingImageLoadTextOam / EndingImageDisplayLinePermanently) reads bytes
@@ -610,7 +628,7 @@ def render_flat_block(
     ]
     thumb_blob = spec.symbol in THUMB_BLOBS
     blob_addr = None
-    if spec.sparse_pointers:
+    if spec.sparse_pointers or spec.sparse_inside_only:
         for symbol in sm.symbols:
             if symbol.name == spec.symbol:
                 blob_addr = symbol.addr
@@ -619,6 +637,18 @@ def render_flat_block(
             raise GenError(f"{spec.symbol}: no linked address in mf_us.map")
     for off in range(0, len(data), 4):
         value = struct.unpack_from("<I", data, off)[0]
+        if spec.sparse_inside_only:
+            if blob_addr <= value < blob_addr + len(data):
+                delta = value - blob_addr
+                lines.append(
+                    f"    (u32)((const u8*){spec.symbol} + 0x{delta:X}),"
+                )
+            else:
+                # Not a confirmed self-pointer: keep the baseline word even
+                # if it looks like a ROM address (text/graphics false
+                # positives must not be relocated).
+                lines.append(f"    0x{value:08X},")
+            continue
         if spec.sparse_pointers and not (0x08000000 <= value < 0x0A000000):
             lines.append(f"    0x{value:08X},")
             continue
