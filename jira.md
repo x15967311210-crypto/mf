@@ -157,6 +157,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - control 200k->223046 still fails at 223045; settle 8 ignores the transient
     and reports the durable diff at 226117 (OAM 0x30, normal room 40 /
     shifted room 24).  Commit `d57e081`; normal SHA `ca33f434...`.
+- [DONE] BUILD-008 (tools) — make auto-detects the ARM binutils path
+  - non-interactive shells do not source `.bashrc`/`.profile`, so make now
+    falls back to `$(HOME)/.local/bin/arm-none-eabi-` when `TOOLCHAIN` was not
+    explicitly set and `arm-none-eabi-as` is not on PATH; explicit overrides
+    still win.  Commit `fe1f221`.
+  - verified `env -u TOOLCHAIN PATH=/usr/bin:/bin make -j20 check` ->
+    `mf_us.gba: OK`, `ca33f434...`; `make doctor` and the
+    `Makefile.shift` wrapper PASS on the same clean PATH.
 
 ## Phase S2 — relocatable build
 
