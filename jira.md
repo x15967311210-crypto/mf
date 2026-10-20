@@ -429,10 +429,10 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Re-run full after BUG-017; reordered remains at 223045 (BUG-011).
   - BUG-013 native idle/focused PASS on 2026-10-19.
   - **D-012 checkpoint ladder (2026-10-20)**: 115000 -> 150000 PASS;
-    150000 -> 200000 PASS after BUG-018; settle-aware 200000 -> 226200 has a
-    durable room/event divergence at 226117 (normal room 40/event 83 vs
-    shifted room 24/event 81).  The 223045 EWRAM diff is transient.  Full
-    339001 not run.
+    150000 -> 200000 PASS after BUG-018; 200000 -> 223040 PASS; 223040
+    audio/channel state differs and the room-14 transition phase shifts at
+    223048, leading to the room 23/14 branch at 223227.  Full 339001 not
+    run.
   - **partial run on `2447dfb7...`**: 384/385/386 callback `0809F9E1`,
     401 `DISPCNT=1E00`, 22922/22923/22924/22925 `0809B2C9`, 22952
     `DISPCNT=9700`, 30000 state fields normal/shifted match.  This confirms
@@ -599,10 +599,22 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     VCOUNT busy-waits at `src/in_game.c:445-451` / `:455`.
   - no raw pointer, wrong door bound, IRQ or callback corruption was found.
     The LR/CPSR signature is a sampling artifact.
-  - next: VCOUNT/DISPSTAT **read** trace 223042-223052 (PC/LR/value) and
-    compare `InitAndLoadGenerics` disassembly normal vs shifted; then decide
-    whether to fix the wait/layout or accept a documented one-frame timing
-    difference.  No full run.
+  - **VCOUNT trace / audio bisect (2026-10-20)**: the three VCOUNT waits in
+    `InitAndLoadGenerics` are identical and exit in the same VCOUNT window.
+    `gMusicInfo` non-pointer fields and channel envelope states are identical
+    at 115000/150000/200000; they first differ by 223040 (channels in
+    different envelope phases, `currentSoundChannel` 5 vs 3).  `UpdateMusic`
+    processes ~half the channels/cycles in shifted in that frame, so the game
+    loop reaches the next iteration one video frame earlier.
+  - all track/vars/voice pointers checked so far relocate +0x1000; postlink
+    has no sound/audio structured runs.  This looks like an audio/music phase
+    or timing difference, not a raw pointer.
+  - next decision: (a) binary-search 200000 -> 204000/210000 for the first
+    non-pointer audio-channel divergence and fix the triggering music/track
+    data, or (b) document/accept a one-frame timing difference if it is
+    inherent to code layout.  Do not full-run.
+  - 223040/223100 checkpoint states are in
+    `work/playtest/m0f-2026-10-17/tas/checkpoints/`.
   - 223100 checkpoint states are in
     `work/playtest/m0f-2026-10-17/tas/checkpoints/{n,s}_223100.state`.
   - fast repro from checkpoint 200000 takes ~50 s; do not run full.
