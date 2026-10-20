@@ -832,7 +832,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - shifted SHA is now `d30310a634e83626e830cc0f481d9d8fece79488`; parity
     300000 -> 332883 PASS.  `gen_blob_tables --check`, `make smoke` and
     `make audit` pass; post-link runs drop 60 -> 56.
-- [DOING @dev23] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
+- [TODO] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
   - after BUG-019, first diff is frame 332884 `VRAM 0xD000` a=`00` b=`8A`,
     then OAM slot 0 (`3C` vs `02`) and `gNextOamSlot` (`0` vs `16`).
   - the first non-pointer IWRAM divergence is also 332884: normal starts the
@@ -841,16 +841,27 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     0x00140000`.  By 332885 shifted IWRAM from 0x11E8 onward is garbage
     (`0x08E81DBD`, `0x00004EB9`, ...); at 339001 normal is `sub1=2` (playing)
     while shifted is still `sub1=1` (transition) — a softlock.
-  - prime suspect: the cutscene/ending data `sBlob_6131c8_63a19c`, the
-    top remaining post-link raw-pointer group (56 runs).  Normal reaches
-    `sCutsceneTextNone` at 0x0863A19C; shifted never initializes the cutscene
-    pointer and appears to copy from a stale/wrong cutscene pointer.
-  - save states: `tas/checkpoints/corrupt_narrow/` (332880..332890),
-    `clean_332500/` (valid final-ROM 332500), `omega_fix1/` (332894) and
-    `omega_fix2/` (332955).  Old `oam_probe/s_332500` is contaminated by the
-    pre-Omega-fix ROM; use `clean_332500/s_332500`.
-  - do not weaken OAM/VRAM durable checks; next is cutscene-data pointer
-    conversion, not a gate exception.
+  - **correction / narrowed 2026-10-20**: the field is
+    `gNonGameplayRam+0` (`INTRO_DATA.pText`), not `+0x1484`; at 332884 normal
+    has `sCutsceneTextNone` and intro stage 2, shifted has 0/0.  The first
+    VRAM diff at `0xD000` is `NewFileIntroLandingOnBslInit` clearing VRAM
+    (`DMA3_FILL` 0x400), so normal calls the cutscene init and shifted does
+    not.  The shifted frame counter then stalls at 332885 and IWRAM from
+    0x11E8 corrupts; final `sub1=1` vs normal 2.
+  - the `sBlob_6131c8_63a19c` / unrelocated-cutscene-pointer hypothesis is
+    **ruled out** for this failure: the init's literals are symbols and are
+    correctly `+0x1000` in shifted.  The `SpecialCutsceneOam+0x1c` pointer is
+    valid and `+0x1000` in both states at 332884 (slot 0x030016A0); the
+    garbage seen at 332885 is downstream of the missing init/stall, not a
+    missing pointer store.
+  - next: trace why `NewFileIntroLandingOnBsl` / its handler is not entered
+    at 332884 in shifted (caller/state/function-pointer timing), not another
+    data relocation.  dev23 now has a working toolchain and the states; use
+    `tas/checkpoints/corrupt_narrow/` (332880..332890) and
+    `clean_332500/` (valid final-ROM 332500).  Old `oam_probe/s_332500` is
+    contaminated by the pre-Omega-fix ROM.
+  - do not weaken OAM/VRAM durable checks; no pointer conversion is justified
+    by this evidence.
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
