@@ -83,19 +83,29 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     semantics)/pinned agbcc/baserom; `make doctor-source` is baserom- and
     agbcc-free for public CI; `make setup` installs the pin.
   - normal SHA stays `ca33f434...`; landed `6069348`.
-- [TODO] BUILD-002 (tools) — unify the build entry point
-  - move the `Makefile.shift` targets into an included fragment
-    (`mk/shift.mk` or similar), enable via `make SHIFT=1 ...`; keep
-    `Makefile.shift` as a thin compatibility wrapper for existing scripts.
-  - avoid duplicate `all`/`help`/`host-test` targets; preserve every current
-    command and its exit/skip semantics.
-  - acceptance: `make -f Makefile.shift <target>` and `make SHIFT=1 <target>`
-    both work; normal SHA unchanged; audit/smoke/strict/host-test pass.
-- [TODO] BUILD-003 (ci/tools) — layered CI + data cache + symbols
+- [DONE] BUILD-002 (tools) — single build entry point
+  - `mk/shift.mk` now holds the shift/audit/test targets; the top-level
+    `Makefile` includes it.  `Makefile.shift` is a 44-line compatibility
+    wrapper that forwards goals/vars to `make -f Makefile` and keeps the old
+    default (`audit`), not a ROM build.
+  - every target is available as `make <target>`; legacy
+    `make -f Makefile.shift <target>` still works.  No duplicate
+    `all`/`help`/`host-test`; `make help` lists both.
+  - acceptance: doctor-source, host-test, audit, smoke, wrapper
+    audit/smoke/check-relocs-strict, shift-build, `make -j20 check` all pass;
+    normal SHA `ca33f434...`; landed `0e8b738`.
+- [TODO] BUILD-003 (tools) — data tree manifest + cache verifier
+  - generate a deterministic manifest (path/size/SHA256) for `data/` (and
+    `sound/direct_sound_samples/` if needed) after `extractor.py`;
+    `make data-manifest` / `make data-verify` targets.
+  - CI can cache the extracted tree keyed by baserom SHA1 + manifest version
+    and fail if a cache restore does not match the manifest.
+  - do not commit `data/` or baserom; the manifest is text-only.
+- [TODO] BUILD-004 (ci/tools) — public/protected CI layers + symbols
   - public layer: `make doctor-source`, host tests, Python self-checks,
     source-only relocation scans; no baserom.
-  - protected layer: private runner with baserom/BIOS/movie, generate `data/`,
-    cache it with a manifest + hash, then run ROM/headless gates.
+  - protected layer: private runner with baserom/BIOS/movie, restore/verify
+    `data/` from BUILD-003, then run ROM/headless gates.
   - publish `mf_us.map` / `work/shift/symbols.json` as a symbols artifact
     (or symbols branch) for REA/debug tooling.
   - do not commit baserom, BIOS, movie, `data/` or ROMs.
