@@ -818,25 +818,31 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     gates PASS; postlink 67 (unchanged).  Checkpoint 115000 -> 130000 PASS
     (29.7 s); 339001 not run, per D-012.
 - [TODO] BUG-018 (shift/engine) — shifted OAM overflow at frame 168582
-  - chunk ladder on fixed `26f1f422...`: 115000 -> 150000 PASS; 150000 ->
-    168582 first diff.
+  - chunk ladder on `26f1f422...`: 115000 -> 150000 PASS; 150000 -> 168582
+    first diff.
   - first diff frame 168582, OAM offset 0 a=`08` b=`02`; state
     `1500 0004 0002 0100 63 0 76 0` (main 4, s1 2, s2 0100, event 0x63,
     area 0, room 0x76).
   - normal PC `1C`/LR `1B8`/CPSR `92`; shifted PC `2C`/LR `0001301C`/
     CPSR `4000009B` (exception path).
-  - shifted `gNextOamSlot=0x40D00002`, `gVBlankCallback=0809BA26`,
-    `gHBlankCallback=FEF70FE2`, `gNonGameplayRam=00001CBA`; OAM writes at
-    168581 from PC `0809DF20..0809E00A`, LR `0809DE99` =
-    `CutsceneMonologueDrawAllOam` / `CutsceneMnologueDrawOam`.
-  - monologue entry base is `gNonGameplayRam+0x214` = `0x03001698`
-    (pOam at +0x10, frame at +6); at 168580 entries are still inactive, so
-    the init + draw happen in 168581.  Next: watch stores to
-    `0x03001698..0x03001730`, capture the pOam value/setup PC, then identify
-    the raw monologue pOam table.  Do not patch the callback/IRQ.
+  - `CutsceneElevatorMonologueSetupOam` writes all four pOam pointers
+    correctly (+0x1000): `08663E5C`, `0866AA30`, `0866AA30`, `0866AA58`.
+  - the pOam tables' **nested frame-entry pointers** are stale:
+    `0866A764`, `0866A8A4`, `0866A9E4` should be `+0x1000`
+    (`0866B764`/`0866B8A4`/`0866B9E4`).  Shifted reads count
+    `0x3300`/`0xAA70` instead of normal `0x35`/`0x0C`, so
+    `CutsceneMnologueDrawOam` overruns gOamData and clobbers
+    gNextOamSlot/neighbouring state.
+  - source: `src/data/new_file_intro_data.c` (`sBlob_6638a0_682fac`
+    region between `sIntroPal_663820` and `sCharactersGfx`) plus
+    `tools/extractor.py`; model the nested frame-entry pointer tables as
+    relocatable C (`sIntroPal_663820 + offset`), preserving every non-pointer
+    byte.  Do not patch callback/IRQ or whitelist.
   - evidence: `work/playtest/m0f-2026-10-17/tas/bug018_168582/`
-    (`repro.log`, `n/s_168582.state`, `diff_168582/`, `pre168581/`).
-  - use checkpoint 150000; do not run 339001 until the chunk ladder is clean.
+    (`repro.log`, states, `diff_168582/`, `pre168581/`); scratch watch
+    `/tmp/opencode/bug018_watch/`.
+  - next: fix, then resume 150000 -> 200000 (D-012); stop on a new diff,
+    do not run 339001 yet.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
