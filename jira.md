@@ -74,6 +74,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - do not duplicate the algorithm in the test; synthetic buffers only.
   - keep host tests as a fast pre-gate; native/behavior suite remains the
     authority.
+- [TODO] QA-028 (tools/qa) — settle window restarts on every new byte pair
+  - during room transitions the two cores are continuously one frame apart in
+    copy phase, so `--settle N` never closes and a run that matches all
+    durable state fields can still report `PARITY: FAIL` (223045 EWRAM,
+    23100-frame run at 223100 with VRAM `0x4B0B`).
+  - use a duration/state-field criterion (e.g. compare disp/main/event/room
+    or require the same byte pair to persist) instead of only "no new pair".
+  - do not weaken OAM/PAL/VRAM durable checks.
 - [DONE] BUILD-001 (tools) — reproducible toolchain checks
   - `tools/doctor.py` (full / `--source-only` / `--self-check`),
     `tools/setup_agbcc.sh`, `tools/agbcc-version` pinned at
@@ -578,10 +586,23 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `sUnk_a5278` is a u16 delay table, and the LR/CPSR difference is an IRQ
     sampling artifact (both cores print the same PC/LR/SP/CPSR at the durable
     frame).
-  - next: create a 223040 checkpoint from the 200k states and trace
-    223040-223050, watching `gFrameCounter8Bit/16Bit`, `gSubGameMode1`,
-    `gColorFading.unk_3` and the `SUB_GAME_MODE_LOADING_ROOM` / ColorFading
-    completion path.  The extra iteration is the root.
+  - **223040 checkpoint PASS** (23040 frames, 53.9 s); 223040 -> 223080
+    resumes in ~0.04 s.  States in
+    `work/playtest/m0f-2026-10-17/tas/checkpoints/{n,s}_223040.state`.
+  - **first differing write**: `gSubGameMode1++` at `InGameHandler+0xAE`
+    lands at 223049 shifted vs 223050 normal (same value).  The frame counter
+    advances once per video frame in `AgbMain+0x1A`; the gap inside the single
+    `InGameHandler` case 0 call is **8 video frames shifted vs 9 normal**
+    (counter 0x25 -> 0x26).  `ColorFadingReveal`/`ColorFadingProcess` are
+    already byte-identical at 223041; the one-frame cost is inside
+    `InitAndLoadGenerics()` case 0 (`src/in_game.c:396`), prime suspects the
+    VCOUNT busy-waits at `src/in_game.c:445-451` / `:455`.
+  - no raw pointer, wrong door bound, IRQ or callback corruption was found.
+    The LR/CPSR signature is a sampling artifact.
+  - next: VCOUNT/DISPSTAT **read** trace 223042-223052 (PC/LR/value) and
+    compare `InitAndLoadGenerics` disassembly normal vs shifted; then decide
+    whether to fix the wait/layout or accept a documented one-frame timing
+    difference.  No full run.
   - 223100 checkpoint states are in
     `work/playtest/m0f-2026-10-17/tas/checkpoints/{n,s}_223100.state`.
   - fast repro from checkpoint 200000 takes ~50 s; do not run full.
