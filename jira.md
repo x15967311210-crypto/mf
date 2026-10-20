@@ -832,7 +832,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - shifted SHA is now `d30310a634e83626e830cc0f481d9d8fece79488`; parity
     300000 -> 332883 PASS.  `gen_blob_tables --check`, `make smoke` and
     `make audit` pass; post-link runs drop 60 -> 56.
-- [TODO] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
+- [DOING @dev23] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
   - after BUG-019, first diff is frame 332884 `VRAM 0xD000` a=`00` b=`8A`,
     then OAM slot 0 (`3C` vs `02`) and `gNextOamSlot` (`0` vs `16`).
   - the first non-pointer IWRAM divergence is also 332884: normal starts the
