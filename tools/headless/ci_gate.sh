@@ -57,7 +57,7 @@ OUT="${HEADLESS_OUT:-$HERE/out/$TIER}"
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
-"$HERE/build06.sh"
+bash "$HERE/build06.sh"
 BUILD="${BUILD06_DIR:-$HERE/build06}"
 
 echo "== normal golden parity ($FRAMES frames) =="
