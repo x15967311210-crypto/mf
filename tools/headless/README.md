@@ -105,6 +105,7 @@ on the runner:
 MF_BASEROM      /opt/mf-assets/mf_us_baserom.gba
 HEADLESS_BIOS   /opt/mf-assets/gba_bios.bin
 HEADLESS_MOVIE  /opt/mf-assets/reserenv2-metroidfusion-100.bk2
+MF_TOOLCHAIN    /opt/gcc-arm-none-eabi/bin       # optional if on PATH
 ```
 
 The runner also needs `cmake`, `ninja`, `gcc`, `make`, `python3`, zlib headers,
@@ -114,9 +115,25 @@ source).
 Tiers:
 
 - pull request / feature-branch push: `smoke`
+  - normal golden at 4k
+  - shifted + reordered lockstep diff at 4k
 - push to `main`/`master`/`hack`: `early`
+  - normal golden at 30k
+  - shifted + reordered lockstep diff at 30k
 - nightly schedule: `full`
+  - normal golden at 339,001
+  - shifted + reordered lockstep diff at 100k by default
+  - set `HEADLESS_SHIFT_FRAMES=339001` to run them full too
 - `workflow_dispatch`: choose `smoke` / `early` / `full`
+
+The shifted/reordered gate is strict: `--diff-regions OAM,PAL,VRAM,EWRAM`
+must report `PARITY: PASS`. IWRAM/IO are intentionally excluded because
+relocated pointers and DMA addresses differ by design.
+
+The current `hack` branch passes shifted/reordered at 4k, 30k and 100k in WSL.
+Requires an ARM toolchain (`arm-none-eabi-gcc` on `PATH`, or set
+`MF_TOOLCHAIN` to its bin directory/prefix) so `tools/shift/shift_test.py` can
+build `work/shift/mf_us_shift.gba` and `mf_us_reorder.gba`.
 
 `actions/cache` caches `tools/headless/.cache` and `tools/headless/build06`,
 keyed on the watchpoint patch, harness, build script and `linux_shim`.

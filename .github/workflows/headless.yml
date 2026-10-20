@@ -27,7 +27,7 @@ jobs:
     # Self-hosted Linux runner: needs agbcc, baserom, BIOS and the movie.
     # Standard runner labels include self-hosted/linux/x64.
     runs-on: [self-hosted, linux, x64]
-    timeout-minutes: 45
+    timeout-minutes: 60
     # Do not run untrusted fork PR code on a self-hosted runner.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
 
@@ -61,6 +61,7 @@ jobs:
           MF_BASEROM: ${{ vars.MF_BASEROM }}
           HEADLESS_BIOS: ${{ vars.HEADLESS_BIOS }}
           HEADLESS_MOVIE: ${{ vars.HEADLESS_MOVIE }}
+          MF_TOOLCHAIN: ${{ vars.MF_TOOLCHAIN }}
         run: |
           for name in MF_BASEROM HEADLESS_BIOS HEADLESS_MOVIE; do
             value="${!name}"
@@ -72,6 +73,20 @@ jobs:
           for tool in cmake ninja gcc make python3; do
             command -v "$tool" >/dev/null || { echo "::error::$tool is missing"; exit 1; }
           done
+          # The project compiles C with agbcc; the ARM toolchain only needs
+          # binutils (as/ld/objcopy).  Do not require arm-none-eabi-gcc.
+          for tool in arm-none-eabi-as arm-none-eabi-ld arm-none-eabi-objcopy; do
+            if [ -n "${MF_TOOLCHAIN:-}" ]; then
+              if [ -d "$MF_TOOLCHAIN" ]; then
+                candidate="$MF_TOOLCHAIN/$tool"
+              else
+                candidate="${MF_TOOLCHAIN}$tool"
+              fi
+              test -x "$candidate" || { echo "::error::MF_TOOLCHAIN has no $tool (looked for $candidate)"; exit 1; }
+            else
+              command -v "$tool" >/dev/null || { echo "::error::$tool is missing (set MF_TOOLCHAIN)"; exit 1; }
+            fi
+          done
 
       - name: Extract data
         shell: bash
@@ -81,8 +96,25 @@ jobs:
           ln -sf "$MF_BASEROM" mf_us_baserom.gba
           python3 tools/extractor.py
 
+      - name: Verify extracted data manifest
+        run: make data-verify
+
+      - name: Install pinned agbcc
+        run: make setup-agbcc
+
       - name: Build ROM
-        run: make -j"$(nproc)"
+        shell: bash
+        env:
+          MF_TOOLCHAIN: ${{ vars.MF_TOOLCHAIN }}
+        run: |
+          if [ -n "${MF_TOOLCHAIN:-}" ]; then
+            if [ -d "$MF_TOOLCHAIN" ]; then
+              export TOOLCHAIN="$MF_TOOLCHAIN/arm-none-eabi-"
+            else
+              export TOOLCHAIN="$MF_TOOLCHAIN"
+            fi
+          fi
+          make -j"$(nproc)"
 
       - name: Cache mGBA 0.6 source/build
         uses: actions/cache@v4
@@ -100,6 +132,8 @@ jobs:
           HEADLESS_MOVIE: ${{ vars.HEADLESS_MOVIE }}
           HEADLESS_ROM: ${{ github.workspace }}/mf_us.gba
           HEADLESS_TIER: ${{ steps.tier.outputs.tier }}
+          HEADLESS_SHIFT_FRAMES: ${{ vars.HEADLESS_SHIFT_FRAMES }}
+          MF_TOOLCHAIN: ${{ vars.MF_TOOLCHAIN }}
         run: bash tools/headless/ci_gate.sh
 
       - name: Upload failure artifacts
