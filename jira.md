@@ -313,6 +313,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - current candidate `012a2c95089485ebd37d19e86717b666ccc00e09` (merged
     `424fd7f`), BIOS `300C20DF...`, normalized SaveRAM `FB611BD6...`,
     same 100% TAS.
+  - **headless full gate 2026-10-20** (`tools/headless/ci_gate.sh`,
+    movie-native mGBA 0.6, 339001 frames, `HEADLESS_SHIFT_FRAMES=339001`):
+    normal golden **PASS**, ending `1900 0009 0002 0100 109 0 63 0`.
+    shifted first diff **114671**: OAM offset 0, a=`80` b=`02`; state
+    `1600 0004 0002 0100 43 0 20 0`; normal PC `1C`/CPSR `92`, shifted
+    PC `60`/CPSR `8000009B` (undefined/exception).  reordered first diff
+    **223045**: EWRAM `0x32290`, a=`41` b=`72`, room 14/event 81 — BUG-011.
+    The strict CI gate is therefore red for shifted and reordered.
+  - evidence: `tools/headless/out/full/` (ignored):
+    `normal_339001_*`, `diff_shift/shift_{a,b}_114671_*`,
+    `diff_reorder/reorder_{a,b}_223045_*`; timings normal 302.6s,
+    shift diff 208.7s, reorder diff 422.0s.
   - BUG-013 native idle/focused PASS on 2026-10-19.
   - **partial run on `2447dfb7...`**: 384/385/386 callback `0809F9E1`,
     401 `DISPCNT=1E00`, 22922/22923/22924/22925 `0809B2C9`, 22952
@@ -429,6 +441,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     checksum in the states differs; verify same BIOS before source chase.
   - leading candidate: copied IRQ/callback table in IWRAM (`sBlob_a5224_a5258`
     at 0x080A5224, moved by reorder) or a raw literal in intr/audio code.
+  - **headless full gate 2026-10-20**: first diff **frame 223045**, EWRAM
+    offset `0x32290`, a=`41` b=`72`; state `disp=1800 main=1 s1=0 s2=0100
+    event=81 area=4 room=14`; LR normal `0x11E0` vs reordered `0x1248`,
+    CPSR normal `0x60000092` vs reordered `0x20000092`.  This is earlier than
+    the native 223227 checkpoint but the same room-14 branch; use it as the
+    deterministic repro for the fix.
+  - evidence: `tools/headless/out/full/diff_reorder/reorder_{a,b}_223045_*`.
   - no fix yet; BUG-011 stays DOING.
 - [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
   - candidate `812d0090...` (BUG-008 fix) passes file-select, then native TAS
@@ -631,30 +650,45 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - top remaining groups: `sBlob_6131c8_63a19c` (many runs),
     `sBlob_6638a0_682fac`, `sBlob_582288_58b3cc`, `sBlob_5766D4_prefix`,
     `sBlob_39aa34_39f4b0`, `DirectSoundData_080BE5B8`.
+  - **concrete hit**: full TAS shifted BUG-016 at 114671 uses the
+    `sBlob_6638a0_682fac` run `0x086792E0..0x086793A0` (9 entries, stride
+    `0x18`).  Prioritize this group; convert it before the next full gate.
+    `sBlob_6131c8_63a19c` is the next-largest risk.
   - next: triage each group as either a real unrelocated FrameData/pointer
     table (convert) or a reviewed false positive (whitelist with evidence).
     Do not auto-whitelist; do not wire strict into the main gate until the
     list is zero or explicitly justified.
   - this is a shiftability P0 but does not block the BUG-013 native gate.
-- [TODO] BUG-015 (emulator) — full TAS shifted black after frame 30000
+- [DONE] BUG-015 (emulator) — full TAS shifted black after frame 30000
   - partial native run on shifted `2447dfb7...` (pre-BUG-013 merge) passed
     file-select, 22922-22952 and 30000 (normal/shifted fields match), then
     shifted went black after 30000; the run was stopped before the next
     checkpoint, so there is no first-black frame or 30000 state.
-  - must first reproduce on the current merged candidate `012a2c95...`;
-    the old black may already be fixed by BUG-013.
-  - **local converted-input triage**: on `012a2c95` the full input reaches
-    339001; the only black frames after 30000 are 1-3 frame fades
-    (55146, 55921-55923, 89885, 90392-90394, ...) and normal has the same
-    frames.  This suggests the native stop was a normal transition, not a
-    persistent shifted black screen.  Local final state is not the ending,
-    so native QA-020 is still required.
-  - next: repeat on `012a2c95`, do not stop on one black frame; save a state
-    at 30000 and at any continuous black run (>60 frames), then capture
-    DISPCNT/callback/IE/PC/LR/CPSR + screenshot + pOam/VRAM.
-  - suspected link: BUG-014 latent raw-pointer runs (large graphics blobs);
-    do not patch callback/IRQ or whitelist a table just to clear the screen.
-  - evidence: `tas/bug012c_full/` (`BUG012C_PARTIAL.md`, logs).
+  - **closed as early-stop/fade**: local converted-input replay and the
+    headless 339001 gate show these black frames are 1-3 frame fades and
+    normal is black at the same frames.  The real first shifted divergence is
+    **BUG-016 at 114671**, not a persistent black after 30000.
+  - evidence: `tas/bug012c_full/`, `tools/headless/out/full/`.
+- [DOING @dev7] BUG-016 (shift/engine) — full TAS shifted divergence at 114671
+  - headless movie-native mGBA 0.6, current `012a2c95...`, 339001 frames:
+    first diff **114671**, OAM offset 0, a=`80` b=`02`; state
+    `1600 0004 0002 0100 43 0 20 0` (disp 1600, main 4, s1 2, s2 0100,
+    event 43, area 0, room 20).
+  - normal PC `1C`, LR `1B8`, SP `03007FA0`, CPSR `92`;
+    shifted PC `60`, LR `2000009B`, SP `03007FE8`, CPSR `8000009B`
+    (undefined/exception path).
+  - pre-crash dumps at 114650/114660/114665/114669/114670: at 114670 normal
+    cutscene entries i=0..2 are active with pOam
+    `086793B0`/`08679280`/`086793A0` and pFrame counts 19/4/6; shifted has
+    garbage pOam (e.g. `0867A9A4`, frame 250 -> pFrame `40030053`) and
+    `gNextOamSlot` wraps (low byte `0x42` after a huge loop).
+  - post-link scan has a matching raw run in
+    `sBlob_6638a0_682fac`: `0x086792E0..0x086793A0`, 9 entries, stride
+    `0x18`; this is the BUG-014 group to convert.  Do not patch callback/IRQ
+    or whitelist the table.
+  - evidence: `tools/headless/out/full/diff_shift/shift_{a,b}_114671_*`,
+    `/tmp/opencode/watch_shift_114671.log`, `/tmp/opencode/bug016_*`.
+  - re-run full 339001 after the fix; do not gate on the first diff frame.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
