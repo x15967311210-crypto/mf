@@ -151,6 +151,13 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `e5d202c8...`; recapture after ROM-changing fixes if needed.
   - policy D-012: checkpoint-first iteration, full 339001 only after the
     incremental chunks pass the previous failure point.
+- [TODO] BUILD-007 (tools) — settle-aware headless diff
+  - add `--settle N` to `mf_bizhawk_linux --diff`: on a frame diff, keep
+    running N frames and only fail if the diff persists; report transient
+    diffs separately.  Use the 200k/223045 checkpoint as the regression case.
+  - wire `--settle 8` (or the measured minimum) into `tools/headless/ci_gate.sh`
+    so EWRAM mid-copy phase artifacts do not fail the gate.
+  - do not weaken OAM/PAL/VRAM persistence checks; transient-only.
 
 ## Phase S2 — relocatable build
 
@@ -407,8 +414,10 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Re-run full after BUG-017; reordered remains at 223045 (BUG-011).
   - BUG-013 native idle/focused PASS on 2026-10-19.
   - **D-012 checkpoint ladder (2026-10-20)**: 115000 -> 150000 PASS;
-    150000 -> 200000 PASS after BUG-018; 200000 -> 223045 stops at BUG-011
-    (shared room-14/gDecompBg3Map).  Full 339001 not run.
+    150000 -> 200000 PASS after BUG-018; 200000 -> 223045 first EWRAM diff is
+    transient (converges by 223047/223049); no persistent diff through 223060.
+    A settle-aware diff is needed before continuing to 250k/339k.  Full 339001
+    not run.
   - **partial run on `2447dfb7...`**: 384/385/386 callback `0809F9E1`,
     401 `DISPCNT=1E00`, 22922/22923/22924/22925 `0809B2C9`, 22952
     `DISPCNT=9700`, 30000 state fields normal/shifted match.  This confirms
@@ -540,6 +549,14 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `60000092` both.  This is shared, not reorder-only.
   - evidence: `work/playtest/m0f-2026-10-17/tas/bug011_223045/`
     (`BUG011_RESULT.md`, `diff_200k/`, 200k/223045 states).
+  - **223045 is a transient gate artifact**: LZ77 source/output are identical
+    (`sSector4_Bg3_1`, shifted +0x1000); normal is still mid-copy at the frame
+    boundary, shifted has finished.  From the 223045 states, EWRAM
+    `gDecompBg3Map+0x290` converges by 223047 (both `0x72`); 223045..223060
+    has no persistent EWRAM diff (diffs at 223046/47/48, 0 at 223049-52,
+    transient at 223053/54, etc.).  Do not treat this as a source bug.
+  - the native reordered room 23/14 at 223227 remains the real BUG-011;
+    the headless gate needs a settle window before it can isolate it.
   - fast repro from checkpoint 200000 takes ~50 s; do not run full.
   - no fix yet; BUG-011 stays DOING.
 - [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
