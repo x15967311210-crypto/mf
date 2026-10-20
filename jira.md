@@ -151,13 +151,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `e5d202c8...`; recapture after ROM-changing fixes if needed.
   - policy D-012: checkpoint-first iteration, full 339001 only after the
     incremental chunks pass the previous failure point.
-- [TODO] BUILD-007 (tools) — settle-aware headless diff
-  - add `--settle N` to `mf_bizhawk_linux --diff`: on a frame diff, keep
-    running N frames and only fail if the diff persists; report transient
-    diffs separately.  Use the 200k/223045 checkpoint as the regression case.
-  - wire `--settle 8` (or the measured minimum) into `tools/headless/ci_gate.sh`
-    so EWRAM mid-copy phase artifacts do not fail the gate.
-  - do not weaken OAM/PAL/VRAM persistence checks; transient-only.
+- [DONE] BUILD-007 (tools) — settle-aware headless diff
+  - `--settle N` in `mf_bizhawk_linux --diff`; `tools/headless/ci_gate.sh`
+    defaults `HEADLESS_SETTLE=8`; README documents the window-end caveat.
+  - control 200k->223046 still fails at 223045; settle 8 ignores the transient
+    and reports the durable diff at 226117 (OAM 0x30, normal room 40 /
+    shifted room 24).  Commit `d57e081`; normal SHA `ca33f434...`.
 
 ## Phase S2 — relocatable build
 
@@ -414,10 +413,10 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Re-run full after BUG-017; reordered remains at 223045 (BUG-011).
   - BUG-013 native idle/focused PASS on 2026-10-19.
   - **D-012 checkpoint ladder (2026-10-20)**: 115000 -> 150000 PASS;
-    150000 -> 200000 PASS after BUG-018; 200000 -> 223045 first EWRAM diff is
-    transient (converges by 223047/223049); no persistent diff through 223060.
-    A settle-aware diff is needed before continuing to 250k/339k.  Full 339001
-    not run.
+    150000 -> 200000 PASS after BUG-018; settle-aware 200000 -> 226200 has a
+    durable room/event divergence at 226117 (normal room 40/event 83 vs
+    shifted room 24/event 81).  The 223045 EWRAM diff is transient.  Full
+    339001 not run.
   - **partial run on `2447dfb7...`**: 384/385/386 callback `0809F9E1`,
     401 `DISPCNT=1E00`, 22922/22923/22924/22925 `0809B2C9`, 22952
     `DISPCNT=9700`, 30000 state fields normal/shifted match.  This confirms
@@ -555,8 +554,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `gDecompBg3Map+0x290` converges by 223047 (both `0x72`); 223045..223060
     has no persistent EWRAM diff (diffs at 223046/47/48, 0 at 223049-52,
     transient at 223053/54, etc.).  Do not treat this as a source bug.
-  - the native reordered room 23/14 at 223227 remains the real BUG-011;
-    the headless gate needs a settle window before it can isolate it.
+  - the native reordered room 23/14 at 223227 remains the real BUG-011.
+  - **settle-aware result**: 200k -> 226200 with `--settle 8` reports a
+    durable diff at **226117**, OAM offset `0x30` a=`21` b=`42`; normal
+    `room=40`/event `0x83`, shifted `room=24`/event `0x81`.  Diffs run
+    continuously from the 223045 phase window to 226117; this is a real
+    room/event transition divergence, not a copy artifact.
+  - next: use `--history` + checkpoint 200000 to find the first frame where
+    the room/event fields diverge, then trace the room-connection/event table
+    (area 4).  Do not patch IRQ/callback; do not run full.
   - fast repro from checkpoint 200000 takes ~50 s; do not run full.
   - no fix yet; BUG-011 stays DOING.
 - [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
