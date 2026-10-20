@@ -136,7 +136,7 @@ else
 endif
 
 # Rules that do not require scanning for dependencies
-RULES_NO_SCAN += dump diff extract clean tidy host-test
+RULES_NO_SCAN += dump diff extract clean tidy host-test doctor doctor-source setup setup-agbcc
 
 # Generate tools before building anything
 SETUP_PREREQS ?= 1
@@ -158,6 +158,21 @@ endif
 check: all
 	$(MSG) SHA1SUM $(SHA1FILE)
 	$Q$(SHA1SUM) -c $(SHA1FILE)
+
+.PHONY: doctor
+doctor:
+	$Q$(PYTHON) tools/doctor.py
+
+.PHONY: doctor-source
+doctor-source:
+	$Q$(PYTHON) tools/doctor.py --source-only
+
+.PHONY: setup-agbcc
+setup-agbcc:
+	$Qsh tools/setup_agbcc.sh
+
+.PHONY: setup
+setup: setup-agbcc doctor
 
 .PHONY: dump
 dump: $(DUMPS)
@@ -230,6 +245,10 @@ help:
 	@echo '  all: build the ROM'
 	@echo '  check: checksum the ROM'
 	@echo '  host-test: build and run host-side unit tests (no emulator/toolchain)'
+	@echo '  doctor: check Python, host tools, ARM binutils, agbcc, and baserom'
+	@echo '  doctor-source: check Python/host tools and tool self-checks (no baserom)'
+	@echo '  setup-agbcc: build and install the pinned agbcc into tools/agbcc'
+	@echo '  setup: setup-agbcc then doctor'
 	@echo '  dump: dump the ROMs'
 	@echo '  diff: compare the ROM with the original'
 	@echo '  clean: remove the ROM and intermediate files'

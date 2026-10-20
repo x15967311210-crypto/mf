@@ -52,6 +52,34 @@ The default built ROM is mf_us.gba
   - Install agbcc into this project (by using its `./install.sh <path>` script, where `<path>` is the path to the root of this repository), or
   - Add agbcc to your path (`export PATH="<agbcc_path>:$PATH"`, where `<agbcc_path>` is the full path to the agbcc directory)
 
+## Toolchain and environment checks
+
+The pinned toolchain and baserom are checked without building the ROM:
+
+```sh
+make doctor-source   # Python, host tools, and tool self-checks (no baserom)
+make setup-agbcc     # clone/build the pinned agbcc into tools/agbcc
+make doctor          # full check: ARM binutils, agbcc, and baserom SHA1
+```
+
+The agbcc commit is pinned in `tools/agbcc-version` and built from
+<https://github.com/pret/agbcc>. The setup script is idempotent and keeps its
+scratch checkout in `${TMPDIR:-/tmp}/opencode/agbcc-src` (override with
+`AGBCC_SRC`, or run `tools/setup_agbcc.sh --check-only` to verify an install
+without building). `make setup` runs `setup-agbcc` followed by `doctor`.
+
+`doctor` resolves `as`/`ld`/`objcopy` through `TOOLCHAIN` (default
+`arm-none-eabi-`). If binutils is installed in `~/.local/bin`, export:
+
+```sh
+export TOOLCHAIN=$HOME/.local/bin/arm-none-eabi-
+```
+
+The baserom check compares `mf_us_baserom.gba` with `tools/baserom.sha1`; the
+baserom is copyrighted and is never committed. For a machine-readable report,
+run `python3 tools/doctor.py --json-out work/doctor.json`; the doctor's own
+parsing/comparison helpers have a synthetic `--self-check`.
+
 ## Build
 
 - Run `make clean` if necessary
