@@ -73,11 +73,14 @@ scratch checkout in `${TMPDIR:-/tmp}/opencode/agbcc-src` (override with
 `AGBCC_SRC`, or run `tools/setup_agbcc.sh --check-only` to verify an install
 without building). `make setup` runs `setup-agbcc` followed by `doctor`.
 
-`doctor` resolves `as`/`ld`/`objcopy` through `TOOLCHAIN` (default
-`arm-none-eabi-`). If binutils is installed in `~/.local/bin`, export:
+`doctor` and the build resolve `as`/`ld`/`objcopy` through `TOOLCHAIN`. The
+toolchain is expected in `~/.local/bin`; when `arm-none-eabi-as` is not on
+`PATH`, `make` auto-detects `$HOME/.local/bin/arm-none-eabi-` for you, so
+non-interactive shells and CI do not need to source your profile. `make doctor`
+verifies the result, and an explicit `TOOLCHAIN` always wins:
 
 ```sh
-export TOOLCHAIN=$HOME/.local/bin/arm-none-eabi-
+make check TOOLCHAIN=$HOME/.local/bin/arm-none-eabi-
 ```
 
 The baserom check compares `mf_us_baserom.gba` with `tools/baserom.sha1`; the

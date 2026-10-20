@@ -70,6 +70,18 @@ GAME_REVISION = 00
 
 # Binaries
 CPP = cpp
+# ARM binutils prefix.  An explicit TOOLCHAIN (command line or environment)
+# always wins.  Otherwise prefer `arm-none-eabi-` from PATH, and when that does
+# not resolve fall back to this project's per-user install in $(HOME)/.local/bin
+# (non-interactive shells do not source ~/.bashrc or ~/.profile, so that
+# directory is often missing from PATH).
+ifeq ($(filter $(origin TOOLCHAIN),command line environment),)
+  ifeq ($(shell command -v arm-none-eabi-as 2>/dev/null),)
+    ifneq ($(wildcard $(HOME)/.local/bin/arm-none-eabi-as),)
+      TOOLCHAIN := $(HOME)/.local/bin/arm-none-eabi-
+    endif
+  endif
+endif
 TOOLCHAIN ?= arm-none-eabi-
 AS = $(TOOLCHAIN)as
 LD = $(TOOLCHAIN)ld
