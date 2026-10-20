@@ -794,6 +794,18 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     checkpoint and only run full 339001 after the chunks are clean.
   - fast repro: `work/playtest/m0f-2026-10-17/tas/bug017_117234/`
     `BUG017_RESULT.md`; states n/s_115000; 3.85 s resume to 117234.
+  - **store-trace finding (2026-10-20)**: the first differing EWRAM store is
+    in the BIOS LZ77 decoder at frame 117234 (`pc 0x11EC`); normal and shifted
+    differ in decoder state, not in a direct table literal.  The earlier
+    `NavigationConversationLoadPopUpGraphics` hypothesis is **disproved**:
+    its two asm constants are already symbols
+    (`sCharacterWidths+0x5A94` / `+0x5A1C`), and the shifted table at
+    `0x0857CC50` has rec2 pGraphics `0x08578024` (correct +0x1000), matching
+    the shifted blob.  Do not edit that asm.
+  - next: capture the **caller** of the LZ77 SWI (read/watch at the source
+    range or SWI-entry stack), not the decoder's internal registers; identify
+    the actual source pointer/record selection at 117234.  The decoder r8/r0
+    values are internal state and were misread as call arguments.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
