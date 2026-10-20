@@ -494,12 +494,19 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - **after BUG-016 fix `1f01180`**: shifted 115000 PASS; full 339001 first
     diff moved to **117234** (BUG-017, EWRAM `0x02000000` zero-fill).
     Re-run full after BUG-017; reordered remains at 223045 (BUG-011).
-  - **2026-10-20 headless full PASS**: with BUG-020 fixed, shifted
+  - **2026-10-20/21 headless full PASS**: with BUG-020 fixed, shifted
     `5888a563...` completes the full 339001-frame diff:
     `PARITY: PASS (339001 frames)` in 646.7 s, final state
     `main=9 sub1=2 frame16=5979` in both, and the 0/115k/200k/300k chunk
-    ladder also passes.  This is the headless half of QA-020; native Windows
-    parity remains @windows.
+    ladder also passes.
+  - **2026-10-21 reordered full PASS**: current reorder build
+    `9dac0a4bcd6257d443a0c1a41b36f54000d1e2c3` (latest fixes, reorder
+    layout PASS) completes normal vs reordered 0 -> 339001:
+    `PARITY: PASS (339001 frames)` in 647.4 s; final state
+    `main=9 sub1=2 frame16=5979` both.  BUG-011's old reordered 223045
+    failure is gone.
+  - This is the headless half of QA-020 for normal/shifted/reordered; native
+    Windows parity remains @windows.
   - **D-012 checkpoint ladder (2026-10-20)**: 115000 -> 150000 PASS;
     150000 -> 200000 PASS after BUG-018; 200000 -> 223040 PASS; 223040
     audio/channel state differs and the room-14 transition phase shifts at
