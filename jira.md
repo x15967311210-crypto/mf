@@ -74,6 +74,31 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - do not duplicate the algorithm in the test; synthetic buffers only.
   - keep host tests as a fast pre-gate; native/behavior suite remains the
     authority.
+- [DONE] BUILD-001 (tools) — reproducible toolchain checks
+  - `tools/doctor.py` (full / `--source-only` / `--self-check`),
+    `tools/setup_agbcc.sh`, `tools/agbcc-version` pinned at
+    `da598c1d918402c42c0c0d7128ba14567f3175e9`, `tools/baserom.sha1`
+    `ca33f434...`.
+  - `make doctor` checks Python/host commands/ARM binutils (TOOLCHAIN
+    semantics)/pinned agbcc/baserom; `make doctor-source` is baserom- and
+    agbcc-free for public CI; `make setup` installs the pin.
+  - normal SHA stays `ca33f434...`; landed `6069348`.
+- [TODO] BUILD-002 (tools) — unify the build entry point
+  - move the `Makefile.shift` targets into an included fragment
+    (`mk/shift.mk` or similar), enable via `make SHIFT=1 ...`; keep
+    `Makefile.shift` as a thin compatibility wrapper for existing scripts.
+  - avoid duplicate `all`/`help`/`host-test` targets; preserve every current
+    command and its exit/skip semantics.
+  - acceptance: `make -f Makefile.shift <target>` and `make SHIFT=1 <target>`
+    both work; normal SHA unchanged; audit/smoke/strict/host-test pass.
+- [TODO] BUILD-003 (ci/tools) — layered CI + data cache + symbols
+  - public layer: `make doctor-source`, host tests, Python self-checks,
+    source-only relocation scans; no baserom.
+  - protected layer: private runner with baserom/BIOS/movie, generate `data/`,
+    cache it with a manifest + hash, then run ROM/headless gates.
+  - publish `mf_us.map` / `work/shift/symbols.json` as a symbols artifact
+    (or symbols branch) for REA/debug tooling.
+  - do not commit baserom, BIOS, movie, `data/` or ROMs.
 
 ## Phase S2 — relocatable build
 
