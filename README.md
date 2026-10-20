@@ -93,6 +93,26 @@ parsing/comparison helpers have a synthetic `--self-check`.
   - Specify the flags, REGION (takes the region name, defaults to `us`) and DEBUG (takes 0 or 1, defaults to 0)
 - Optionally, you can combine the commands to make it easier: `python3 tools/extractor.py && make -j`
 
+### Shift, audit and test targets
+
+The shiftability and behavior-harness targets are now part of the same build
+entry point:
+
+```sh
+make audit                 # regenerate symbols/relocation audit/blobs/report
+make smoke                 # static ROM/header checks (no emulator)
+make check-relocs-strict   # gate: hardcoded ROM refs and raw pointer blobs
+make host-test             # host-compiler unit tests (no toolchain/baserom)
+make shift-build           # padded-layout build (TOOLCHAIN=... if not on PATH)
+make help                  # every normal and shift target
+```
+
+`make shift-help` lists only the shift/audit/test targets. `make -f
+Makefile.shift <target>` remains a thin compatibility wrapper for existing
+scripts; new work should use `make <target>`. Audit targets that read extracted
+blobs take `DATA_ROOT=<path>` (default `data`), and the map comes from a normal
+`make` build unless `MAP=<path>` is given.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
