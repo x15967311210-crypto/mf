@@ -443,16 +443,18 @@ def split_navigation_pop_up_graphics_blob() -> None:
     `Blob_5766D4_581510.bin` contains a 0x14-byte preamble followed by four
     0x18-byte graphics descriptors at offset 0x557C.  Their pGraphics words are
     raw ROM addresses, so the table must be rebuilt as C data to let the linker
-    relocate them.  Split the blob into the bytes before the table and the
-    bytes after it so the surrounding graphics/palette data stays
-    byte-identical; the table itself is skipped (0x557C + 0x74 + 0x584C =
-    0xAE3C).
+    relocate them.  The descriptor consumer also indexes id 4, whose pGraphics
+    word lives at table + 0x74 (one word past the four records; BUG-017), so
+    that word is part of the rebuilt table too.  Split the blob into the bytes
+    before the table and the bytes after it so the surrounding
+    graphics/palette data stays byte-identical; the table itself is skipped
+    (0x557C + 0x78 + 0x5848 = 0xAE3C).
     """
     blob_path = Path(DATA_PATH, "Blob_5766D4_581510.bin")
     if not blob_path.exists():
         return
     split_blob(
-        blob_path, 0x557C, 0x14 + 4 * 0x18,
+        blob_path, 0x557C, 0x14 + 4 * 0x18 + 4,
         Path(DATA_PATH, "Blob_5766D4_prefix.bin"),
         Path(DATA_PATH, "Blob_5766D4_after.bin"),
     )

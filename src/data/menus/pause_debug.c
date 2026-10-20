@@ -276,6 +276,11 @@ struct NavigationConversationPopUpGraphics {
 struct NavigationConversationPopUpGraphicsTable {
     struct NavigationConversationPopUpGraphicsData preamble;
     struct NavigationConversationPopUpGraphics records[4];
+    // BUG-017: `NavigationConversationLoadPopUpGraphics` also accepts id 4 and
+    // reads pGraphics at table + 0x14 + 4 * 0x18 (= +0x74), one word past
+    // `records[3]`.  In the baseline that word is the first word of the opaque
+    // graphics blob, i.e. prefix + 0x950; model it explicitly so it relocates.
+    const u8* id4Graphics; // +0x74
 };
 
 const struct NavigationConversationPopUpGraphicsTable sNavigationConversationPopUpGraphics = {
@@ -328,9 +333,11 @@ const struct NavigationConversationPopUpGraphicsTable sNavigationConversationPop
             },
         },
     },
+    // Baseline word at +0x74 is 0x08577024 = sBlob_5766D4_prefix + 0x950.
+    .id4Graphics = (const u8*)sBlob_5766D4_prefix + 0x950,
 };
 
-static const u8 sBlob_5766D4_after[0x584C] = INCBIN_U8("data/Blob_5766D4_after.bin");
+static const u8 sBlob_5766D4_after[0x5848] = INCBIN_U8("data/Blob_5766D4_after.bin");
 
 const u8 sPauseDebugEventNames[EVENT_END][EVENT_NAME_SIZE] = {
     [EVENT_NONE] = SHIFT_JIS("TOHOKANKO   トクベツホカンコヘ ムカエ  "),
