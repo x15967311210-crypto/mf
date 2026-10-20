@@ -82,6 +82,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - use a duration/state-field criterion (e.g. compare disp/main/event/room
     or require the same byte pair to persist) instead of only "no new pair".
   - do not weaken OAM/PAL/VRAM durable checks.
+- [DOING @qa] QA-029 (emulator) — BUG-020 cutscene callback/state trace at 332884
+  - normal: `disp=1800`, `nextOam=0`, LR BIOS; shifted: `disp=4000`,
+    `nextOam=20`, executing `SpecialCutsceneDrawOam` at 332884.
+  - `gOamData` ends at `0x030011E8`, exactly where shifted IWRAM corrupts at
+    332885; this is an OAM draw overflow after the cutscene reset was missed.
+  - trace who should reset `gNextOamSlot` / clear the VBlank cutscene callback
+    at the ending transition; compare `gCurrentCutscene=0x80`,
+    `gSubGameMode1/2`, `gMainGameMode`, callback pointers and the
+    `CutsceneElevatorMonologue` entry/exit.  Do not chase data pointers.
+  - deliverable: state/callback trace report + one actionable root/fix
+    recommendation; no feature code, no jira edits, no commit.
 - [DONE] BUILD-001 (tools) — reproducible toolchain checks
   - `tools/doctor.py` (full / `--source-only` / `--self-check`),
     `tools/setup_agbcc.sh`, `tools/agbcc-version` pinned at
