@@ -494,7 +494,12 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - **after BUG-016 fix `1f01180`**: shifted 115000 PASS; full 339001 first
     diff moved to **117234** (BUG-017, EWRAM `0x02000000` zero-fill).
     Re-run full after BUG-017; reordered remains at 223045 (BUG-011).
-  - BUG-013 native idle/focused PASS on 2026-10-19.
+  - **2026-10-20 headless full PASS**: with BUG-020 fixed, shifted
+    `5888a563...` completes the full 339001-frame diff:
+    `PARITY: PASS (339001 frames)` in 646.7 s, final state
+    `main=9 sub1=2 frame16=5979` in both, and the 0/115k/200k/300k chunk
+    ladder also passes.  This is the headless half of QA-020; native Windows
+    parity remains @windows.
   - **D-012 checkpoint ladder (2026-10-20)**: 115000 -> 150000 PASS;
     150000 -> 200000 PASS after BUG-018; 200000 -> 223040 PASS; 223040
     audio/channel state differs and the room-14 transition phase shifts at
@@ -940,6 +945,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     332880 -> 339001 `PARITY: PASS (6121 frames)`; final
     `gSubGameMode1=2` both.  `check-relocs-strict` passes (the reviewed
     generated block is data-whitelisted); post-link runs drop **56 -> 5**.
+    Full 0 -> 339001 also passes 339001 frames (646.7 s), final
+    `main=9 sub1=2 frame16=5979` both; all chunk ladders
+    0-115k-200k-300k-332880-339001 PASS.
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
