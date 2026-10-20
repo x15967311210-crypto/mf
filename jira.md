@@ -609,10 +609,17 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - all track/vars/voice pointers checked so far relocate +0x1000; postlink
     has no sound/audio structured runs.  This looks like an audio/music phase
     or timing difference, not a raw pointer.
-  - next decision: (a) binary-search 200000 -> 204000/210000 for the first
-    non-pointer audio-channel divergence and fix the triggering music/track
-    data, or (b) document/accept a one-frame timing difference if it is
-    inherent to code layout.  Do not full-run.
+  - **audio bisection (A) completed**: channels are identical through
+    **222333**; first divergence is **222334 channel 0**.  Track 60's current
+    pattern bytes at `pRawData` (08268F2A / shifted 08269F2A) are identical,
+    and `pRawData` is correctly `+0x1000`; the channel's sample/voice
+    selection differs (`pSample1` normal `080CA0BC` vs shifted `080A6560`).
+    No raw pointer was found in the track/voice tables; the suspected
+    `sBlob_a5710` word at +0x62C is Envelope data, not pSample.
+  - this points to an audio voice/timing phase, not a simple stale table.
+    Recommend **B**: document/accept the one-frame timing difference (or
+    investigate `AudioCommand_Voice` timing separately) rather than patching
+    waits or IRQ vectors.  A full run remains out of scope.
   - 223040/223100 checkpoint states are in
     `work/playtest/m0f-2026-10-17/tas/checkpoints/`.
   - 223100 checkpoint states are in
