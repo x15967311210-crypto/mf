@@ -1,0 +1,33 @@
+name: public-gate
+
+# ROM-free public CI layer (BUILD-004).  This workflow is independent from
+# headless.yml: it never uses a self-hosted runner, secrets, a baserom, agbcc,
+# an ARM toolchain or extracted data.
+on:
+  pull_request:
+  push:
+    branches: [main, master, hack]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Public gate (no baserom)
+        run: bash tools/ci/public_gate.sh

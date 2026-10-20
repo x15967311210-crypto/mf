@@ -79,7 +79,8 @@ POSTLINK_RELINK = $(MAKE) -f Makefile ELF=$(POSTLINK_ELF) \
         shift-reorder shift-start shift-input shift-input-30k shift-screen \
         screen-diff oam-diff event-diff shift-check-all content-check \
         data-manifest data-verify data-cache-key \
-        postlink-scan postlink-scan-strict shift-help
+        postlink-scan postlink-scan-strict shift-help \
+        public-gate protected-gate collect-symbols
 
 symbols:
 	$(PYTHON) tools/shift/map_symbols.py --map $(MAP) --out $(SYMBOLS)
@@ -156,6 +157,18 @@ data-verify:
 
 data-cache-key:
 	$(PYTHON) tools/data_manifest.py --cache-key --manifest $(DATA_MANIFEST)
+
+# BUILD-004: CI layers.  `public-gate` is ROM-free; `protected-gate` needs the
+# private baserom/toolchain/BIOS/movie; `collect-symbols` packages the existing
+# map plus work/shift/*.json into a text-only artifact.
+public-gate:
+	bash tools/ci/public_gate.sh
+
+protected-gate:
+	bash tools/ci/protected_gate.sh
+
+collect-symbols:
+	bash tools/ci/collect_symbols.sh
 
 # Fast host-compiler unit tests for pure engine code.  No emulator, baserom,
 # data/ directory, or ARM toolchain required.  The target itself lives in the
@@ -571,6 +584,9 @@ define SHIFT_HELP
 	@echo "  data-manifest       write tools/data-manifest.json from extracted data"
 	@echo "  data-verify         fail if extracted data is missing, extra, or changed"
 	@echo "  data-cache-key      print baserom+manifest cache key (one line)"
+	@echo "  public-gate         ROM-free public CI gate (no baserom/toolchain)"
+	@echo "  protected-gate      private-runner CI gate (baserom/toolchain/BIOS/movie)"
+	@echo "  collect-symbols     package mf_us.map + work/shift/*.json as an artifact"
 	@echo "  host-test           host-compiler unit tests for pure engine code"
 	@echo "  emulator-harness    build tests/emulator/bin/mgba-harness (MGBA_SRC/MGBA_BUILD)"
 	@echo "  test                static + headless boot smoke + 4k input replay (exit 77 if no harness)"
@@ -589,6 +605,7 @@ define SHIFT_HELP
 	@echo "  shift-reorder       audit + smoke + link check + .rodata reorder test"
 	@echo "  shift-check-all     shift-check then shift-reorder"
 	@echo "Variables: MAP, ROM, DATA_ROOT, DATA_MANIFEST, TOOLCHAIN, FRAMES, START_FRAMES, INPUT, INPUT_FRAMES, INPUT_EXPECT, INPUT_30K, INPUT_30K_EXPECT, INPUT_30K_FRAMES, OAM_CHECKPOINTS, PAD_BYTES, SHIFT_WORK, POSTLINK_ELF, POSTLINK_MAP, POSTLINK_JSON, POSTLINK_WHITELIST"
+	@echo "CI variables: OUT_DIR (collect-symbols), HEADLESS, HEADLESS_TIER, HEADLESS_SHIFT_BUILD, HEADLESS_BIOS, HEADLESS_MOVIE, JOBS, SYMBOLS"
 endef
 
 .PHONY: shift-help

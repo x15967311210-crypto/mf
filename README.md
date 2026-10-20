@@ -29,6 +29,11 @@ The default built ROM is mf_us.gba
 - https://discord.gg/2MGB9Xbr9y Metroidret
 - https://discord.gg/WtekHKb MAGConst
 
+## CI
+
+Public (no baserom) and protected (private runner) CI layers, plus the symbols
+artifact they publish, are documented in [tools/ci/README.md](tools/ci/README.md).
+
 ## Dependencies
 
 - [agbcc](https://github.com/pret/agbcc)
