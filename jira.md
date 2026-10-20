@@ -124,10 +124,21 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     - shifted OAM writes 462 vs normal 403 in that frame; first OAM values
       differ (normal 0 vs shifted 15), and shifted's only `gNextOamSlot` write
       is 20; it overflows before `DrawAll` resets.
-  - the direct cause is the draw loop overrun before the init's final VRAM
-    clear; data at slot `+0x1c` and its target is identical normal/+0x1000,
-    so inspect slot `+0x11/+0x12/+0x14/+0x15`/index state at draw entry or
-    add a shift-only guard, not another pointer relocation.
+  - **slot/gNonGameplayRam watch trace**: the setup writes to the 20
+    `SpecialCutsceneOam` slots are identical normal/shifted modulo the
+    `+0x1c/+0x20` pointer relocations; no setup data difference.
+    At 332884 end, slots 16/17/18 differ only in
+    `animationDurationCounter` (`+0x12`): normal `1/1/1`, shifted `1/0/0`
+    (plus the expected `+0x1c/+0x20` `+0x1000`).
+  - normal writes `+0x12` for slots 16/17/18 at cycles
+    `256029/258555/261089`; shifted writes only slot 16 at `260241`, then the
+    frame ends inside `SpecialCutsceneDrawOam` before slots 17/18.
+  - direct cause: shifted's per-slot draw/animation loop does not reach all
+    active slots before the frame boundary; the missing `+0x12` updates then
+    change the next frame's frame selection.  This remains a timing/loop
+    overrun, not a data relocation.  Inspect `SpecialCutsceneDrawOam`'s
+    per-slot loop/`+0x12` update or add a shift-only guard; do not chase
+    another pointer.
   - this is a timing/control-flow overrun, not a data relocation.  The
     shifted init does not execute the same `+0x14A` store loop as normal;
     inspect `EndingBslCrashingInit` +0x82/+0x14A branch/IRQ interaction, or
