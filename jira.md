@@ -389,6 +389,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `normal_339001_*`, `diff_shift/shift_{a,b}_114671_*`,
     `diff_reorder/reorder_{a,b}_223045_*`; timings normal 302.6s,
     shift diff 208.7s, reorder diff 422.0s.
+  - **after BUG-016 fix `1f01180`**: shifted 115000 PASS; full 339001 first
+    diff moved to **117234** (BUG-017, EWRAM `0x02000000` zero-fill).
+    Re-run full after BUG-017; reordered remains at 223045 (BUG-011).
   - BUG-013 native idle/focused PASS on 2026-10-19.
   - **partial run on `2447dfb7...`**: 384/385/386 callback `0809F9E1`,
     401 `DISPCNT=1E00`, 22922/22923/22924/22925 `0809B2C9`, 22952
@@ -512,6 +515,8 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     the native 223227 checkpoint but the same room-14 branch; use it as the
     deterministic repro for the fix.
   - evidence: `tools/headless/out/full/diff_reorder/reorder_{a,b}_223045_*`.
+  - the EWRAM `0x32290` diff lands in `gDecompBg3Map` (0x02032000..0x02035D20)
+    in both maps; first inspect the room-14 BG3 decompression/copy path.
   - no fix yet; BUG-011 stays DOING.
 - [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
   - candidate `812d0090...` (BUG-008 fix) passes file-select, then native TAS
@@ -714,10 +719,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - top remaining groups: `sBlob_6131c8_63a19c` (many runs),
     `sBlob_6638a0_682fac`, `sBlob_582288_58b3cc`, `sBlob_5766D4_prefix`,
     `sBlob_39aa34_39f4b0`, `DirectSoundData_080BE5B8`.
-  - **concrete hit**: full TAS shifted BUG-016 at 114671 uses the
-    `sBlob_6638a0_682fac` run `0x086792E0..0x086793A0` (9 entries, stride
-    `0x18`).  Prioritize this group; convert it before the next full gate.
-    `sBlob_6131c8_63a19c` is the next-largest risk.
+  - **concrete hit fixed by BUG-016 `1f01180`**: the
+    `sBlob_6638a0_682fac` run `0x086792E0..0x086793A0` is gone; postlink is
+    now 67 runs.  The next full-TAS failure (BUG-017 at 117234) is **not**
+    from the remaining `sBlob_6638a0_682fac+0x1D0xx` run; it is an EWRAM
+    zero-fill.  `sBlob_6131c8_63a19c` remains the next-largest risk.
   - next: triage each group as either a real unrelocated FrameData/pointer
     table (convert) or a reviewed false positive (whitelist with evidence).
     Do not auto-whitelist; do not wire strict into the main gate until the
@@ -733,7 +739,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     normal is black at the same frames.  The real first shifted divergence is
     **BUG-016 at 114671**, not a persistent black after 30000.
   - evidence: `tas/bug012c_full/`, `tools/headless/out/full/`.
-- [TODO] BUG-016 (shift/engine) — full TAS shifted divergence at 114671
+- [DONE] BUG-016 (shift/engine) — full TAS shifted divergence at 114671
   - headless movie-native mGBA 0.6, current `012a2c95...`, 339001 frames:
     first diff **114671**, OAM offset 0, a=`80` b=`02`; state
     `1600 0004 0002 0100 43 0 20 0` (disp 1600, main 4, s1 2, s2 0100,
@@ -743,16 +749,35 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     (undefined/exception path).
   - pre-crash dumps at 114650/114660/114665/114669/114670: at 114670 normal
     cutscene entries i=0..2 are active with pOam
-    `086793B0`/`08679280`/`086793A0` and pFrame counts 19/4/6; shifted has
-    garbage pOam (e.g. `0867A9A4`, frame 250 -> pFrame `40030053`) and
-    `gNextOamSlot` wraps (low byte `0x42` after a huge loop).
-  - post-link scan has a matching raw run in
-    `sBlob_6638a0_682fac`: `0x086792E0..0x086793A0`, 9 entries, stride
-    `0x18`; this is the BUG-014 group to convert.  Do not patch callback/IRQ
-    or whitelist the table.
-  - evidence: `tools/headless/out/full/diff_shift/shift_{a,b}_114671_*`,
-    `/tmp/opencode/watch_shift_114671.log`, `/tmp/opencode/bug016_*`.
-  - re-run full 339001 after the fix; do not gate on the first diff frame.
+    `086793B0`/`08679280`/`086793A0` and pFrame counts 19/4/6; shifted had
+    garbage pOam and `gNextOamSlot` wrapped.
+  - root cause: the 52-record `struct FrameData` table at
+    `sBlob_6638a0_682fac+0x159E0` (normal `0x08679280..0x08679420`, 8-byte
+    records: pFrame + timer + 3 pad) had raw normal pFrame words.  41 pointers
+    / 11 terminators are now relocatable C; extractor splits at
+    `0x159E0`/`0x15B80` and self-checks the table.
+  - **FIX LANDED `1f01180`**: normal SHA `ca33f434...`, shifted
+    `e5d202c84f5a638678cc474dddf96b30552249bf`; strict/host/doctor PASS;
+    postlink 74 -> 67 and the `0x086792E0..0x086793A0` run is gone.
+  - headless **115000 PASS**; full 339001 now first-diffs at **117234**
+    (BUG-017), so BUG-016 is closed.
+- [TODO] BUG-017 (shift/engine) — full TAS shifted EWRAM zero-fill at 117234
+  - headless 339001 on shifted `e5d202c8...`: first diff **117234**, EWRAM
+    offset `0x0`, a=`FF` b=`00`; state `0000 0003 0000 0100 47 6 2 9`
+    (main 3, s1 0, s2 0100, event 47, area 6, room 2).
+  - normal PC `1C`/LR `0x11DC`/CPSR `60000092`; shifted PC `1C`/LR `0x11D0`/
+    CPSR `60000092`.  OAM/PAL/VRAM agree; the shifted 4 KiB window at EWRAM
+    `0x02000000` is zero where normal holds data.
+  - likely an intro/cutscene `LZ77UncompWram` destination/length or a different
+    source pointer: call sites `EndingMonologueInit 0x08095E24`,
+    `CutsceneElevatorMonologueInit 0x08099C38`,
+    `CutsceneInternalMonologueInit 0x0809A3AC`,
+    `CutsceneFederationMonologueInit 0x0809A6CC`; the
+    `sIntroTilemap_662804` literal (`0x08662804` -> shifted `0x08663804`) is
+    already relocated, so inspect the destination/length words.
+  - not the remaining `sBlob_6638a0_682fac+0x1D0xx` run; do not whitelist.
+  - next: reproduce with headless 117k, compare EWRAM source writes, find the
+    writer/length, convert the stale constant, then rerun full 339001.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
