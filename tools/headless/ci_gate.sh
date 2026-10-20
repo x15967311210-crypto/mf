@@ -11,6 +11,7 @@
 #   HEADLESS_SHIFT        1|0 (default: 1)
 #   HEADLESS_SHIFT_BUILD  1|0 build shifted/reordered ROMs (default: 1)
 #   HEADLESS_SHIFT_FRAMES shifted/reorder frames for full (default: 100000)
+#   HEADLESS_SETTLE       per-diff settle window in frames (default: 8; 0 = strict)
 #   MF_TOOLCHAIN          arm-none-eabi prefix or bin directory
 #   PAD_BYTES             shifted build padding (default: 0x1000)
 set -euo pipefail
@@ -25,6 +26,7 @@ SHIFT="${HEADLESS_SHIFT:-1}"
 SHIFT_BUILD="${HEADLESS_SHIFT_BUILD:-1}"
 TOOLCHAIN="${MF_TOOLCHAIN:-}"
 PAD_BYTES="${PAD_BYTES:-0x1000}"
+SETTLE="${HEADLESS_SETTLE:-8}"
 
 if [ -z "$BIOS" ] || [ -z "$MOVIE" ]; then
     echo "error: set HEADLESS_BIOS and HEADLESS_MOVIE" >&2
@@ -99,7 +101,7 @@ for variant in shift reorder; do
         echo "error: missing $candidate" >&2
         exit 1
     fi
-    echo "== $variant lockstep diff ($SHIFT_FRAMES frames) =="
+    echo "== $variant lockstep diff ($SHIFT_FRAMES frames, settle $SETTLE) =="
     "$BUILD/mf_bizhawk_linux" \
         --dll none \
         --rom "$ROM" \
@@ -107,6 +109,7 @@ for variant in shift reorder; do
         --bios "$BIOS" \
         --movie "$MOVIE" \
         --diff \
+        --settle "$SETTLE" \
         --diff-regions OAM,PAL,VRAM,EWRAM \
         --frames "$SHIFT_FRAMES" \
         --dump-dir "$OUT/diff_$variant" \

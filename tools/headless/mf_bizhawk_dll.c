@@ -91,6 +91,33 @@ typedef struct {
     const char* name;
 } DiffRegion;
 
+/* First differing byte across the compared regions. With --settle this is
+ * re-scanned every frame until the regions agree for a full settle window. */
+typedef struct {
+    bool found;
+    size_t region;
+    long offset;
+    uint8_t a;
+    uint8_t b;
+} RegionDiff;
+
+/* A diff that is being given --settle frames to disappear. `first*` is the
+ * original observation and is what a durable failure reports; `last*` is the
+ * most recent signature and drives window extensions. */
+typedef struct {
+    bool active;
+    long firstFrame;
+    size_t firstRegion;
+    long firstOffset;
+    uint8_t firstA;
+    uint8_t firstB;
+    size_t lastRegion;
+    long lastOffset;
+    uint8_t lastA;
+    uint8_t lastB;
+    long deadline;
+} PendingDiff;
+
 typedef struct {
     long frame;
     uint32_t keys;
@@ -149,6 +176,8 @@ typedef struct {
     long startFrame;
     long frames;
     int history;
+    int settle;
+    bool settleSet;
     bool diff;
     bool includeIwram;
     bool stackScan;
@@ -413,6 +442,8 @@ static void usage(const char* argv0) {
         "  --stack-scan         print heuristic stack return-address candidates at first diff\n"
         "  --stack-depth N      bytes to scan above SP (default 0x400)\n"
         "  --diff               run normal + candidate cores in lockstep and stop at first diff\n"
+        "  --settle N           with --diff: give a diff N frames to disappear before failing\n"
+        "                       (default 0 = fail on the first differing frame)\n"
         "  --diff-rom FILE      candidate ROM for --diff\n"
         "  --diff-save FILE     candidate SaveRAM for --diff (default: same as --save)\n"
         "  --include-iwram      also compare/dump IWRAM in --diff mode\n"
@@ -460,6 +491,17 @@ static bool parseArgs(int argc, char** argv, Options* opt) {
         else if (!strcmp(a, "--stack-scan")) { opt->stackScan = true; }
         else if (!strcmp(a, "--stack-depth") && v) { opt->stackDepth = (size_t) strtoul(v, NULL, 0); ++i; }
         else if (!strcmp(a, "--frames") && v) { opt->frames = atol(v); ++i; }
+        else if (!strcmp(a, "--settle") && v) {
+            char* end = NULL;
+            long value = strtol(v, &end, 0);
+            if (end == v || *end || value < 0 || value > 100000) {
+                fprintf(stderr, "error: invalid --settle '%s' (expected 0..100000 frames)\n", v);
+                return false;
+            }
+            opt->settle = (int) value;
+            opt->settleSet = true;
+            ++i;
+        }
         else if (!strcmp(a, "--start-frame") && v) {
             char* end = NULL;
             long value = strtol(v, &end, 0);
@@ -480,6 +522,10 @@ static bool parseArgs(int argc, char** argv, Options* opt) {
     }
     if (!opt->dll || !opt->rom || !opt->bios || !opt->movie) {
         usage(argv[0]);
+        return false;
+    }
+    if (opt->settleSet && !opt->diff) {
+        fprintf(stderr, "error: --settle requires --diff\n");
         return false;
     }
     if (opt->diff && !opt->diffRom) {
@@ -625,6 +671,23 @@ static long firstDiff(const void* a, const void* b, size_t size) {
         if (pa[i] != pb[i]) return (long) i;
     }
     return -1;
+}
+
+static RegionDiff scanRegions(const DiffRegion* regions, size_t count) {
+    RegionDiff diff;
+    memset(&diff, 0, sizeof(diff));
+    diff.offset = -1;
+    for (size_t r = 0; r < count; ++r) {
+        long off = firstDiff(regions[r].a, regions[r].b, regions[r].size);
+        if (off < 0) continue;
+        diff.found = true;
+        diff.region = r;
+        diff.offset = off;
+        diff.a = ((const uint8_t*) regions[r].a)[off];
+        diff.b = ((const uint8_t*) regions[r].b)[off];
+        return diff;
+    }
+    return diff;
 }
 
 static int symbolCompare(const void* a, const void* b) {
@@ -849,6 +912,40 @@ static bool historyWrite(const History* history, const Options* opt, const char*
     return true;
 }
 
+/* Print and dump one diff observation: the first differing byte, both cores'
+ * state, registers and (optionally) stack candidates, plus full region dumps
+ * and history. Used for an immediate first diff and for a durable diff after
+ * the settle window. Returns false on a dump/IO error. */
+static bool reportDiff(const Options* opt, const char* label, long frame,
+    const DiffRegion* regions, const RegionDiff* diff,
+    const MemoryAreas* memA, const MemoryAreas* memB, void* ctxA, void* ctxB,
+    BizGetRegistersFn getRegisters, BizReadBusFn readBus,
+    const SymbolTable* mapA, const SymbolTable* mapB,
+    History* historyA, History* historyB,
+    const char* prefixA, const char* prefixB) {
+    fprintf(stderr, "%s: frame=%ld region=%s offset=0x%lX a=%02X b=%02X\n",
+        label, frame, regions[diff->region].name, diff->offset, diff->a, diff->b);
+    logState(memA, stderr, (int) frame);
+    logState(memB, stderr, (int) frame);
+    printRegs("A normal", ctxA, getRegisters, mapA);
+    printRegs("B candidate", ctxB, getRegisters, mapB);
+    if (opt->stackScan) {
+        int regsA[18] = {0};
+        int regsB[18] = {0};
+        getRegisters(ctxA, regsA);
+        getRegisters(ctxB, regsB);
+        stackScan("A normal", ctxA, readBus, mapA, (uint32_t) regsA[13], opt->stackDepth);
+        stackScan("B candidate", ctxB, readBus, mapB, (uint32_t) regsB[13], opt->stackDepth);
+    }
+    if (!dumpRegions(memA, opt, prefixA, (int) frame) ||
+        !dumpRegions(memB, opt, prefixB, (int) frame)) {
+        return false;
+    }
+    historyWrite(historyA, opt, prefixA, mapA);
+    historyWrite(historyB, opt, prefixB, mapB);
+    return true;
+}
+
 int main(int argc, char** argv) {
     Options opt;
     if (!parseArgs(argc, argv, &opt)) return 1;
@@ -990,6 +1087,10 @@ int main(int argc, char** argv) {
 
         bool failed = false;
         long lastFrame = opt.startFrame;
+        long endFrame = opt.startFrame + opt.frames;
+        long transientCount = 0;
+        PendingDiff pending;
+        memset(&pending, 0, sizeof(pending));
         clock_t started = clock();
         for (long i = opt.startFrame; i < opt.startFrame + opt.frames; ++i) {
             FrameInput* in = &movie.frames[i];
@@ -1025,42 +1126,104 @@ int main(int argc, char** argv) {
                 regions[nregions++] = (DiffRegion) {memA.iwram, memB.iwram, 0x8000, "IWRAM"};
             }
 
-            for (size_t r = 0; r < nregions; ++r) {
-                long off = firstDiff(regions[r].a, regions[r].b, regions[r].size);
-                if (off < 0) continue;
-                failed = true;
-                fprintf(stderr, "first diff: frame=%ld region=%s offset=0x%lX a=%02X b=%02X\n",
-                    frame, regions[r].name, off,
-                    ((const uint8_t*) regions[r].a)[off],
-                    ((const uint8_t*) regions[r].b)[off]);
-                logState(&memA, stderr, (int) frame);
-                logState(&memB, stderr, (int) frame);
-                printRegs("A normal", ctx, BizGetRegisters, &mapA);
-                printRegs("B candidate", ctxB, BizGetRegisters, &mapB);
-                if (opt.stackScan) {
-                    int regsA[18] = {0};
-                    int regsB[18] = {0};
-                    BizGetRegisters(ctx, regsA);
-                    BizGetRegisters(ctxB, regsB);
-                    stackScan("A normal", ctx, BizReadBus, &mapA,
-                        (uint32_t) regsA[13], opt.stackDepth);
-                    stackScan("B candidate", ctxB, BizReadBus, &mapB,
-                        (uint32_t) regsB[13], opt.stackDepth);
+            RegionDiff diff = scanRegions(regions, nregions);
+            if (!pending.active) {
+                if (!diff.found) continue;
+                if (opt.settle <= 0) {
+                    failed = true;
+                    if (!reportDiff(&opt, "first diff", frame, regions, &diff,
+                            &memA, &memB, ctx, ctxB, BizGetRegisters, BizReadBus,
+                            &mapA, &mapB, &historyA, &historyB, prefixA, prefixB)) {
+                        return 1;
+                    }
+                    break;
                 }
-                if (!dumpRegions(&memA, &opt, prefixA, (int) frame) ||
-                    !dumpRegions(&memB, &opt, prefixB, (int) frame)) {
+                /* Record the observation, then keep both cores running so a
+                 * mid-frame copy can finish on the slower timeline. */
+                pending.active = true;
+                pending.firstFrame = frame;
+                pending.firstRegion = diff.region;
+                pending.firstOffset = diff.offset;
+                pending.firstA = diff.a;
+                pending.firstB = diff.b;
+                pending.lastRegion = diff.region;
+                pending.lastOffset = diff.offset;
+                pending.lastA = diff.a;
+                pending.lastB = diff.b;
+                pending.deadline = frame + opt.settle;
+                if (pending.deadline > endFrame) pending.deadline = endFrame;
+                if (frame >= pending.deadline) {
+                    /* The window is already over: only possible when the diff
+                     * lands on the last processed frame. Treat as durable. */
+                    failed = true;
+                    fprintf(stderr, "settle: window exhausted at frame=%ld with diffs still "
+                        "present; reporting durable diff\n", frame);
+                    fprintf(stderr, "first diff: frame=%ld region=%s offset=0x%lX a=%02X b=%02X\n",
+                        pending.firstFrame, regions[pending.firstRegion].name,
+                        pending.firstOffset, pending.firstA, pending.firstB);
+                    if (!reportDiff(&opt, "durable diff", frame, regions, &diff,
+                            &memA, &memB, ctx, ctxB, BizGetRegisters, BizReadBus,
+                            &mapA, &mapB, &historyA, &historyB, prefixA, prefixB)) {
+                        return 1;
+                    }
+                    break;
+                }
+                fprintf(stderr, "settle: diff at frame=%ld region=%s offset=0x%lX a=%02X b=%02X; "
+                    "waiting %ld frame(s)\n", frame, regions[diff.region].name,
+                    diff.offset, diff.a, diff.b, pending.deadline - frame);
+                continue;
+            }
+
+            if (!diff.found) {
+                if (frame >= pending.deadline) {
+                    fprintf(stderr, "TRANSIENT diff at frame %ld settled after %ld frames\n",
+                        pending.firstFrame, frame - pending.firstFrame);
+                    ++transientCount;
+                    pending.active = false;
+                }
+                continue;
+            }
+
+            bool newSignature = diff.region != pending.lastRegion ||
+                diff.offset != pending.lastOffset ||
+                diff.a != pending.lastA || diff.b != pending.lastB;
+            if (newSignature) {
+                /* A different byte pair is diverging while we wait: restart
+                 * the window from this frame, bounded by the run end. */
+                pending.lastRegion = diff.region;
+                pending.lastOffset = diff.offset;
+                pending.lastA = diff.a;
+                pending.lastB = diff.b;
+                pending.deadline = frame + opt.settle;
+                if (pending.deadline > endFrame) pending.deadline = endFrame;
+                fprintf(stderr, "settle: new diff at frame=%ld region=%s offset=0x%lX "
+                    "a=%02X b=%02X; extending window to frame %ld\n",
+                    frame, regions[diff.region].name, diff.offset, diff.a, diff.b,
+                    pending.deadline);
+            }
+            if (frame >= pending.deadline) {
+                failed = true;
+                fprintf(stderr, "settle: window exhausted at frame=%ld with diffs still "
+                    "present (first observed at frame=%ld); reporting durable diff\n",
+                    frame, pending.firstFrame);
+                fprintf(stderr, "first diff: frame=%ld region=%s offset=0x%lX a=%02X b=%02X\n",
+                    pending.firstFrame, regions[pending.firstRegion].name,
+                    pending.firstOffset, pending.firstA, pending.firstB);
+                if (!reportDiff(&opt, "durable diff", frame, regions, &diff,
+                        &memA, &memB, ctx, ctxB, BizGetRegisters, BizReadBus,
+                        &mapA, &mapB, &historyA, &historyB, prefixA, prefixB)) {
                     return 1;
                 }
-                historyWrite(&historyA, &opt, prefixA, &mapA);
-                historyWrite(&historyB, &opt, prefixB, &mapB);
                 break;
             }
-            if (failed) break;
         }
 
         double seconds = (double) (clock() - started) / CLOCKS_PER_SEC;
         fprintf(stderr, "diff ran %ld frames in %.3f s (%.1f fps)\n",
             opt.frames, seconds, seconds > 0 ? opt.frames / seconds : 0.0);
+        if (transientCount) {
+            fprintf(stderr, "settle: %ld transient diff(s) ignored\n", transientCount);
+        }
         if (failed) {
             fprintf(stderr, "PARITY: FAIL\n");
         } else {

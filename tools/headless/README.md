@@ -156,6 +156,37 @@ State files are local scratch data (`/tmp`). They contain game RAM, so they are
 never committed; `.gitignore` does not need to cover them because they live
 outside the repository.
 
+### Diff settle window (`--settle`)
+
+A frame-boundary diff can be transient: the normal core may still be mid-LZ77
+copy into EWRAM when the shifted core has already finished, so the regions
+differ at the boundary but agree a few frames later. `--settle N` (only valid
+with `--diff`) keeps both cores running for up to N frames after a diff is
+found instead of failing immediately:
+
+- if the compared regions agree for the whole window, the runner prints
+  `TRANSIENT diff at frame F settled after N frames` to stderr and continues;
+- if a diff is still present when the window expires, it is reported as a
+  durable `first diff` and the run exits 1;
+- a new differing byte pair inside the window restarts the window, bounded by
+  the end of the `--frames` run.
+
+The window never exempts a region: OAM/PAL/VRAM/EWRAM diffs still fail unless
+they actually clear. `--settle` defaults to 0 (strict, fail on the first
+differing frame). `tools/headless/ci_gate.sh` passes
+`--settle "${HEADLESS_SETTLE:-8}"`; set `HEADLESS_SETTLE=0` for strict mode.
+
+The window is clamped to the requested `--frames` run, so a diff still present
+on the **final processed frame** is reported as durable even though it might
+have cleared just past the boundary. A durable line that lands exactly on the
+last frame is *window-truncated*: re-run with a longer `--frames` window (or
+from a checkpoint just before it) before claiming the diff is persistent.
+
+Example: the shifted run from the 200000 checkpoint first diffs at frame
+223045 in EWRAM `0x32290` (`gDecompBg3Map+0x290`, `a=41 b=72`). That is a
+mid-BG3-copy phase artifact, not a source bug. With `--settle 8` the gate does
+not fail at 223045; only a diff that survives the settle window is durable.
+
 ### Checkpoint-first test policy
 
 Bug-fix iteration does **not** re-run the full 339001-frame movie after every
