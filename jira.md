@@ -899,7 +899,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - shifted SHA is now `d30310a634e83626e830cc0f481d9d8fece79488`; parity
     300000 -> 332883 PASS.  `gen_blob_tables --check`, `make smoke` and
     `make audit` pass; post-link runs drop 60 -> 56.
-- [DOING @dev23] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
+- [DONE] BUG-020 (shift/engine) — late-game VRAM/OAM at TAS 332884
   - after BUG-019, first diff is frame 332884 `VRAM 0xD000` a=`00` b=`8A`,
     then OAM slot 0 (`3C` vs `02`) and `gNextOamSlot` (`0` vs `16`).
   - the first non-pointer IWRAM divergence is also 332884: normal starts the
@@ -920,10 +920,9 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `gSubGameMode1=1` and `gCurrentCutscene=0x80`, so the direct
     `NewFileIntroLandingOnBsl` case-11 caller is not the path.  The pText/stage
     change is a downstream cutscene-state symptom.
-  - the `sBlob_6131c8` / raw-table hypothesis is also **ruled out**: the
-    monologue OAM pointer table `sData_79C2CC+0x290` is relocated (shifted
-    table is `+0x1000`) and slot `+0x1c` pointers are valid `+0x1000` at
-    332884 (slots 16-18).
+  - the `sBlob_6131c8` table pointer itself is relocated, but its **nested
+    pFrame words** are not (final root below); this is why the earlier
+    table-pointer check looked clean.
   - next: trace the 332884 cutscene/ending transition that should reset
     `gNextOamSlot` (normal) but does not in shifted; inspect
     `gCurrentCutscene=0x80`, the VBlank/cutscene callback, and the
@@ -932,6 +931,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - history CSVs and states: `tas/checkpoints/bug020_hist/` (332884..332887)
     and `bug020_probe/` (332884).  `clean_332500/` is valid final-ROM 332500;
     old `oam_probe/s_332500` is contaminated by the pre-Omega-fix ROM.
+  - **FIXED 2026-10-20**: `sBlob_6131c8_63a19c` is a 159700-byte cutscene
+    blob whose nested `FrameData.pFrame` words were still normal addresses.
+    Added `sparse_inside_only` to `gen_blob_tables.py`; 506 inside-blob
+    pointer words now relocate, 382 outside text/graphics literals stay
+    literal.  Normal SHA stays `ca33f434...`; shifted is
+    `5888a563129ae391c0abb0f202748fd7fd883e93`.
+    332880 -> 339001 `PARITY: PASS (6121 frames)`; final
+    `gSubGameMode1=2` both.  `check-relocs-strict` passes (the reviewed
+    generated block is data-whitelisted); post-link runs drop **56 -> 5**.
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
@@ -944,10 +952,11 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `sBlob_64e470_662804` run `0x0865BB98..0x0865BCF0` (44 words).
     After merging the BUG-013 fix, the integrated tree reports **74 runs** and
     **no `sBlob_64e470` run**; normal `ca33f434...`, shifted `012a2c95...`.
-  - top remaining groups: `sBlob_6131c8_63a19c` (many runs),
-    `sBlob_6638a0_682fac`, `sBlob_582288_58b3cc`, `sBlob_5766D4_prefix`,
-    `DirectSoundData_080BE5B8`.  `sBlob_39aa34_39f4b0` was a real
-    FrameData-pFrame group and is fixed by BUG-019; runs are now 56.
+  - after BUG-020, only **5** structured runs remain; the
+    `sBlob_6131c8_63a19c` group is gone.  Remaining groups include
+    `sBlob_6638a0_682fac`, `sBlob_582288_58b3cc`, `sBlob_5766D4_prefix`
+    and `DirectSoundData_080BE5B8`.  `sBlob_39aa34_39f4b0` (BUG-019) and
+    `sBlob_6131c8_63a19c` (BUG-020) are fixed.
   - **concrete hit fixed by BUG-016 `1f01180`**: the
     `sBlob_6638a0_682fac` run `0x086792E0..0x086793A0` is gone; postlink is
     now 67 runs.  The next full-TAS failure (BUG-017 at 117234) is **not**
