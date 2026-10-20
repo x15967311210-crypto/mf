@@ -774,7 +774,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     postlink 74 -> 67 and the `0x086792E0..0x086793A0` run is gone.
   - headless **115000 PASS**; full 339001 now first-diffs at **117234**
     (BUG-017), so BUG-016 is closed.
-- [TODO] BUG-017 (shift/engine) — full TAS shifted EWRAM zero-fill at 117234
+- [DONE] BUG-017 (shift/engine) — full TAS shifted EWRAM zero-fill at 117234
   - headless 339001 on shifted `e5d202c8...`: first diff **117234**, EWRAM
     offset `0x0`, a=`FF` b=`00`; state `0000 0003 0000 0100 47 6 2 9`
     (main 3, s1 0, s2 0100, event 47, area 6, room 2).
@@ -813,6 +813,30 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `sBlob_5766D4_after` at `+0x78` (4 bytes later) and update
     `tools/extractor.py` to skip the pointer.  No asm change, no LZ77 data
     change.
+  - **FIX LANDED `e35a785`**: id-4 pGraphics now relocatable; normal SHA
+    `ca33f434...`, shifted `26f1f4223d06844851999d5a3417cb38653b6961`;
+    gates PASS; postlink 67 (unchanged).  Checkpoint 115000 -> 130000 PASS
+    (29.7 s); 339001 not run, per D-012.
+- [TODO] BUG-018 (shift/engine) — shifted OAM overflow at frame 168582
+  - chunk ladder on fixed `26f1f422...`: 115000 -> 150000 PASS; 150000 ->
+    168582 first diff.
+  - first diff frame 168582, OAM offset 0 a=`08` b=`02`; state
+    `1500 0004 0002 0100 63 0 76 0` (main 4, s1 2, s2 0100, event 0x63,
+    area 0, room 0x76).
+  - normal PC `1C`/LR `1B8`/CPSR `92`; shifted PC `2C`/LR `0001301C`/
+    CPSR `4000009B` (exception path).
+  - shifted `gNextOamSlot=0x40D00002`, `gVBlankCallback=0809BA26`,
+    `gHBlankCallback=FEF70FE2`, `gNonGameplayRam=00001CBA`; OAM writes at
+    168581 from PC `0809DF20..0809E00A`, LR `0809DE99` =
+    `CutsceneMonologueDrawAllOam` / `CutsceneMnologueDrawOam`.
+  - monologue entry base is `gNonGameplayRam+0x214` = `0x03001698`
+    (pOam at +0x10, frame at +6); at 168580 entries are still inactive, so
+    the init + draw happen in 168581.  Next: watch stores to
+    `0x03001698..0x03001730`, capture the pOam value/setup PC, then identify
+    the raw monologue pOam table.  Do not patch the callback/IRQ.
+  - evidence: `work/playtest/m0f-2026-10-17/tas/bug018_168582/`
+    (`repro.log`, `n/s_168582.state`, `diff_168582/`, `pre168581/`).
+  - use checkpoint 150000; do not run 339001 until the chunk ladder is clean.
 - [PARK] BUG-010 (playtest) — shifted elevator hard freeze / black screen (deferred)
   - candidate `0bddba78...` loading `elevator_01.ss0` frame 11274
     `event=4 area=0 room=61 main=4 s1=2 s2=0x100 disp=0x1500 active_oam=3`
