@@ -161,6 +161,92 @@ def split_new_file_intro_frame_data_blob() -> None:
         Path(DATA_PATH, name).write_bytes(blob[start:end])
 
 
+# `Blob_6638a0_682fac.bin` also embeds a 52-record cutscene `struct FrameData`
+# table at +0x159E0 (normal ROM 0x08679280..0x08679420).  The cutscene entries
+# set their pOam to +0x159E0, +0x15A30, +0x15B00 or +0x15B10 and then walk the
+# records by frame index, so every pFrame word must relocate with the blob
+# (BUG-016: the shifted ROM read the stale normal targets and the OAM loop
+# overflowed into gNonGameplayRam).
+INTRO_DATA_BLOB_ADDR = 0x086638A0
+INTRO_DATA_BLOB_SIZE = 0x1F70C
+INTRO_DATA_STRUCT_PATH = Path("src/data/new_file_intro_data.c")
+INTRO_CUTSCENE_TABLE_OFFSET = 0x159E0
+INTRO_CUTSCENE_TABLE_COUNT = 52
+INTRO_CUTSCENE_TABLE_END = (
+    INTRO_CUTSCENE_TABLE_OFFSET + INTRO_CUTSCENE_TABLE_COUNT * 8)
+
+
+def new_file_intro_cutscene_records(blob: bytes) -> list:
+    """Return (offset, target blob offset or None, timer) for the table.
+
+    A zero pFrame is a `FRAME_DATA_TERMINATOR` and stays a NULL initializer.
+    Every other pFrame must point inside this blob, and the record's upper
+    three metadata bytes must be zero so a C `struct FrameData` initializer
+    reproduces them exactly.
+    """
+    if len(blob) != INTRO_DATA_BLOB_SIZE:
+        raise ValueError(
+            f"intro data blob is {len(blob)} bytes, "
+            f"expected 0x{INTRO_DATA_BLOB_SIZE:X}")
+    records = []
+    for offset in range(
+            INTRO_CUTSCENE_TABLE_OFFSET, INTRO_CUTSCENE_TABLE_END, 8):
+        word = int.from_bytes(blob[offset:offset + 4], "little")
+        rest = int.from_bytes(blob[offset + 4:offset + 8], "little")
+        if rest > 0xFF:
+            raise ValueError(
+                f"intro cutscene record at +0x{offset:04X} has nonzero "
+                f"padding 0x{rest:08X}")
+        if word == 0:
+            if rest != 0:
+                raise ValueError(
+                    f"intro cutscene terminator at +0x{offset:04X} has "
+                    f"timer 0x{rest:02X}")
+            records.append((offset, None, 0))
+            continue
+        if not (INTRO_DATA_BLOB_ADDR
+                <= word < INTRO_DATA_BLOB_ADDR + INTRO_DATA_BLOB_SIZE):
+            raise ValueError(
+                f"intro cutscene pFrame at +0x{offset:04X} is 0x{word:08X}, "
+                f"outside 0x{INTRO_DATA_BLOB_ADDR:08X}.."
+                f"0x{INTRO_DATA_BLOB_ADDR + INTRO_DATA_BLOB_SIZE:08X}")
+        records.append((offset, word - INTRO_DATA_BLOB_ADDR, rest))
+    return records
+
+
+def emit_new_file_intro_cutscene_table(blob: bytes) -> str:
+    """Emit the C initializer entry for the cutscene FrameData table.
+
+    `src/data/new_file_intro_data.c` embeds this exact text so the extractor
+    and the committed table cannot drift apart.
+    """
+    records = new_file_intro_cutscene_records(blob)
+    lines = ["    .cutsceneFrameData = {"]
+    for offset, target, timer in records:
+        if target is None:
+            lines.append(
+                f"        FRAME_DATA_TERMINATOR, /* +0x{offset:04X} */")
+        else:
+            lines.append(
+                f"        {{ .pFrame = (const u16*)((const u8*)"
+                f"&sBlob_6638a0_682fac + 0x{target:04X}), "
+                f".timer = 0x{timer:02X} }}, /* +0x{offset:04X} */")
+    lines.append("    },")
+    return "\n".join(lines)
+
+
+def check_new_file_intro_cutscene_table(blob: bytes) -> None:
+    """Fail extraction if the committed C table does not match this blob."""
+    if not INTRO_DATA_STRUCT_PATH.exists():
+        return
+    expected = emit_new_file_intro_cutscene_table(blob)
+    if expected not in INTRO_DATA_STRUCT_PATH.read_text():
+        raise ValueError(
+            f"{INTRO_DATA_STRUCT_PATH} does not match the generated "
+            "cutscene FrameData table; regenerate it with "
+            "`python3 tools/extractor.py --emit-intro-cutscene-table`")
+
+
 def split_new_file_intro_data_pointer_tables() -> None:
     """Split the raw FrameData pointer tables out of the intro data blob.
 
@@ -170,12 +256,17 @@ def split_new_file_intro_data_pointer_tables() -> None:
     representation can relocate the eight pointers.  The table bytes must stay
     at their original offsets because the cutscene code references the tables
     by absolute address.
+
+    The 52-record cutscene table at 0x159E0 is also rebuilt in C (BUG-016), so
+    the blob is split before it and resumed after it; the table bytes stay at
+    their original offsets and the two surrounding segments keep the blob
+    byte-identical.
     """
     blob_path = Path(DATA_PATH, "Blob_6638a0_682fac.bin")
     if not blob_path.exists():
         return
     blob = blob_path.read_bytes()
-    if len(blob) != 0x1F70C:
+    if len(blob) != INTRO_DATA_BLOB_SIZE:
         raise ValueError(
             f"{blob_path} is {len(blob)} bytes, expected 0x1F70C")
     spans = (
@@ -198,10 +289,14 @@ def split_new_file_intro_data_pointer_tables() -> None:
         (0x05F8, 0x05FC, "Blob_6638a0_gap_05F8.bin"),
         (0x0600, 0x0604, "Blob_6638a0_gap_0600.bin"),
         (0x0604, 0x060C, "Blob_6638a0_term_0604.bin"),
-        (0x060C, 0x1F70C, "Blob_6638a0_after.bin"),
+        (0x060C, INTRO_CUTSCENE_TABLE_OFFSET,
+         "Blob_6638a0_seg_060C_159E0.bin"),
+        (INTRO_CUTSCENE_TABLE_END, INTRO_DATA_BLOB_SIZE,
+         "Blob_6638a0_seg_15B80_1F70C.bin"),
     )
     for start, end, name in spans:
         Path(DATA_PATH, name).write_bytes(blob[start:end])
+    check_new_file_intro_cutscene_table(blob)
 
 
 # `Blob_64e470_662804.bin` is the normal-ROM image of the intro graphics blob.
@@ -435,6 +530,9 @@ if __name__ == "__main__":
     group.add_argument("--emit-intro-gfx-struct", action="store_true",
         help="Print the NewFileIntroGfxBlob C definition generated from the "
              "extracted intro graphics blob")
+    group.add_argument("--emit-intro-cutscene-table", action="store_true",
+        help="Print the cutscene FrameData initializer generated from the "
+             "extracted new-file intro data blob")
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output")
     parser.add_argument("--sort", action="store_true",
         help="Sort database entries by address")
@@ -451,6 +549,13 @@ if __name__ == "__main__":
         if not blob_path.exists():
             parser.error(f"{blob_path} does not exist; run the extractor first")
         print(emit_new_file_intro_gfx_struct(blob_path.read_bytes()), end="")
+    elif args.emit_intro_cutscene_table:
+        blob_path = Path(DATA_PATH, "Blob_6638a0_682fac.bin")
+        if not blob_path.exists():
+            parser.error(f"{blob_path} does not exist; run the extractor first")
+        print(
+            emit_new_file_intro_cutscene_table(blob_path.read_bytes()),
+            end="")
     elif args.sort:
         sort_by_address(args.debug, args.quiet)
     else:
