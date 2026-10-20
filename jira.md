@@ -562,20 +562,28 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `gDecompBg3Map+0x290` converges by 223047 (both `0x72`); 223045..223060
     has no persistent EWRAM diff (diffs at 223046/47/48, 0 at 223049-52,
     transient at 223053/54, etc.).  Do not treat this as a source bug.
-  - the native reordered room 23/14 at 223227 remains the real BUG-011.
-  - **settle-aware + history result**: the 223045 EWRAM diff is transient.
-    The first durable field divergence is **223214**: normal `s1=3`,
-    shifted `s1=2`; at **223227** normal `room=23`, shifted `room=14`;
-    normal LR `0x1238`, shifted LR `0x1B8`, CPSR `0x20000092` vs `0x92`.
-    This is the exact native BUG-011 signature, now reproduced in headless
-    shifted.
-  - the settle run eventually reports OAM at 226117 (normal room 40/event 83,
-    shifted room 24/event 81), a downstream consequence of the room-23/14
-    transition divergence.
-  - next: save a 223210 checkpoint from the 200k states, trace the
-    transition/IRQ/callback path around 223214-223227 (the native notes point
-    at the copied IWRAM callback table `sBlob_a5224_a5258` / audio-intr
-    literals), and fix the raw pointer.  No full run.
+  - **caller/phase trace (2026-10-20)**: the real start is **223048/223049**,
+    not 223214.  At 223048 normal `gSamusData.x=928`, shifted `x=916`
+    (shifted has already applied one frame of movement); at 223049 normal
+    `s1=0`, shifted `s1=1`; at 223100 shifted frame counters are +1
+    (`gFrameCounter8Bit 0x88 vs 0x87`, `gFrameCounter16Bit +1`,
+    `gColorFading.unk_3 0x21 vs 0x20`).  The shifted core runs **one extra
+    game-loop iteration** when `SUB_GAME_MODE_LOADING_ROOM` /
+    `ColorFadingReveal` completes.
+  - that one-frame phase offset flips Samus at 223205 (normal pose 14
+    grounded/vy 0, shifted pose 16 airborne), so only normal reaches door 79
+    (`gLastDoorUsed=78` vs shifted 32) and room 23/14 at 223227.
+  - the earlier `sBlob_a5224_a5258` IRQ/callback hypothesis is **ruled out**:
+    the table is already relocatable (`src/data/generic_data.c:331`),
+    `sUnk_a5278` is a u16 delay table, and the LR/CPSR difference is an IRQ
+    sampling artifact (both cores print the same PC/LR/SP/CPSR at the durable
+    frame).
+  - next: create a 223040 checkpoint from the 200k states and trace
+    223040-223050, watching `gFrameCounter8Bit/16Bit`, `gSubGameMode1`,
+    `gColorFading.unk_3` and the `SUB_GAME_MODE_LOADING_ROOM` / ColorFading
+    completion path.  The extra iteration is the root.
+  - 223100 checkpoint states are in
+    `work/playtest/m0f-2026-10-17/tas/checkpoints/{n,s}_223100.state`.
   - fast repro from checkpoint 200000 takes ~50 s; do not run full.
   - no fix yet; BUG-011 stays DOING.
 - [DONE] BUG-012 (shift/engine) — shifted elevator callback/IRQ divergence at native TAS 22923
