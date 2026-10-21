@@ -1069,29 +1069,35 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     the banner and room tiles draw
   - deferred with the M1 rendering pause; likely VRAM/palette overlap from the
     room tileset/backdrop path
-- [TODO] DOC-001 (docs) — rewrite README for the shiftable engine
-  - remove the stale "This decomp is not shiftable, don't use it as a base"
-    warning; document the shiftable/hackable status, build flows
-    (`make`, `make shift-build`, `make hack-build`), current gates, and where
-    the docs live
-  - keep the upstream decomp attribution and toolchain setup
-- [TODO] DOC-002 (tools/docs) — format contract
-  - add `.clang-format` (4-space indent, project style), a `make format`
-    target (and `format-check` if cheap), and `docs/style.md` describing it
-  - do not reformat engine files in this task; only add the contract
-- [TODO] DOC-003 (docs) — engine architecture overview
-  - `docs/architecture/overview.md`: main loop/VBlank/state machine, room load
-    and clipdata, OAM/sprite lifecycle, audio interface, SRAM/save layout; cite
-    files/functions instead of only prose
-- [TODO] DOC-004 (docs) — how-to: add a room/door
-  - `docs/howto/add-a-room.md`: Tiled -> manifest -> converter -> generated
-    table -> door IDs -> scenario, using the existing pipeline
-- [TODO] DOC-005 (docs) — how-to: add dialogue/text
-  - `docs/howto/add-dialogue.md`: charmap/INCTEXT, `messages.json`, text IDs,
-    banner spawn/message id, validation
-- [TODO] DOC-006 (docs) — how-to: add an enemy behaviour
-  - `docs/howto/add-enemy.md`: sprite IDs/tables, spriteset slot, AI dispatch,
-    HACK overlay vs baseline, PSPRITE_END constraint
+- [DONE] DOC-001 (docs) — rewrite README for the shiftable engine
+  - removed the stale "not shiftable" warning; reframed the repo as the
+    decomp baseline + shiftable engine + `HACK=1` Sector Null overlay, with
+    quick start, gate inventory, docs map, M0 pass/M1 blocked status, regions
+    and attribution
+  - landed `6b856e3`; `README.md`
+- [DONE] DOC-002 (tools/docs) — format contract
+  - `.clang-format` (4 spaces, Allman, pointer-left, 120 cols), `mk/format.mk`
+    with `format`/`format-check`/`format-list`, `docs/style.md`; no mass
+    reformat; missing clang-format skips with a clear non-pass message
+  - landed `6b856e3`; `make help` and `make format-check` verified
+- [DONE] DOC-003 (docs) — engine architecture overview
+  - `docs/architecture/overview.md`: boot/main loop/VBlank, file load and the
+    HACK warp, room load pipeline, RLE/tilemap/clipdata, sprite/OAM, text,
+    audio, SRAM, D-013 overlay hooks, gates and decomp gaps
+  - landed `700b407`; based on dev39's verified symbol map (frame counters are
+    main-loop counters, `SaveFile` is still a stub)
+- [DONE] DOC-004 (docs) — how-to: add a room/door
+  - `docs/howto/add-a-room.md`: IDs -> Tiled/manifest -> converter -> generated
+    tables -> `HACK_ROOMS`/doors -> validation/pitfalls
+  - landed `c035f9b`
+- [DONE] DOC-005 (docs) — how-to: add dialogue/text
+  - `docs/howto/add-dialogue.md`: INCTEXT/charmap, messages.json, TEXT IDs,
+    spawn-index message id, BUG-022 roomSlot pitfall, validation
+  - landed `c035f9b`
+- [DONE] DOC-006 (docs) — how-to: add an enemy behaviour
+  - `docs/howto/add-enemy.md`: PSPRITE_END constraint, proxy pattern, spriteset
+    slot vs roomSlot, hack/*.c is not compiled, custom-AI options
+  - landed `c035f9b`
 - [TODO] TECH-001 (tools) — symbolise hardcoded ROM literals
   - use `tools/shift/map_symbols.py` and the audit ledger to replace the 697
     `ldr` comments/raw addresses with semantic symbols where known
