@@ -19,7 +19,8 @@ map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
 Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
-HACK-001/001a/006 (GDD, layout, Cantor), QA-020 (native normal/shifted/
+HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2
+(ID/text/overlay/generated Entry Ledge table), QA-020 (native normal/shifted/
 reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
 `git log`.
 
@@ -1485,20 +1486,28 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     `src/room.c` selecting `hack/include/hack/content_tables.h`.
   - empty overlay is byte-identical to baseline: normal/hack SHA
     `ca33f434...`; hack `boot_smoke` PASS; `content-check` PASS.
-- [TODO] HACK-008c2 (tools/content) — generated C content tables
-  - emit room/door/spriteset/scroll/text/event C tables from
-    `hack/content` into ignored `hack/gen`; wire through the 008c1 hook
-  - no hand edits to `src/data`
-  - **partial / blocked 2026-10-21**: `tools/content/gen_content_tables.py`
-    generates a valid one-room Entry Ledge table and `hack/gen` header
-    (self-check PASS).  Integration is not merged: the HACK link still picks
-    the baseline `src/room.o` path/duplicate section, so the generated
-    `src/room.o(.rodata)` table is not selected and hack SHA stays baseline.
-    The uncommitted worktree `dev27` has the generator/header; next step is a
-    clean HACK object/linker inclusion rule, then hack SHA/room-load gate.
+- [DONE] HACK-008c2 (tools/content) — generated Entry Ledge room/door/spriteset table
+  - `tools/content/gen_content_tables.py` reads the Tiled converter output and
+    emits `hack/gen/content_tables.h`: one `RoomEntryRom`, RLE bg1/bg2/clip,
+    default spriteset records, a safe empty bg3, and a `DOOR_TYPE_NONE`
+    terminator; deterministic `--write/--check/--self-check`
+  - `make content-tables` / `content-tables-check`; generated output remains
+    ignored under `hack/gen`; no hand edits to `src/data`
+  - HACK linker uses the same `linker.ld` rewritten by
+    `tools/shift/prefix_linker_objects.py` to load only `work/hack/obj`
+    objects; `src/room.o(.rodata)` carries the generated table and
+    `hack-build` rebuilds `room.s` when the generated header changes
+  - landed `4129ed1` + `cd29b7a`; normal/shifted/reordered SHAs unchanged
+    (`ca33f434...` / `5888a563...` / `9dac0a4b...`), hack SHA
+    `621ddc6e...`, `hack-smoke` PASS, `test` PASS, `content-check` PASS
+  - scope note: this task generated room/door/spriteset data only.  Hack-owned
+    scrolls, text, events and music remain for HACK-008d; the two authored
+    Entry Ledge doors stay suppressed until their destinations exist.
 - [TODO] HACK-008d (content/engine) — golden path: 1 room + 1 dialogue + 1 enemy
   - end-to-end from content source to playable build: room, door, text,
     one enemy behavior/event, save entry warp, validator and one-page docs
+  - also emit/select the hack-owned scroll, text and event tables; add the
+    reciprocal Entry Ledge door records or keep the one-room path isolated
   - acceptance: normal/shifted/reordered build; behavior scenario; save/load;
     `content-check`; no baseline table editing
   - HACK-004a2 starts only after this is green
