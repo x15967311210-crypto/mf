@@ -35,6 +35,19 @@
 #include "structs/screen_shake.h"
 #include "structs/scroll.h"
 
+// HACK-008c1 / D-013: AREA_TEST_1 is the single baseline hook that lets the
+// HACK=1 overlay replace room/door tables.  The overlay header defaults to the
+// baseline tables while the overlay is empty; baseline builds do not see it.
+// This is the only `#ifdef HACK` in baseline code.
+#ifdef HACK
+#include "hack/content_tables.h"
+#define AREA_TEST_1_DOORS HACK_AREA_TEST_1_DOORS
+#define AREA_TEST_1_ROOMS HACK_AREA_TEST_1_ROOM_ENTRIES
+#else
+#define AREA_TEST_1_DOORS sTest1Doors
+#define AREA_TEST_1_ROOMS sTest1RoomEntries
+#endif
+
 const struct Door* sAreaDoorPointers[AREA_END] = {
     [AREA_MAIN_DECK] = sMainDeckDoors,
     [AREA_SECTOR_1] = sSector1Doors,
@@ -43,7 +56,7 @@ const struct Door* sAreaDoorPointers[AREA_END] = {
     [AREA_SECTOR_4] = sSector4Doors,
     [AREA_SECTOR_5] = sSector5Doors,
     [AREA_SECTOR_6] = sSector6Doors,
-    [AREA_TEST_1] = sTest1Doors,
+    [AREA_TEST_1] = AREA_TEST_1_DOORS,
     [AREA_TEST_2] = sTest2Doors,
     [AREA_TEST_3] = sTest3Doors
 };
@@ -56,7 +69,7 @@ const struct RoomEntryRom* sAreaRoomEntryPointers[AREA_END] = {
     [AREA_SECTOR_4] = sSector4RoomEntries,
     [AREA_SECTOR_5] = sSector5RoomEntries,
     [AREA_SECTOR_6] = sSector6RoomEntries,
-    [AREA_TEST_1] = sTest1RoomEntries,
+    [AREA_TEST_1] = AREA_TEST_1_ROOMS,
     [AREA_TEST_2] = sTest2RoomEntries,
     [AREA_TEST_3] = sTest3RoomEntries
 };

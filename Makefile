@@ -51,8 +51,24 @@ ifeq ($(DEBUG),1)
 	TARGET := $(TARGET)_debug
 endif
 
-BASEROM := $(TARGET)_baserom.gba
-TARGET := $(TARGET).gba
+# HACK-008c1 / D-013: optional hack content overlay.  `make hack-build`
+# (mk/hack.mk) runs a sub-make with HACK=1; a plain `make` never sets it.  The
+# flag reaches C (-DHACK) and assembly (--defsym HACK=1), and the overlay
+# headers are the only extra include path.  The artifact and the object tree
+# live under work/hack/, so a hack build can never overwrite mf_us.* or the
+# baseline objects it was built from.
+ifeq ($(HACK),1)
+	CPPFLAGS += -DHACK -Ihack/include
+	ASFLAGS += --defsym HACK=1
+	ROM_STEM := work/hack/mf_us_hack
+	OBJ_DIR ?= work/hack/obj
+endif
+
+# ROM_STEM is the artifact basename without .gba.  A command-line override
+# (`make ... ROM_STEM=...`) always wins; baseline builds use $(TARGET).
+ROM_STEM ?= $(TARGET)
+BASEROM := $(ROM_STEM)_baserom.gba
+TARGET := $(ROM_STEM).gba
 
 # Default target
 .PHONY: all
@@ -123,6 +139,15 @@ CSRC = $(wildcard src/**.c) $(wildcard src/**/**.c) $(wildcard src/**/**/**.c) $
 ASMSRC = $(CSRC:.c=.s) $(wildcard asm/*.s) $(wildcard sound/*.s) $(wildcard sound/**/*.s)
 OBJ = $(ASMSRC:.s=.o) 
 
+# HACK-008c1: OBJ_DIR redirects intermediates into a private tree (see
+# mk/hack.mk).  It is empty for every baseline/shift/reorder target, so their
+# object paths and link order are unchanged.  When set, the link order below
+# still follows ASMSRC exactly.
+OBJ_DIR ?=
+ifneq ($(OBJ_DIR),)
+	OBJ := $(addprefix $(OBJ_DIR)/,$(OBJ))
+endif
+
 # Detect if agbcc was installed into the project
 ifneq (,$(wildcard tools/agbcc))
 	AGBCC_BIN := tools/agbcc/bin/agbcc
@@ -157,7 +182,8 @@ RULES_NO_SCAN += symbols audit-asm audit-blobs rewrite report audit \
 	test test-input input-smoke emulator-harness shift-build shift-test \
 	shift-check shift-reorder shift-start shift-input shift-input-30k \
 	shift-screen screen-diff oam-diff event-diff shift-check-all \
-	postlink-scan postlink-scan-strict shift-help
+	postlink-scan postlink-scan-strict shift-help \
+	hack-build hack-sha1 hack-smoke
 
 # Generate tools before building anything
 SETUP_PREREQS ?= 1
@@ -267,6 +293,10 @@ host-test:
 # $(SHIFT_HELP).
 include mk/shift.mk
 
+# HACK=1 overlay build (HACK-008c1 / D-013).  Contributes `hack-build`,
+# `hack-sha1`, `hack-smoke` and $(HACK_HELP); it owns no `all`/`help` target.
+include mk/hack.mk
+
 .PHONY: help
 help:
 	@echo 'Targets:'
@@ -286,6 +316,9 @@ help:
 	@echo ''
 	@echo 'Shift/audit/test targets (always available; legacy: make -f Makefile.shift <target>):'
 	$(SHIFT_HELP)
+	@echo ''
+	@echo 'Hack overlay build (D-013; HACK=1, artifacts under work/hack/):'
+	$(HACK_HELP)
 	@echo ''
 	@echo 'Flags:'
 	@echo '  V=1: enable verbose output'

@@ -177,6 +177,46 @@ HACK-004a should consume the output directory, not the Tiled file directly:
 The exact room IDs and provisional door indices are in
 `docs/design/content-ids.md`; they are not duplicated here.
 
+## Hack build boundary (HACK-008c1 / D-013)
+
+D-013 splits baseline parity builds from hack content: `src/data` stays
+vanilla-owned, and a `HACK=1` build links an overlay that the baseline builds
+never see.  HACK-008c1 adds that build boundary with an **empty** overlay.
+
+```sh
+make hack-build   # work/hack/mf_us_hack.gba (+ .elf, .map)
+make hack-sha1    # hack-build, then work/hack/mf_us_hack.sha1
+make hack-smoke   # hack-build + static smoke + boot_smoke (77 if no harness)
+```
+
+The target runs one sub-make with:
+
+| Channel | Value |
+|---|---|
+| C preprocessor | `CPPFLAGS += -DHACK -Ihack/include` |
+| assembler | `ASFLAGS += --defsym HACK=1` |
+| artifact | `ROM_STEM=work/hack/mf_us_hack` |
+| objects | `OBJ_DIR=work/hack/obj` |
+| linker script | `LD_SCRIPT=work/hack/linker.ld.pp` |
+
+Both artefact and intermediates live under the ignored `work/hack/`, so a hack
+build never replaces `mf_us.gba`/`mf_us.elf`/`mf_us.map`, and the baseline
+objects that a later `make` would relink are untouched.  `make`, `make
+shift-build` and `make shift-reorder` keep their normal flags and SHAs.
+
+The overlay's only baseline hook is in `src/room.c`: under `#ifdef HACK` it
+includes `hack/include/hack/content_tables.h` and uses
+`HACK_AREA_TEST_1_DOORS` / `HACK_AREA_TEST_1_ROOM_ENTRIES` for the
+`AREA_TEST_1` entries of `sAreaDoorPointers` / `sAreaRoomEntryPointers`.  For
+008c1 the header maps both macros to `sTest1Doors` / `sTest1RoomEntries`, so
+the hack ROM is byte-identical to the baseline and boots through the baseline
+Test Area 1 tables.
+
+HACK-008c2 replaces those two defaults with the generated tables (declared
+`extern` in the same header) under the ignored `hack/gen/`; no linker, object
+or `src/data` change is needed.  Do not add hack content directly to
+`src/data`, and do not commit generated tables.
+
 ## Text pipeline (HACK-008b)
 
 Text uses the repository `charmap.txt` through `tools/preproc`'s **C
