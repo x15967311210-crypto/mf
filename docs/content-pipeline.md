@@ -163,6 +163,13 @@ The RLE encoder emits the same two one-byte planes consumed by
 round-trip.  Spawn record byte 2 is encoded with `SPRITESET_IDX(slot)` and
 `sprite_id` is round-tripped through `decode_spawn_record()` in the self-check.
 
+`doors.bin` is a **9-byte** file record (`type, srcRoom, xStart, xEnd, yStart,
+yEnd, dstDoor, xExit, yExit`).  The generated C table stores the same fields as
+`struct Door`, which agbcc pads to **12 bytes**, so door N is
+`HackTest1Doors + 12*N` in the ROM and `doors.bin + 9*N` on disk.  Never index
+one with the other's stride; the generator converts the records and both sides
+use the same table order.
+
 ## HACK-004a integration
 
 HACK-004a should consume the output directory, not the Tiled file directly:
@@ -179,6 +186,10 @@ HACK-004a should consume the output directory, not the Tiled file directly:
 The exact room IDs and provisional door indices are in
 `docs/design/content-ids.md`; they are not duplicated here.
 
+HACK-004a2a implements steps 1–3 for all five Test Area 1 rooms (see “Five-room
+generation and reciprocal doors”); the baseline, shifted and reordered SHAs stay
+unchanged because the tables are ROM-relocatable and only linked into `HACK=1`.
+
 ## Hack build boundary (HACK-008c1 / D-013)
 
 D-013 splits baseline parity builds from hack content: `src/data` stays
@@ -186,7 +197,7 @@ vanilla-owned, and a `HACK=1` build links an overlay that the baseline builds
 never see.  HACK-008c1 adds that build boundary with an **empty** overlay.
 
 ```sh
-make content-tables      # hack/content -> hack/gen/rooms/entry_ledge + content_tables.h + scroll_tables.h
+make content-tables      # hack/content -> hack/gen/rooms/<room> + content_tables.h + scroll_tables.h + sprite_tables.h + text_tables.h
 make content-tables-check
 make hack-build          # work/hack/mf_us_hack.gba (+ .elf, .map)
 make hack-sha1           # hack-build, then work/hack/mf_us_hack.sha1
@@ -237,11 +248,12 @@ explicitly: without the rewrite GNU ld would load baseline `src/*.o` even
 though `hack-build` compiles private objects.  The normal/shifted/reordered
 builds use the unmodified object paths and keep their SHAs.
 
-The current overlay intentionally does **not** yet select hack-owned text,
-events, enemy sprites, active doors or an entry warp.  Test Area 1 uses the
-generated room-entry and scroll tables described below; text/event table
-generation belongs to the HACK-008d golden path.  Do not add hack content
-directly to `src/data`, and do not commit generated tables.
+The current overlay selects hack-owned room/door, scroll, spriteset and
+message-banner tables, plus the HACK-only entry warp described below.  Events,
+enemy AI/art and the authored event block remain future work
+(HACK-004a2b/004b); see “Five-room generation and reciprocal doors” for the
+current five-room state.  Do not add hack content directly to `src/data`, and
+do not commit generated tables.
 
 ### Scroll tables (HACK-008d1)
 
@@ -345,15 +357,33 @@ without a vanilla door.  It is one narrow `#ifdef HACK` block in
 - it sets `gCurrentArea = AREA_TEST_1`, `gLastDoorUsed = 0` and a valid Samus
   position, because `RoomLoadEntry()`'s file-load branch returns without
   placing Samus outside Main Deck room 0;
-- `RoomLoad()` then takes room 0 from the generated `HackTest1Doors`
-  `DOOR_TYPE_NONE` terminator.
+- `RoomLoad()` then takes the room from door 0 of the generated
+  `HackTest1Doors`; door 0's `srcRoom` is 0, so a fresh file still lands in
+  Entry Ledge (before HACK-004a2a the one-entry table's `DOOR_TYPE_NONE`
+  terminator supplied the room number).
 
-`make hack-room-check` replays the committed
-`tests/emulator/inputs/baseline_first30000.input` (the first fixture that
-reaches in-game) against the hack ROM and requires the final state to report
-`area=7 room=0`, `main=1` and a live frame counter.  The assertion lives in
-`tests/emulator/run.py --expect-event`; the harness binary is unchanged.
-`make hack-smoke` stays a fast static + 600-frame boot check.
+`make hack-room-check` replays a **29500-frame prefix** of the committed
+`tests/emulator/inputs/baseline_first30000.input` against the hack ROM and
+requires the final state to report `area=7 room=0`, `main=1` and a live frame
+counter.  The prefix is generated deterministically into the ignored
+`work/emulator/` tree by `mk/hack.mk`:
+
+```sh
+awk '/^#/ || ($1+0)<=29500' tests/emulator/inputs/baseline_first30000.input \
+  > work/emulator/hack_room_prefix_29500.input
+```
+
+`HACK_ROOM_PREFIX` names that file, `HACK_ROOM_INPUT` defaults to it and
+`HACK_ROOM_FRAME` (default 29500) controls the cut, so the target depends on a
+rule whose prerequisite is the committed fixture.  The full 30k fixture is
+**not** a valid entry-warp assertion any more: HACK-004a2a makes the 12 doors
+live, and the replay walks through Entry Ledge's door 0 at about frame 29657,
+legitimately ending in a different Test Area 1 room.  `hack-room-check` proves
+the HACK-008d4a entry warp/room load, not door chaining; the prefix ends before
+that transition (frame 29500 still reports room 0).  `hack-liveness-check` is
+unaffected because its own 28450-frame prefix is earlier still.  The assertion
+lives in `tests/emulator/run.py --expect-event`; the harness binary is
+unchanged.  `make hack-smoke` stays a fast static + 600-frame boot check.
 
 Known limits: the warp is HACK-only and applies to a fresh file load; normal
 door transitions, save/load persistence and the route back into Entry Ledge are
@@ -395,6 +425,79 @@ SHA).  Instead:
 The result is a Hornoad data clone with the Echo Hunter's id in the content
 tables.  Custom AI, animation and art are HACK-004b work, not part of this
 golden path.
+
+### Five-room generation and reciprocal doors (HACK-004a2a)
+
+The content-tables and hack-build path now converts and links **all five**
+authored Test Area 1 rooms instead of one.  The defaults in `mk/hack.mk` are:
+
+```make
+HACK_ROOMS        ?= entry_ledge silent_atrium resonance_chamber hidden_conduit choir_nest
+HACK_ROOMS_DIR    ?= hack/gen/rooms
+HACK_ACTIVE_DOORS ?= 1
+HACK_DOOR_FLAGS   ?= $(if $(filter 0,$(HACK_ACTIVE_DOORS)),,--active-doors)
+```
+
+`content-tables` runs `tiled_to_room.py` once per name (output
+`hack/gen/rooms/<room>/`, `--force`), then a single `gen_content_tables.py`
+with one `--room-dir` per room.  `HACK_ROOM`/`HACK_ROOM_DIR` remain the
+single-room debugging selection; a subset that has no destinations can pass
+`HACK_ACTIVE_DOORS=0`, which drops `--active-doors` and emits the one-entry
+`DOOR_TYPE_NONE` table again.  The manifest index of each room (0..4, in
+`HACK_ROOMS` order) is the engine room number and matches the `ROOM_*` IDs in
+`hack/content/ids.yaml`.
+
+Every room gets its own blobs in the three generated headers:
+
+| Header | Per-room tables | Room-indexed table |
+|---|---|---|
+| `content_tables.h` | `HackTest1Room<N>{Bg1Data,Bg2Data,ClipData}`, `HackTest1Room<N>{Default,First,Second}SpriteData`, `HackTest1Room<N>Bg3Empty` | `HackTest1RoomEntries[5]` (`RoomEntryRom`) |
+| `content_tables.h` | — | `HackTest1Doors[12]` + `DOOR_TYPE_NONE` |
+| `scroll_tables.h` | `HackTest1Room<N>Scrolls[SCROLL_DATA_SIZE(n)]` | `HackTest1ScrollPointers[5]` + `HackAreaScrollEnd` |
+| `sprite_tables.h` | `HackTest1Room<N>DefaultSpriteset` | `HackTest1DefaultSpritesets[5]` |
+
+The 12 authored doors are six **reciprocal pairs** — table indices `0/1`,
+`2/3`, `4/5`, `6/7`, `8/9`, `10/11`.  The index is the position in
+`HackTest1Doors`; `dstDoor` is another index in that same table, and the room
+number is `srcRoom` (the generated table is already room-filtered by
+`RoomLoadDoors`).  `--active-doors` makes the generator validate each pair:
+the destination index must be in range, point back to the source door and land
+in the room the manifest names.  A `DOOR_TYPE_NONE` terminator ends the scan,
+so the table is 13 records in C.
+
+The file record and the C record do **not** have the same stride.  `doors.bin`
+stores 9 bytes (`struct Door` fields in order); agbcc pads the same
+`struct Door` to **12 bytes**, and the linked table is `13 * 12 = 0x9C` bytes
+(`nm -S`).  Door `N` is `doors.bin + 9*N` but `HackTest1Doors + 12*N`; the
+generator is the only place that translates between them.
+
+`src/room.c` consumes the generated tables through the existing narrow
+`#ifdef HACK` selectors (`HACK_AREA_TEST_1_ROOM_ENTRIES`,
+`HACK_AREA_TEST_1_DOORS`), so the five rooms and their door chaining are still
+linked only in `HACK=1`; `src/data` is untouched and the baseline/shifted/
+reordered SHAs are unchanged.
+
+Gates for this work: `make content-tables-check`, `make content-check`,
+`make hack-build`, `make hack-smoke`, `make hack-room-check` (29500-frame
+entry-warp prefix, above) and `make hack-liveness-check` (unchanged 28450-frame
+prefix: 7-entry Entry Ledge spriteset, four live spawns).
+
+**Still missing (HACK-004a2b and later):**
+
+- **Event block:** the authored `AREA_TEST_1` events `0x6E..0x77`
+  (`EVENT_END = 0x78`) are not emitted; the entry warp is still the HACK-only
+  `InitAndLoadGenerics()` block, not an event.  Reserve/IDs are in
+  `docs/design/content-ids.md`.
+- **Broad event checks:** vanilla code that compares
+  `event >= EVENT_ORBIT_CHANGE_IMPLEMENTED` (0x67) still treats the new range as
+  late-game, which disables the save/navigation/recharge pads.  Those checks
+  must be narrowed before M1; this patch deliberately does not touch them.
+- **Door-transition/save-load scenario:** `hack-room-check` stops before the
+  first door on purpose, so `xExit`/`yExit` placement, hatch/lock state, the
+  return route and save/load persistence across the five rooms are **not**
+  proven.  HACK-004a2b adds that dedicated scenario.
+- **Echo Hunter AI:** still a Hornoad data clone (HACK-008d3); custom AI,
+  animation and art are HACK-004b.
 
 
 ## Text pipeline (HACK-008b)
@@ -453,10 +556,13 @@ banner is not exercised until HACK-008d4 adds the Entry Ledge entry warp.
 - **Animated tilesets/palettes:** `TilesetEntry`/`RoomEntry` fields exist but
   the manifest does not model animation, and the PNG palette is validated but
   not emitted.
-- **Composition/room lists:** no `sAreaRoomEntryPointers`, room-entry, door,
-  tileset or scroll C-table emission; HACK-004a does that integration.
-- **Scripts/events:** no puzzle, event, lock, text, music or transition
-  scripting; doors are static records only.
+- **Composition/room lists:** HACK-004a2a now emits room entries, doors,
+  spritesets and scrolls for the five Test Area 1 rooms; other areas and
+  tileset/palette tables still come from baseline `src/data`.
+- **Scripts/events:** no puzzle, lock, music or event scripting; the 12 doors
+  are static reciprocal records with working room transitions, but the authored
+  `0x6E..0x77` event block and the broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED`
+  fixes are HACK-004a2b (see “Five-room generation and reciprocal doors”).
 - **ID allocation:** rooms, doors and the slice event block are seeded;
   `SPRITE_ECHO_HUNTER=0xCF` is reserved for HACK-008d and requires extending
   `PSPRITE_END`/primary tables before use. Text now has one active
