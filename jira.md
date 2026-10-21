@@ -19,8 +19,8 @@ map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
 Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
-HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2
-(ID/text/overlay/generated Entry Ledge table), QA-020 (native normal/shifted/
+HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1
+(ID/text/overlay/generated Entry Ledge room + scroll tables), QA-020 (native normal/shifted/
 reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
 `git log`.
 
@@ -1503,18 +1503,26 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - scope note: this task generated room/door/spriteset data only.  Hack-owned
     scrolls, text, events and music remain for HACK-008d; the two authored
     Entry Ledge doors stay suppressed until their destinations exist.
-- [DOING @dev28] HACK-008d1 (tools/engine) — hack-owned scroll table for AREA_TEST_1
-  - extend `tools/content/gen_content_tables.py` to emit the Entry Ledge scroll
-    block from `scrolls.bin` plus a `const u8*` per-room list and an `0xFF`
-    terminator; validate the decoded records against the room manifest
-  - one narrow `#ifdef HACK` hook in `src/scroll.c` (mirroring `src/room.c`)
-    selecting the generated list for `sAreaScrollPointers[AREA_TEST_1]`;
-    baseline builds keep their exact text/scroll tables
-  - evidence: generator `--self-check`/`--check`, `make content-tables-check`,
-    `hack-build`/`hack-smoke`, the generated symbols present in the hack ELF
-    and referenced by `sAreaScrollPointers`, and unchanged normal/shifted/
-    reordered SHAs
-  - out of scope: text, events, enemy, doors, room entry/save-load
+- [DONE] HACK-008d1 (tools/engine) — hack-owned scroll table for AREA_TEST_1
+  - `tools/content/gen_content_tables.py` now emits `scroll_tables.h` beside
+    `content_tables.h`: one `SCROLL_DATA_SIZE(n)` block per room, byte-exact
+    with `scrolls.bin`, the `0xFF` terminator, `HackTest1ScrollPointers` and
+    `HACK_AREA_TEST_1_SCROLLS`; `--self-check` covers bad count/length/field/
+    room-id plus stale/missing headers
+  - scrolls are split from the room/door header so `src/room.c` and
+    `src/scroll.c` each define the generated objects exactly once; a single
+    shared header emitted every blob twice (now proven gone by `nm`: one
+    `HackTest1Room0Scrolls` at `0x0879b978`, `sAreaScrollPointers[7]` =
+    `0x0879b9d4` = the single list, ROM bytes = `scrolls.bin`)
+  - one new `#ifdef HACK` hook in `src/scroll.c` selects the generated list;
+    tracked shim `hack/include/hack/scroll_tables.h`; `mk/hack.mk` rebuilds
+    `scroll.s` when the header changes
+  - landed `5251917`; gates: `content-tables-check`, `content-check`,
+    `hack-build`, `hack-smoke` (static + 600-frame boot) PASS; normal
+    `ca33f434…`, shifted `5888a563…`, reordered `9dac0a4b…` unchanged; `make
+    -f Makefile.shift test` (boot + 4k input), `audit`, `check_relocs` PASS
+  - still missing: no active doors/entry warp, so `ScrollLoad()` with this
+    table is linked but not yet exercised in a room-load scenario
 - [TODO] HACK-008d2 (tools/engine) — text ID space and hack-owned message table
   - define the first `TEXT_*` ID and a relocatable hack-owned text pointer
     table; add one narrow `#ifdef HACK` lookup hook in `src/text.c` with a
