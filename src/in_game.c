@@ -17,6 +17,11 @@
 #include "structs/samus.h"
 #include "structs/sa_x.h"
 
+#ifdef HACK
+#include "constants/connection.h"
+#include "structs/connection.h"
+#endif
+
 /**
  * @brief dd24 | 234 | In game mode handler
  * 
@@ -449,6 +454,23 @@ void InitAndLoadGenerics(void)
         if (vcount >= 140)
             break;
     }
+
+#ifdef HACK
+    // M1 test-entry shortcut (HACK-008d4a / D-013): the first room load after
+    // starting or continuing a file goes to the hack-owned Entry Ledge
+    // (AREA_TEST_1 room 0) instead of vanilla Main Deck.  gUnk_3000be3 is 0 only
+    // until the first room has loaded (Sram_CheckLoadSaveFile clears it and the
+    // end of this function sets it), so later door transitions keep the
+    // baseline destination.  Block 11 is clear of the save pad (3,7), data pad
+    // (9,7) and message banner (6,4); block 8 is the top of the floor.
+    if (gUnk_3000be3 == 0)
+    {
+        gCurrentArea = AREA_TEST_1;
+        gLastDoorUsed = 0;
+        gSamusData.xPosition = BLOCK_TO_SUB_PIXEL(11) + HALF_BLOCK_SIZE;
+        gSamusData.yPosition = BLOCK_TO_SUB_PIXEL(8) - ONE_SUB_PIXEL;
+    }
+#endif
 
     RoomLoad();
 

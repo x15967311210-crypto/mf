@@ -3,6 +3,12 @@
 
 Static mode always works.  Dynamic mode uses mGBA's Lua interface; if no
 emulator is installed it exits 77 (skip), never a false pass.
+
+Input replays can opt into an end-state assertion with ``--expect-event``.
+That passes ``--final`` to the harness and requires the final `FINAL_EVENT`
+line to report the expected area/room, the `INPUT_FINAL` line to report
+``main=1`` (in-game) and a live frame counter.  Without the option the
+harness invocation and markers are unchanged.
 """
 
 from __future__ import annotations
@@ -35,6 +41,75 @@ DEFAULT_FRAMES = {
 DEFAULT_TIMEOUT = 180
 INPUT_TIMEOUT = 1800
 
+# `--expect-event` accepts either the harness spelling or AREA:ROOM.
+EXPECT_EVENT_RE = re.compile(r"^(?:area=(\d+)\s+room=(\d+)|(\d+):(\d+))$")
+FINAL_EVENT_RE = re.compile(
+    r"^FINAL_EVENT frame=(\d+) counter=(\d+) area=(\d+) room=(\d+) nav=(\d+)$",
+    re.MULTILINE,
+)
+INPUT_FINAL_RE = re.compile(
+    r"^INPUT_FINAL frames=(\d+) frame_counter=(\d+) keys=\d+ "
+    r"disp=0x[0-9A-Fa-f]+ main=(\d+)\b",
+    re.MULTILINE,
+)
+# How far the emulator's frame counter may trail the input length before the
+# replay is considered frozen.
+FRAME_COUNTER_SLACK = 200
+
+
+def parse_expect_event(value: str) -> tuple[int, int]:
+    """Parse ``area=N room=N`` or ``N:N`` into (area, room)."""
+    match = EXPECT_EVENT_RE.match(value.strip())
+    if not match:
+        raise ValueError(
+            f"invalid --expect-event {value!r} "
+            "(expected 'area=N room=N' or 'AREA:ROOM')"
+        )
+    if match.group(1) is not None:
+        return int(match.group(1)), int(match.group(2))
+    return int(match.group(3)), int(match.group(4))
+
+
+def check_expected_event(output: str, expected: tuple[int, int]) -> bool:
+    """Validate the harness end-state lines for an --expect-event run."""
+    area, room = expected
+
+    final_event = FINAL_EVENT_RE.search(output)
+    if not final_event:
+        print("FAIL: --expect-event: harness printed no FINAL_EVENT line")
+        return False
+    got_area = int(final_event.group(3))
+    got_room = int(final_event.group(4))
+    if (got_area, got_room) != (area, room):
+        print(
+            "FAIL: --expect-event: expected area="
+            f"{area} room={room}, harness ended at "
+            f"area={got_area} room={got_room}"
+        )
+        return False
+
+    input_final = INPUT_FINAL_RE.search(output)
+    if not input_final:
+        print("FAIL: --expect-event: harness printed no INPUT_FINAL line")
+        return False
+    frames = int(input_final.group(1))
+    frame_counter = int(input_final.group(2))
+    main = int(input_final.group(3))
+    if main != 1:
+        print(
+            "FAIL: --expect-event: expected main=1 (in-game), "
+            f"harness reported main={main}"
+        )
+        return False
+    if frame_counter < frames - FRAME_COUNTER_SLACK:
+        print(
+            "FAIL: --expect-event: replay stalled at "
+            f"frame_counter={frame_counter}, expected at least "
+            f"{frames - FRAME_COUNTER_SLACK} for a {frames}-frame input"
+        )
+        return False
+    return True
+
 
 def harness_command(
     harness: str,
@@ -44,6 +119,7 @@ def harness_command(
     input_path: str | None = None,
     expect_path: str | None = None,
     screen: bool = False,
+    expect_event: tuple[int, int] | None = None,
 ) -> list[str]:
     """Build the harness argv, preserving the legacy boot-smoke invocation."""
     if scenario == "boot_smoke":
@@ -57,6 +133,8 @@ def harness_command(
             cmd += ["--expect", expect_path]
         if screen:
             cmd += ["--screen"]
+        if expect_event is not None:
+            cmd += ["--final"]
     if frames is not None:
         cmd += ["--frames", str(frames)]
     return cmd
@@ -98,11 +176,19 @@ def run_dynamic(
     expect_path: str | None = None,
     timeout: int | None = None,
     screen: bool = False,
+    expect_event: tuple[int, int] | None = None,
 ) -> int:
     harness = find_harness()
     if harness:
         cmd = harness_command(
-            harness, rom, scenario, frames, input_path, expect_path, screen
+            harness,
+            rom,
+            scenario,
+            frames,
+            input_path,
+            expect_path,
+            screen,
+            expect_event,
         )
         print("RUN:", " ".join(cmd))
         if timeout is None:
@@ -137,6 +223,13 @@ def run_dynamic(
         if marker not in output:
             print(f"FAIL: harness did not print {marker!r}")
             return 1
+        if expect_event is not None:
+            if not check_expected_event(output, expect_event):
+                return 1
+            print(
+                f"PASS: expected event area={expect_event[0]} "
+                f"room={expect_event[1]} (in-game, live)"
+            )
         print(f"PASS: {scenario}")
         return 0
 
@@ -220,6 +313,13 @@ def main() -> int:
         help="hash the framebuffer at input checkpoints (requires --input)",
     )
     ap.add_argument(
+        "--expect-event",
+        default=None,
+        metavar="AREA:ROOM",
+        help="require the input replay to end in area/room, in-game and "
+        "live (e.g. 'area=7 room=0' or '7:0'); implies --final",
+    )
+    ap.add_argument(
         "--timeout",
         type=int,
         default=None,
@@ -237,6 +337,14 @@ def main() -> int:
         ap.error("--expect requires --input FILE")
     if args.screen and not args.input:
         ap.error("--screen requires --input FILE")
+    if args.expect_event and not args.input:
+        ap.error("--expect-event requires --input FILE")
+    expect_event = None
+    if args.expect_event:
+        try:
+            expect_event = parse_expect_event(args.expect_event)
+        except ValueError as exc:
+            ap.error(str(exc))
     scenario = "input" if args.input else args.scenario
     if scenario == "input" and not args.input:
         ap.error("--scenario input requires --input FILE")
@@ -258,6 +366,7 @@ def main() -> int:
         args.expect,
         args.timeout,
         args.screen,
+        expect_event,
     )
 
 

@@ -329,8 +329,36 @@ slot and stage falls through to the unchanged vanilla index math.
 `make content-tables` writes the table, `make content-tables-check` fails if it
 is stale or missing, and `python3 tools/content/gen_text_tables.py
 --self-check` covers the generator without a ROM.  This proves the linked
-table, not the in-game display: a message banner is still only reachable after
-HACK-008d4 adds the Entry Ledge entry warp.
+table.  HACK-008d4a now makes Entry Ledge reachable (below), but no scenario
+yet proves that the banner actually pops up and draws the hack text in game.
+
+### Hack entry warp (HACK-008d4a)
+
+The HACK build redirects the **first** room load after starting or continuing a
+file into `AREA_TEST_1` room 0 (Entry Ledge), so the overlay is reachable
+without a vanilla door.  It is one narrow `#ifdef HACK` block in
+`InitAndLoadGenerics()` (`src/in_game.c`) immediately before `RoomLoad()`:
+
+- it is gated on `gUnk_3000be3 == 0`, which is true only until the first room
+  has loaded (`Sram_CheckLoadSaveFile` clears it; the end of the same function
+  sets it), so later door transitions keep their baseline destination;
+- it sets `gCurrentArea = AREA_TEST_1`, `gLastDoorUsed = 0` and a valid Samus
+  position, because `RoomLoadEntry()`'s file-load branch returns without
+  placing Samus outside Main Deck room 0;
+- `RoomLoad()` then takes room 0 from the generated `HackTest1Doors`
+  `DOOR_TYPE_NONE` terminator.
+
+`make hack-room-check` replays the committed
+`tests/emulator/inputs/baseline_first30000.input` (the first fixture that
+reaches in-game) against the hack ROM and requires the final state to report
+`area=7 room=0`, `main=1` and a live frame counter.  The assertion lives in
+`tests/emulator/run.py --expect-event`; the harness binary is unchanged.
+`make hack-smoke` stays a fast static + 600-frame boot check.
+
+Known limits: the warp is HACK-only and applies to a fresh file load; normal
+door transitions, save/load persistence and the route back into Entry Ledge are
+still baseline behaviour.
+
 
 ## Text pipeline (HACK-008b)
 

@@ -39,6 +39,11 @@ HACK_OBJ_DIR ?= $(HACK_WORK)/obj
 HACK_LD_SCRIPT ?= $(HACK_WORK)/linker.ld.pp
 HACK_FRAMES ?= 600
 HACK_SCENARIO ?= boot_smoke
+# HACK-008d4a: first file-load input fixture that reaches in-game, plus the
+# expected hack entry area/room (AREA_TEST_1 = 7, Entry Ledge room 0).
+HACK_ROOM_INPUT ?= tests/emulator/inputs/baseline_first30000.input
+HACK_ROOM_EVENT ?= area=7 room=0
+HACK_ROOM_TIMEOUT ?= 600
 HACK_ROOM ?= entry_ledge
 HACK_ROOM_DIR ?= hack/gen/rooms/$(HACK_ROOM)
 HACK_TABLES ?= hack/gen/content_tables.h
@@ -96,7 +101,7 @@ $(HACK_LD_SCRIPT): linker.ld tools/shift/prefix_linker_objects.py
 	$(CPP) $(CPPFLAGS) $< -o $@
 	$(PYTHON) tools/shift/prefix_linker_objects.py $@ --obj-dir $(HACK_OBJ_DIR)
 
-.PHONY: content-tables content-tables-check hack-build hack-sha1 hack-smoke
+.PHONY: content-tables content-tables-check hack-build hack-sha1 hack-smoke hack-room-check
 
 # HACK-008c2/HACK-008d1/HACK-008d2: the only generated-content step.  The room
 # converter output and all C headers are under ignored hack/gen/.
@@ -135,11 +140,21 @@ hack-smoke: hack-build
 	$(PYTHON) tests/emulator/run.py --rom $(HACK_ROM) \
 		--scenario $(HACK_SCENARIO) --frames $(HACK_FRAMES)
 
+# HACK-008d4a: replay the first 30k baseline frames and require the hack ROM to
+# end in Entry Ledge (AREA_TEST_1 room 0), still in-game, with a live frame
+# counter (77 if the headless harness is unavailable).
+hack-room-check: hack-build
+	$(PYTHON) tests/emulator/run.py --rom $(HACK_ROM) \
+		--input $(HACK_ROOM_INPUT) --expect-event "$(HACK_ROOM_EVENT)" \
+		--timeout $(HACK_ROOM_TIMEOUT)
+
 define HACK_HELP
 	@echo "  content-tables      generate hack/gen/rooms/entry_ledge + content_tables.h + scroll_tables.h + text_tables.h"
 	@echo "  content-tables-check verify the generated one-room headers and text table are fresh"
 	@echo "  hack-build          build the HACK=1 overlay ROM into work/hack/ (D-013)"
 	@echo "  hack-sha1           hack-build, then write work/hack/mf_us_hack.sha1"
 	@echo "  hack-smoke          hack-build + static smoke + boot smoke (77 if no harness)"
-	@echo "Variables: HACK_WORK, HACK_STEM, HACK_ROM, HACK_OBJ_DIR, HACK_LD_SCRIPT, HACK_FRAMES, HACK_SCENARIO"
+	@echo "  hack-room-check     hack-build + 30k input replay; require Entry Ledge area=7 room=0 in-game (77 if no harness)"
+	@echo "Variables: HACK_WORK, HACK_STEM, HACK_ROM, HACK_OBJ_DIR, HACK_LD_SCRIPT, HACK_FRAMES, HACK_SCENARIO,"
+	@echo "           HACK_ROOM_INPUT, HACK_ROOM_EVENT, HACK_ROOM_TIMEOUT"
 endef
