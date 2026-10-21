@@ -1609,12 +1609,17 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     the 12-entry `sTest1Doors` shape belong to HACK-004a2; do not renumber
     `dstDoor` in this task
   - add a repeatable sprite-liveness check on top of `hack-room-check`:
-    replay a deterministic prefix of the committed 30k input (~input frame
-    28450, the window where all spawns are alive), dump IWRAM, and assert
-    `gSpritesetSpriteIds[0..6] == 1F 1E 12 41 62 21 CF`, gfx slots 0..6, and
-    live sprites with roomSlots 0..3 and ids `1F,1E,21,12`; read the addresses
-    from the hack ELF (`nm`), exit 77 without a harness, and wire it into
-    `mk/hack.mk`/`HACK_HELP` without slowing `hack-smoke`
+    replay input prefix **28450** of the committed 30k input (verified stable:
+    three runs, identical IWRAM; `frames=28451 frame_counter=28312`), dump
+    IWRAM, and assert the exact table `gSpritesetSpriteIds[0..6] ==
+    1F 1E 12 41 62 21 CF` with gfx slots `0..6`, plus live sprite-table
+    indices 0..3 with ids/status/roomSlot
+    `1F/0003/0`, `1E/0003/1`, `21/0013/255`, `12/8003/3`.
+    `struct SpriteData` stride is **0x38** on GBA (derive it from
+    `(gSpritesetSpriteIds - gSpriteData) / 24`); the banner's roomSlot is
+    `UCHAR_MAX` (MessageBannerInit), not its spawn index.  Read addresses with
+    `nm` (PATH, then `/home/x1596/.local/bin`), exit 77 without a harness, and
+    wire it into `mk/hack.mk`/`HACK_HELP` without slowing `hack-smoke`
   - write the one-page `docs/golden-path.md`: build/run commands, entry-warp
     explanation, controls, what to see (Entry Ledge, save pad, data pad,
     banner text "ENTRY LEDGE / THE SIGNAL IS WEAK", Echo Hunter clone), how to
