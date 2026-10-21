@@ -1551,18 +1551,24 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - display in game is still unproven: no entry warp yet, so the banner is
     never drawn (HACK-008d4)
   - out of scope: entry warp, enemy, doors, save/load
-- [TODO] HACK-008d3 (engine/content) — Echo Hunter primary sprite
-  - design constraint found in 008d2 research: `PSPRITE_END` (0xCF) sizes
-    `sPrimarySpritesAiPointers`, `sPrimarySpriteStats`, `sSpritesGraphicsPointers`,
+- [DOING @dev31] HACK-008d3 (engine/content) — Echo Hunter primary sprite
+  - entry warp (008d4a) now provides the behaviour gate
+  - design constraint: `PSPRITE_END` (0xCF) sizes `sPrimarySpritesAiPointers`,
+    `sPrimarySpriteStats`, `sSpritesGraphicsPointers`,
     `sSpritesPalettePointers` and `sSpritesGraphicsLength`; appending an entry
     to those baseline `src/data` arrays shifts later symbols and changes the
     baseline SHA, so "extend every table in place" is not allowed
-  - use a HACK-only dispatch wrapper instead: `SPRITE_ECHO_HUNTER = 0xCF`
-    stays out of the baseline arrays, and one narrow `#ifdef HACK` lookup
-    helper in `src/sprite.c` (plus the gfx/pal/length/stats accessors) returns
-    the hack entry for 0xCF and the unchanged baseline table otherwise; the AI
-    entry is hack-owned, not `src/data`
-  - one Entry Ledge spawn record, a host/static check that the ID resolves, and
+  - use a HACK-only wrapper instead: keep `SPRITE_ECHO_HUNTER = 0xCF` out of
+    the baseline arrays; in `src/sprite.c` (single TU) add a HACK-only AI
+    dispatch helper for the four `sPrimarySpritesAiPointers[...]` call sites
+    and a proxy id for the gfx/pal/length loads, so 0xCF runs a baseline-sprite
+    data clone without touching `src/data`; custom AI/animation is HACK-004b
+  - tool: `tiled_to_room.py` must resolve `SPRITE_ECHO_HUNTER` from
+    `hack/include/hack/ids.h` (or accept it via the manifest) and allow the
+    id in a spriteset table even though the vanilla enum stops at 0xCE
+  - content: one Entry Ledge spawn record + manifest spriteset slot
+  - gates: `hack-room-check` must still end in `area=7 room=0` with a live
+    frame counter (a bad table read would stall/crash), `hack-smoke`, and
     unchanged normal/shifted/reordered SHAs
 - [DONE] HACK-008d4a (engine/qa) — hack entry warp + room-load check
   - ordering changed by the manager: without an entry warp neither the d2 text
@@ -1588,8 +1594,6 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - limits: HACK-only first-load warp; no door reciprocity, no save/load
     persistence, no route back into Entry Ledge, and the banner/enemy are now
     reachable but not yet exercised by a scenario
-- [TODO] HACK-008d3 (engine/content) — Echo Hunter primary sprite
-  - behaviour proof depends on HACK-008d4a's entry warp; start after it lands
 - [TODO] HACK-008d4b (engine/content/qa) — doors, save/load and golden-path doc
   - reciprocal Entry Ledge door records or an isolated one-room path, then the
     save/load persistence scenario and the one-page golden-path doc
