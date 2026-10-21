@@ -997,6 +997,41 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     Full 0 -> 339001 also passes 339001 frames (646.7 s), final
     `main=9 sub1=2 frame16=5979` both; all chunk ladders
     0-115k-200k-300k-332880-339001 PASS.
+- [TODO] BUG-021 (content/tools) — M1 rooms render as garbage (blocking)
+  - playtest 2026-10-21 (M1 artifact `098414b9…`): every Test Area 1 room is
+    visually corrupted — wrong tiles/doors, HUD and minimap unreadable; the
+    room is not playable
+  - root cause: generated rooms use `.tileset = 0` but the blockout RLE block
+    IDs (1/4/8/12 …) are synthetic and do not match tileset 0's `pTilemap`
+    entries; the pipeline has **no tileset gfx/palette conversion** (known gap
+    in `docs/content-pipeline.md`).  The generated entry also uses
+    `bg3Prop = BG_PROP_NONE` + empty bg3, while vanilla Test Area 1 rooms use
+    `BG_PROP_LZ77_COMPRESSED` + `sBg3_TestRoom`
+  - fix options, in order: (a) remap the five manifests' `tile_mapping` to
+    block IDs that tileset 0 actually renders (wall/floor/door) and reuse
+    `sBg3_TestRoom`, or (b) generate a hack tileset entry
+    (tiles/palette/tilemap + LZ77) and select it in `RoomLoadTileset` under
+    HACK for AREA_TEST_1.  Do not edit `src/data`; no SHA drift
+  - acceptance: headless screen dump at the 28450/29500 prefix shows a coherent
+    room (no garbage tiles/HUD), `hack-room-check` + `hack-liveness-check`
+    still pass, normal/shifted/reordered SHAs unchanged
+- [TODO] BUG-022 (engine) — banner shows vanilla debug text (blocking)
+  - playtest 2026-10-21: the Entry Ledge banner displays
+    "Enemy location abnormal. Check message frame position."
+  - root cause: the banner is a static spawn at record index 2;
+    `MessageBannerInit` sets `gCurrentSprite.roomSlot = UCHAR_MAX` when the
+    sprite is not onscreen at init, so `TextDrawMessageBanner` receives 255,
+    clamps to 21, adds 21 and draws vanilla English text index 42 —
+    verified `sMessageTextPointers[2][42]` decodes to exactly that string.
+    The HACK-008d2 hook only handles `messageId < 22`
+  - fix: under `#ifdef HACK` keep the authored message id for
+    `gCurrentArea == AREA_TEST_1` (e.g. do not overwrite `roomSlot`, or carry
+    the id in an unused work byte / spawn through `TrySpawnMessageBanner`) and
+    make `HackAreaTest1Text[2]` the text actually drawn; no baseline table
+    edits, no SHA drift
+  - acceptance: IWRAM dump shows the banner's message id is the authored one,
+    screen dump at the 28450 prefix shows `ENTRY LEDGE / THE SIGNAL IS WEAK`
+    (not vanilla index 42), `hack-liveness-check` unchanged, SHAs unchanged
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
@@ -1688,8 +1723,11 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     template in the same directory
   - scope per `docs/playtest.md`: 5-room flow, doors, camera, readability, save
     pad; pulse/boss/logs/art are explicitly out of scope
-  - waiting on the human verdict (`PLAYTEST-PASS` / blocking `BUG-*` /
-    `PLAYTEST-*`).  Do not start HACK-004b or any dependent task before sign-off
+  - **PLAYTEST-FAIL 2026-10-21**: 花屏（tileset/背景错误，HUD/小地图不可读）
+    and the banner shows a vanilla debug string; evidence filed as BUG-021 and
+    BUG-022.  M1 is not signed off; do not start HACK-004b
+  - re-handoff after BUG-021 + BUG-022 are fixed and a fresh screen dump shows
+    a coherent Entry Ledge with the authored banner text
   - HACK-004a2b (event block + broad pad checks + dedicated transition/save
     scenario) stays queued for the M2 cycle; it does not block M1
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
