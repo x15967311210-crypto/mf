@@ -53,6 +53,56 @@ CLIP_SOLID = 1
 CLIP_AIR = 2
 CLIP_DOOR = 3
 
+# Role -> block index in the generated blockout tileset.  ``gen_tileset.py``
+# packs the PNG's 4x4 grid row-major, so PNG block B becomes tileset block B:
+# RoomLoadTileset reads ``(u16*)tileset.pTilemap + 1``, the generated tilemap
+# has four TL/TR/BL/BR entries per block, and block B selects tiles
+# ``0xC0 + B*4 .. 0xC0 + B*4 + 3`` with palette bank 4.  Every authored role
+# therefore maps to its own readable synthetic tile; the blockout no longer
+# borrows vanilla Test Area 1 blocks.  The synthetic PNG GIDs remain the
+# authoring key and are never written to the ROM.
+#
+#   block 0  - EMPTY     transparent void
+#   block 1  - SOLID     room shell / solid wall
+#   block 2  - FLOOR     floor surface band
+#   block 3  - PLATFORM  ledge / platform
+#   block 4  - DARK      dark background panel
+#   block 5  - LIGHT     working light
+#   block 6  - DOOR_TILE door frame
+#   block 7  - CONSOLE   terminal
+#   block 8  - PIPE      pipe run
+#   block 9  - HAZARD    hazard stripe
+#   block 10 - PULSE     pulse-only geometry (non-solid)
+#   block 11 - GRATE     grate
+#   block 12 - CABLE     cable
+#   block 13 - RUBBLE    rubble
+#   block 14 - MARKER    marker
+#   block 15 - MIST      haze / mist
+BLOCK_BY_GID: dict[int, int] = {
+    EMPTY: 0,
+    SOLID: 1,
+    FLOOR: 2,
+    PLATFORM: 3,
+    DARK: 4,
+    LIGHT: 5,
+    DOOR_TILE: 6,
+    CONSOLE: 7,
+    PIPE: 8,
+    HAZARD: 9,
+    PULSE: 10,
+    GRATE: 11,
+    CABLE: 12,
+    RUBBLE: 13,
+    MARKER: 14,
+    MIST: 15,
+}
+
+# Vanilla Test Area 1 rooms use the LZ77-compressed sBg3_TestRoom backdrop (a
+# blue-grid 256x256 map) with bg3Scrolling 1; sBg3_TestRoom is declared in
+# include/data/rooms/test_rooms_data.h.
+BG3_PROP = "BG_PROP_LZ77_COMPRESSED"
+BG3_SCROLLING = 1
+
 NO_HATCH = "DOOR_TYPE_NORMAL | DOOR_TYPE_NO_HATCH"
 HATCH = "DOOR_TYPE_NORMAL | DOOR_TYPE_HATCH_CAN_LOCK"
 
@@ -66,6 +116,7 @@ SPRITE_SLOTS: dict[int, str] = {
     3: "PSPRITE_GERON_MISSILE_1",
     4: "PSPRITE_BOX",
     5: "PSPRITE_MESSAGE_BANNER",
+    6: "SPRITE_ECHO_HUNTER",
 }
 SPRITE_SLOT_BY_NAME = {name: slot for slot, name in SPRITE_SLOTS.items()}
 
@@ -226,6 +277,9 @@ def build_rooms() -> list[Room]:
     entry.bg_prop(9, 4, CABLE)
     entry.spawn("save_pad", "PSPRITE_SAVE_PAD", 3, 7, "only save pad in the slice")
     entry.spawn("log_deck_07", "PSPRITE_DATA_PAD", 9, 7, "Deck 07 sealed log placeholder")
+    # Third spawn record = in-area message_id 2 (HACK-008d2); keep it third.
+    entry.spawn("signal_banner", "PSPRITE_MESSAGE_BANNER", 6, 4, "scripted signal banner placeholder")
+    entry.spawn("echo_hunter", "SPRITE_ECHO_HUNTER", 12, 8, "Echo Hunter proxy spawn")
     entry.scroll(0, 14, 0, 9)
     entry.notes.append("dark room look is authored in tiles; engine dark-room flag is a HACK-004a2 todo")
 
@@ -518,6 +572,10 @@ def room_manifest(room: Room) -> dict[str, Any]:
     used_bg2 = sorted({value for row in room.bg2 for value in row if value})
     used_clip = sorted({value for row in room.clip for value in row if value})
     assert set(used_clip) <= set(clip_names), (room.name, used_clip)
+    unknown_bg1 = set(used_bg1) - set(BLOCK_BY_GID)
+    unknown_bg2 = set(used_bg2) - set(BLOCK_BY_GID)
+    assert not unknown_bg1, (room.name, "bg1", sorted(unknown_bg1))
+    assert not unknown_bg2, (room.name, "bg2", sorted(unknown_bg2))
 
     return {
         "schema": "mf-hack.room-manifest/v1",
@@ -540,8 +598,8 @@ def room_manifest(room: Room) -> dict[str, Any]:
                 "clip": "collision",
             },
             "tile_mapping": {
-                "bg1": {str(gid): gid - 1 for gid in used_bg1},
-                "bg2": {str(gid): gid - 1 for gid in used_bg2},
+                "bg1": {str(gid): BLOCK_BY_GID[gid] for gid in used_bg1},
+                "bg2": {str(gid): BLOCK_BY_GID[gid] for gid in used_bg2},
                 "clip": {str(gid): clip_names[gid] for gid in used_clip},
             },
             "spritesets": {
@@ -551,8 +609,8 @@ def room_manifest(room: Room) -> dict[str, Any]:
                 "bg0_prop": "BG_PROP_NONE",
                 "bg1_prop": "BG_PROP_RLE_COMPRESSED",
                 "bg2_prop": "BG_PROP_RLE_COMPRESSED",
-                "bg3_prop": "BG_PROP_NONE",
-                "bg3_scrolling": 0,
+                "bg3_prop": BG3_PROP,
+                "bg3_scrolling": BG3_SCROLLING,
                 "transparency": 0,
                 "effect": "EFFECT_NONE",
                 "effect_y": 255,

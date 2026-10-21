@@ -517,6 +517,29 @@ prefix: 7-entry Entry Ledge spriteset, four live spawns).
   animation and art are HACK-004b.
 
 
+### Blockout tileset (HACK-004a2a / BUG-021)
+
+`tools/content/gen_tileset.py` converts `hack/content/tiled/blockout_tileset.png`
+(64x64, 16x16 blocks, 16-colour indexed) into the ignored
+`hack/gen/tileset_tables.h`:
+
+- `HackTest1TilesetGfx`: 2048 bytes of 4bpp tiles (TL/TR/BL/BR per block),
+  stored as a literal LZ77 stream for `CallLZ77UncompVram`;
+- `HackTest1TilesetPal[224]`: the authored 16 colours in **row 2**, which the
+  engine copies to global PALRAM row 4; rows 1..3 are cleared by the
+  first-load HUD/fade path, rows 4..15 survive;
+- `HackTest1TilesetTilemap`: header `0x0002` + 16 blocks x 4 entries at tile
+  base `0xC0` and **palette bank 4**;
+- `HackTest1TilesetEntry`, selected by `RoomLoadTileset` under `#ifdef HACK`
+  for `AREA_TEST_1` only.
+
+`build_rooms.py` maps the authored roles to PNG block indices 0..15 (EMPTY 0,
+SOLID 1, FLOOR 2, PLATFORM 3, DARK 4, LIGHT 5, DOOR 6, CONSOLE 7, PIPE 8,
+HAZARD 9, PULSE 10, GRATE 11, CABLE 12, RUBBLE 13, MARKER 14, MIST 15) and the
+rooms keep the vanilla `sBg3_TestRoom` backdrop with `bg3_scrolling = 1`.
+The PNG remains the authoring source; no baseline tileset or `src/data` table
+is edited.
+
 ## Text pipeline (HACK-008b)
 
 Text uses the repository `charmap.txt` through `tools/preproc`'s **C

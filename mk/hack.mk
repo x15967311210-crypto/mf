@@ -3,8 +3,9 @@
 # The hack build is the same engine and baseline data as `all`, compiled with
 # -DHACK (C) and --defsym HACK=1 (assembly).  The baseline hooks are the narrow
 # `#ifdef HACK` selections in src/room.c, src/scroll.c, src/sprite.c and
-# src/text.c: the hack-owned room/door, scroll, spriteset and message-banner
-# tables all live in ignored hack/gen/ headers behind tracked shims.  For
+# src/text.c: the hack-owned room/door, scroll, spriteset, message-banner and
+# blockout-tileset tables all live in ignored hack/gen/ headers behind tracked
+# shims.  For
 # HACK-008c1 those headers fall back to the baseline AREA_TEST_1 tables, so the
 # overlay is empty; HACK-008c2/HACK-008d replace them with generated tables
 # without touching this build boundary.  HACK-004a2a converts and links all
@@ -75,6 +76,8 @@ HACK_SCROLL_TABLES ?= $(patsubst %content_tables.h,%scroll_tables.h,$(HACK_TABLE
 HACK_TEXT_TABLES ?= hack/gen/text_tables.h
 # HACK-008d3: per-room (spriteId, gfxSlot) spriteset tables, beside HACK_TABLES.
 HACK_SPRITE_TABLES ?= $(patsubst %content_tables.h,%sprite_tables.h,$(HACK_TABLES))
+# BUG-023: generated blockout tileset (palette row 2 -> global row 4, bank 4).
+HACK_TILESET_TABLES ?= hack/gen/tileset_tables.h
 
 # Objects for the private tree.  The split mirrors ASMSRC: C sources are
 # preprocessed/compiled there, while checked-in .s files are assembled from
@@ -102,8 +105,8 @@ $(HACK_DIRECT_OBJ): $(OBJ_DIR)/%.o: %.s
 
 # The two baseline hooks include generated headers; make must rebuild each
 # object when content-tables regenerates its header.
-$(OBJ_DIR)/src/room.s: $(HACK_TABLES)
-$(OBJ_DIR)/src/room.o: $(OBJ_DIR)/src/room.s $(HACK_TABLES)
+$(OBJ_DIR)/src/room.s: $(HACK_TABLES) $(HACK_TILESET_TABLES)
+$(OBJ_DIR)/src/room.o: $(OBJ_DIR)/src/room.s $(HACK_TABLES) $(HACK_TILESET_TABLES)
 $(OBJ_DIR)/src/scroll.s: $(HACK_SCROLL_TABLES)
 $(OBJ_DIR)/src/scroll.o: $(OBJ_DIR)/src/scroll.s $(HACK_SCROLL_TABLES)
 $(OBJ_DIR)/src/text.s: $(HACK_TEXT_TABLES)
@@ -147,17 +150,23 @@ content-tables:
 		$(HACK_DOOR_FLAGS) --out $(HACK_TABLES) --write
 	$(PYTHON) tools/content/gen_text_tables.py \
 		--out $(HACK_TEXT_TABLES) --write
+	$(PYTHON) tools/content/gen_tileset.py \
+		--out $(HACK_TILESET_TABLES) --write
 # gen_content_tables.py writes content_tables.h, scroll_tables.h and
 # sprite_tables.h together; HACK_SPRITE_TABLES must match that sibling path.
+# gen_tileset.py owns the separate tileset header used by RoomLoadTileset.
 
-# --check verifies $(HACK_TABLES), its scroll and sprite siblings, and the
-# HACK-008d2 text table for the same HACK_ROOMS table set.
+# --check verifies $(HACK_TABLES), its scroll and sprite siblings, the
+# HACK-008d2 text table for the same HACK_ROOMS table set, and the BUG-023
+# blockout tileset header.
 content-tables-check:
 	$(PYTHON) tools/content/gen_content_tables.py \
 		$(foreach room,$(HACK_ROOMS),--room-dir $(HACK_ROOMS_DIR)/$(room)) \
 		$(HACK_DOOR_FLAGS) --out $(HACK_TABLES) --check
 	$(PYTHON) tools/content/gen_text_tables.py \
 		--out $(HACK_TEXT_TABLES) --check
+	$(PYTHON) tools/content/gen_tileset.py \
+		--out $(HACK_TILESET_TABLES) --check
 
 hack-build: content-tables
 	@mkdir -p $(HACK_WORK)
@@ -196,14 +205,15 @@ hack-liveness-check: hack-build
 	$(PYTHON) tests/emulator/hack_room_check.py --rom $(HACK_ROM) --elf $(HACK_STEM).elf
 
 define HACK_HELP
-	@echo "  content-tables      convert HACK_ROOMS + generate hack/gen/{content,scroll,sprite,text}_tables.h"
-	@echo "  content-tables-check verify the five-room generated headers and text table are fresh"
+	@echo "  content-tables      convert HACK_ROOMS + generate hack/gen/{content,scroll,sprite,text,tileset}_tables.h"
+	@echo "  content-tables-check verify the five-room generated headers, text and tileset tables are fresh"
 	@echo "  hack-build          build the HACK=1 overlay ROM into work/hack/ (D-013)"
 	@echo "  hack-sha1           hack-build, then write work/hack/mf_us_hack.sha1"
 	@echo "  hack-smoke          hack-build + static smoke + boot smoke (77 if no harness)"
 	@echo "  hack-room-check     hack-build + 29500-frame prefix replay; require Entry Ledge area=7 room=0 in-game (77 if no harness)"
 	@echo "  hack-liveness-check hack-build + 28450-frame replay; assert IWRAM spriteset table and 4 live spawns (77 if no harness)"
 	@echo "Variables: HACK_WORK, HACK_STEM, HACK_ROM, HACK_OBJ_DIR, HACK_LD_SCRIPT, HACK_FRAMES, HACK_SCENARIO,"
+	@echo "           HACK_TABLES, HACK_SCROLL_TABLES, HACK_SPRITE_TABLES, HACK_TEXT_TABLES, HACK_TILESET_TABLES,"
 	@echo "           HACK_ROOM_FIXTURE, HACK_ROOM_FRAME, HACK_ROOM_PREFIX,"
 	@echo "           HACK_ROOM_INPUT, HACK_ROOM_EVENT, HACK_ROOM_TIMEOUT, HACK_ROOMS, HACK_ROOMS_DIR,"
 	@echo "           HACK_ROOM, HACK_ROOM_DIR, HACK_ACTIVE_DOORS"

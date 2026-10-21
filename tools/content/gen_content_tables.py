@@ -10,11 +10,13 @@ under ``#ifdef HACK``, so the baseline tables in ``src/data`` are never touched.
 The generated headers contain:
 
 * in ``content_tables.h``: ``static const u8`` blobs for bg1/bg2/clipdata and
-  the default spriteset; empty bg0/bg3 blobs (no bg0 layer yet, and the engine
-  always touches bg3); ``HackTest1Doors`` -- a one-entry ``DOOR_TYPE_NONE``
-  terminator for 008c2 because the authored Entry Ledge doors target rooms
-  outside this one-room table, replaced by the real pair in HACK-008d;
-  ``HackTest1RoomEntries`` with one ``RoomEntryRom`` at index 0;
+  the default spriteset; an empty bg0 blob (no bg0 layer yet) and the vanilla
+  ``sBg3_TestRoom`` LZ77 blue-grid backdrop with ``bg3Scrolling = 1`` (the
+  engine always LZ77-decompresses ``pBg3Data + 4``); ``HackTest1Doors`` -- a
+  one-entry ``DOOR_TYPE_NONE`` terminator for 008c2 because the authored Entry
+  Ledge doors target rooms outside this one-room table, replaced by the real
+  pair in HACK-008d; ``HackTest1RoomEntries`` with one ``RoomEntryRom`` at
+  index 0;
 * in the sibling ``scroll_tables.h``: HACK-008d1's one
   ``HackTest1Room<N>Scrolls[SCROLL_DATA_SIZE(n)]`` per room (byte-exact with
   the converter's ``scrolls.bin``), the generated ``HackAreaScrollEnd``
@@ -70,6 +72,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
 
+# The blockout tileset is read through the sibling standard-library PNG reader.
+_CONTENT_DIR = str(Path(__file__).resolve().parent)
+if _CONTENT_DIR not in sys.path:
+    sys.path.insert(0, _CONTENT_DIR)
+
+import pngio
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ROOM_DIRS = ("hack/gen/rooms/entry_ledge",)
@@ -79,6 +88,31 @@ ROOM_SCHEMA = "mf-hack.room/v1"
 AREA_TEST_1 = 7
 AREA_TEST_1_NAME = "AREA_TEST_1"
 PIXEL_PER_BLOCK = 16
+
+# BUG-021: the hack-owned blockout tileset.  The source is a 64x64 indexed PNG
+# (4x4 grid of 16x16 blocks, 16 colours, index 0 transparent) authored by
+# hack/content/tiled/make_blockout_tileset.py.  The generator packs block B from
+# PNG block B into 4bpp 8x8 tiles in the order RoomSetInitialTilemap writes them
+# (dst[0], dst[1], dst[32], dst[33] = TL, TR, BL, BR).
+TILESET_SOURCE = "hack/content/tiled/blockout_tileset.png"
+TILESET_IMAGE_SIZE = 64
+TILESET_BLOCK_SIZE = 16
+TILESET_TILE_SIZE = 8
+TILESET_BLOCK_COUNT = 16
+TILESET_TILES_PER_BLOCK = 4
+TILESET_GFX_BYTES = TILESET_BLOCK_COUNT * TILESET_TILES_PER_BLOCK * 32
+TILESET_PALETTE_ROW_SIZE = 16
+TILESET_PALETTE_ROWS = 14
+# RoomLoadTileset DMA-copies the 14-row tileset palette to global PALRAM row 2,
+# so pPalette row 2 lands in global row 4.  The HUD/fade path clears global
+# rows 1..3 before the first playable frame but leaves rows 4..15 alone, so the
+# authored 16 colours live in pPalette row 2 and the tilemap selects bank 4.
+TILESET_PALETTE_ROW = 2
+TILESET_PALETTE_BANK = 4
+TILESET_TILEMAP_HEADER = 0x0002
+TILESET_TILE_BASE = 0xC0
+LZ77_LITERAL_HEADER = 0x10
+LZ77_EMPTY_STREAM = b"\x10\x00\x00\x00"
 DOOR_RECORD_SIZE = 9
 SPRITESET_TERMINATOR = b"\xff\xff\xff"
 SPRITESET_RECORD_SIZE = 3
@@ -815,12 +849,15 @@ def _load_room_entry(
             raise ContentError(
                 f"$.room_entry.{key}: {values[key]} has no known C constant"
             )
-    # The golden-path table emits RLE payloads only; reject a property that
-    # would make the engine read a payload this tool does not write.
-    if values["bg3_prop"] != 0:
+    # RoomLoadBackgrounds unconditionally LZ77-decompresses pBg3Data + 4, even
+    # for BG_PROP_NONE; an "empty" blob therefore corrupts gDecompBg3Map.  The
+    # golden path reuses the vanilla Test Area 1 blue-grid backdrop
+    # (sBg3_TestRoom), whose property is BG_PROP_LZ77_COMPRESSED.
+    if values["bg3_prop"] != 0x40:
         raise ContentError(
-            "$.room_entry.bg3_prop: HACK-008c2 emits an empty bg3 blob only; "
-            "use BG_PROP_NONE until the bg3 LZ77 path is wired"
+            "$.room_entry.bg3_prop: generated rooms require "
+            "BG_PROP_LZ77_COMPRESSED because RoomLoadBackgrounds always "
+            "LZ77-decompresses pBg3Data + 4"
         )
     if values["bg0_prop"] not in (0, 0x10):
         raise ContentError(
@@ -1115,6 +1152,12 @@ def render_header(rooms: Sequence[RoomData], active_doors: bool) -> str:
     lines.append('#include "structs/room.h"')
     lines.append('#include "structs/scroll.h"')
     lines.append("")
+    if any(room.entry["bg3_prop"] == 0x40 for room in rooms):
+        # Vanilla Test Area 1 blue-grid backdrop; declared in
+        # include/data/rooms/test_rooms_data.h and defined in
+        # src/data/rooms/test_rooms_data.c, so a non-static extern is safe.
+        lines.append("extern const u32 sBg3_TestRoom[224];")
+        lines.append("")
 
     # Payload arrays.
     for room in rooms:
@@ -1163,15 +1206,17 @@ def render_header(rooms: Sequence[RoomData], active_doors: bool) -> str:
             room.spritesets["second"],
             f"Room {room.index} second spriteset records (empty terminator).",
         )
-        # RoomLoadBackgrounds always reads byte 0 and calls LZ77 on +4, even
-        # when bg3Prop is BG_PROP_NONE.  A zero BGCNT plus an empty uncompressed
-        # LZ77 stream (header 0x00, size 0) is a safe no-op payload.
-        _format_u32_array(
-            lines,
-            f"{prefix}Bg3Empty",
-            (0x00000000, 0x00000000),
-            f"Room {room.index} bg3: BGCNT_SIZE_256x256 + empty LZ77 stream.",
-        )
+        # Rooms with BG_PROP_LZ77_COMPRESSED point at the vanilla
+        # sBg3_TestRoom backdrop, so no per-room payload is emitted for them.
+        # The fallback keeps only for a future non-LZ77 room; it is dead today
+        # because the loader rejects every other bg3_prop.
+        if room.entry["bg3_prop"] != 0x40:
+            _format_u32_array(
+                lines,
+                f"{prefix}Bg3Empty",
+                (0x00000000, 0x00000000),
+                f"Room {room.index} bg3: BGCNT_SIZE_256x256 + empty LZ77 stream.",
+            )
 
     # Door table.
     if active_doors:
@@ -1234,7 +1279,12 @@ def render_header(rooms: Sequence[RoomData], active_doors: bool) -> str:
         lines.append(f"        .pBg1Data = {prefix}Bg1Data,")
         lines.append(f"        .pBg2Data = {prefix}Bg2Data,")
         lines.append(f"        .pClipData = {prefix}ClipData,")
-        lines.append(f"        .pBg3Data = {prefix}Bg3Empty,")
+        bg3_data = (
+            "sBg3_TestRoom"
+            if entry["bg3_prop"] == 0x40
+            else f"{prefix}Bg3Empty"
+        )
+        lines.append(f"        .pBg3Data = {bg3_data},")
         lines.append(f"        .bg3Scrolling = {entry['bg3_scrolling']},")
         lines.append(f"        .transparency = {entry['transparency']},")
         lines.append(f"        .pDefaultSpriteData = {prefix}DefaultSpriteData,")
@@ -1556,6 +1606,7 @@ def _synthetic_room(
     name: str = "synthetic",
     door: tuple[int, int, int] | None = (1, 0, 1),
     bg1_prop: int = 0x10,
+    bg3_prop: int = 0x40,
     door_type: int = 0x12,
     missing_bg1: bool = False,
     bad_counter: bool = False,
@@ -1630,8 +1681,8 @@ def _synthetic_room(
             "bg0_prop": 0,
             "bg1_prop": bg1_prop,
             "bg2_prop": 0x10,
-            "bg3_prop": 0,
-            "bg3_scrolling": 0,
+            "bg3_prop": bg3_prop,
+            "bg3_scrolling": 1,
             "transparency": 0,
             "effect": 0,
             "effect_y": 255,
@@ -1802,9 +1853,16 @@ def self_check() -> None:
             "HackTest1RoomEntries",
             "{ .type = DOOR_TYPE_NONE },",
             ".mapY = 2,",
+            "extern const u32 sBg3_TestRoom[224];",
+            ".pBg3Data = sBg3_TestRoom,",
+            ".bg3Scrolling = 1,",
         ):
             if needle not in first:
                 raise ContentError(f"self-check: generated header lacks {needle!r}")
+        if "Bg3Empty" in first:
+            raise ContentError(
+                "self-check: generated header emits an unused Bg3Empty payload"
+            )
         for needle in (
             "HackTest1Room0Scrolls",
             "SCROLL_DATA_SIZE(1)",
@@ -1933,6 +1991,15 @@ def self_check() -> None:
         _expect_error(
             lambda: build_header([unknown_room], active_doors=False),
             "has no known C constant",
+        )
+
+        # bg3 must be LZ77: RoomLoadBackgrounds always decompresses + 4.
+        bg3_root = root / "bg3"
+        bg3_root.mkdir()
+        bg3_room = _synthetic_room(bg3_root, bg3_prop=0)
+        _expect_error(
+            lambda: build_header([bg3_room], active_doors=False),
+            "BG_PROP_LZ77_COMPRESSED",
         )
 
         # Bad counters.

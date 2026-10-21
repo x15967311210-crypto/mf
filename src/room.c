@@ -43,6 +43,7 @@
 // in baseline code.
 #ifdef HACK
 #include "hack/content_tables.h"
+#include "hack/tileset_tables.h"
 #define AREA_TEST_1_DOORS HACK_AREA_TEST_1_DOORS
 #define AREA_TEST_1_ROOMS HACK_AREA_TEST_1_ROOM_ENTRIES
 #else
@@ -144,7 +145,16 @@ void RoomLoadTileset(void)
     struct TilesetEntry tileset;
     u32 bgGfxSize;
 
+#ifdef HACK
+    /* BUG-023: AREA_TEST_1 uses the generated blockout tileset; every other
+     * area keeps the baseline sTilesetEntries path. */
+    if (gCurrentArea == AREA_TEST_1)
+        tileset = HackTest1TilesetEntry;
+    else
+        tileset = sTilesetEntries[gCurrentRoomEntry.tilesetNumber];
+#else
     tileset = sTilesetEntries[gCurrentRoomEntry.tilesetNumber];
+#endif
 
     gTilemapAndClipPointers.pTilemap = (u16*)tileset.pTilemap + 1;
 
