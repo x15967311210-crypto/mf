@@ -34,9 +34,13 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - committed 4k fixture + `INPUT_CHECK` assertions; `make test` runs it
   - `shift-input` runs the same 4k input against the shifted build; PASS
   - full 259k input stays manual/BizHawk; manual playtest remains extra
-- [TODO] QA-004 (tools) — scanner for 2-byte-aligned embedded
-  `FrameData`/pointer tables; prototype found the BUG-003/004 tables but the
-  tool/report is not committed yet
+  - landed `c4312f0` + `75d94bc`; fixtures
+    `tests/emulator/inputs/baseline_first4000.input` / `.expected`
+- [TODO] QA-004 (tools) — scanner for 2-byte/4-byte pointer-like data in raw
+  blobs (the BUG-003/004/005/006/009 class)
+  - find 2-byte-aligned embedded `FrameData`/pointer tables; prototype found
+    the BUG-003/004 tables but the tool/report is not committed yet
+  - no raw pointer table may remain hidden behind a `data` classification
 - [DONE] QA-024 (tools) — host-side RoomRleDecompress unit-test harness
   - `tests/host/test.h`, `tests/host/room_rle_test.c`, `make host-test`
     (also `make -f Makefile.shift host-test`); 33/33 checks in ~1s, no
@@ -152,6 +156,8 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     inspect `EndingBslCrashingInit` +0x82/+0x14A branch/IRQ interaction, or
     add a shift-only OAM-slot guard.  Do not add a normal-ROM-only patch
     without a baseline decision and do not chase another blob pointer.
+  - landed `919c8cb` (trace); follow-up `3a0e6cd` relocated the inside-blob
+    pFrame words in `sBlob_6131c8_63a19c` (BUG-020) per the root cause above.
 - [DONE] BUILD-001 (tools) — reproducible toolchain checks
   - `tools/doctor.py` (full / `--source-only` / `--self-check`),
     `tools/setup_agbcc.sh`, `tools/agbcc-version` pinned at
@@ -246,6 +252,13 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
 
 ## Phase S2 — relocatable build
 
+- [DONE] SHIFT-008 (tools) — section-reorder shift test
+  - padding boot was already green (`SHIFT-CHECK: PASS`, 578/600); this entry
+    added the section-reorder build and made both a repeatable gate.
+  - landed `a1178d5`: `Makefile.shift` targets + `tools/shift/shift_test.py`
+    (reorder layout build and boot check).
+  - the entry was dropped in a later backlog sweep, which left the SHIFT-009 /
+    SHIFT-010 dependencies dangling; the deps are real work, not placeholders.
 - [DONE] PLAYTEST-000 (human) — M0 shiftable-boot playtest
   - `PLAYTEST-PASS` received 2026-10-18 for the fixed shifted candidate
     `work/playtest/m0f-2026-10-17/fixed/mf_us_m0f_shifted_fixed.gba`
@@ -284,6 +297,8 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     and fails too, so this cannot decide BUG-008.  mGBA 0.11 vs capture 0.10.5
     and the committed harness having no state option are contributing factors.
   - Do not use the mid-BIOS state or a per-build input offset as a gate.
+  - landed `2c47fe9`; state-container analysis in
+    `docs/shift-test-diagnosis.md` ("BUG-008 state-container finding").
 - [DONE] QA-011a (emulator) — cold-boot file-select parity
   - rebuild normal/reordered/shifted in one tree with identical `data/Blob_*`
     inputs and record SHA1s; use the common SaveRAM and cold boot, not a
@@ -298,6 +313,9 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     mGBA 0.11 control.
   - decide whether the gate is BizHawk-specific or whether mGBA 0.11 is
     authoritative before changing source.
+  - landed `d160eaf` + `9ef2e57`; core matrix and scope in
+    `docs/shift-test-diagnosis.md` ("BUG-008 emulator-core scope") and the
+    M0 row in `docs/playtest.md`.
 - [DONE] BUG-009 (playtest) — shifted Navigation Room computer-dialogue corruption
   - final shifted fixed `a822b2d8...` fresh manual path: slot1 Navigation Room
     frame 18171 `disp=5E00 main=1 s2=0100 active_oam=40` clean; slot2 computer
@@ -609,6 +627,8 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     `shifted_2200`: writer `PC=08099F28`, `LR=08099D75`, value `0000C1A2`,
     `r3=030019C0`, `sl=0865A2E4`, `nextOamSlot=0x47`.
   - filed as BUG-013; callback setter/IRQ not patched.
+  - landed `19193f1` (capture + BUG-013 record); follow-up fix `da248e3`
+    (`src/data/new_file_intro_data.c`, `tools/extractor.py`).
 - [DONE] QA-015 (emulator/tools) — native BizHawk TAS parity
   - native 100% TAS, normalized SaveRAM `FB611BD6...`: `PARITY: FAIL`.
   - shifted first behavior divergence frame 401 (`DISPCNT 1E00` vs `1C00`),
@@ -619,6 +639,8 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     223201-223300.
   - normal reaches the ending state at 339001.  Event counter is not QA-013a
     story evidence.
+  - landed `9f4b502`; result section in `docs/shift-test-diagnosis.md`
+    ("QA-015 native TAS parity result").
 - [DONE] QA-016 (emulator) — refine reordered TAS room branch
   - run native BizHawk single-frame/checkpoint trace 223201-223300 for normal
     and reordered; capture first differing frame, PC/LR/SP, room/transition,
@@ -627,6 +649,8 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - next: run native normal/reordered fine trace 223201-223300 with PC/LR/SP
     and first-diff dumps; the 100-frame coarse interval is not enough for a
     source patch.
+  - landed `b1b85c6`; fine trace in `docs/shift-test-diagnosis.md`
+    ("BUG-011 fine trace"), feeding BUG-011's `tas/bizhawk_fine/` evidence.
 
 - [DONE @dev17] BUG-011 (shift/reorder) — room-14 branch at TAS frame ~223045
   - native 100% TAS normal vs reordered: identical through 223200; at 223300
@@ -1359,6 +1383,9 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     `story_route/{normal,shifted}_start_4fd0_139.state` + from139 input.
   - baseline movement TAS still has event counter 0; do not use it for story
     coverage.
+  - landed `2b4a0a0` + `4c61351`; pass write-up in
+    `docs/shift-test-diagnosis.md` ("QA-013a pass") and harness support in
+    `tests/emulator/harness.c` / `tests/emulator/README.md`.
 - [PARK] QA-012 (emulator) — M0 fresh-path room/dialog coverage matrix (paused: BUG-010)
   - run normal/shifted/reordered from matched saves/states through all rooms,
     Navigation Room dialogs, pause/map/status, save/load, intro/ending and
@@ -1367,21 +1394,20 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     matrix plus the fresh manual route, not only the controlled map.
   - depends on BUG-009; run after the current fix lands.  Do not close M0 on a
     single controlled path.
-- [TODO] QA-004 (tools) — scanner for 2-byte/4-byte pointer-like data in raw
-  blobs (the BUG-003/004/005/006/009 class); no raw pointer table may remain
-  hidden behind a `data` classification.
-- [TODO] QA-009 (emulator) — checkpoint memory parity (OAM/PAL/VRAM/IO exact;
-  IWRAM/EWRAM normalized); feeds QA-012.
-- [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
-  - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
-    map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
-    not BUG-007
-  - savestate-based objective-page comparison stays local-only
 - [TODO] QA-009 (emulator) — checkpoint memory parity (OAM/PAL/VRAM/IO exact;
   IWRAM/EWRAM normalized)
   - exact: OAM/PAL/VRAM-BG/VRAM-OBJ/IO registers
   - normalized: IWRAM/EWRAM 32-bit ROM pointers (+0x1000), excluding the
     known IWRAM code-copy tail; state-based local diff for manual pages
+  - feeds QA-012: the room/dialog coverage matrix reuses this checkpoint diff
+    (OAM/PAL/VRAM/IO exact, IWRAM/EWRAM normalized)
+- [DONE] QA-008 (emulator) — OAM parity telemetry at checkpoints
+  - `oam-diff` PASS 6/6 at 300/600/900/1059/4000/30000, including the plain
+    map frame 1059; the earlier 30k mismatch was a worktree data-artifact issue,
+    not BUG-007
+  - savestate-based objective-page comparison stays local-only
+  - landed `e1793f5`; gate in `tests/emulator/oam_diff.py` and
+    `tests/emulator/harness.c`.
 - [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint
   - shifted black-screen reproduction can be automated from
     `m0e_shifted_slot3.ss3` + held Start; map/dialog visual comparison needs a
@@ -1389,12 +1415,13 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - BUG-005 fixed; slot3 local state check passes
 - [DONE] QA-006 (emulator) — 30k input fixture + `shift-input-30k` gate
   - normal/reordered/shifted 30k PASS after BUG-004
+  - landed `f466f7d`; fixture `tests/emulator/inputs/baseline_first30000.input`
+    plus `.expected`.
 - [DONE] QA-005 (emulator) — screenshot-parity gate
   - `screen-diff` passes after BUG-003; normal/shifted/reordered match at
     600/900
-- [TODO] QA-004 (tools) — scanner for 2-byte-aligned embedded
-  `FrameData`/pointer tables; prototype found the BUG-003/004/005 tables but
-  the tool/report is not committed yet
+  - landed `d2485e7`; `screen-diff` gate in `tests/emulator/harness.c` and
+    `Makefile.shift`.
 
 ## Phase S3a — hack-critical C (106 functions)
 
@@ -1431,6 +1458,9 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - HACK-004a2 may now start with Test Area 1 rooms; still document bg3,
     palettes, composition/scripts and secondary-sprite tables as pipeline gaps.
 - [DONE] HACK-003 (baseline) — content pipeline: Tiled/PNG → room data
+  - landed `dfe4b5a`: `tools/content/tiled_to_room.py`, `tools/content/pngio.py`,
+    synthetic fixture under `tools/content/fixtures/`, and
+    `docs/content-pipeline.md`; `content-check` PASS.
 - [DONE] HACK-004a1 (content) — five-room blockout source assets
   - `1d3d03a`: synthetic tileset + 5 Tiled maps/manifests under
     `hack/content/tiled/`; 12 doors, 12 spawns, camera scrolls; all rooms
@@ -1644,7 +1674,7 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - load the save in the hack build, assert `area=7 room=0`, the saved
     `gEventCounter` and that the banner/enemy/spriteset still load
 
-- [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a2]
+- [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a2a, HACK-004a2b]
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
 - [TODO] PLAYTEST-002 (human) — M2 pulse playtest  [deps: HACK-004b]
 - [TODO] HACK-004c (engine/content) — The Cantor prototype  [deps: PLAYTEST-002]

@@ -187,7 +187,7 @@ changing the parity ROMs.
 - One narrow, reviewed hook selects hack-owned AREA_TEST_1 room/door/text
   tables when `HACK=1`; no other baseline table edits for content.
 - Generated C tables are deterministic and ignored; only source YAML/JSON,
-  `charmap.txt`, `ids.h` and the tracker are committed.
+  `charmap.txt`, `hack/include/hack/ids.h` and the tracker are committed.
 - The golden path must be one room + one dialogue + one enemy behavior driven
   from source, with a validator and a behavior scenario.
 - No hand-written magic IDs; unknown text characters and dangling references

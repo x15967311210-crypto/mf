@@ -8,7 +8,7 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **30 TODO / 1 DOING / 58 DONE / 3 PARK** (92 entries).
+Counts: **27 TODO / 1 DOING / 59 DONE / 3 PARK** (90 entries).
 
 ### In progress (DOING)
 
@@ -18,7 +18,7 @@ Counts: **30 TODO / 1 DOING / 58 DONE / 3 PARK** (92 entries).
 
 - `SHIFT-001a` — add title/new-game/pause/save scenarios
 - `SHIFT-001b` — room-sweep scenario and telemetry mailbox
-- `QA-004` — scanner for 2-byte-aligned embedded
+- `QA-004` — scanner for 2-byte/4-byte pointer-like data in raw
 - `QA-027` — host harness: save validation/checksum
 - `QA-028` — settle window restarts on every new byte pair
 
