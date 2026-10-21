@@ -105,7 +105,7 @@ $(HACK_LD_SCRIPT): linker.ld tools/shift/prefix_linker_objects.py
 	$(CPP) $(CPPFLAGS) $< -o $@
 	$(PYTHON) tools/shift/prefix_linker_objects.py $@ --obj-dir $(HACK_OBJ_DIR)
 
-.PHONY: content-tables content-tables-check hack-build hack-sha1 hack-smoke hack-room-check
+.PHONY: content-tables content-tables-check hack-build hack-sha1 hack-smoke hack-room-check hack-liveness-check
 
 # HACK-008c2/HACK-008d1/HACK-008d2: the only generated-content step.  The room
 # converter output and all C headers are under ignored hack/gen/.
@@ -154,6 +154,12 @@ hack-room-check: hack-build
 		--input $(HACK_ROOM_INPUT) --expect-event "$(HACK_ROOM_EVENT)" \
 		--timeout $(HACK_ROOM_TIMEOUT)
 
+# HACK-008d4b: replay the verified 28450-frame prefix, dump IWRAM and assert the
+# generated 7-entry spriteset plus the four live Entry Ledge spawns.  77 if the
+# headless harness is unavailable.
+hack-liveness-check: hack-build
+	$(PYTHON) tests/emulator/hack_room_check.py --rom $(HACK_ROM) --elf $(HACK_STEM).elf
+
 define HACK_HELP
 	@echo "  content-tables      generate hack/gen/rooms/entry_ledge + content_tables.h + scroll_tables.h + text_tables.h"
 	@echo "  content-tables-check verify the generated one-room headers and text table are fresh"
@@ -161,6 +167,7 @@ define HACK_HELP
 	@echo "  hack-sha1           hack-build, then write work/hack/mf_us_hack.sha1"
 	@echo "  hack-smoke          hack-build + static smoke + boot smoke (77 if no harness)"
 	@echo "  hack-room-check     hack-build + 30k input replay; require Entry Ledge area=7 room=0 in-game (77 if no harness)"
+	@echo "  hack-liveness-check hack-build + 28450-frame replay; assert IWRAM spriteset table and 4 live spawns (77 if no harness)"
 	@echo "Variables: HACK_WORK, HACK_STEM, HACK_ROM, HACK_OBJ_DIR, HACK_LD_SCRIPT, HACK_FRAMES, HACK_SCENARIO,"
 	@echo "           HACK_ROOM_INPUT, HACK_ROOM_EVENT, HACK_ROOM_TIMEOUT"
 endef
