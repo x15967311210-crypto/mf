@@ -1135,8 +1135,22 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     `check_relocs` PASS; concatenating the parts reproduces the old file
     byte-for-byte (minus headers)
   - landed `2bac36c` (+ refreshed `docs/shiftability-audit.md` `64f2f3f`)
-  - next: repeat one file at a time for `disasm_0x0807e678.s`,
-    `0x0809deb4.s`, `0x08079afc.s`, `0x080765f8.s`, `0x08056140.s`
+- [DONE] TECH-002c (decomp) — split SRAM/status and file-select asm
+  - `disasm_0x0807e678.s` -> `_0807e678` (StatusScreenHandler, 0x82C) /
+    `_0807eea4` (Sram_ReadAll, 0x1B4C) / `_080809f0` (EraseSramMenuHandler,
+    0x77C); sum 0x2AF4
+  - `disasm_0x0809deb4.s` -> `_0809deb4` (GameOverHandler, 0x6E4) /
+    `_0809e598` (FileSelectHandler, 0x2E38) / `_080a13d0` (SetLanguage,
+    0x8B4); sum 0x3DD0
+  - normal `ca33f434…`, shifted `5888a563…`, reordered `9dac0a4b…` unchanged;
+    audit/smoke/test (boot + 4k input), `shift-test`, `shift-reorder`,
+    `check_relocs` PASS; bodies concatenate byte-identically minus headers
+  - landed `acf2301` + `4b92bc9` (+ refreshed audit table)
+- [TODO] TECH-002d (decomp) — split the remaining disasm files
+  - `disasm_0x08079afc.s` (2 parts, cut at 3857), `disasm_0x080765f8.s`
+    (2 parts, cut at 1227), `disasm_0x08056140.s` (2 parts, candidate)
+  - same rule: function boundary, 3-line header, ascending `linker.ld` order,
+    `ca33f434…` unchanged or revert
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
