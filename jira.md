@@ -19,8 +19,8 @@ map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
 Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
-HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2
-(ID/text/overlay/generated Entry Ledge room, scroll and message tables), QA-020 (native normal/shifted/
+HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2/008d4a
+(ID/text/overlay/generated Entry Ledge room, scroll and message tables + entry warp), QA-020 (native normal/shifted/
 reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
 `git log`.
 
@@ -1564,25 +1564,30 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     entry is hack-owned, not `src/data`
   - one Entry Ledge spawn record, a host/static check that the ID resolves, and
     unchanged normal/shifted/reordered SHAs
-- [DOING @dev30] HACK-008d4a (engine/qa) — hack entry warp + room-load scenario
+- [DONE] HACK-008d4a (engine/qa) — hack entry warp + room-load check
   - ordering changed by the manager: without an entry warp neither the d2 text
-    nor the d3 enemy can be behaviour-tested, so the warp lands first
-  - hook the existing C file-load path (`InGameLoad`, `src/in_game.c`, the
-    function that clears `gIsLoadingFile`): under `#ifdef HACK`, before
-    `RoomLoad()`, set `gCurrentArea = AREA_TEST_1`, `gLastDoorUsed = 0`
-    (door 0 has `srcRoom = 0`) and a valid Samus position, because the
-    `gIsLoadingFile` branch in `RoomLoadEntry` returns before placing Samus for
-    non-Main-Deck rooms
-  - add one headless room-load check that replays the committed 30k input
-    (the first fixture that reaches in-game) and asserts `area == 7`,
-    `room == 0`, main mode in-game and a live frame counter; wire it into
-    `tests/emulator/run.py` (new expected-event option) and a make target.
-    No `harness.c` change: the mGBA build tree is not available here, so the
-    committed harness binary cannot be rebuilt; the check must use the existing
-    binary's `--final` output
-  - baseline builds must keep their exact SHAs; the warp is HACK-only and
-    documented as the M1 test-entry shortcut
-  - out of scope: door reciprocity, save/load persistence, the one-page doc
+    nor the d3 enemy can be behaviour-tested, so the warp landed first
+  - `src/in_game.c` `InitAndLoadGenerics()`, one `#ifdef HACK` block before
+    `RoomLoad()`: sets `gCurrentArea = AREA_TEST_1`, `gLastDoorUsed = 0` and a
+    Samus spawn at block (11,8)
+  - **condition is `gUnk_3000be3 == 0`, not `gIsLoadingFile`**: AGBCC/asm
+    evidence shows `gIsLoadingFile` is 0 on the New Game/empty-slot path and
+    `SramRead_WorldData` clears it before the C room-load path, so it never
+    fires there.  `gUnk_3000be3` is cleared by `Sram_CheckLoadSaveFile`, stays
+    0 until the first room load and is set at the end of the same function, so
+    door transitions keep the baseline destination
+  - `tests/emulator/run.py --expect-event` (new, optional) passes `--final`,
+    parses `FINAL_EVENT`, requires `area=7 room=0`, `main=1` and a live frame
+    counter; `make hack-room-check` replays the committed 30k input with the
+    existing harness binary (no `harness.c` rebuild needed)
+  - landed `d6deecb`; `hack-room-check` PASS with
+    `FINAL_EVENT frame=30000 counter=0 area=7 room=0 nav=0` and
+    `INPUT_FINAL ... main=1 ... frame_counter=29862`; `hack-smoke`,
+    `content-check`, baseline `ca33f434…`, shifted `5888a563…`, reordered
+    `9dac0a4b…`, `make -f Makefile.shift test`, `audit`, `check_relocs` PASS
+  - limits: HACK-only first-load warp; no door reciprocity, no save/load
+    persistence, no route back into Entry Ledge, and the banner/enemy are now
+    reachable but not yet exercised by a scenario
 - [TODO] HACK-008d3 (engine/content) — Echo Hunter primary sprite
   - behaviour proof depends on HACK-008d4a's entry warp; start after it lands
 - [TODO] HACK-008d4b (engine/content/qa) — doors, save/load and golden-path doc
