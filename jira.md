@@ -1451,13 +1451,18 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     baseline-owned `src/data` into `hack/content` + generated `hack/gen`
   - D-009 requires `hack/include/hack/ids.h` and `docs/content-tracker.md`;
     no new magic numbers may enter before the ADR lands
-- [DOING @dev24] HACK-008a (tools) — YAML ID registry -> ids.h/tracker
+- [DONE] HACK-008a (tools) — YAML ID registry -> ids.h/tracker
   - source `hack/content/ids.yaml`; deterministic generator
     `tools/content/gen_ids.py --check/--write`
   - emit `hack/include/hack/ids.h` and `docs/content-tracker.md`; validate
     uniqueness, reserved ranges, room/door/text/event/save references
   - add to `make content-check`; no engine/source data changes
-- [TODO] HACK-008b (tools) — charmap text pipeline + roundtrip
+  - landed `8be4573`: 28 IDs / 7 categories; generator + generated
+    `hack/include/hack/ids.h`, `docs/content-tracker.md`; `content-check`
+    PASS.  `SPRITE_ECHO_HUNTER=0xCF` is reserved for HACK-008d and requires
+    extending `PSPRITE_END`/primary tables before use; text/music/save fields
+    remain deliberately unallocated (typed reserved placeholders).
+- [DOING @dev25] HACK-008b (tools) — charmap text pipeline + roundtrip
   - fill `charmap.txt` with the real MF character map; use the existing
     `tools/preproc` charmap support instead of a parallel encoder
   - compile one dialogue block to bytes and decode it back in a host test;
