@@ -14,6 +14,11 @@
 #include "structs/sprite.h"
 #include "structs/samus.h"
 
+#ifdef HACK
+#include "constants/connection.h"
+#include "structs/connection.h"
+#endif
+
 // FIXME: room slot enum
 
 #define MESSAGE_BANNER_YES_X 54
@@ -57,7 +62,18 @@ void MessageBannerInit(void)
     if (!(gCurrentSprite.status & SPRITE_STATUS_ONSCREEN))
     {
         gCurrentSprite.status |= SPRITE_STATUS_ONSCREEN;
+#ifdef HACK
+        // BUG-022 / HACK-008d2: the AREA_TEST_1 banners are static spawns that
+        // initialise offscreen, and their roomSlot is the authored message id
+        // (the spawn record index) rather than a vanilla banner id.  The
+        // vanilla UCHAR_MAX overwrite would discard it, so keep it here and let
+        // TextDrawMessageBanner select the HACK-008d2 text table.  Every other
+        // area keeps the baseline overwrite byte-for-byte.
+        if (gCurrentArea != AREA_TEST_1)
+            gCurrentSprite.roomSlot = UCHAR_MAX;
+#else
         gCurrentSprite.roomSlot = UCHAR_MAX;
+#endif
     }
 
     roomSlot = gCurrentSprite.roomSlot;

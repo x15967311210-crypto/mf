@@ -338,11 +338,28 @@ includes it under `#ifdef HACK` and uses the hack slot only when
 slot and stage falls through to the unchanged vanilla index math.
 `TextDisplayMessage` (event/ability messages) is not modified.
 
+The banner only draws the authored message if its `roomSlot` survives init.
+Vanilla `MessageBannerInit` overwrites `roomSlot` with `UCHAR_MAX` for a banner
+that initialises offscreen.  The AREA_TEST_1 banners are static spawns that do
+initialise offscreen, so that overwrite discarded the spawn record index that
+`SpriteInitPrimary` had stored as the message id, and
+`TextDrawMessageBanner` fell back to the vanilla `messageId > 21 -> 21` clamp.
+That was BUG-022: the Entry Ledge banner drew the wrong text.  Under
+`#ifdef HACK`, `MessageBannerInit` now keeps the spawn's `roomSlot` when
+`gCurrentArea == AREA_TEST_1`; every other area still performs the baseline
+`UCHAR_MAX` overwrite byte-for-byte, and the non-HACK build is unchanged.
+`tests/emulator/hack_room_check.py` therefore expects `roomSlot == 2` for that
+spawn instead of `0xFF`.
+
 `make content-tables` writes the table, `make content-tables-check` fails if it
 is stale or missing, and `python3 tools/content/gen_text_tables.py
 --self-check` covers the generator without a ROM.  This proves the linked
-table.  HACK-008d4a now makes Entry Ledge reachable (below), but no scenario
-yet proves that the banner actually pops up and draws the hack text in game.
+table.  HACK-008d4a makes Entry Ledge reachable (below), and
+`make hack-liveness-check` asserts that the live banner spawn keeps message id
+`2`.  A temporary EWRAM mirror of the selected block (BUG-022, not committed)
+confirmed the drawn pointer was `0x0879C1D0` (`HackTextEntryLedgeSignal` in the
+`HackAreaTest1Text` table, not `sMessageTextPointers`) with `messageId == 2`,
+and that the words decode to `ENTRY LEDGE{NEW_LINE}THE SIGNAL IS WEAK`.
 
 ### Hack entry warp (HACK-008d4a)
 

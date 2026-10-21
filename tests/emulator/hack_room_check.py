@@ -62,13 +62,15 @@ OFFSET_SPRITE_ID = 0x1D
 OFFSET_ROOM_SLOT = 0x1E
 
 # Generated per-room spriteset and the spawns live at this prefix.  The banner
-# sets its roomSlot to UCHAR_MAX; the Echo Hunter is a Hornoad data clone.
+# keeps its authored message id (spawn record index 2, BUG-022) instead of the
+# vanilla UCHAR_MAX overwrite, so TextDrawMessageBanner draws the HACK-008d2
+# Entry Ledge text; the Echo Hunter is a Hornoad data clone.
 DEFAULT_TABLE = "1F,1E,12,41,62,21,CF"
 DEFAULT_GFX_SLOTS = "0,1,2,3,4,5,6"
 DEFAULT_LIVE = [
     (0x0003, 0x1F, 0),
     (0x0003, 0x1E, 1),
-    (0x0013, 0x21, 0xFF),
+    (0x0013, 0x21, 2),
     (0x8003, 0x12, 3),
 ]
 
