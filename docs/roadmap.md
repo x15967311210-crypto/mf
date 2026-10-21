@@ -83,16 +83,14 @@ Gate **S4**: playable slice sign-off, then content production.
 
 ## Current status
 
-**M0 shiftable-boot gate: BLOCKED** — the headless 339001-frame gate passes
-normal to the ending (`1900 0009 0002 0100 109 0 63 0`).  BUG-016's raw
-`sBlob_6638a0_682fac` FrameData table is fixed (`1f01180`); shifted now passes
-115,000 but first-diffs at **117234** on an EWRAM `0x02000000` zero-fill
-(BUG-017).  Reordered still first-diffs at **223045** (BUG-011, room 14 /
-`gDecompBg3Map`).  BUG-013 native idle/focused checks pass on shifted
-`e5d202c8…`.  `PLAYTEST-000` human sign-off is pending.  BUG-010's elevator
-state is parked as an invalid post-entry capture; QA-012 coverage is paused.
-The post-link scan is down to 67 latent runs (BUG-014); continue that triage
-alongside BUG-017.  M1 blockout is paused; see `jira.md`.
+**M0 shiftable-boot gate: PASS (2026-10-21)** — normal, shifted and
+reordered all complete the native 339001-frame TAS with final
+`DISPCNT=1900 main=9 s1=2 s2=0100 event=109 area=0 room=63`; the native Any%
+TAS also passes at 259176 for all three.  Headless parity and the 0/115k/
+200k/300k chunk ladder are green, and `check-relocs-strict` passes with the
+post-link scan down to 5 runs.  Human `PLAYTEST-PASS` is recorded in
+`docs/playtest.md`.  M1 blockout is ready; `HACK-004a2` is the next
+integration task.
 
 Baseline evidence (2026-10-17):
 

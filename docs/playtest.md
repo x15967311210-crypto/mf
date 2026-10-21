@@ -96,3 +96,4 @@ does not advance the gate until the human signs off.
 | Gate | Date | Build | Result |
 |---|---|---|---|
 | M0 | 2026-10-18 | fixed shifted `0bddba78...` | mGBA 0.11 authoritative; BUG-009/event parity pass; BUG-010 room-61 elevator freeze blocks; QA-012 paused |
+| M0 | 2026-10-21 | normal `ca33f434...`, shifted `5888a563...`, reordered `9dac0a4b...` | **PLAYTEST-PASS**: native QA-020 339001 and Any% 259176 all three builds PASS; final `room=63`, `main=9`; no crash/softlock |

@@ -19,7 +19,9 @@ map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
 Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
-HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
+HACK-001/001a/006 (GDD, layout, Cantor), QA-020 (native normal/shifted/
+reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
+`git log`.
 
 ---
 
@@ -243,7 +245,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
 
 ## Phase S2 — relocatable build
 
-- [BLOCKED @human] PLAYTEST-000 (human) — M0 shiftable-boot playtest
+- [DONE] PLAYTEST-000 (human) — M0 shiftable-boot playtest
   - `PLAYTEST-PASS` received 2026-10-18 for the fixed shifted candidate
     `work/playtest/m0f-2026-10-17/fixed/mf_us_m0f_shifted_fixed.gba`
     (`a822b2d8...`); normal/reordered original artifacts unchanged.
@@ -262,8 +264,16 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     Room/computer dialogue (slot2 corrupted, active_oam=96; normal 66); this
     path is not covered by the common-save controlled map PASS (BUG-009).
   - **BLOCKED AGAIN 2026-10-18**: candidate `0bddba78` hard-freezes on
-    room-61 elevator state (BUG-010); M0 is not DONE.  QA-012 coverage is
-    paused; M1 blockout stays parked.
+    room-61 elevator state (BUG-010); M0 was not done.  QA-012 coverage was
+    paused.
+  - **PLAYTEST-PASS 2026-10-21**: human native QA-020 full 339001 PASS for
+    normal, shifted and reordered; native Any% TAS also PASS at 259176 for
+    all three.  Candidates: normal `ca33f434...`, shifted `5888a563...`,
+    reordered `9dac0a4b...`.  Final state `DISPCNT=1900 main=9 s1=2 s2=0100
+    event=109 area=0 room=63`; shifted callback `08098325` is the expected
+    `+0x1000`.  Evidence:
+    `work/playtest/m0f-2026-10-17/tas/qa020_latest/` and `anypct_latest/`
+    (`QA020_LATEST_RESULT.md`, `ANY_PCT_LATEST_RESULT.md`).  M0 is DONE.
 - [DONE] QA-011 (emulator) — common file-select state parity (inconclusive)
   - mGBA f600 common state loads visually identically in normal/reordered/
     shifted (`1C00/7/3/0`, same framebuffer hash).
@@ -475,7 +485,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     full final checkpoint not reached.  Evidence:
     `tas/bug008_candidate_fine/BUG008_CANDIDATE_FINE.md` and logs.
   - parity remains FAIL because of BUG-012, not BUG-008.
-- [DOING @windows] QA-020 (emulator) — full native TAS parity after BUG-013
+- [DONE @windows] QA-020 (emulator) — full native TAS parity after BUG-013
   - current candidate `012a2c95089485ebd37d19e86717b666ccc00e09` (merged
     `424fd7f`), BIOS `300C20DF...`, normalized SaveRAM `FB611BD6...`,
     same 100% TAS.
@@ -505,8 +515,15 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
     `PARITY: PASS (339001 frames)` in 647.4 s; final state
     `main=9 sub1=2 frame16=5979` both.  BUG-011's old reordered 223045
     failure is gone.
-  - This is the headless half of QA-020 for normal/shifted/reordered; native
-    Windows parity remains @windows.
+  - This is the headless half of QA-020 for normal/shifted/reordered.
+  - **native Windows 2026-10-21 PASS**: normal, shifted and reordered all
+    reach 339001 with final `DISPCNT=1900 main=9 s1=2 s2=0100 event=109
+    area=0 room=63`; shifted callback `08098325` (`+0x1000`).  Key
+    checkpoints 384/385/386, 401, 22923/22924/22925 and 22952 PASS; no
+    `LONG_BLACK`, all rc=0.  Any% TAS also PASS at 259176 for all three.
+    Native core `4109E16135B2F44A4E8EF046ACD99EAB8600AC4A`; no EmuHawk
+    left running.  Evidence: `tas/qa020_latest/`, `tas/anypct_latest/` and
+    `mgba-final-latest/`.
   - **D-012 checkpoint ladder (2026-10-20)**: 115000 -> 150000 PASS;
     150000 -> 200000 PASS after BUG-018; 200000 -> 223040 PASS; 223040
     audio/channel state differs and the room-14 transition phase shifts at
@@ -1420,7 +1437,7 @@ HACK-001/001a/006 (GDD, layout, Cantor).  Details in `git log`.
   - generated `hack/gen/rooms/` stays ignored; README has the HACK-004a2
     integration checklist. Door IDs 10/11 are a provisional post-boss return
     pair and need design sign-off before the 13-entry door table is committed.
-- [PARK] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms (paused: M0 file-select parity)
+- [TODO] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms
   - extend `sTest1RoomEntries` to 5 and `sTest1Doors` to 13; room/door data
     promotion needs an ADR because `src/data` is baseline-owned
   - resolve tileset 0, bg0/dark-room handling, spawn tables, entry warp
