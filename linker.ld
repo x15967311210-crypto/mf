@@ -490,7 +490,9 @@ SECTIONS {
 
         src/menus/pause_debug.o(.text);
 
-        asm/disasm_0x0807e678.o(.text);
+        asm/disasm_0x0807e678_0807e678.o(.text);
+        asm/disasm_0x0807e678_0807eea4.o(.text);
+        asm/disasm_0x0807e678_080809f0.o(.text);
 
         src/projectile.o(.text);
         src/menus/title_screen.o(.text);
