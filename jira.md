@@ -1015,23 +1015,25 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - acceptance: headless screen dump at the 28450/29500 prefix shows a coherent
     room (no garbage tiles/HUD), `hack-room-check` + `hack-liveness-check`
     still pass, normal/shifted/reordered SHAs unchanged
-- [TODO] BUG-022 (engine) — banner shows vanilla debug text (blocking)
-  - playtest 2026-10-21: the Entry Ledge banner displays
+- [DONE] BUG-022 (engine) — banner showed vanilla debug text
+  - playtest 2026-10-21: the Entry Ledge banner displayed
     "Enemy location abnormal. Check message frame position."
   - root cause: the banner is a static spawn at record index 2;
-    `MessageBannerInit` sets `gCurrentSprite.roomSlot = UCHAR_MAX` when the
-    sprite is not onscreen at init, so `TextDrawMessageBanner` receives 255,
-    clamps to 21, adds 21 and draws vanilla English text index 42 —
-    verified `sMessageTextPointers[2][42]` decodes to exactly that string.
-    The HACK-008d2 hook only handles `messageId < 22`
-  - fix: under `#ifdef HACK` keep the authored message id for
-    `gCurrentArea == AREA_TEST_1` (e.g. do not overwrite `roomSlot`, or carry
-    the id in an unused work byte / spawn through `TrySpawnMessageBanner`) and
-    make `HackAreaTest1Text[2]` the text actually drawn; no baseline table
-    edits, no SHA drift
-  - acceptance: IWRAM dump shows the banner's message id is the authored one,
-    screen dump at the 28450 prefix shows `ENTRY LEDGE / THE SIGNAL IS WEAK`
-    (not vanilla index 42), `hack-liveness-check` unchanged, SHAs unchanged
+    `MessageBannerInit` set `gCurrentSprite.roomSlot = UCHAR_MAX` when the
+    sprite was not onscreen at init, so `TextDrawMessageBanner` received 255,
+    clamped to 21, added 21 and drew vanilla English text index 42 —
+    `sMessageTextPointers[2][42]` decodes to exactly that string
+  - fix (`src/sprites_AI/message_banner.c`, HACK-only): for
+    `gCurrentArea == AREA_TEST_1` keep the authored `roomSlot`; every other
+    area keeps the baseline `UCHAR_MAX` overwrite token-for-token
+  - evidence: instrumented EWRAM dump decoded to
+    `ENTRY LEDGE{NEW_LINE}THE SIGNAL IS WEAK`, `pText = 0x0879C1D0`
+    (`HackTextEntryLedgeSignal`, not `sMessageTextPointers`), `messageId = 2`;
+    clean-ROM liveness reports `SPRITE[2] ... roomSlot=0x02`; the other three
+    spawns unchanged; `hack-room-check` PASS
+  - landed `8e05fbf`; normal `ca33f434…`, shifted `5888a563…`, reordered
+    `9dac0a4b…` unchanged; `Makefile.shift test`, `audit`, `check_relocs` PASS
+  - instrumentation was removed before commit (`src/text.c` clean)
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores

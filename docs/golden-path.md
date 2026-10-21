@@ -58,7 +58,8 @@ make content-check         # content validators and ID registry
 `work/emulator/`, dumps IWRAM through the headless harness, and asserts fixed
 D-002 addresses: `gSpritesetSpriteIds[0..6] == 1F 1E 12 41 62 21 CF`, gfx slots
 `0..6`, `struct SpriteData` stride `0x38`, and live entries 0..3 with
-(status, id, roomSlot) `0003/1F/0`, `0003/1E/1`, `0013/21/FF`, `8003/12/3`.
+(status, id, roomSlot) `0003/1F/0`, `0003/1E/1`, `0013/21/2`, `8003/12/3`;
+the banner keeps its authored message id 2 (BUG-022), so it draws the hack text.
 All three emulator targets exit **77** (skip) when no headless harness is
 installed; they never pass falsely.
 
