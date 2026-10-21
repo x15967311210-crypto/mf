@@ -1738,17 +1738,22 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - load the save in the hack build, assert `area=7 room=0`, the saved
     `gEventCounter` and that the banner/enemy/spriteset still load
 
-- [PARK] PLAYTEST-001 (human) — M1 blockout playtest handed off 2026-10-21
-  - artifact: `work/playtest/M1-2026-10-21/mf_us_M1.gba` (commit `e5eb486`,
-    SHA1 `098414b9a5a6f4b479f4f77e20458756d335e7c1`), README + feedback
-    template in the same directory
+- [PARK] PLAYTEST-001 (human) — M1 blockout playtest re-handed off 2026-10-21b
+  - current artifact: `work/playtest/M1-2026-10-21b/mf_us_M1b.gba` (commit
+    `7b65927`, SHA1 `d6dac5dbe4852d52ef02c03a40e7efe13c21d739`), README +
+    feedback template in the same directory; the first artifact
+    (`work/playtest/M1-2026-10-21/`) is superseded
   - scope per `docs/playtest.md`: 5-room flow, doors, camera, readability, save
     pad; pulse/boss/logs/art are explicitly out of scope
   - **PLAYTEST-FAIL 2026-10-21**: 花屏（tileset/背景错误，HUD/小地图不可读）
     and the banner shows a vanilla debug string; evidence filed as BUG-021 and
     BUG-022.  M1 is not signed off; do not start HACK-004b
-  - re-handoff after BUG-021 + BUG-022 are fixed and a fresh screen dump shows
-    a coherent Entry Ledge with the authored banner text
+  - **re-handed off 2026-10-21b**: `work/playtest/M1-2026-10-21b/mf_us_M1b.gba`
+    (commit `7b65927`, SHA1 `d6dac5dbe4852d52ef02c03a40e7efe13c21d739`);
+    BUG-021 and BUG-022 are fixed, the screen dump shows the generated blockout
+    tileset, clean HUD/minimap and the authored banner text
+  - M1 is not signed off until the human returns `PLAYTEST-PASS`; blocking
+    feedback becomes `BUG-*` / `PLAYTEST-*`
   - HACK-004a2b (event block + broad pad checks + dedicated transition/save
     scenario) stays queued for the M2 cycle; it does not block M1
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
