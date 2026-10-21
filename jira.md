@@ -1053,6 +1053,51 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     renders correctly
   - evidence: palette dumps, `_pal.bin` row 4 after the fix, and
     `work/emulator/bug021_truth_blocks.png`
+- [TODO] BUG-024 (engine) — player sprite invisible in the M1 rooms
+  - M1b screenshot evidence: the HUD/minimap draw, the room renders, but Samus
+    is not visible anywhere in Entry Ledge
+  - deferred with the M1 rendering pause; start after the documentation phase
+    or when the human reopens M1
+  - check sprite gfx slots vs the room spriteset, Samus palette/OBJ rows, and
+    whether the custom tileset/backdrop path overwrote Samus' VRAM/palette
+- [TODO] BUG-025 (content) — room tile colours wrong in the M1 rooms
+  - M1b screenshot evidence: some blockout tiles use the wrong colours (the
+    generated tileset palette is bank 4; row/bank edge cases remain)
+  - deferred with the M1 rendering pause
+- [TODO] BUG-026 (engine/content) — HUD/minimap textures wrong
+  - M1b screenshot evidence: HUD and minimap tiles are garbled/incorrect while
+    the banner and room tiles draw
+  - deferred with the M1 rendering pause; likely VRAM/palette overlap from the
+    room tileset/backdrop path
+- [TODO] DOC-001 (docs) — rewrite README for the shiftable engine
+  - remove the stale "This decomp is not shiftable, don't use it as a base"
+    warning; document the shiftable/hackable status, build flows
+    (`make`, `make shift-build`, `make hack-build`), current gates, and where
+    the docs live
+  - keep the upstream decomp attribution and toolchain setup
+- [TODO] DOC-002 (tools/docs) — format contract
+  - add `.clang-format` (4-space indent, project style), a `make format`
+    target (and `format-check` if cheap), and `docs/style.md` describing it
+  - do not reformat engine files in this task; only add the contract
+- [TODO] DOC-003 (docs) — engine architecture overview
+  - `docs/architecture/overview.md`: main loop/VBlank/state machine, room load
+    and clipdata, OAM/sprite lifecycle, audio interface, SRAM/save layout; cite
+    files/functions instead of only prose
+- [TODO] DOC-004 (docs) — how-to: add a room/door
+  - `docs/howto/add-a-room.md`: Tiled -> manifest -> converter -> generated
+    table -> door IDs -> scenario, using the existing pipeline
+- [TODO] DOC-005 (docs) — how-to: add dialogue/text
+  - `docs/howto/add-dialogue.md`: charmap/INCTEXT, `messages.json`, text IDs,
+    banner spawn/message id, validation
+- [TODO] DOC-006 (docs) — how-to: add an enemy behaviour
+  - `docs/howto/add-enemy.md`: sprite IDs/tables, spriteset slot, AI dispatch,
+    HACK overlay vs baseline, PSPRITE_END constraint
+- [TODO] TECH-001 (tools) — symbolise hardcoded ROM literals
+  - use `tools/shift/map_symbols.py` and the audit ledger to replace the 697
+    `ldr` comments/raw addresses with semantic symbols where known
+- [TODO] TECH-002 (decomp) — split the giant disasm files
+  - prioritise `disasm_0x0808F5C4.s` (335 ROM refs) and the other five large
+    files; split by function/concern and name the entry points
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
@@ -1752,8 +1797,12 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     (commit `7b65927`, SHA1 `d6dac5dbe4852d52ef02c03a40e7efe13c21d739`);
     BUG-021 and BUG-022 are fixed, the screen dump shows the generated blockout
     tileset, clean HUD/minimap and the authored banner text
-  - M1 is not signed off until the human returns `PLAYTEST-PASS`; blocking
-    feedback becomes `BUG-*` / `PLAYTEST-*`
+  - **PLAYTEST-FAIL 2026-10-21b** (second attempt): 1) Samus/player sprite is
+    invisible; 2) several room tile colours are wrong; 3) HUD/minimap textures
+    are wrong.  Filed as BUG-024/025/026
+  - **paused at the human's request**: rendering is not worth another
+    round-trip now; the focus moves to engine comprehension and onboarding
+    docs.  M1 stays failed/blocked; `HACK-004b` and M2 do not start
   - HACK-004a2b (event block + broad pad checks + dedicated transition/save
     scenario) stays queued for the M2 cycle; it does not block M1
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
