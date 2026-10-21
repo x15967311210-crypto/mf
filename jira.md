@@ -1485,10 +1485,17 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     `src/room.c` selecting `hack/include/hack/content_tables.h`.
   - empty overlay is byte-identical to baseline: normal/hack SHA
     `ca33f434...`; hack `boot_smoke` PASS; `content-check` PASS.
-- [DOING @dev27] HACK-008c2 (tools/content) — generated C content tables
+- [TODO] HACK-008c2 (tools/content) — generated C content tables
   - emit room/door/spriteset/scroll/text/event C tables from
     `hack/content` into ignored `hack/gen`; wire through the 008c1 hook
   - no hand edits to `src/data`
+  - **partial / blocked 2026-10-21**: `tools/content/gen_content_tables.py`
+    generates a valid one-room Entry Ledge table and `hack/gen` header
+    (self-check PASS).  Integration is not merged: the HACK link still picks
+    the baseline `src/room.o` path/duplicate section, so the generated
+    `src/room.o(.rodata)` table is not selected and hack SHA stays baseline.
+    The uncommitted worktree `dev27` has the generator/header; next step is a
+    clean HACK object/linker inclusion rule, then hack SHA/room-load gate.
 - [TODO] HACK-008d (content/engine) — golden path: 1 room + 1 dialogue + 1 enemy
   - end-to-end from content source to playable build: room, door, text,
     one enemy behavior/event, save entry warp, validator and one-page docs
