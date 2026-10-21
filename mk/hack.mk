@@ -67,7 +67,8 @@ $(HACK_DIRECT_OBJ): $(OBJ_DIR)/%.o: %.s
 
 # The one baseline hook includes the generated table header; make must rebuild
 # it when content-tables regenerates that header.
-$(OBJ_DIR)/src/room.o: $(HACK_TABLES)
+$(OBJ_DIR)/src/room.s: $(HACK_TABLES)
+$(OBJ_DIR)/src/room.o: $(OBJ_DIR)/src/room.s $(HACK_TABLES)
 
 # Same per-file optimisation overrides as the baseline build (Makefile).
 $(OBJ_DIR)/src/dma.s: CFLAGS = -O1 -mthumb-interwork -fhex-asm
