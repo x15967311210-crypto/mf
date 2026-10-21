@@ -297,6 +297,11 @@ include mk/shift.mk
 # `hack-sha1`, `hack-smoke` and $(HACK_HELP); it owns no `all`/`help` target.
 include mk/hack.mk
 
+# Project-management targets (PM-001): `jira-check`, `dashboard`,
+# `dashboard-check`, `jira-check-self`.  Contributes $(PM_HELP) and owns no
+# `all`/`help` target, matching mk/shift.mk and mk/hack.mk.
+include mk/pm.mk
+
 .PHONY: help
 help:
 	@echo 'Targets:'
@@ -319,6 +324,9 @@ help:
 	@echo ''
 	@echo 'Hack overlay build (D-013; HACK=1, artifacts under work/hack/):'
 	$(HACK_HELP)
+	@echo ''
+	@echo 'Project management (jira.md is the backlog source of truth):'
+	$(PM_HELP)
 	@echo ''
 	@echo 'Flags:'
 	@echo '  V=1: enable verbose output'
