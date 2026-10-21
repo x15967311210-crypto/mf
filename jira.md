@@ -19,8 +19,8 @@ map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
 Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
-HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2/008d4a
-(ID/text/overlay/generated Entry Ledge room, scroll and message tables + entry warp), QA-020 (native normal/shifted/
+HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2/008d3/008d4a
+(ID/text/overlay/generated Entry Ledge room, scroll, message and sprite tables + entry warp), QA-020 (native normal/shifted/
 reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
 `git log`.
 
@@ -1551,43 +1551,34 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - display in game is still unproven: no entry warp yet, so the banner is
     never drawn (HACK-008d4)
   - out of scope: entry warp, enemy, doors, save/load
-- [DOING @dev31] HACK-008d3 (engine/content) — Echo Hunter primary sprite
-  - entry warp (008d4a) now provides the behaviour gate
-  - design constraint: `PSPRITE_END` (0xCF) sizes `sPrimarySpritesAiPointers`,
-    `sPrimarySpriteStats`, `sSpritesGraphicsPointers`,
-    `sSpritesPalettePointers` and `sSpritesGraphicsLength`; appending an entry
-    to those baseline `src/data` arrays shifts later symbols and changes the
-    baseline SHA, so "extend every table in place" is not allowed
-  - use a HACK-only wrapper instead: keep `SPRITE_ECHO_HUNTER = 0xCF` out of
-    the baseline arrays; in `src/sprite.c` (single TU) add a HACK-only AI
-    dispatch helper for the four `sPrimarySpritesAiPointers[...]` call sites
-    and a proxy id for the gfx/pal/length loads, so 0xCF runs a baseline-sprite
-    data clone without touching `src/data`; custom AI/animation is HACK-004b
-  - **latent 008c2 bug found while preparing d3** (dev31 + manager IWRAM dump):
-    the generated room entry sets `defaultSpriteset = 255`, so
-    `SpriteLoadSpriteset` falls back to `sSpritesetPointers[129]`, which is an
-    empty table (first pair `0x00` = `PSPRITE_TARGET_CIRCLES`); every spawn
-    slot therefore resolves through `gSpritesetSpriteIds[] = 0x10`
-    (`PSPRITE_UNUSED_16`).  The manifest `spritesets` table is converter-only
-    and never reaches the engine.  Save pad, data pad and message banner have
-    been spawning as placeholders; d3 must fix this for the enemy and the
-    banner text to work
-  - fix: generate `hack/gen/sprite_tables.h` from the manifest table
-    (`(spriteId, gfxSlot)` byte pairs + `0x00` terminator), add a tracked shim,
-    and select it in `SpriteLoadSpriteset` under `#ifdef HACK` when
-    `gCurrentArea == AREA_TEST_1`
-  - tool: `tiled_to_room.py` must resolve `SPRITE_ECHO_HUNTER` from
-    `hack/include/hack/ids.h` and allow it in a spriteset table even though the
-    vanilla enum stops at 0xCE
-  - runtime proxy: keep 0xCF in the generated table/spawn data, but rewrite the
-    stored `gSpriteData[].spriteId` from 0xCF to `PSPRITE_HORNOAD` inside
-    `SpriteInitPrimary`, so AI, stats, health macros, projectile weakness and
-    gfx/pal/length all read the Hornoad entries and nothing indexes past a
-    baseline array; the spriteset graphics load must proxy 0xCF too
-  - content: one Entry Ledge spawn record + manifest spriteset slot 6
-  - gates: `hack-room-check` must still end in `area=7 room=0` with a live
-    frame counter, and the dump must show spawned sprite ids (not 0x10
-    placeholders), `hack-smoke`, and unchanged normal/shifted/reordered SHAs
+- [DONE] HACK-008d3 (engine/content) — hack spriteset selection + Echo Hunter
+  - **fixed a latent 008c2 bug**: the generated room entry's
+    `defaultSpriteset = 255` fell back to the empty `sSpritesetPointers[129]`,
+    so every spawn slot resolved through `gSpritesetSpriteIds[] = 0x10`
+    (`PSPRITE_UNUSED_16`); the save pad, data pad and message banner had been
+    spawning as placeholders and the d2 text could never draw
+  - `gen_content_tables.py` now emits `hack/gen/sprite_tables.h` with the
+    manifest `(spriteId, gfxSlot)` pairs + `0x00` terminator and a room-indexed
+    pointer list; tracked shim `hack/include/hack/sprite_tables.h`;
+    `SpriteLoadSpriteset` selects it for `AREA_TEST_1` with a non-HACK macro
+    expansion that keeps the baseline tokens identical
+  - `SPRITE_ECHO_HUNTER = 0xCF` is resolved by `tiled_to_room.py` from
+    `hack/include/hack/ids.h` (plus a `parse_c_enum` brace fix for
+    `typedef enum`); Entry Ledge has spriteset slot 6 and spawn record 3
+  - runtime proxy: the table/spawn data keep 0xCF, but `SpriteInitPrimary`
+    stores `PSPRITE_HORNOAD` and the spriteset/gfx/pal loads proxy 0xCF, so no
+    baseline `PSPRITE_END`-sized array is indexed out of bounds; the enemy runs
+    Hornoad data as a golden-path clone (custom AI/art is HACK-004b)
+  - evidence: IWRAM dump shows `gSpritesetSpriteIds = 1F 1E 12 41 62 21 CF`,
+    gfx slots 0..6, and live sprites `ids=1F,1E,21,12` with status
+    `0003/0003/0013/8003` (save pad, data pad, message banner, Echo Hunter)
+  - landed `1f73189`; gates: `content-tables-check`, `content-check`,
+    `hack-build`, `hack-smoke`, `hack-room-check` (`FINAL_EVENT ... area=7
+    room=0`, `main=1`, `frame_counter=29861`) PASS; normal `ca33f434…`,
+    shifted `5888a563…`, reordered `9dac0a4b…` unchanged; `Makefile.shift
+    test`, `audit`, `check_relocs` PASS
+  - next: 008d4b (doors, save/load, golden-path doc); the banner now spawns,
+    so its text display is the first thing to assert there
 - [DONE] HACK-008d4a (engine/qa) — hack entry warp + room-load check
   - ordering changed by the manager: without an entry warp neither the d2 text
     nor the d3 enemy can be behaviour-tested, so the warp landed first
