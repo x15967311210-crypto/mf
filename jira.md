@@ -1523,12 +1523,25 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     -f Makefile.shift test` (boot + 4k input), `audit`, `check_relocs` PASS
   - still missing: no active doors/entry warp, so `ScrollLoad()` with this
     table is linked but not yet exercised in a room-load scenario
-- [TODO] HACK-008d2 (tools/engine) — text ID space and hack-owned message table
-  - define the first `TEXT_*` ID and a relocatable hack-owned text pointer
-    table; add one narrow `#ifdef HACK` lookup hook in `src/text.c` with a
-    baseline fallback; wire the `hack/content/text` golden-path dialogue to the
-    Entry Ledge message banner
-  - no baseline `sMessageTextPointers` edits and no guessed charmap glyphs
+- [DOING @dev29] HACK-008d2 (tools/engine) — text ID space and hack-owned message table
+  - design fixed by the manager: `TEXT_*` IDs are global (ids.yaml), while the
+    engine lookup is per area and per `messageId` (`TextDrawMessageBanner`
+    clamps `messageId` to 21, then uses index `messageId + 21`); a strict
+    `hack/content/text/messages.json` maps `(area, message_id, text_id)` to a
+    committed INCTEXT source + literal index
+  - `tools/content/gen_text_tables.py` runs the real `tools/preproc` path
+    (reuse `text_roundtrip.py` helpers, no second encoder) and emits
+    `hack/gen/text_tables.h` with one `u16` block per message plus a
+    `[message_id]`-indexed pointer table; tracked shim
+    `hack/include/hack/text_tables.h`
+  - one narrow `#ifdef HACK` hook in `src/text.c`: only when
+    `gCurrentArea == AREA_TEST_1` and the generated slot is non-NULL, use the
+    hack block; otherwise take the unchanged vanilla `sMessageTextPointers`
+    path. No baseline table edits, no guessed charmap glyphs
+  - proof without an entry warp: generator `--self-check`/`--check`,
+    `content-check`, `hack-build`, and the linked `HackText*` words in the hack
+    ELF/ROM equal the preproc words; display in game is deferred to 008d4
+  - out of scope: entry warp, enemy, doors, save/load
 - [TODO] HACK-008d3 (engine/content) — Echo Hunter primary sprite
   - extend `PSPRITE_END` and every primary sprite table (behaviour, gfx, pal,
     oam, sizes) with `SPRITE_ECHO_HUNTER = 0xCF`; one room spawn record and a
