@@ -1007,11 +1007,27 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     in `docs/content-pipeline.md`).  The generated entry also uses
     `bg3Prop = BG_PROP_NONE` + empty bg3, while vanilla Test Area 1 rooms use
     `BG_PROP_LZ77_COMPRESSED` + `sBg3_TestRoom`
-  - fix options, in order: (a) remap the five manifests' `tile_mapping` to
-    block IDs that tileset 0 actually renders (wall/floor/door) and reuse
-    `sBg3_TestRoom`, or (b) generate a hack tileset entry
-    (tiles/palette/tilemap + LZ77) and select it in `RoomLoadTileset` under
-    HACK for AREA_TEST_1.  Do not edit `src/data`; no SHA drift
+  - progress: switching the bg3 payload to `sBg3_Empty` + `bg3_scrolling = 6`
+    fixed the busy backdrop (flat dark field); the banner text is now correct.
+    The remaining gap is the **tileset itself** — guessing tileset-0 block IDs
+    does not produce readable geometry, and the synthetic PNG's intended
+    tile roles (0 empty … 15 mist) never reach the ROM
+  - generated tileset entry now exists (gfx/palette/tilemap/LZ77, palette row 1
+    + tilemap bank 3) but the **BG palette is empty at runtime**: PALRAM dump at
+    the 28450 prefix has colours only in row 0, rows 1..15 zero, while vanilla
+    at the same frame has rows 0..4.  The generated array is linked with the
+    authored colours at row 1.  Suspect the post-load
+    `ColorFadingTransferPaletteOnTransition` / `gBackgroundPalette1` capture
+    overwrites the tileset palette with a pre-load buffer; the fix must re-apply
+    the generated palette after the transition transfer (HACK+AREA_TEST_1) or
+    correct the capture order.  Until then the room renders black
+  - chosen fix: generate a hack tileset entry from
+    `blockout_tileset.png` — 4bpp tiles + RGB555 palette + 4-entry-per-block
+    tilemap, LZ77 literal stream, selected in `RoomLoadTileset` under HACK for
+    `AREA_TEST_1`; map `BLOCK_BY_GID` back to the synthetic role index
+    (EMPTY 0, SOLID 1, FLOOR 2, PLATFORM 3, DARK 4, LIGHT 5, DOOR 6,
+    CONSOLE 7, PIPE 8, HAZARD 9, PULSE 10, GRATE 11, CABLE 12, RUBBLE 13,
+    MARKER 14, MIST 15).  Do not edit `src/data`; no SHA drift
   - acceptance: headless screen dump at the 28450/29500 prefix shows a coherent
     room (no garbage tiles/HUD), `hack-room-check` + `hack-liveness-check`
     still pass, normal/shifted/reordered SHAs unchanged
@@ -1034,6 +1050,22 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - landed `8e05fbf`; normal `ca33f434…`, shifted `5888a563…`, reordered
     `9dac0a4b…` unchanged; `Makefile.shift test`, `audit`, `check_relocs` PASS
   - instrumentation was removed before commit (`src/text.c` clean)
+- [TODO] BUG-023 (engine) — BG palette rows 1..3 black for the hack entry room
+  - M1 blocker; found while reworking BUG-021.  At the 28450 prefix the hack
+    ROM's BG PALRAM has colours only in row 0 (plus vanilla rows 4/5 when using
+    tileset 0); rows 1..3 are zero.  Vanilla at the same frame has rows 0..4
+    populated.  The generated tileset palette (row 1/bank 3) and the common
+    palette rows 1/2 therefore never reach the screen, so all room tiles render
+    black/teal regardless of block IDs
+  - evidence: `_pal.bin` dumps, `src/room.c` palette copy order, and the
+    `ColorFadingTransferPaletteOnTransition` / `gBackgroundPalette1/2` capture
+    path.  A HACK-only post-copy refresh of both fade buffers was tried; rows
+    4/5 survived but rows 1..3 were still zero, so the writer is not identified
+    yet
+  - next: instrument PALRAM before/after `RoomLoadTileset`, the common-palette
+    copy and `ColorFadingTransferPaletteOnTransition` (one frame), then fix the
+    capture/restore order or re-apply the room palette after the transfer;
+    keep baseline SHAs unchanged
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
