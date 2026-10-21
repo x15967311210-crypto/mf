@@ -1437,11 +1437,41 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - generated `hack/gen/rooms/` stays ignored; README has the HACK-004a2
     integration checklist. Door IDs 10/11 are a provisional post-boss return
     pair and need design sign-off before the 13-entry door table is committed.
-- [TODO] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms
+- [PARK] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms
+  - parked until the content golden path lands: new rooms still require
+    hand-editing baseline-owned `src/data` tables and there is no text,
+    ID or script pipeline
   - extend `sTest1RoomEntries` to 5 and `sTest1Doors` to 13; room/door data
     promotion needs an ADR because `src/data` is baseline-owned
   - resolve tileset 0, bg0/dark-room handling, spawn tables, entry warp
   - fix broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1
+- [TODO] ADR-013 (design/manager) — hack-owned content tables and generated IDs
+  - decide the narrow engine hook/link boundary that moves rooms, doors,
+    tilesets, scrolls, text, events and save IDs that hacks mutate out of
+    baseline-owned `src/data` into `hack/content` + generated `hack/gen`
+  - D-009 requires `hack/include/hack/ids.h` and `docs/content-tracker.md`;
+    no new magic numbers may enter before the ADR lands
+- [DOING @dev24] HACK-008a (tools) — YAML ID registry -> ids.h/tracker
+  - source `hack/content/ids.yaml`; deterministic generator
+    `tools/content/gen_ids.py --check/--write`
+  - emit `hack/include/hack/ids.h` and `docs/content-tracker.md`; validate
+    uniqueness, reserved ranges, room/door/text/event/save references
+  - add to `make content-check`; no engine/source data changes
+- [TODO] HACK-008b (tools) — charmap text pipeline + roundtrip
+  - fill `charmap.txt` with the real MF character map; use the existing
+    `tools/preproc` charmap support instead of a parallel encoder
+  - compile one dialogue block to bytes and decode it back in a host test;
+    add a content validator and docs
+- [TODO] HACK-008c (tools/engine) — generated C content tables
+  - emit room/door/spriteset/scroll/text/event C tables from
+    `hack/content` into ignored `hack/gen`; narrow baseline hook from
+    ADR-013; no hand edits to `src/data`
+- [TODO] HACK-008d (content/engine) — golden path: 1 room + 1 dialogue + 1 enemy
+  - end-to-end from content source to playable build: room, door, text,
+    one enemy behavior/event, save entry warp, validator and one-page docs
+  - acceptance: normal/shifted/reordered build; behavior scenario; save/load;
+    `content-check`; no baseline table editing
+  - HACK-004a2 starts only after this is green
 
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a2]
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
