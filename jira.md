@@ -1125,12 +1125,18 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     behavior-relevant codegen differences before a C port is accepted; never
     commit scratch output or third-party tool trees
   - start with the SRAM functions in the TECH-002a priority list
-- [TODO] TECH-002b (decomp) — execute the first disasm split
-  - split `asm/disasm_0x0808F5C4.s` into the four validated parts, replace its
-    `linker.ld` line in ascending order, and require normal
-    `ca33f434…`, `audit`, `smoke`, `test`, `check_relocs` all green
-  - then repeat for `disasm_0x0807e678.s` / `0x0809deb4.s` / `0x08079afc.s` /
-    `0x080765f8.s` / `0x08056140.s` one file at a time
+- [DONE] TECH-002b (decomp) — first disasm split
+  - `asm/disasm_0x0808F5C4.s` split into `_090d60` / `_09223c` / `_094e84` /
+    `_09994c` at the validated function boundaries; `linker.ld` lists the four
+    objects in ascending address order; `.text` sizes match the plan exactly
+    (0x14DC/0x2C48/0x4AC8/0x4228; total 0xCE14)
+  - normal `ca33f434…`, shifted `5888a563…`, reordered `9dac0a4b…` unchanged;
+    `audit`, `smoke`, `test` (boot + 4k input), `shift-test`, `shift-reorder`,
+    `check_relocs` PASS; concatenating the parts reproduces the old file
+    byte-for-byte (minus headers)
+  - landed `2bac36c` (+ refreshed `docs/shiftability-audit.md` `64f2f3f`)
+  - next: repeat one file at a time for `disasm_0x0807e678.s`,
+    `0x0809deb4.s`, `0x08079afc.s`, `0x080765f8.s`, `0x08056140.s`
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
