@@ -1475,11 +1475,16 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     example, `content-check` round-trip; `make content-check` PASS.
     Digits/punctuation remain deliberately unproven; text IDs stay
     unallocated until HACK-008d.
-- [DOING @dev26] HACK-008c1 (engine/tools) — HACK=1 build overlay scaffold
+- [DONE] HACK-008c1 (engine/tools) — HACK=1 build overlay scaffold
   - add a separate hack build target/artifact that defines `HACK=1` and links
     a narrow AREA_TEST_1 selection hook; empty overlay falls back to baseline
     so normal/shifted/reordered SHAs stay unchanged
   - no generated tables yet; prove the build/boot and no-baseline-edit contract
+  - landed `93a7d4f`: `mk/hack.mk` + `make hack-build`/`hack-smoke`, private
+    `work/hack/obj`, `HACK=1` C/asm defines, and one `#ifdef HACK` hook in
+    `src/room.c` selecting `hack/include/hack/content_tables.h`.
+  - empty overlay is byte-identical to baseline: normal/hack SHA
+    `ca33f434...`; hack `boot_smoke` PASS; `content-check` PASS.
 - [TODO] HACK-008c2 (tools/content) — generated C content tables
   - emit room/door/spriteset/scroll/text/event C tables from
     `hack/content` into ignored `hack/gen`; wire through the 008c1 hook
