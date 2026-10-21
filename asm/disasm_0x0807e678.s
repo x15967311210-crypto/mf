@@ -126,7 +126,7 @@ StatusScreenDrawNumber: @ 0x0807E754
 	lsls r3, r3, #0x18
 	lsrs r3, r3, #0x18
 	mov sl, r3
-	ldr r3, _0807E7D0 @ =0x0858217C
+	ldr r3, _0807E7D0 @ =0x0858217C (sBlob_58217b_58225c+0x1)
 	lsls r2, r0, #2
 	adds r2, r2, r0
 	adds r0, r2, r3
@@ -144,7 +144,7 @@ StatusScreenDrawNumber: @ 0x0807E754
 	adds r2, r2, r3
 	ldrb r0, [r2]
 	subs r6, r0, r4
-	ldr r1, _0807E7D8 @ =0x08576180
+	ldr r1, _0807E7D8 @ =0x08576180 (sPauseDebugNumbersIncrementValues)
 	lsls r0, r6, #1
 	adds r0, r0, r1
 	ldrh r4, [r0]
@@ -242,16 +242,16 @@ StatusScreenDrawBeamOrSuit: @ 0x0807E834
 	movs r0, #0
 	mov sb, r0
 	movs r2, #0
-	ldr r0, _0807E964 @ =0x0857617A
+	ldr r0, _0807E964 @ =0x0857617A (sStatusScreenSectionSizes)
 	adds r1, r7, r0
 	ldrb r1, [r1]
 	cmp sb, r1
 	bge _0807E8F8
-	ldr r1, _0807E968 @ =0x0858217C
+	ldr r1, _0807E968 @ =0x0858217C (sBlob_58217b_58225c+0x1)
 	lsls r3, r7, #2
 	mov sl, r3
 	adds r5, r3, r7
-	ldr r0, _0807E96C @ =0x085821B3
+	ldr r0, _0807E96C @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, #2
 	adds r0, r5, r0
 	ldrb r0, [r0]
@@ -275,7 +275,7 @@ _0807E886:
 	lsls r0, r0, #5
 	add r0, r8
 	mov ip, r0
-	ldr r3, _0807E96C @ =0x085821B3
+	ldr r3, _0807E96C @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, r5, r3
 	ldrb r0, [r0]
 	adds r0, #1
@@ -283,7 +283,7 @@ _0807E886:
 	lsls r0, r0, #5
 	ldr r1, [sp, #8]
 	adds r6, r0, r1
-	ldr r0, _0807E970 @ =0x0879BEA8
+	ldr r0, _0807E970 @ =0x0879BEA8 (sUnk_79bea8)
 	add r0, sl
 	ldr r0, [r0]
 	adds r0, r0, r2
@@ -302,7 +302,7 @@ _0807E886:
 	cmp r0, #0
 	blt _0807E8EE
 	ldr r3, [sp, #0xc]
-	ldr r1, _0807E974 @ =0x0858217F
+	ldr r1, _0807E974 @ =0x0858217F (sBlob_58217b_58225c+0x4)
 	adds r0, r3, r1
 	ldrb r1, [r0]
 	ldr r3, [sp, #0x10]
@@ -324,7 +324,7 @@ _0807E8E0:
 	cmp r1, #0
 	bne _0807E8E0
 _0807E8EE:
-	ldr r6, _0807E964 @ =0x0857617A
+	ldr r6, _0807E964 @ =0x0857617A (sStatusScreenSectionSizes)
 	adds r0, r7, r6
 	ldrb r0, [r0]
 	cmp r2, r0
@@ -333,7 +333,7 @@ _0807E8F8:
 	mov r0, sb
 	cmp r0, #0
 	beq _0807E954
-	ldr r3, _0807E968 @ =0x0858217C
+	ldr r3, _0807E968 @ =0x0858217C (sBlob_58217b_58225c+0x1)
 	lsls r2, r7, #2
 	adds r2, r2, r7
 	adds r0, r2, r3
@@ -347,7 +347,7 @@ _0807E8F8:
 	ldrb r4, [r0]
 	adds r1, r1, r4
 	mov ip, r1
-	ldr r1, _0807E96C @ =0x085821B3
+	ldr r1, _0807E96C @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, r1, #1
 	adds r0, r2, r0
 	ldrb r0, [r0]
@@ -411,16 +411,16 @@ StatusScreenDrawMissileOrBomb: @ 0x0807E97C
 	rsbs r0, r0, #0
 	str r0, [sp, #4]
 	movs r2, #0
-	ldr r0, _0807EA30 @ =0x0857617A
+	ldr r0, _0807EA30 @ =0x0857617A (sStatusScreenSectionSizes)
 	adds r1, r7, r0
 	ldrb r1, [r1]
 	cmp r2, r1
 	bge _0807EA5C
-	ldr r1, _0807EA34 @ =0x0858217C
+	ldr r1, _0807EA34 @ =0x0858217C (sBlob_58217b_58225c+0x1)
 	lsls r3, r7, #2
 	mov sl, r3
 	adds r5, r3, r7
-	ldr r0, _0807EA38 @ =0x085821B3
+	ldr r0, _0807EA38 @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, #2
 	adds r0, r5, r0
 	ldrb r0, [r0]
@@ -442,14 +442,14 @@ _0807E9D0:
 	mov r0, ip
 	add r0, sb
 	mov r8, r0
-	ldr r1, _0807EA38 @ =0x085821B3
+	ldr r1, _0807EA38 @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, r5, r1
 	ldrb r0, [r0]
 	adds r0, r0, r2
 	lsls r0, r0, #5
 	ldr r3, [sp, #8]
 	adds r6, r0, r3
-	ldr r0, _0807EA3C @ =0x0879BEA8
+	ldr r0, _0807EA3C @ =0x0879BEA8 (sUnk_79bea8)
 	add r0, sl
 	ldr r0, [r0]
 	adds r0, r0, r2
@@ -465,7 +465,7 @@ _0807E9D0:
 	subs r0, r0, r1
 	cmp r0, #0
 	blt _0807EA4C
-	ldr r0, _0807EA40 @ =0x0858217F
+	ldr r0, _0807EA40 @ =0x0858217F (sBlob_58217b_58225c+0x4)
 	ldr r3, [sp, #0xc]
 	adds r0, r3, r0
 	ldrb r1, [r0]
@@ -502,7 +502,7 @@ _0807EA4C:
 	movs r6, #0x20
 	add ip, r6
 	adds r2, #1
-	ldr r1, _0807EAC8 @ =0x0857617A
+	ldr r1, _0807EAC8 @ =0x0857617A (sStatusScreenSectionSizes)
 	adds r0, r7, r1
 	ldrb r0, [r0]
 	cmp r2, r0
@@ -511,7 +511,7 @@ _0807EA5C:
 	ldr r2, [sp, #4]
 	cmp r2, #0
 	blt _0807EAB8
-	ldr r3, _0807EACC @ =0x0858217C
+	ldr r3, _0807EACC @ =0x0858217C (sBlob_58217b_58225c+0x1)
 	lsls r2, r7, #2
 	adds r2, r2, r7
 	adds r0, r2, r3
@@ -525,7 +525,7 @@ _0807EA5C:
 	ldrb r4, [r0]
 	adds r1, r1, r4
 	mov r8, r1
-	ldr r1, _0807EAD0 @ =0x085821B3
+	ldr r1, _0807EAD0 @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, r1, #1
 	adds r0, r2, r0
 	ldrb r0, [r0]
@@ -587,17 +587,17 @@ StatusScreenDrawMisc: @ 0x0807EAD8
 	movs r0, #0
 	str r0, [sp, #4]
 	movs r4, #0
-	ldr r0, _0807EBF8 @ =0x0857617A
+	ldr r0, _0807EBF8 @ =0x0857617A (sStatusScreenSectionSizes)
 	mov r2, r8
 	adds r1, r2, r0
 	ldrb r1, [r1]
 	cmp r4, r1
 	bge _0807EB9C
-	ldr r1, _0807EBFC @ =0x0858217C
+	ldr r1, _0807EBFC @ =0x0858217C (sBlob_58217b_58225c+0x1)
 	lsls r2, r2, #2
 	mov sb, r2
 	add r2, r8
-	ldr r3, _0807EC00 @ =0x085821B3
+	ldr r3, _0807EC00 @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	mov sl, r3
 	mov r0, sl
 	adds r0, #2
@@ -629,7 +629,7 @@ _0807EB30:
 	lsls r0, r0, #5
 	ldr r1, [sp, #0xc]
 	adds r3, r0, r1
-	ldr r0, _0807EC04 @ =0x0879BEA8
+	ldr r0, _0807EC04 @ =0x0879BEA8 (sUnk_79bea8)
 	add r0, sb
 	ldr r0, [r0]
 	adds r0, r0, r4
@@ -646,7 +646,7 @@ _0807EB30:
 	cmp r0, #0
 	blt _0807EB90
 	ldr r1, [sp, #0x10]
-	ldr r4, _0807EC08 @ =0x0858217F
+	ldr r4, _0807EC08 @ =0x0858217F (sBlob_58217b_58225c+0x4)
 	adds r0, r1, r4
 	ldrb r1, [r0]
 	mov r4, ip
@@ -668,7 +668,7 @@ _0807EB82:
 	bne _0807EB82
 _0807EB90:
 	adds r4, r5, #0
-	ldr r0, _0807EBF8 @ =0x0857617A
+	ldr r0, _0807EBF8 @ =0x0857617A (sStatusScreenSectionSizes)
 	add r0, r8
 	ldrb r0, [r0]
 	cmp r4, r0
@@ -678,7 +678,7 @@ _0807EB9C:
 	cmp r4, #0
 	beq _0807EC6C
 	movs r4, #0
-	ldr r1, _0807EBFC @ =0x0858217C
+	ldr r1, _0807EBFC @ =0x0858217C (sBlob_58217b_58225c+0x1)
 	mov r6, r8
 	lsls r6, r6, #2
 	str r6, [sp, #0x14]
@@ -687,17 +687,17 @@ _0807EB9C:
 	adds r2, r1, #2
 	adds r0, r7, r2
 	mov ip, r0
-	ldr r0, _0807EC00 @ =0x085821B3
+	ldr r0, _0807EC00 @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, #2
 	adds r0, r0, r7
 	mov sl, r0
 	adds r2, r7, r1
 	mov sb, r2
-	ldr r0, _0807EC00 @ =0x085821B3
+	ldr r0, _0807EC00 @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, #1
 	adds r0, r7, r0
 	str r0, [sp, #0x18]
-	ldr r3, _0807EC08 @ =0x0858217F
+	ldr r3, _0807EC08 @ =0x0858217F (sBlob_58217b_58225c+0x4)
 	adds r3, r7, r3
 	str r3, [sp, #0x20]
 _0807EBD0:
@@ -734,7 +734,7 @@ _0807EC10:
 	mov r3, ip
 	ldrb r3, [r3]
 	adds r6, r0, r3
-	ldr r1, _0807EC7C @ =0x085821B3
+	ldr r1, _0807EC7C @ =0x085821B3 (sBlob_58217b_58225c+0x38)
 	adds r0, r7, r1
 	ldrb r0, [r0]
 	lsls r0, r0, #5
@@ -752,10 +752,10 @@ _0807EC2A:
 	blt _0807EC66
 	ldr r1, [sp, #0x14]
 	add r1, r8
-	ldr r4, _0807EC80 @ =0x0858217F
+	ldr r4, _0807EC80 @ =0x0858217F (sBlob_58217b_58225c+0x4)
 	adds r0, r1, r4
 	ldrb r2, [r0]
-	ldr r0, _0807EC84 @ =0x0858217E
+	ldr r0, _0807EC84 @ =0x0858217E (sBlob_58217b_58225c+0x3)
 	adds r1, r1, r0
 	ldrb r0, [r1]
 	subs r2, r2, r0
@@ -814,7 +814,7 @@ _0807ECA8:
 	mov r8, r0
 	movs r3, #0
 	lsls r1, r1, #2
-	ldr r5, _0807ED1C @ =0x085821D6
+	ldr r5, _0807ED1C @ =0x085821D6 (sBlob_58217b_58225c+0x5B)
 	adds r0, r1, r5
 	ldrb r0, [r0]
 	mov sl, r0
@@ -1092,7 +1092,7 @@ Sram_WriteHeader: @ 0x0807EEBC
 	movs r2, #0
 	adds r5, r4, #0
 	adds r5, #0xc
-	ldr r3, _0807EF24 @ =0x08582248
+	ldr r3, _0807EF24 @ =0x08582248 (sBlob_58217b_58225c+0xCD)
 _0807EEDA:
 	adds r0, r5, r2
 	adds r1, r2, r3
@@ -1322,7 +1322,7 @@ _0807F09C:
 _0807F0BA:
 	movs r3, #0
 	adds r2, r5, #0
-	ldr r6, _0807F0F4 @ =0x08582248
+	ldr r6, _0807F0F4 @ =0x08582248 (sBlob_58217b_58225c+0xCD)
 	movs r5, #2
 _0807F0C2:
 	adds r0, r2, r3
@@ -1403,10 +1403,10 @@ _0807F136:
 _0807F150: .4byte gDisableSoftReset
 _0807F154: .4byte 0x03000014
 _0807F158:
-	ldr r0, _0807F174 @ =0x0858225C
+	ldr r0, _0807F174 @ =0x0858225C (sSaveDataEwramPointers)
 	adds r0, r2, r0
 	ldr r1, [r0]
-	ldr r0, _0807F178 @ =0x08582268
+	ldr r0, _0807F178 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r2, r0
 	ldr r2, [r0]
 	movs r3, #0x90
@@ -1453,7 +1453,7 @@ _0807F194:
 	adds r0, r0, r6
 	ldrb r0, [r0, #0x10]
 	strb r0, [r3]
-	ldr r1, _0807F1E0 @ =0x0858225C
+	ldr r1, _0807F1E0 @ =0x0858225C (sSaveDataEwramPointers)
 	ldrb r0, [r4]
 	lsls r0, r0, #2
 	adds r0, r0, r1
@@ -1477,10 +1477,10 @@ _0807F1EA:
 	bl WriteMostRecentFileToSram
 	b _0807F222
 _0807F1F0:
-	ldr r0, _0807F210 @ =0x0858225C
+	ldr r0, _0807F210 @ =0x0858225C (sSaveDataEwramPointers)
 	adds r0, r2, r0
 	ldr r1, [r0]
-	ldr r0, _0807F214 @ =0x08582268
+	ldr r0, _0807F214 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r2, r0
 	ldr r2, [r0]
 	movs r3, #0x90
@@ -1511,13 +1511,13 @@ _0807F22C: .4byte gDisableSoftReset
 	thumb_func_start Sram_WriteHeaderAndGameInfo
 Sram_WriteHeaderAndGameInfo: @ 0x0807F230
 	push {r4, r5, r6, lr}
-	ldr r5, _0807F2A0 @ =0x0858225C
+	ldr r5, _0807F2A0 @ =0x0858225C (sSaveDataEwramPointers)
 	ldr r4, _0807F2A4 @ =0x03000B8D
 	ldrb r0, [r4]
 	lsls r0, r0, #2
 	adds r0, r0, r5
 	ldr r6, [r0]
-	ldr r1, _0807F2A8 @ =0x08582200
+	ldr r1, _0807F2A8 @ =0x08582200 (sBlob_58217b_58225c+0x85)
 	adds r0, r6, #0
 	bl Sram_StringCopy_MetroidEpisode4A
 	movs r0, #0
@@ -1531,7 +1531,7 @@ Sram_WriteHeaderAndGameInfo: @ 0x0807F230
 	strb r0, [r6, #0x18]
 	adds r0, r6, #0
 	adds r0, #0xf0
-	ldr r1, _0807F2B0 @ =0x085821F8
+	ldr r1, _0807F2B0 @ =0x085821F8 (sBlob_58217b_58225c+0x7D)
 	bl Sram_StringCopy_SAVE_END
 	ldrb r0, [r4]
 	lsls r0, r0, #2
@@ -1619,13 +1619,13 @@ _0807F304: .4byte 0x03000B94
 _0807F308: .4byte 0x03000B8D
 _0807F30C: .4byte 0x03000014
 _0807F310:
-	ldr r1, _0807F338 @ =0x0858225C
+	ldr r1, _0807F338 @ =0x0858225C (sSaveDataEwramPointers)
 	ldr r0, _0807F33C @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
 	adds r1, r0, r1
 	ldr r1, [r1]
-	ldr r2, _0807F340 @ =0x08582268
+	ldr r2, _0807F340 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r0, r2
 	ldr r2, [r0]
 	movs r3, #0x90
@@ -1646,7 +1646,7 @@ _0807F340: .4byte sSaveDataEwramBackupPointers
 	thumb_func_start Sram_CopyGameCompletion
 Sram_CopyGameCompletion: @ 0x0807F344
 	push {r4, lr}
-	ldr r2, _0807F3A0 @ =0x0858225C
+	ldr r2, _0807F3A0 @ =0x0858225C (sSaveDataEwramPointers)
 	ldr r1, _0807F3A4 @ =0x03000B8D
 	ldrb r0, [r1]
 	lsls r0, r0, #2
@@ -1747,13 +1747,13 @@ _0807F3F2:
 _0807F40C: .4byte 0x03000B94
 _0807F410: .4byte 0x03000B8D
 _0807F414:
-	ldr r1, _0807F440 @ =0x0858225C
+	ldr r1, _0807F440 @ =0x0858225C (sSaveDataEwramPointers)
 	ldr r0, _0807F444 @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
 	adds r1, r0, r1
 	ldr r1, [r1]
-	ldr r2, _0807F448 @ =0x08582268
+	ldr r2, _0807F448 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r0, r2
 	ldr r2, [r0]
 	movs r3, #0x90
@@ -1813,13 +1813,13 @@ SramWrite_ToEwram: @ 0x0807F450
 	ands r0, r3
 	adds r6, r0, #0
 	orrs r6, r1
-	ldr r1, _0807F70C @ =0x0858225C
+	ldr r1, _0807F70C @ =0x0858225C (sSaveDataEwramPointers)
 	ldr r0, _0807F710 @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
 	adds r0, r0, r1
 	ldr r4, [r0]
-	ldr r1, _0807F714 @ =0x08582200
+	ldr r1, _0807F714 @ =0x08582200 (sBlob_58217b_58225c+0x85)
 	adds r0, r4, #0
 	bl Sram_StringCopy_MetroidEpisode4A
 	movs r0, #0
@@ -2077,9 +2077,9 @@ _0807F5F4:
 	str r5, [r7]
 	str r6, [r7, #4]
 	ldr r0, [sp, #0x34]
-	ldr r1, _0807F7BC @ =0x085821F8
+	ldr r1, _0807F7BC @ =0x085821F8 (sBlob_58217b_58225c+0x7D)
 	bl Sram_StringCopy_SAVE_END
-	ldr r1, _0807F70C @ =0x0858225C
+	ldr r1, _0807F70C @ =0x0858225C (sSaveDataEwramPointers)
 	ldr r0, _0807F710 @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
@@ -2178,7 +2178,7 @@ SramRead_FromEwram: @ 0x0807F7C0
 	mov r5, r8
 	push {r5, r6, r7}
 	sub sp, #0x2c
-	ldr r1, _0807F9F8 @ =0x0858225C
+	ldr r1, _0807F9F8 @ =0x0858225C (sSaveDataEwramPointers)
 	ldr r0, _0807F9FC @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
@@ -2547,7 +2547,7 @@ SramTestFlash: @ 0x0807FAE0
 	movs r5, #0
 	ldr r0, _0807FB3C @ =0x03000B8E
 	strb r5, [r0]
-	ldr r0, _0807FB40 @ =0x085821E8
+	ldr r0, _0807FB40 @ =0x085821E8 (sBlob_58217b_58225c+0x6D)
 	ldr r4, _0807FB44 @ =0x0E007FE0
 	adds r1, r4, #0
 	movs r2, #0x10
@@ -2596,13 +2596,13 @@ _0807FB44: .4byte 0x0E007FE0
 Sram_BackupCurrentFile_Unused: @ 0x0807FB48
 	push {lr}
 	sub sp, #4
-	ldr r1, _0807FB78 @ =0x0858225C
+	ldr r1, _0807FB78 @ =0x0858225C (sSaveDataEwramPointers)
 	ldr r0, _0807FB7C @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
 	adds r1, r0, r1
 	ldr r1, [r1]
-	ldr r2, _0807FB80 @ =0x08582268
+	ldr r2, _0807FB80 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r0, r2
 	ldr r2, [r0]
 	movs r3, #0x90
@@ -2661,7 +2661,7 @@ _0807FBC8:
 	movs r6, #0x10
 	ldr r0, _0807FC1C @ =0x03000B94
 	str r0, [sp, #0x18]
-	ldr r1, _0807FC2C @ =0x0858225C
+	ldr r1, _0807FC2C @ =0x0858225C (sSaveDataEwramPointers)
 	mov sl, r1
 	ldr r3, _0807FC30 @ =0x0000FFFF
 	mov sb, r3
@@ -2683,7 +2683,7 @@ _0807FBE0:
 	mov r3, sl
 	adds r0, r2, r3
 	ldr r1, [r0]
-	ldr r4, _0807FC34 @ =0x08582268
+	ldr r4, _0807FC34 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r2, r4
 	ldr r2, [r0]
 	str r6, [sp]
@@ -2707,7 +2707,7 @@ _0807FC34: .4byte sSaveDataEwramBackupPointers
 _0807FC38:
 	cmp r4, #1
 	bne _0807FC60
-	ldr r3, _0807FC5C @ =0x08582268
+	ldr r3, _0807FC5C @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r2, r3
 	ldr r1, [r0]
 	mov r3, sl
@@ -2736,7 +2736,7 @@ _0807FC60:
 	bl BitFill
 	ldrb r0, [r7]
 	lsls r0, r0, #2
-	ldr r3, _0807FC90 @ =0x08582268
+	ldr r3, _0807FC90 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r0, r3
 	ldr r2, [r0]
 	str r6, [sp]
@@ -2761,7 +2761,7 @@ _0807FC94:
 	bl WriteMostRecentFileToSram
 	ldrb r0, [r7]
 	lsls r0, r0, #2
-	ldr r1, _0807FCDC @ =0x08582268
+	ldr r1, _0807FCDC @ =0x08582268 (sSaveDataEwramBackupPointers)
 	adds r0, r0, r1
 	ldr r2, [r0]
 	str r6, [sp]
@@ -2900,12 +2900,12 @@ unk_7fdb0: @ 0x0807FDB0
 	movs r7, #0
 	cmp r0, #0
 	bne _0807FDC8
-	ldr r1, _0807FDC4 @ =0x0858225C
+	ldr r1, _0807FDC4 @ =0x0858225C (sSaveDataEwramPointers)
 	b _0807FDCA
 	.align 2, 0
 _0807FDC4: .4byte sSaveDataEwramPointers
 _0807FDC8:
-	ldr r1, _0807FE50 @ =0x08582268
+	ldr r1, _0807FE50 @ =0x08582268 (sSaveDataEwramBackupPointers)
 _0807FDCA:
 	ldr r0, _0807FE54 @ =0x03000B8D
 	ldrb r0, [r0]
@@ -2947,7 +2947,7 @@ _0807FE0E:
 	orrs r5, r0
 _0807FE12:
 	movs r2, #0
-	ldr r6, _0807FE58 @ =0x08582200
+	ldr r6, _0807FE58 @ =0x08582200 (sBlob_58217b_58225c+0x85)
 	movs r3, #1
 _0807FE18:
 	adds r0, r2, r6
@@ -3027,7 +3027,7 @@ SramWrite_WorldData: @ 0x0807FEA4
 	mov r7, r8
 	push {r7}
 	sub sp, #4
-	ldr r1, _0807FF5C @ =0x08582274
+	ldr r1, _0807FF5C @ =0x08582274 (sUnk_582274)
 	ldr r0, _0807FF60 @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
@@ -3134,7 +3134,7 @@ SramRead_WorldData: @ 0x0807FF7C
 	mov r7, r8
 	push {r7}
 	sub sp, #4
-	ldr r1, _08080044 @ =0x08582274
+	ldr r1, _08080044 @ =0x08582274 (sUnk_582274)
 	ldr r0, _08080048 @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
@@ -3260,7 +3260,7 @@ SramWrite_MostRecentSaveFile: @ 0x08080068
 	ldr r0, _080800EC @ =0x03000B8D
 	ldrb r0, [r0]
 	strb r0, [r5, #0x16]
-	ldr r2, _080800F0 @ =0x08582288
+	ldr r2, _080800F0 @ =0x08582288 (sBlob_582288_58b3cc)
 	adds r1, r5, #6
 	movs r4, #0xf
 _0808008C:
@@ -3364,7 +3364,7 @@ _0808014A:
 	cmp r4, #0
 	bne _080801A0
 	movs r2, #0
-	ldr r0, _0808019C @ =0x08582288
+	ldr r0, _0808019C @ =0x08582288 (sBlob_582288_58b3cc)
 	mov r3, ip
 	ldrb r1, [r3, #6]
 	adds r3, r0, #0
@@ -3447,7 +3447,7 @@ SramWrite_Language: @ 0x080801D4
 	ldr r0, _0808025C @ =0x03000011
 	ldrb r0, [r0]
 	strb r0, [r5, #0x16]
-	ldr r2, _08080260 @ =0x085822A8
+	ldr r2, _08080260 @ =0x085822A8 (sBlob_582288_58b3cc+0x20)
 	adds r1, r5, #6
 	movs r4, #0xf
 _080801F8:
@@ -3512,7 +3512,7 @@ SramRead_Language: @ 0x08080264
 	sub sp, #4
 	movs r0, #0
 	mov r8, r0
-	ldr r1, _080802E8 @ =0x08582280
+	ldr r1, _080802E8 @ =0x08582280 (sUnk_582280)
 	mov sb, r1
 	ldr r6, _080802EC @ =0x040000D4
 	ldr r2, _080802F0 @ =0x81000020
@@ -3565,7 +3565,7 @@ _080802D2:
 	cmp r4, #0
 	bne _08080326
 	movs r3, #0
-	ldr r0, _080802F4 @ =0x085822A8
+	ldr r0, _080802F4 @ =0x085822A8 (sBlob_582288_58b3cc+0x20)
 	ldrb r1, [r5, #6]
 	adds r2, r0, #0
 	ldrb r0, [r2]
@@ -3666,7 +3666,7 @@ _08080390:
 _0808039C: .4byte 0x03000011
 _080803A0:
 	ldr r1, _080803BC @ =0x040000D4
-	ldr r2, _080803C0 @ =0x08582280
+	ldr r2, _080803C0 @ =0x08582280 (sUnk_582280)
 	ldr r0, [r2, #4]
 	str r0, [r1]
 	ldr r0, [r2]
@@ -3737,7 +3737,7 @@ _08080424:
 	cmp r1, #7
 	ble _08080424
 	ldr r1, _080804E0 @ =gInGameTimer
-	ldr r0, _080804E4 @ =0x085822D4
+	ldr r0, _080804E4 @ =0x085822D4 (sBlob_582288_58b3cc+0x4C)
 	ldr r0, [r0]
 	str r0, [r1]
 	ldr r1, _080804E8 @ =gDisableDrawingSamusAndScrollingFlag
@@ -3775,7 +3775,7 @@ _08080424:
 	strb r1, [r0]
 	ldr r0, _08080518 @ =0x0300004D
 	strb r1, [r0]
-	ldr r0, _0808051C @ =0x0879B894
+	ldr r0, _0808051C @ =0x0879B894 (sAreaDoorPointers)
 	ldr r2, [r0]
 	ldrb r0, [r2, #2]
 	movs r6, #7
@@ -3841,11 +3841,11 @@ Sram_ResetForDemo: @ 0x08080530
 	push {r4, r5, lr}
 	sub sp, #4
 	ldr r1, _080805F0 @ =gBootDebugOptions
-	ldr r0, _080805F4 @ =0x085822E4
+	ldr r0, _080805F4 @ =0x085822E4 (sBlob_582288_58b3cc+0x5C)
 	ldm r0!, {r2, r3, r4}
 	stm r1!, {r2, r3, r4}
 	ldr r2, _080805F8 @ =gButtonAssignments
-	ldr r0, _080805FC @ =0x085822C8
+	ldr r0, _080805FC @ =0x085822C8 (sBlob_582288_58b3cc+0x40)
 	ldr r1, [r0, #4]
 	ldr r0, [r0]
 	str r0, [r2]
@@ -3886,7 +3886,7 @@ _08080584:
 	cmp r1, #7
 	ble _08080584
 	ldr r1, _08080618 @ =gInGameTimer
-	ldr r0, _0808061C @ =0x085822D4
+	ldr r0, _0808061C @ =0x085822D4 (sBlob_582288_58b3cc+0x4C)
 	ldr r0, [r0]
 	str r0, [r1]
 	ldr r0, _08080620 @ =gDisableDrawingSamusAndScrollingFlag
@@ -3967,13 +3967,13 @@ _08080660: .4byte gDebugFlag
 Sram_CheckLoadSaveFile: @ 0x08080664
 	push {r4, r5, r6, lr}
 	ldr r2, _080806BC @ =gButtonAssignments
-	ldr r0, _080806C0 @ =0x085822C8
+	ldr r0, _080806C0 @ =0x085822C8 (sBlob_582288_58b3cc+0x40)
 	ldr r1, [r0, #4]
 	ldr r0, [r0]
 	str r0, [r2]
 	str r1, [r2, #4]
 	ldr r1, _080806C4 @ =gBootDebugOptions
-	ldr r0, _080806C8 @ =0x085822E4
+	ldr r0, _080806C8 @ =0x085822E4 (sBlob_582288_58b3cc+0x5C)
 	ldm r0!, {r2, r3, r4}
 	stm r1!, {r2, r3, r4}
 	ldr r2, _080806CC @ =gIsLoadingFile
@@ -4089,7 +4089,7 @@ Sram_EraseFile: @ 0x08080744
 	ldm r0!, {r2, r4}
 	stm r1!, {r2, r4}
 	ldr r1, _08080790 @ =0x0000FFFF
-	ldr r2, _08080794 @ =0x0858225C
+	ldr r2, _08080794 @ =0x0858225C (sSaveDataEwramPointers)
 	ldrb r0, [r3]
 	b _080807AE
 	.align 2, 0
@@ -4107,7 +4107,7 @@ _080807A2:
 	cmp r4, #2
 	bne _080807D0
 	ldr r1, _080807C4 @ =0x0000FFFF
-	ldr r2, _080807C8 @ =0x08582268
+	ldr r2, _080807C8 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	ldr r0, _080807CC @ =0x03000B8D
 	ldrb r0, [r0]
 _080807AE:
@@ -4171,7 +4171,7 @@ Sram_CopyFile: @ 0x080807EC
 	stm r1!, {r2, r4, r6}
 	ldm r0!, {r2, r4}
 	stm r1!, {r2, r4}
-	ldr r2, _08080840 @ =0x0858225C
+	ldr r2, _08080840 @ =0x0858225C (sSaveDataEwramPointers)
 	ldrb r0, [r5]
 	lsls r0, r0, #2
 	adds r0, r0, r2
@@ -4198,7 +4198,7 @@ _08080858: .4byte 0x03000B8D
 _0808085C:
 	cmp r1, #2
 	bne _0808088C
-	ldr r2, _08080884 @ =0x08582268
+	ldr r2, _08080884 @ =0x08582268 (sSaveDataEwramBackupPointers)
 	ldr r0, _08080888 @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
@@ -4250,7 +4250,7 @@ _080808BC:
 	ldrb r0, [r2]
 	cmp r0, #1
 	bne _0808091A
-	ldr r0, _0808094C @ =0x0858225C
+	ldr r0, _0808094C @ =0x0858225C (sSaveDataEwramPointers)
 	adds r0, r1, r0
 	ldr r1, [r0]
 	ldrb r0, [r1, #0x1d]
@@ -4621,12 +4621,12 @@ _08080B88:
 	beq _08080BBC
 	b _08080BC6
 _08080B92:
-	ldr r0, _08080B98 @ =0x0858B3B0
+	ldr r0, _08080B98 @ =0x0858B3B0 (sBlob_582288_58b3cc+0x9128)
 	b _08080B9E
 	.align 2, 0
 _08080B98: .4byte sUnk_582280+0x9130
 _08080B9C:
-	ldr r0, _08080BB0 @ =0x0858B3B1
+	ldr r0, _08080BB0 @ =0x0858B3B1 (sBlob_582288_58b3cc+0x9129)
 _08080B9E:
 	ldrb r0, [r0]
 	adds r1, r2, #0
@@ -4639,12 +4639,12 @@ _08080B9E:
 	.align 2, 0
 _08080BB0: .4byte sUnk_582280+0x9131
 _08080BB4:
-	ldr r0, _08080BB8 @ =0x0858B3B2
+	ldr r0, _08080BB8 @ =0x0858B3B2 (sBlob_582288_58b3cc+0x912A)
 	b _08080BBE
 	.align 2, 0
 _08080BB8: .4byte sUnk_582280+0x9132
 _08080BBC:
-	ldr r0, _08080BE8 @ =0x0858B3B3
+	ldr r0, _08080BE8 @ =0x0858B3B3 (sBlob_582288_58b3cc+0x912B)
 _08080BBE:
 	ldrb r0, [r0]
 	adds r1, r2, #0
@@ -4802,7 +4802,7 @@ _08080CD0:
 	strb r1, [r3, #0x14]
 	strb r1, [r3, #0x15]
 _08080CDA:
-	ldr r0, _08080CF4 @ =0x0858B3B4
+	ldr r0, _08080CF4 @ =0x0858B3B4 (sBlob_582288_58b3cc+0x912C)
 	lsls r1, r4, #1
 	adds r1, r1, r0
 	ldrh r0, [r1]
@@ -4877,9 +4877,9 @@ _08080D66:
 	subs r0, #0x15
 	lsls r0, r0, #0x10
 	lsrs r0, r0, #0x10
-	ldr r2, _08080E88 @ =0x085823D0
-	ldr r3, _08080E8C @ =0x085822F0
-	ldr r4, _08080E90 @ =0x0858340C
+	ldr r2, _08080E88 @ =0x085823D0 (sBlob_582288_58b3cc+0x148)
+	ldr r3, _08080E8C @ =0x085822F0 (sBlob_582288_58b3cc+0x68)
+	ldr r4, _08080E90 @ =0x0858340C (sBlob_582288_58b3cc+0x1184)
 	cmp r0, #0x8b
 	bhi _08080D86
 _08080D7A:
@@ -4907,10 +4907,10 @@ _08080D86:
 	ldr r1, _08080EA0 @ =0x06001000
 	adds r0, r4, #0
 	bl LZ77UncompVram
-	ldr r0, _08080EA4 @ =0x08582BBC
+	ldr r0, _08080EA4 @ =0x08582BBC (sBlob_582288_58b3cc+0x934)
 	ldr r1, _08080EA8 @ =0x06012000
 	bl LZ77UncompVram
-	ldr r5, _08080EAC @ =0x0879C228
+	ldr r5, _08080EAC @ =0x0879C228 (sBlob_79c170_79c27c+0xB8)
 	ldr r4, _08080E74 @ =gNonGameplayRam
 	ldrb r0, [r4, #2]
 	lsls r0, r0, #3
@@ -4932,10 +4932,10 @@ _08080D86:
 	ldr r0, [r0]
 	ldr r1, _08080EB4 @ =0x06010000
 	bl LZ77UncompVram
-	ldr r0, _08080EB8 @ =0x0858ABE4
+	ldr r0, _08080EB8 @ =0x0858ABE4 (sBlob_582288_58b3cc+0x895C)
 	ldr r1, _08080EBC @ =0x0600D000
 	bl LZ77UncompVram
-	ldr r0, _08080EC0 @ =0x0858ADF0
+	ldr r0, _08080EC0 @ =0x0858ADF0 (sBlob_582288_58b3cc+0x8B68)
 	ldr r1, _08080EC4 @ =0x0600F000
 	bl LZ77UncompVram
 	ldr r0, _08080EC8 @ =0x04000008
@@ -5032,7 +5032,7 @@ EraseSramResetOam: @ 0x08080EF8
 	strb r1, [r3]
 	movs r0, #0x80
 	strb r0, [r3, #1]
-	ldr r0, _08080F4C @ =0x0858B3B0
+	ldr r0, _08080F4C @ =0x0858B3B0 (sBlob_582288_58b3cc+0x9128)
 	ldrb r0, [r0]
 	adds r2, r3, #0
 	adds r2, #0x2e
@@ -5042,7 +5042,7 @@ EraseSramResetOam: @ 0x08080EF8
 	strb r1, [r0]
 	adds r0, #1
 	strb r1, [r0]
-	ldr r2, _08080F50 @ =0x0858B3BE
+	ldr r2, _08080F50 @ =0x0858B3BE (sBlob_582288_58b3cc+0x9136)
 	ldrb r0, [r2, #1]
 	strh r0, [r3, #0x24]
 	ldrb r0, [r2]
@@ -5074,13 +5074,13 @@ _08080F50: .4byte sUnk_582280+0x913E
 EraseSramUpdateCursorPosition: @ 0x08080F54
 	push {r4, r5, r6, lr}
 	ldr r4, _08080F94 @ =gNonGameplayRam
-	ldr r6, _08080F98 @ =0x0858B3BE
+	ldr r6, _08080F98 @ =0x0858B3BE (sBlob_582288_58b3cc+0x9136)
 	ldrb r2, [r4]
 	lsrs r2, r2, #1
 	lsls r2, r2, #1
 	adds r3, r6, #1
 	adds r3, r2, r3
-	ldr r5, _08080F9C @ =0x0858B3C2
+	ldr r5, _08080F9C @ =0x0858B3C2 (sBlob_582288_58b3cc+0x913A)
 	ldrb r0, [r4]
 	lsls r0, r0, #1
 	adds r1, r5, #1
@@ -5207,7 +5207,7 @@ _08081040:
 	blt _08081092
 	cmp r0, #6
 	bgt _08081092
-	ldr r1, _08081158 @ =0x0879C260
+	ldr r1, _08081158 @ =0x0879C260 (sBlob_79c170_79c27c+0xF0)
 	lsls r0, r0, #2
 	adds r0, r0, r1
 	ldr r7, [r0]

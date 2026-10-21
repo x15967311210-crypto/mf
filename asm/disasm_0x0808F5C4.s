@@ -36,30 +36,30 @@ NewFileIntroLandingOnBslInit: @ 0x08090D60
 	ldr r0, _08090EE0 @ =0x85000150
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08090EE4 @ =0x085FAB54
+	ldr r0, _08090EE4 @ =0x085FAB54 (sBlob_5f6990_prefix+0x41C4)
 	ldr r1, _08090EE8 @ =0x06010000
 	bl LZ77UncompVram
-	ldr r0, _08090EEC @ =0x085FFD08
+	ldr r0, _08090EEC @ =0x085FFD08 (sBlob_5f6990_after+0x600)
 	str r0, [r4]
 	ldr r0, _08090EF0 @ =0x05000200
 	str r0, [r4, #4]
 	ldr r6, _08090EF4 @ =0x84000080
 	str r6, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08090EF8 @ =0x085F7190
+	ldr r0, _08090EF8 @ =0x085F7190 (sBlob_5f6990_prefix+0x800)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _08090EFC @ =0x0860030C
+	ldr r0, _08090EFC @ =0x0860030C (sBlob_5f6990_after+0xC04)
 	ldr r1, _08090F00 @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _08090F04 @ =0x085FFF08
+	ldr r0, _08090F04 @ =0x085FFF08 (sBlob_5f6990_after+0x800)
 	ldr r1, _08090F08 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _08090F0C @ =0x08598898
+	ldr r0, _08090F0C @ =0x08598898 (sIntroSamusShipFlyingTextTilemap)
 	ldr r1, _08090F10 @ =0x0600E000
 	bl LZ77UncompVram
-	ldr r0, _08090F14 @ =0x085FF708
+	ldr r0, _08090F14 @ =0x085FF708 (sBlob_5f6990_after)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -141,7 +141,7 @@ NewFileIntroLandingOnBslInit: @ 0x08090D60
 	bl NewFileIntroLandingOnBslSetupOam
 	bl SpecialCutsceneProcessOam
 	bl SpecialCutsceneDrawAllOam
-	ldr r0, _08090F44 @ =0x0863A19C
+	ldr r0, _08090F44 @ =0x0863A19C (sCutsceneTextNone)
 	mov r1, r8
 	str r0, [r1]
 	str r5, [sp]
@@ -504,7 +504,7 @@ NewFileIntroProcessBslDoor: @ 0x08091178
 	bl NewFileIntroLandingOnBslSetupOam
 	strb r5, [r4, #0x12]
 	strb r5, [r4, #0x11]
-	ldr r0, _080911A4 @ =0x085FE370
+	ldr r0, _080911A4 @ =0x085FE370 (sIntroLandingFrameData)
 	str r0, [r4, #0x1c]
 	ldr r0, _080911A8 @ =0x00000246
 	bl SoundPlay_3b1c
@@ -1057,7 +1057,7 @@ _080915A6:
 	cmp r0, #0xc
 	bne _08091664
 	strb r7, [r5, #0x13]
-	ldr r0, _080915BC @ =0x085FF628
+	ldr r0, _080915BC @ =0x085FF628 (sIntroShipLandingFrameData+0x150)
 	str r0, [r5, #0x1c]
 	movs r0, #0xf8
 	lsls r0, r0, #1
@@ -1136,7 +1136,7 @@ _08091636:
 	cmp r0, #8
 	bne _08091664
 	strb r7, [r5, #0x13]
-	ldr r0, _08091674 @ =0x085FF638
+	ldr r0, _08091674 @ =0x085FF638 (sIntroShipLandingFrameData+0x160)
 	str r0, [r5, #0x1c]
 	movs r3, #0xf8
 	lsls r3, r3, #1
@@ -1214,7 +1214,7 @@ _080916B6:
 	rsbs r0, r0, #0
 	ands r0, r1
 	strb r0, [r5, #0x18]
-	ldr r0, _080916D8 @ =0x085FF540
+	ldr r0, _080916D8 @ =0x085FF540 (sIntroShipLandingFrameData+0x68)
 	str r0, [r5, #0x1c]
 	movs r0, #5
 	b _080917C6
@@ -1239,7 +1239,7 @@ _080916DC:
 	lsls r1, r1, #9
 	cmp r0, r1
 	bne _080917C8
-	ldr r0, _08091718 @ =0x085FF4D8
+	ldr r0, _08091718 @ =0x085FF4D8 (sIntroShipLandingFrameData)
 	str r0, [r5, #0x1c]
 	mov r3, r8
 	strh r3, [r5, #0xa]
@@ -1277,7 +1277,7 @@ _0809171C:
 	strh r2, [r5, #2]
 	strb r7, [r5, #0x12]
 	strb r7, [r5, #0x11]
-	ldr r0, _08091758 @ =0x085FF5A8
+	ldr r0, _08091758 @ =0x085FF5A8 (sIntroShipLandingFrameData+0xD0)
 	str r0, [r5, #0x1c]
 	movs r0, #7
 	b _080917C6
@@ -1302,7 +1302,7 @@ _0809175C:
 	strh r1, [r5, #2]
 	strb r7, [r5, #0x12]
 	strb r7, [r5, #0x11]
-	ldr r0, _08091788 @ =0x085FF580
+	ldr r0, _08091788 @ =0x085FF580 (sIntroShipLandingFrameData+0xA8)
 	str r0, [r5, #0x1c]
 	movs r0, #8
 	b _080917C6
@@ -1329,7 +1329,7 @@ _0809178C:
 	strh r0, [r5, #2]
 	strb r7, [r5, #0x12]
 	strb r7, [r5, #0x11]
-	ldr r0, _080917D4 @ =0x085FF5A8
+	ldr r0, _080917D4 @ =0x085FF5A8 (sIntroShipLandingFrameData+0xD0)
 	str r0, [r5, #0x1c]
 	ldr r0, _080917D8 @ =gNonGameplayRam
 	movs r3, #0x85
@@ -1389,7 +1389,7 @@ NewFileIntroProcessShipLandingSmoke: @ 0x080917DC
 	strh r6, [r5, #0xa]
 	strb r2, [r5, #0x12]
 	strb r2, [r5, #0x11]
-	ldr r0, _08091830 @ =0x085FF5E8
+	ldr r0, _08091830 @ =0x085FF5E8 (sIntroShipLandingFrameData+0x110)
 	str r0, [r5, #0x1c]
 	movs r0, #1
 	strb r0, [r5, #0x14]
@@ -1477,7 +1477,7 @@ unk_918a8: @ 0x080918A8
 	bne _080918E4
 	strb r3, [r2, #0x12]
 	strb r3, [r2, #0x11]
-	ldr r0, _080918D8 @ =0x085FE430
+	ldr r0, _080918D8 @ =0x085FE430 (sIntroLandingFrameData+0xC0)
 	str r0, [r2, #0x1c]
 	movs r0, #1
 	strb r0, [r2, #0x14]
@@ -1660,7 +1660,7 @@ _080919FA:
 _08091A16:
 	strb r2, [r4, #0x12]
 	strb r2, [r4, #0x11]
-	ldr r0, _08091A24 @ =0x085FF530
+	ldr r0, _08091A24 @ =0x085FF530 (sIntroShipLandingFrameData+0x58)
 	str r0, [r4, #0x1c]
 	movs r0, #3
 	strb r0, [r4, #0x14]
@@ -1679,7 +1679,7 @@ _08091A36:
 	strh r3, [r4, #0xa]
 	strb r2, [r4, #0x12]
 	strb r2, [r4, #0x11]
-	ldr r0, _08091A54 @ =0x085FF540
+	ldr r0, _08091A54 @ =0x085FF540 (sIntroShipLandingFrameData+0x68)
 	str r0, [r4, #0x1c]
 	movs r0, #4
 	strb r0, [r4, #0x14]
@@ -1701,7 +1701,7 @@ _08091A58:
 	bne _08091B50
 	strb r2, [r4, #0x12]
 	strb r2, [r4, #0x11]
-	ldr r0, _08091A74 @ =0x085FF530
+	ldr r0, _08091A74 @ =0x085FF530 (sIntroShipLandingFrameData+0x58)
 	str r0, [r4, #0x1c]
 	movs r0, #5
 	strb r0, [r4, #0x14]
@@ -1743,7 +1743,7 @@ _08091A98:
 	strh r1, [r4, #2]
 	strb r2, [r4, #0x12]
 	strb r2, [r4, #0x11]
-	ldr r0, _08091AC4 @ =0x085FF4D8
+	ldr r0, _08091AC4 @ =0x085FF4D8 (sIntroShipLandingFrameData)
 	str r0, [r4, #0x1c]
 	movs r0, #7
 	strb r0, [r4, #0x14]
@@ -1783,7 +1783,7 @@ _08091AE4:
 	strh r1, [r4, #2]
 	strb r2, [r4, #0x12]
 	strb r2, [r4, #0x11]
-	ldr r0, _08091B10 @ =0x085FF580
+	ldr r0, _08091B10 @ =0x085FF580 (sIntroShipLandingFrameData+0xA8)
 	str r0, [r4, #0x1c]
 	movs r0, #8
 	strb r0, [r4, #0x14]
@@ -1811,7 +1811,7 @@ _08091B14:
 	strh r0, [r4, #2]
 	strb r2, [r4, #0x12]
 	strb r2, [r4, #0x11]
-	ldr r0, _08091B68 @ =0x085FF5A8
+	ldr r0, _08091B68 @ =0x085FF5A8 (sIntroShipLandingFrameData+0xD0)
 	str r0, [r4, #0x1c]
 	movs r0, #9
 	strb r0, [r4, #0x14]
@@ -2005,7 +2005,7 @@ _08091C9C:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08091CCC @ =0x085FE430
+	ldr r1, _08091CCC @ =0x085FE430 (sIntroLandingFrameData+0xC0)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -2047,7 +2047,7 @@ _08091CF0:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08091D20 @ =0x085FE410
+	ldr r1, _08091D20 @ =0x085FE410 (sIntroLandingFrameData+0xA0)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -2074,7 +2074,7 @@ _08091D28:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08091D58 @ =0x085FE420
+	ldr r1, _08091D58 @ =0x085FE420 (sIntroLandingFrameData+0xB0)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -2125,7 +2125,7 @@ _08091D7C:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08091DC4 @ =0x085FF618
+	ldr r1, _08091DC4 @ =0x085FF618 (sIntroShipLandingFrameData+0x140)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -2144,7 +2144,7 @@ _08091DCC:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08091DE8 @ =0x085FF5B8
+	ldr r1, _08091DE8 @ =0x085FF5B8 (sIntroShipLandingFrameData+0xE0)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -2170,7 +2170,7 @@ _08091DF0:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08091E20 @ =0x085FE3C0
+	ldr r1, _08091E20 @ =0x085FE3C0 (sIntroLandingFrameData+0x50)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -2219,7 +2219,7 @@ _08091E44:
 	lsls r0, r0, #2
 	add r0, ip
 	adds r0, r2, r0
-	ldr r1, _08091E84 @ =0x085FF6C0
+	ldr r1, _08091E84 @ =0x085FF6C0 (sIntroShipLandingFrameData+0x1E8)
 	str r1, [r0]
 	movs r0, #0x8f
 	lsls r0, r0, #2
@@ -2263,7 +2263,7 @@ _08091E8C:
 	lsls r0, r0, #2
 	add r0, ip
 	adds r0, r2, r0
-	ldr r1, _08091EF4 @ =0x085FF638
+	ldr r1, _08091EF4 @ =0x085FF638 (sIntroShipLandingFrameData+0x160)
 	str r1, [r0]
 	movs r0, #0x8f
 	lsls r0, r0, #2
@@ -2341,7 +2341,7 @@ NewFileIntroLandingOnBslVblank: @ 0x08091EFC
 	adds r0, r2, r1
 	ldrb r0, [r0]
 	lsls r0, r0, #5
-	ldr r1, _08092014 @ =0x085FFB08
+	ldr r1, _08092014 @ =0x085FFB08 (sBlob_5f6990_after+0x400)
 	adds r0, r0, r1
 	str r0, [r3]
 	ldr r0, _08092018 @ =0x05000340
@@ -2362,7 +2362,7 @@ _08091F72:
 	adds r0, r2, r1
 	ldrb r0, [r0]
 	lsls r0, r0, #5
-	ldr r1, _08092024 @ =0x085FF908
+	ldr r1, _08092024 @ =0x085FF908 (sBlob_5f6990_after+0x200)
 	adds r0, r0, r1
 	str r0, [r3]
 	ldr r0, _08092028 @ =0x05000300
@@ -2384,7 +2384,7 @@ _08091F9A:
 	mov ip, r0
 	ldrb r0, [r0]
 	lsls r0, r0, #5
-	ldr r2, _08092014 @ =0x085FFB08
+	ldr r2, _08092014 @ =0x085FFB08 (sBlob_5f6990_after+0x400)
 	adds r0, r0, r2
 	str r0, [r3]
 	ldr r0, _08092030 @ =0x05000320
@@ -2519,7 +2519,7 @@ unk_9209c: @ 0x0809209C
 	str r0, [r1, #8]
 	ldr r0, [r1, #8]
 	movs r4, #0
-	ldr r5, _080921D8 @ =0x0879C41C
+	ldr r5, _080921D8 @ =0x0879C41C (sIntroSamusSittingBgGfxPointers)
 _080920DC:
 	lsls r0, r4, #2
 	adds r0, r0, r5
@@ -2533,14 +2533,14 @@ _080920DC:
 	lsrs r4, r0, #0x10
 	cmp r4, #4
 	bls _080920DC
-	ldr r0, _080921E0 @ =0x08658BE0
+	ldr r0, _080921E0 @ =0x08658BE0 (sBlob_64e470_662804+0xA770)
 	ldr r1, _080921E4 @ =0x0600E800
 	bl LZ77UncompVram
-	ldr r0, _080921E8 @ =0x08598898
+	ldr r0, _080921E8 @ =0x08598898 (sIntroSamusShipFlyingTextTilemap)
 	ldr r1, _080921EC @ =0x0600E000
 	bl LZ77UncompVram
 	ldr r4, _080921CC @ =0x040000D4
-	ldr r0, _080921F0 @ =0x086591E4
+	ldr r0, _080921F0 @ =0x086591E4 (sBlob_64e470_662804+0xAD74)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -2600,7 +2600,7 @@ _080920DC:
 	bl SpecialCutsceneProcessOam
 	bl SpecialCutsceneDrawAllOam
 	ldr r1, _080921D0 @ =gNonGameplayRam
-	ldr r0, _0809222C @ =0x0863A19C
+	ldr r0, _0809222C @ =0x0863A19C (sCutsceneTextNone)
 	str r0, [r1]
 	movs r0, #0
 	str r0, [sp]
@@ -2703,7 +2703,7 @@ _08092290:
 	ldrh r0, [r4]
 	cmp r0, #5
 	bhi _080922BC
-	ldr r2, _080922B4 @ =0x0879C41C
+	ldr r2, _080922B4 @ =0x0879C41C (sIntroSamusSittingBgGfxPointers)
 	adds r1, r0, #0
 	subs r1, #1
 	lsls r0, r1, #2
@@ -2720,11 +2720,11 @@ _080922B8: .4byte 0x06008000
 _080922BC:
 	cmp r0, #6
 	bne _08092320
-	ldr r0, _080922F8 @ =0x08658BE0
+	ldr r0, _080922F8 @ =0x08658BE0 (sBlob_64e470_662804+0xA770)
 	ldr r1, _080922FC @ =0x0600E800
 	bl LZ77UncompVram
 	ldr r1, _08092300 @ =0x040000D4
-	ldr r0, _08092304 @ =0x086591E4
+	ldr r0, _08092304 @ =0x086591E4 (sBlob_64e470_662804+0xAD74)
 	str r0, [r1]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -2802,8 +2802,8 @@ _08092362:
 	beq _080923C0
 	cmp r0, #0x10
 	bne _080923A2
-	ldr r5, _080923B0 @ =0x080A8CDC
-	ldr r4, _080923B4 @ =0x080A8D3C
+	ldr r5, _080923B0 @ =0x080A8CDC (sMusicTrackDataRom)
+	ldr r4, _080923B4 @ =0x080A8D3C (sSoundDataEntries)
 	ldr r1, _080923B8 @ =0x00000F64
 	adds r0, r4, r1
 	ldrh r1, [r0]
@@ -3006,7 +3006,7 @@ IntroShipAlertInit: @ 0x080924D0
 	str r0, [r1, #8]
 	ldr r0, [r1, #8]
 	movs r4, #0
-	ldr r5, _080926C4 @ =0x0879C45C
+	ldr r5, _080926C4 @ =0x0879C45C (sBlob_79c448_79c5a4+0x14)
 _08092510:
 	lsls r0, r4, #2
 	adds r0, r0, r5
@@ -3021,7 +3021,7 @@ _08092510:
 	cmp r4, #5
 	bls _08092510
 	ldr r1, _080926B8 @ =0x040000D4
-	ldr r0, _080926CC @ =0x0865C268
+	ldr r0, _080926CC @ =0x0865C268 (sBlob_64e470_662804+0xDDF8)
 	str r0, [r1]
 	ldr r0, _080926D0 @ =0x05000200
 	str r0, [r1, #4]
@@ -3029,7 +3029,7 @@ _08092510:
 	str r0, [r1, #8]
 	ldr r0, [r1, #8]
 	movs r4, #0
-	ldr r5, _080926D8 @ =0x0879C448
+	ldr r5, _080926D8 @ =0x0879C448 (sBlob_79c448_79c5a4)
 _0809253E:
 	lsls r0, r4, #2
 	adds r0, r0, r5
@@ -3044,14 +3044,14 @@ _0809253E:
 	lsrs r4, r0, #0x10
 	cmp r4, #4
 	bls _0809253E
-	ldr r0, _080926DC @ =0x086593E4
+	ldr r0, _080926DC @ =0x086593E4 (sBlob_64e470_662804+0xAF74)
 	ldr r1, _080926E0 @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _080926E4 @ =0x08598898
+	ldr r0, _080926E4 @ =0x08598898 (sIntroSamusShipFlyingTextTilemap)
 	ldr r1, _080926E8 @ =0x0600E000
 	bl LZ77UncompVram
 	ldr r4, _080926B8 @ =0x040000D4
-	ldr r0, _080926EC @ =0x086599A4
+	ldr r0, _080926EC @ =0x086599A4 (sBlob_64e470_662804+0xB534)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -3169,7 +3169,7 @@ _0809253E:
 	bl SpecialCutsceneProcessOam
 	bl SpecialCutsceneDrawAllOam
 	ldr r1, _0809272C @ =gNonGameplayRam
-	ldr r0, _08092730 @ =0x0863A19C
+	ldr r0, _08092730 @ =0x0863A19C (sCutsceneTextNone)
 	str r0, [r1]
 	str r5, [sp]
 	mov r0, sp
@@ -3319,8 +3319,8 @@ _080927D4:
 	bhi _08092814
 	cmp r0, #0
 	bne _080927FA
-	ldr r2, _08092808 @ =0x080A8CDC
-	ldr r0, _0809280C @ =0x080A8D3C
+	ldr r2, _08092808 @ =0x080A8CDC (sMusicTrackDataRom)
+	ldr r0, _0809280C @ =0x080A8D3C (sSoundDataEntries)
 	ldr r1, _08092810 @ =0x00000F5C
 	adds r0, r0, r1
 	ldrh r1, [r0]
@@ -3390,27 +3390,27 @@ IntroSamusDriftingOutInit: @ 0x08092830
 	ldr r0, _08092988 @ =0x850000B4
 	str r0, [r5, #8]
 	ldr r0, [r5, #8]
-	ldr r0, _0809298C @ =0x086101B8
+	ldr r0, _0809298C @ =0x086101B8 (sBlob_6101b8_612e48)
 	ldr r1, _08092990 @ =0x06010000
 	bl LZ77UncompVram
-	ldr r0, _08092994 @ =0x08612F48
+	ldr r0, _08092994 @ =0x08612F48 (sPal_612f48)
 	str r0, [r5]
 	ldr r0, _08092998 @ =0x05000200
 	str r0, [r5, #4]
 	ldr r6, _0809299C @ =0x84000080
 	str r6, [r5, #8]
 	ldr r0, [r5, #8]
-	ldr r0, _080929A0 @ =0x08605D08
+	ldr r0, _080929A0 @ =0x08605D08 (sTitleScreenSpaceBackgroundGfx)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _080929A4 @ =0x08609220
+	ldr r0, _080929A4 @ =0x08609220 (sTitleScreenSpaceBackgroundTilemap)
 	ldr r1, _080929A8 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _080929AC @ =0x08598898
+	ldr r0, _080929AC @ =0x08598898 (sIntroSamusShipFlyingTextTilemap)
 	ldr r1, _080929B0 @ =0x0600E000
 	bl LZ77UncompVram
-	ldr r0, _080929B4 @ =0x08609020
+	ldr r0, _080929B4 @ =0x08609020 (sPal_609020)
 	str r0, [r5]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -3478,7 +3478,7 @@ IntroSamusDriftingOutInit: @ 0x08092830
 	bl SpecialCutsceneDrawAllOam
 	ldr r0, _080929EC @ =0xFFFFFDE4
 	add r8, r0
-	ldr r0, _080929F0 @ =0x0863A19C
+	ldr r0, _080929F0 @ =0x0863A19C (sCutsceneTextNone)
 	mov r1, r8
 	str r0, [r1]
 	str r4, [sp]
@@ -3735,8 +3735,8 @@ _08092B7C:
 	strh r0, [r2]
 	cmp r1, #0
 	bne _08092BB2
-	ldr r2, _08092BC0 @ =0x080A8CDC
-	ldr r0, _08092BC4 @ =0x080A8D3C
+	ldr r2, _08092BC0 @ =0x080A8CDC (sMusicTrackDataRom)
+	ldr r0, _08092BC4 @ =0x080A8D3C (sSoundDataEntries)
 	ldr r1, _08092BC8 @ =0x00000F64
 	adds r0, r0, r1
 	ldrh r1, [r0]
@@ -4104,7 +4104,7 @@ _08092E78:
 	ldrb r1, [r3, #0x13]
 	adds r1, #1
 	strb r1, [r3, #0x13]
-	ldr r2, _08092EFC @ =0x080A4FA4
+	ldr r2, _08092EFC @ =0x080A4FA4 (sSineTable)
 	ldrb r0, [r3, #0x13]
 	lsls r0, r0, #1
 	adds r0, r0, r2
@@ -4183,7 +4183,7 @@ _08092F00:
 	lsrs r1, r1, #0x13
 	ldrh r2, [r3, #2]
 	subs r2, r2, r1
-	ldr r1, _08092F78 @ =0x080A4FA4
+	ldr r1, _08092F78 @ =0x080A4FA4 (sSineTable)
 	ldrb r0, [r3, #0x13]
 	lsls r0, r0, #1
 	adds r0, r0, r1
@@ -4359,7 +4359,7 @@ _0809304A:
 	rsbs r0, r0, #0
 	ands r0, r1
 	strb r0, [r3, #0x18]
-	ldr r0, _08093088 @ =0x0860AD48
+	ldr r0, _08093088 @ =0x0860AD48 (sIntroFrameDataAfter+0xF8)
 	str r0, [r3, #0x1c]
 	movs r0, #6
 	strb r0, [r3, #0x14]
@@ -4604,21 +4604,21 @@ _08093222:
 	bgt _080932A0
 	cmp r0, #0x19
 	bne _08093238
-	ldr r0, _08093234 @ =0x0860AC18
+	ldr r0, _08093234 @ =0x0860AC18 (sIntroMonologueFrameData+0x10)
 	b _0809324A
 	.align 2, 0
 _08093234: .4byte sTitleScreenSpaceBackgroundTilemap+0x19F8
 _08093238:
 	cmp r0, #0x32
 	bne _08093244
-	ldr r0, _08093240 @ =0x0860AC28
+	ldr r0, _08093240 @ =0x0860AC28 (sIntroMonologueFrameData+0x20)
 	b _0809324A
 	.align 2, 0
 _08093240: .4byte sTitleScreenSpaceBackgroundTilemap+0x1A08
 _08093244:
 	cmp r0, #0x46
 	bne _0809324C
-	ldr r0, _0809329C @ =0x0860AC38
+	ldr r0, _0809329C @ =0x0860AC38 (sIntroMonologueFrameData+0x30)
 _0809324A:
 	str r0, [r6, #0x1c]
 _0809324C:
@@ -4995,7 +4995,7 @@ _080934D8:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08093524 @ =0x0860ACD0
+	ldr r1, _08093524 @ =0x0860ACD0 (sIntroFrameDataAfter+0x80)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -5018,7 +5018,7 @@ _0809352C:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08093550 @ =0x0860ACD0
+	ldr r1, _08093550 @ =0x0860ACD0 (sIntroFrameDataAfter+0x80)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -5040,7 +5040,7 @@ _08093558:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08093574 @ =0x0860AD28
+	ldr r1, _08093574 @ =0x0860AD28 (sIntroFrameDataAfter+0xD8)
 	b _080935CE
 	.align 2, 0
 _08093570: .4byte 0x0000FFD8
@@ -5056,7 +5056,7 @@ _08093578:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08093594 @ =0x0860AD18
+	ldr r1, _08093594 @ =0x0860AD18 (sIntroFrameDataAfter+0xC8)
 	b _080935CE
 	.align 2, 0
 _08093590: .4byte 0x0000FFE2
@@ -5072,7 +5072,7 @@ _08093598:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _080935B4 @ =0x0860AD08
+	ldr r1, _080935B4 @ =0x0860AD08 (sIntroFrameDataAfter+0xB8)
 	b _080935CE
 	.align 2, 0
 _080935B0: .4byte 0x0000FFEC
@@ -5088,7 +5088,7 @@ _080935B8:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _080935E0 @ =0x0860ACF8
+	ldr r1, _080935E0 @ =0x0860ACF8 (sIntroFrameDataAfter+0xA8)
 _080935CE:
 	str r1, [r0]
 	adds r0, r3, #0
@@ -5107,7 +5107,7 @@ _080935E8:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08093604 @ =0x0860AC08
+	ldr r1, _08093604 @ =0x0860AC08 (sIntroMonologueFrameData)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -5124,7 +5124,7 @@ _0809360C:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08093628 @ =0x0865BB38
+	ldr r1, _08093628 @ =0x0865BB38 (sBlob_64e470_662804+0xD6C8)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -5141,7 +5141,7 @@ _08093630:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08093648 @ =0x0865BD00
+	ldr r1, _08093648 @ =0x0865BD00 (sBlob_64e470_662804+0xD890)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -5161,7 +5161,7 @@ _0809364C:
 	lsls r1, r1, #2
 	add r1, r8
 	adds r1, r0, r1
-	ldr r2, _08093674 @ =0x0865BD48
+	ldr r2, _08093674 @ =0x0865BD48 (sBlob_64e470_662804+0xD8D8)
 	str r2, [r1]
 	movs r1, #0x8f
 	lsls r1, r1, #2
@@ -5186,7 +5186,7 @@ _0809367C:
 	lsls r1, r1, #2
 	add r1, r8
 	adds r1, r0, r1
-	ldr r2, _080936A4 @ =0x0865BD60
+	ldr r2, _080936A4 @ =0x0865BD60 (sBlob_64e470_662804+0xD8F0)
 	str r2, [r1]
 	movs r1, #0x8f
 	lsls r1, r1, #2
@@ -5210,7 +5210,7 @@ _080936AC:
 	lsls r1, r1, #2
 	add r1, r8
 	adds r1, r0, r1
-	ldr r2, _080936D4 @ =0x0865BE00
+	ldr r2, _080936D4 @ =0x0865BE00 (sBlob_64e470_662804+0xD990)
 	str r2, [r1]
 	movs r1, #0x8f
 	lsls r1, r1, #2
@@ -5244,7 +5244,7 @@ _080936DC:
 	lsls r0, r0, #2
 	add r0, r8
 	adds r0, r2, r0
-	ldr r1, _0809370C @ =0x0865BF10
+	ldr r1, _0809370C @ =0x0865BF10 (sBlob_64e470_662804+0xDAA0)
 	b _0809381C
 	.align 2, 0
 _0809370C: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE0EC
@@ -5270,7 +5270,7 @@ _08093710:
 	lsls r0, r0, #2
 	add r0, r8
 	adds r0, r2, r0
-	ldr r1, _0809374C @ =0x0865C0D0
+	ldr r1, _0809374C @ =0x0865C0D0 (sBlob_64e470_662804+0xDC60)
 	str r1, [r0]
 	movs r0, #0x8f
 	lsls r0, r0, #2
@@ -5303,7 +5303,7 @@ _08093754:
 	lsls r0, r0, #2
 	add r0, r8
 	adds r0, r2, r0
-	ldr r1, _08093784 @ =0x0865C128
+	ldr r1, _08093784 @ =0x0865C128 (sBlob_64e470_662804+0xDCB8)
 	b _0809381C
 	.align 2, 0
 _08093784: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE304
@@ -5329,7 +5329,7 @@ _08093788:
 	lsls r0, r0, #2
 	add r0, r8
 	adds r0, r2, r0
-	ldr r1, _080937B8 @ =0x0865C180
+	ldr r1, _080937B8 @ =0x0865C180 (sBlob_64e470_662804+0xDD10)
 	b _0809381C
 	.align 2, 0
 _080937B8: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE35C
@@ -5355,7 +5355,7 @@ _080937BC:
 	lsls r0, r0, #2
 	add r0, r8
 	adds r0, r2, r0
-	ldr r1, _080937EC @ =0x0865C1D8
+	ldr r1, _080937EC @ =0x0865C1D8 (sBlob_64e470_662804+0xDD68)
 	b _0809381C
 	.align 2, 0
 _080937EC: .4byte sIntroSamusHelmetCloseupBgGfx5+0xE3B4
@@ -5381,7 +5381,7 @@ _080937F0:
 	lsls r0, r0, #2
 	add r0, r8
 	adds r0, r2, r0
-	ldr r1, _08093840 @ =0x0865C230
+	ldr r1, _08093840 @ =0x0865C230 (sBlob_64e470_662804+0xDDC0)
 _0809381C:
 	str r1, [r0]
 	movs r0, #0x8f
@@ -5586,21 +5586,21 @@ IntroSpaceViewInit: @ 0x08093980
 	ldr r0, _08093B30 @ =0x85000150
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08093B34 @ =0x086101B8
+	ldr r0, _08093B34 @ =0x086101B8 (sBlob_6101b8_612e48)
 	ldr r1, _08093B38 @ =0x06010000
 	bl LZ77UncompVram
-	ldr r0, _08093B3C @ =0x08612F48
+	ldr r0, _08093B3C @ =0x08612F48 (sPal_612f48)
 	str r0, [r4]
 	ldr r0, _08093B40 @ =0x05000200
 	str r0, [r4, #4]
 	ldr r0, _08093B44 @ =0x84000080
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08093B48 @ =0x0860BCA4
+	ldr r0, _08093B48 @ =0x0860BCA4 (sIntroBslSpaceBgGfx)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _08093B4C @ =0x0860B670
+	ldr r0, _08093B4C @ =0x0860B670 (sIntroBslTilemap)
 	ldr r5, _08093B50 @ =0x02010000
 	adds r1, r5, #0
 	bl LZ77UncompWram
@@ -5620,10 +5620,10 @@ IntroSpaceViewInit: @ 0x08093980
 	ldr r0, _08093B64 @ =0x81000400
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08093B68 @ =0x0860B148
+	ldr r0, _08093B68 @ =0x0860B148 (sIntroSpaceTilemap)
 	ldr r1, _08093B6C @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _08093B70 @ =0x08612E48
+	ldr r0, _08093B70 @ =0x08612E48 (sIntroBslSpaceBgPal)
 	str r0, [r4]
 	ldr r0, _08093B74 @ =0x05000100
 	str r0, [r4, #4]
@@ -5633,7 +5633,7 @@ IntroSpaceViewInit: @ 0x08093980
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
 	strh r6, [r0]
-	ldr r0, _08093B7C @ =0x08598898
+	ldr r0, _08093B7C @ =0x08598898 (sIntroSamusShipFlyingTextTilemap)
 	ldr r1, _08093B80 @ =0x0600E000
 	bl LZ77UncompVram
 	ldr r0, _08093B84 @ =0x04000010
@@ -5710,7 +5710,7 @@ _08093AA4:
 	bl SpecialCutsceneProcessOam
 	bl SpecialCutsceneDrawAllOam
 	ldr r1, _08093B2C @ =gNonGameplayRam
-	ldr r0, _08093BB0 @ =0x0863A19C
+	ldr r0, _08093BB0 @ =0x0863A19C (sCutsceneTextNone)
 	str r0, [r1]
 	movs r0, #0
 	str r0, [sp]
@@ -5989,8 +5989,8 @@ _08093D54:
 	bhi _08093D94
 	cmp r0, #0
 	bne _08093D7A
-	ldr r2, _08093D88 @ =0x080A8CDC
-	ldr r0, _08093D8C @ =0x080A8D3C
+	ldr r2, _08093D88 @ =0x080A8CDC (sMusicTrackDataRom)
+	ldr r0, _08093D8C @ =0x080A8D3C (sSoundDataEntries)
 	ldr r3, _08093D90 @ =0x00000F5C
 	adds r0, r0, r3
 	ldrh r1, [r0]
@@ -6021,7 +6021,7 @@ _08093D98:
 	ldrh r0, [r3]
 	cmp r0, #5
 	bhi _08093DC4
-	ldr r2, _08093DBC @ =0x0879C41C
+	ldr r2, _08093DBC @ =0x0879C41C (sIntroSamusSittingBgGfxPointers)
 	adds r1, r0, #0
 	subs r1, #1
 	lsls r0, r1, #2
@@ -6038,11 +6038,11 @@ _08093DC0: .4byte 0x06008000
 _08093DC4:
 	cmp r0, #6
 	bne _08093E28
-	ldr r0, _08093E00 @ =0x08658BE0
+	ldr r0, _08093E00 @ =0x08658BE0 (sBlob_64e470_662804+0xA770)
 	ldr r1, _08093E04 @ =0x0600E000
 	bl LZ77UncompVram
 	ldr r1, _08093E08 @ =0x040000D4
-	ldr r0, _08093E0C @ =0x086591E4
+	ldr r0, _08093E0C @ =0x086591E4 (sBlob_64e470_662804+0xAD74)
 	str r0, [r1]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -6117,8 +6117,8 @@ _08093E5C:
 	bhi _08093EDC
 	cmp r0, #0
 	bne _08093EB0
-	ldr r5, _08093EC4 @ =0x080A8CDC
-	ldr r4, _08093EC8 @ =0x080A8D3C
+	ldr r5, _08093EC4 @ =0x080A8CDC (sMusicTrackDataRom)
+	ldr r4, _08093EC8 @ =0x080A8D3C (sSoundDataEntries)
 	ldr r3, _08093ECC @ =0x00000F4C
 	adds r0, r4, r3
 	ldrh r1, [r0]
@@ -6247,34 +6247,34 @@ IntroFlyingViewInit: @ 0x08093F4C
 	ldr r0, _0809409C @ =0x850000B4
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _080940A0 @ =0x086101B8
+	ldr r0, _080940A0 @ =0x086101B8 (sBlob_6101b8_612e48)
 	ldr r1, _080940A4 @ =0x06010000
 	bl LZ77UncompVram
-	ldr r0, _080940A8 @ =0x08612F48
+	ldr r0, _080940A8 @ =0x08612F48 (sPal_612f48)
 	str r0, [r4]
 	ldr r0, _080940AC @ =0x05000200
 	str r0, [r4, #4]
 	ldr r6, _080940B0 @ =0x84000080
 	str r6, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _080940B4 @ =0x08605D08
+	ldr r0, _080940B4 @ =0x08605D08 (sTitleScreenSpaceBackgroundGfx)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _080940B8 @ =0x08609220
+	ldr r0, _080940B8 @ =0x08609220 (sTitleScreenSpaceBackgroundTilemap)
 	ldr r1, _080940BC @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _080940C0 @ =0x08598898
+	ldr r0, _080940C0 @ =0x08598898 (sIntroSamusShipFlyingTextTilemap)
 	ldr r1, _080940C4 @ =0x0600E000
 	bl LZ77UncompVram
-	ldr r0, _080940C8 @ =0x08609020
+	ldr r0, _080940C8 @ =0x08609020 (sPal_609020)
 	str r0, [r4]
 	movs r1, #0xa0
 	lsls r1, r1, #0x13
 	str r1, [r4, #4]
 	str r6, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _080940CC @ =0x08598A8C
+	ldr r0, _080940CC @ =0x08598A8C (sPal_598a8c)
 	str r0, [r4]
 	ldr r0, _080940D0 @ =0x050001E0
 	str r0, [r4, #4]
@@ -6332,7 +6332,7 @@ IntroFlyingViewInit: @ 0x08093F4C
 	bl SpecialCutsceneDrawAllOam
 	ldr r0, _08094100 @ =0xFFFFFDE4
 	add r8, r0
-	ldr r0, _08094104 @ =0x0863A19C
+	ldr r0, _08094104 @ =0x0863A19C (sCutsceneTextNone)
 	mov r1, r8
 	str r0, [r1]
 	str r5, [sp]
@@ -6781,7 +6781,7 @@ _08094408:
 	bne _08094480
 	movs r0, #0
 	ldrsh r3, [r5, r0]
-	ldr r2, _08094478 @ =0x080A4FA4
+	ldr r2, _08094478 @ =0x080A4FA4 (sSineTable)
 	ldrb r1, [r5, #0x13]
 	adds r0, r1, #0
 	adds r0, #0x40
@@ -7097,7 +7097,7 @@ _0809465A:
 _08094676:
 	movs r2, #0
 	ldrsh r3, [r6, r2]
-	ldr r2, _080946D4 @ =0x080A4FA4
+	ldr r2, _080946D4 @ =0x080A4FA4 (sSineTable)
 	ldrb r1, [r6, #0x13]
 	adds r0, r1, #0
 	adds r0, #0x40
@@ -7187,7 +7187,7 @@ IntroProcessSpaceViewParticle: @ 0x08094704
 	movs r1, #3
 	ands r1, r0
 	strh r1, [r4, #4]
-	ldr r1, _0809473C @ =0x0879C394
+	ldr r1, _0809473C @ =0x0879C394 (sBlob_79c394_79c3c8)
 	movs r2, #4
 	ldrsh r0, [r4, r2]
 	lsls r0, r0, #2
@@ -7235,7 +7235,7 @@ _0809477A:
 	movs r0, #0
 _0809477C:
 	strh r0, [r4, #4]
-	ldr r1, _080947B4 @ =0x0879C394
+	ldr r1, _080947B4 @ =0x0879C394 (sBlob_79c394_79c3c8)
 	movs r2, #4
 	ldrsh r0, [r4, r2]
 	lsls r0, r0, #2
@@ -7289,7 +7289,7 @@ _080947D2:
 	ldrb r0, [r2, #0x13]
 	adds r0, #1
 	strb r0, [r2, #0x13]
-	ldr r1, _080947F4 @ =0x080A4FA4
+	ldr r1, _080947F4 @ =0x080A4FA4 (sSineTable)
 	ldrb r0, [r2, #0x13]
 	lsls r0, r0, #1
 	adds r0, r0, r1
@@ -7506,21 +7506,21 @@ _0809495E:
 	bgt _080949DC
 	cmp r0, #0x19
 	bne _08094974
-	ldr r0, _08094970 @ =0x0860AC18
+	ldr r0, _08094970 @ =0x0860AC18 (sIntroMonologueFrameData+0x10)
 	b _08094986
 	.align 2, 0
 _08094970: .4byte sTitleScreenSpaceBackgroundTilemap+0x19F8
 _08094974:
 	cmp r0, #0x32
 	bne _08094980
-	ldr r0, _0809497C @ =0x0860AC28
+	ldr r0, _0809497C @ =0x0860AC28 (sIntroMonologueFrameData+0x20)
 	b _08094986
 	.align 2, 0
 _0809497C: .4byte sTitleScreenSpaceBackgroundTilemap+0x1A08
 _08094980:
 	cmp r0, #0x46
 	bne _08094988
-	ldr r0, _080949D8 @ =0x0860AC38
+	ldr r0, _080949D8 @ =0x0860AC38 (sIntroMonologueFrameData+0x30)
 _08094986:
 	str r0, [r6, #0x1c]
 _08094988:
@@ -7775,7 +7775,7 @@ _08094B44:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08094B88 @ =0x0860AC98
+	ldr r1, _08094B88 @ =0x0860AC98 (sIntroFrameDataAfter+0x48)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -7794,7 +7794,7 @@ _08094B90:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08094BAC @ =0x0860AF10
+	ldr r1, _08094BAC @ =0x0860AF10 (sIntroFrameDataAfter+0x2C0)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -7817,7 +7817,7 @@ _08094BB4:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08094BE0 @ =0x0860AC38
+	ldr r1, _08094BE0 @ =0x0860AC38 (sIntroMonologueFrameData+0x30)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -7865,7 +7865,7 @@ _08094BE8:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08094C4C @ =0x0860ACD0
+	ldr r1, _08094C4C @ =0x0860ACD0 (sIntroFrameDataAfter+0x80)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -7889,7 +7889,7 @@ _08094C54:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08094C78 @ =0x0860ACD0
+	ldr r1, _08094C78 @ =0x0860ACD0 (sIntroFrameDataAfter+0x80)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -7920,7 +7920,7 @@ _08094C80:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08094CB4 @ =0x0860AD28
+	ldr r1, _08094CB4 @ =0x0860AD28 (sIntroFrameDataAfter+0xD8)
 	b _08094D18
 	.align 2, 0
 _08094CAC: .4byte 0x0000FFD8
@@ -7946,7 +7946,7 @@ _08094CB8:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08094CEC @ =0x0860AD18
+	ldr r1, _08094CEC @ =0x0860AD18 (sIntroFrameDataAfter+0xC8)
 	b _08094D18
 	.align 2, 0
 _08094CE4: .4byte 0x0000FFE2
@@ -7972,7 +7972,7 @@ _08094CF0:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08094D30 @ =0x0860AD08
+	ldr r1, _08094D30 @ =0x0860AD08 (sIntroFrameDataAfter+0xB8)
 _08094D18:
 	str r1, [r0]
 	adds r0, r3, #0
@@ -8014,7 +8014,7 @@ _08094D38:
 	lsls r0, r0, #2
 	add r0, r8
 	adds r0, r2, r0
-	ldr r1, _08094D88 @ =0x0860ACF8
+	ldr r1, _08094D88 @ =0x0860ACF8 (sIntroFrameDataAfter+0xA8)
 	str r1, [r0]
 	movs r0, #0x8f
 	lsls r0, r0, #2
@@ -8050,7 +8050,7 @@ _08094D90:
 	lsls r0, r0, #2
 	add r0, r8
 	adds r0, r2, r0
-	ldr r1, _08094DE4 @ =0x0860AC08
+	ldr r1, _08094DE4 @ =0x0860AC08 (sIntroMonologueFrameData)
 	str r1, [r0]
 	movs r0, #0x8f
 	lsls r0, r0, #2
@@ -8299,27 +8299,27 @@ EndingBslCrashingInit: @ 0x08094F74
 	ldr r0, _080950FC @ =0x85000150
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08095100 @ =0x086238F4
+	ldr r0, _08095100 @ =0x086238F4 (sBlob_6131c8_63a19c+0x1072C)
 	ldr r1, _08095104 @ =0x06010000
 	bl LZ77UncompVram
-	ldr r0, _08095108 @ =0x08636C38
+	ldr r0, _08095108 @ =0x08636C38 (sBlob_6131c8_63a19c+0x23A70)
 	str r0, [r4]
 	ldr r0, _0809510C @ =0x05000200
 	str r0, [r4, #4]
 	ldr r6, _08095110 @ =0x84000080
 	str r6, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08095114 @ =0x0862B5F4
+	ldr r0, _08095114 @ =0x0862B5F4 (sBlob_6131c8_63a19c+0x1842C)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _08095118 @ =0x08638C14
+	ldr r0, _08095118 @ =0x08638C14 (sBlob_6131c8_63a19c+0x25A4C)
 	ldr r1, _0809511C @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _08095120 @ =0x08639BC4
+	ldr r0, _08095120 @ =0x08639BC4 (sBlob_6131c8_63a19c+0x269FC)
 	ldr r1, _08095124 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _08095128 @ =0x08637038
+	ldr r0, _08095128 @ =0x08637038 (sBlob_6131c8_63a19c+0x23E70)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -8408,7 +8408,7 @@ EndingBslCrashingInit: @ 0x08094F74
 	bl EndingBslCrashingSetupOam
 	bl SpecialCutsceneProcessOam
 	bl SpecialCutsceneDrawAllOam
-	ldr r0, _08095168 @ =0x0863A19C
+	ldr r0, _08095168 @ =0x0863A19C (sCutsceneTextNone)
 	mov r1, r8
 	str r0, [r1]
 	str r5, [sp]
@@ -8521,17 +8521,17 @@ EndingShipFrontViewInit: @ 0x08095178
 	str r0, [r4, #4]
 	str r2, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08095304 @ =0x08626738
+	ldr r0, _08095304 @ =0x08626738 (sBlob_6131c8_63a19c+0x13570)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _08095308 @ =0x0863929C
+	ldr r0, _08095308 @ =0x0863929C (sBlob_6131c8_63a19c+0x260D4)
 	ldr r1, _0809530C @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _08095310 @ =0x086395B8
+	ldr r0, _08095310 @ =0x086395B8 (sBlob_6131c8_63a19c+0x263F0)
 	ldr r1, _08095314 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _08095318 @ =0x08636E38
+	ldr r0, _08095318 @ =0x08636E38 (sBlob_6131c8_63a19c+0x23C70)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -8617,7 +8617,7 @@ EndingShipFrontViewInit: @ 0x08095178
 	bl SpecialCutsceneDrawAllOam
 	ldr r1, _08095364 @ =0xFFFFFDE4
 	adds r6, r6, r1
-	ldr r0, _08095368 @ =0x0863A19C
+	ldr r0, _08095368 @ =0x0863A19C (sCutsceneTextNone)
 	str r0, [r6]
 	str r5, [sp]
 	mov r2, sp
@@ -9184,7 +9184,7 @@ _08095744:
 	ldrb r0, [r4, #0x10]
 	cmp r0, #1
 	bne _0809578A
-	ldr r0, _08095768 @ =0x086362B8
+	ldr r0, _08095768 @ =0x086362B8 (sBlob_6131c8_63a19c+0x230F0)
 	str r0, [r4, #0x1c]
 	strb r2, [r4, #0x12]
 	strb r2, [r4, #0x11]
@@ -9414,7 +9414,7 @@ _080958EA:
 	ldrb r1, [r3, #0x13]
 	adds r1, #1
 	strb r1, [r3, #0x13]
-	ldr r2, _08095918 @ =0x080A4FA4
+	ldr r2, _08095918 @ =0x080A4FA4 (sSineTable)
 	ldrb r0, [r3, #0x13]
 	lsls r0, r0, #1
 	adds r0, r0, r2
@@ -9446,7 +9446,7 @@ _0809591C:
 	adds r0, #1
 	strb r0, [r3, #0x13]
 _08095930:
-	ldr r1, _08095950 @ =0x080A4FA4
+	ldr r1, _08095950 @ =0x080A4FA4 (sSineTable)
 	ldrb r0, [r3, #0x13]
 	lsls r0, r0, #1
 	adds r0, r0, r1
@@ -9624,7 +9624,7 @@ _08095A04:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08095AAC @ =0x08636020
+	ldr r1, _08095AAC @ =0x08636020 (sBlob_6131c8_63a19c+0x22E58)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -9673,7 +9673,7 @@ _08095AB4:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08095B0C @ =0x08636038
+	ldr r1, _08095B0C @ =0x08636038 (sBlob_6131c8_63a19c+0x22E70)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -9700,7 +9700,7 @@ _08095B14:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08095B44 @ =0x08636050
+	ldr r1, _08095B44 @ =0x08636050 (sBlob_6131c8_63a19c+0x22E88)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -9729,7 +9729,7 @@ _08095B4C:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08095B80 @ =0x08636288
+	ldr r1, _08095B80 @ =0x08636288 (sBlob_6131c8_63a19c+0x230C0)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -9750,7 +9750,7 @@ _08095B88:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08095BA8 @ =0x086362A0
+	ldr r1, _08095BA8 @ =0x086362A0 (sBlob_6131c8_63a19c+0x230D8)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -9778,7 +9778,7 @@ _08095BB0:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08095BE4 @ =0x086363A0
+	ldr r1, _08095BE4 @ =0x086363A0 (sBlob_6131c8_63a19c+0x231D8)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -9801,7 +9801,7 @@ _08095BEC:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08095C14 @ =0x086363B8
+	ldr r1, _08095C14 @ =0x086363B8 (sBlob_6131c8_63a19c+0x231F0)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -9822,7 +9822,7 @@ _08095C1C:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08095C4C @ =0x086363A0
+	ldr r1, _08095C4C @ =0x086363A0 (sBlob_6131c8_63a19c+0x231D8)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -9905,7 +9905,7 @@ EndingBslCrashingVblank: @ 0x08095C54
 	adds r0, r1, r2
 	ldrb r0, [r0]
 	lsls r0, r0, #5
-	ldr r1, _08095D20 @ =0x08636A38
+	ldr r1, _08095D20 @ =0x08636A38 (sBlob_6131c8_63a19c+0x23870)
 	adds r0, r0, r1
 	str r0, [r3]
 	ldr r0, _08095D24 @ =0x05000120
@@ -10092,30 +10092,30 @@ EndingMonologueInit: @ 0x08095E24
 	ldr r0, _08095F98 @ =0x85000150
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08095F9C @ =0x086150E8
+	ldr r0, _08095F9C @ =0x086150E8 (sBlob_6131c8_63a19c+0x1F20)
 	ldr r1, _08095FA0 @ =0x06010000
 	bl LZ77UncompVram
-	ldr r0, _08095FA4 @ =0x08636638
+	ldr r0, _08095FA4 @ =0x08636638 (sBlob_6131c8_63a19c+0x23470)
 	str r0, [r4]
 	ldr r0, _08095FA8 @ =0x05000200
 	str r0, [r4, #4]
 	ldr r5, _08095FAC @ =0x84000080
 	str r5, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08095FB0 @ =0x086186A4
+	ldr r0, _08095FB0 @ =0x086186A4 (sBlob_6131c8_63a19c+0x54DC)
 	ldr r1, _08095FB4 @ =0x06008000
 	bl LZ77UncompVram
-	ldr r0, _08095FB8 @ =0x086377F8
+	ldr r0, _08095FB8 @ =0x086377F8 (sBlob_6131c8_63a19c+0x24630)
 	ldr r1, _08095FBC @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _08095FC0 @ =0x08636438
+	ldr r0, _08095FC0 @ =0x08636438 (sBlob_6131c8_63a19c+0x23270)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
 	str r0, [r4, #4]
 	str r5, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08095FC4 @ =0x08662804
+	ldr r0, _08095FC4 @ =0x08662804 (sIntroTilemap_662804)
 	movs r5, #0x80
 	lsls r5, r5, #0x12
 	adds r1, r5, #0
@@ -10135,7 +10135,7 @@ EndingMonologueInit: @ 0x08095E24
 	ldr r0, _08095FD0 @ =0x85001200
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08095FD4 @ =0x08663820
+	ldr r0, _08095FD4 @ =0x08663820 (sIntroPal_663820)
 	str r0, [r4]
 	ldr r0, _08095FD8 @ =0x05000180
 	str r0, [r4, #4]
@@ -10204,7 +10204,7 @@ EndingMonologueInit: @ 0x08095E24
 	bl EndingDialogueSetupOam
 	bl SpecialCutsceneProcessOam
 	bl SpecialCutsceneDrawAllOam
-	ldr r0, _0809601C @ =0x0863A19C
+	ldr r0, _0809601C @ =0x0863A19C (sCutsceneTextNone)
 	mov r1, r8
 	str r0, [r1]
 	movs r1, #0x80
@@ -10313,16 +10313,16 @@ EndingAdamConversationInit: @ 0x08096024
 	str r0, [r4, #4]
 	str r2, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _080961AC @ =0x086131C8
+	ldr r0, _080961AC @ =0x086131C8 (sBlob_6131c8_63a19c)
 	ldr r1, _080961B0 @ =0x06008000
 	bl LZ77UncompVram
-	ldr r0, _080961B4 @ =0x08637238
+	ldr r0, _080961B4 @ =0x08637238 (sBlob_6131c8_63a19c+0x24070)
 	ldr r1, _080961B8 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _080961BC @ =0x08598898
+	ldr r0, _080961BC @ =0x08598898 (sIntroSamusShipFlyingTextTilemap)
 	ldr r1, _080961C0 @ =0x0600E000
 	bl LZ77UncompVram
-	ldr r0, _080961C4 @ =0x08636438
+	ldr r0, _080961C4 @ =0x08636438 (sBlob_6131c8_63a19c+0x23270)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -10408,7 +10408,7 @@ EndingAdamConversationInit: @ 0x08096024
 	bl SpecialCutsceneDrawAllOam
 	ldr r0, _08096214 @ =0xFFFFFDE4
 	adds r6, r6, r0
-	ldr r0, _08096218 @ =0x0863A19C
+	ldr r0, _08096218 @ =0x0863A19C (sCutsceneTextNone)
 	str r0, [r6]
 	str r5, [sp]
 	mov r1, sp
@@ -10525,20 +10525,20 @@ EndingAnimalsInit: @ 0x08096228
 	str r0, [r4, #4]
 	str r1, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _080963C0 @ =0x0861B89C
+	ldr r0, _080963C0 @ =0x0861B89C (sBlob_6131c8_63a19c+0x86D4)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _080963C4 @ =0x086217A8
+	ldr r0, _080963C4 @ =0x086217A8 (sBlob_6131c8_63a19c+0xE5E0)
 	ldr r1, _080963C8 @ =0x06008000
 	bl LZ77UncompVram
-	ldr r0, _080963CC @ =0x08638654
+	ldr r0, _080963CC @ =0x08638654 (sBlob_6131c8_63a19c+0x2548C)
 	ldr r1, _080963D0 @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _080963D4 @ =0x08637DB8
+	ldr r0, _080963D4 @ =0x08637DB8 (sBlob_6131c8_63a19c+0x24BF0)
 	ldr r1, _080963D8 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _080963DC @ =0x08636838
+	ldr r0, _080963DC @ =0x08636838 (sBlob_6131c8_63a19c+0x23670)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -10623,7 +10623,7 @@ EndingAnimalsInit: @ 0x08096228
 	bl SpecialCutsceneDrawAllOam
 	ldr r0, _08096434 @ =0xFFFFFDE4
 	add r8, r0
-	ldr r0, _08096438 @ =0x0863A19C
+	ldr r0, _08096438 @ =0x0863A19C (sCutsceneTextNone)
 	mov r1, r8
 	str r0, [r1]
 	str r5, [sp]
@@ -10797,7 +10797,7 @@ _08096500:
 	ldr r1, _08096544 @ =0x00000212
 	adds r0, r5, r1
 	strb r4, [r0]
-	ldr r1, _08096548 @ =0x0879C5A4
+	ldr r1, _08096548 @ =0x0879C5A4 (sMonologueTextPointers)
 	ldr r0, _0809654C @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -11192,8 +11192,8 @@ _08096828:
 	ldrh r0, [r1]
 	cmp r0, #1
 	bne _0809685C
-	ldr r2, _08096850 @ =0x080A8CDC
-	ldr r0, _08096854 @ =0x080A8D3C
+	ldr r2, _08096850 @ =0x080A8CDC (sMusicTrackDataRom)
+	ldr r0, _08096854 @ =0x080A8D3C (sSoundDataEntries)
 	ldr r1, _08096858 @ =0x00001264
 	adds r0, r0, r1
 	ldrh r1, [r0]
@@ -11458,7 +11458,7 @@ EndingProcessSr388RadarView: @ 0x08096A08
 	bne _08096A34
 	strb r1, [r2, #0x12]
 	strb r1, [r2, #0x11]
-	ldr r0, _08096A38 @ =0x08633EC4
+	ldr r0, _08096A38 @ =0x08633EC4 (sBlob_6131c8_63a19c+0x20CFC)
 	str r0, [r2, #0x1c]
 	movs r0, #1
 	strb r0, [r2, #0x14]
@@ -11488,7 +11488,7 @@ EndingProcessSamusViewRadarView: @ 0x08096A3C
 	bne _08096A68
 	strb r1, [r2, #0x12]
 	strb r1, [r2, #0x11]
-	ldr r0, _08096A6C @ =0x08633F0C
+	ldr r0, _08096A6C @ =0x08633F0C (sBlob_6131c8_63a19c+0x20D44)
 	str r0, [r2, #0x1c]
 	movs r0, #1
 	strb r0, [r2, #0x14]
@@ -11546,7 +11546,7 @@ _08096AB4:
 	cmp r0, #0xb
 	bne _08096B06
 	strb r1, [r4, #0x11]
-	ldr r0, _08096AE0 @ =0x08633244
+	ldr r0, _08096AE0 @ =0x08633244 (sBlob_6131c8_63a19c+0x2007C)
 	str r0, [r4, #0x1c]
 	ldr r0, _08096AE4 @ =0x0000011D
 	bl SoundPlay
@@ -11610,7 +11610,7 @@ _08096B2C:
 	strh r1, [r2, #0xc]
 	strb r0, [r2, #0x12]
 	strb r0, [r2, #0x11]
-	ldr r0, _08096B50 @ =0x08633E8C
+	ldr r0, _08096B50 @ =0x08633E8C (sBlob_6131c8_63a19c+0x20CC4)
 	str r0, [r2, #0x1c]
 	b _08096B8E
 	.align 2, 0
@@ -11624,7 +11624,7 @@ _08096B54:
 	strh r0, [r2, #0xc]
 	movs r0, #0x9a
 	strh r0, [r2, #0xe]
-	ldr r0, _08096B6C @ =0x08633E64
+	ldr r0, _08096B6C @ =0x08633E64 (sBlob_6131c8_63a19c+0x20C9C)
 	str r0, [r2, #0x1c]
 	b _08096B8E
 	.align 2, 0
@@ -11740,7 +11740,7 @@ _08096C2A:
 	strb r0, [r1]
 	strh r0, [r2, #0xe]
 	strh r0, [r2, #0xc]
-	ldr r1, _08096C5C @ =0x0879C3AC
+	ldr r1, _08096C5C @ =0x0879C3AC (sBlob_79c394_79c3c8+0x18)
 	ldr r0, _08096C60 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -11791,7 +11791,7 @@ _08096C82:
 	ldrb r0, [r4, #0x10]
 	cmp r0, #7
 	bne _08096CB8
-	ldr r0, _08096CB0 @ =0x086332FC
+	ldr r0, _08096CB0 @ =0x086332FC (sBlob_6131c8_63a19c+0x20134)
 	str r0, [r4, #0x1c]
 	ldr r0, _08096CB4 @ =0x0000020B
 	bl SoundPlay
@@ -11803,7 +11803,7 @@ _08096CB4: .4byte 0x0000020B
 _08096CB8:
 	cmp r0, #9
 	bne _08096CC0
-	ldr r0, _08096CC8 @ =0x086333CC
+	ldr r0, _08096CC8 @ =0x086333CC (sBlob_6131c8_63a19c+0x20204)
 	str r0, [r4, #0x1c]
 _08096CC0:
 	movs r0, #4
@@ -11887,7 +11887,7 @@ EndingProcessAdamIcon: @ 0x08096D40
 	bne _08096D62
 	strb r1, [r2, #0x12]
 	strb r1, [r2, #0x11]
-	ldr r0, _08096D78 @ =0x086338A4
+	ldr r0, _08096D78 @ =0x086338A4 (sBlob_6131c8_63a19c+0x206DC)
 	str r0, [r2, #0x1c]
 	movs r0, #1
 	strb r0, [r2, #0x14]
@@ -11919,7 +11919,7 @@ _08096D80:
 	strb r0, [r2, #0x12]
 	strb r0, [r2, #0x11]
 _08096D98:
-	ldr r0, _08096DA8 @ =0x0863345C
+	ldr r0, _08096DA8 @ =0x0863345C (sBlob_6131c8_63a19c+0x20294)
 	str r0, [r2, #0x1c]
 	movs r0, #2
 	strb r0, [r2, #0x14]
@@ -12241,7 +12241,7 @@ _08096FB0:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08097024 @ =0x08633E64
+	ldr r1, _08097024 @ =0x08633E64 (sBlob_6131c8_63a19c+0x20C9C)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -12271,7 +12271,7 @@ _0809702C:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _0809705C @ =0x086338D4
+	ldr r1, _0809705C @ =0x086338D4 (sBlob_6131c8_63a19c+0x2070C)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -12298,7 +12298,7 @@ _08097064:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08097094 @ =0x086339D4
+	ldr r1, _08097094 @ =0x086339D4 (sBlob_6131c8_63a19c+0x2080C)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -12325,7 +12325,7 @@ _0809709C:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _080970CC @ =0x08633C4C
+	ldr r1, _080970CC @ =0x08633C4C (sBlob_6131c8_63a19c+0x20A84)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -12352,7 +12352,7 @@ _080970D4:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08097104 @ =0x086331EC
+	ldr r1, _08097104 @ =0x086331EC (sBlob_6131c8_63a19c+0x20024)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -12370,7 +12370,7 @@ _0809710C:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08097128 @ =0x08633E8C
+	ldr r1, _08097128 @ =0x08633E8C (sBlob_6131c8_63a19c+0x20CC4)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -12396,7 +12396,7 @@ _08097130:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08097154 @ =0x08633294
+	ldr r1, _08097154 @ =0x08633294 (sBlob_6131c8_63a19c+0x200CC)
 	b _080971AE
 	.align 2, 0
 _08097150: .4byte 0x00000236
@@ -12416,7 +12416,7 @@ _08097158:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _08097188 @ =0x08633434
+	ldr r1, _08097188 @ =0x08633434 (sBlob_6131c8_63a19c+0x2026C)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -12443,7 +12443,7 @@ _08097190:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _080971C0 @ =0x08633364
+	ldr r1, _080971C0 @ =0x08633364 (sBlob_6131c8_63a19c+0x2019C)
 _080971AE:
 	str r1, [r0]
 	adds r0, r3, #0
@@ -12495,7 +12495,7 @@ _080971E4:
 	lsls r1, r1, #2
 	adds r0, r4, r1
 	adds r0, r2, r0
-	ldr r1, _08097230 @ =0x08633F24
+	ldr r1, _08097230 @ =0x08633F24 (sBlob_6131c8_63a19c+0x20D5C)
 	str r1, [r0]
 	movs r3, #0x8f
 	lsls r3, r3, #2
@@ -12530,7 +12530,7 @@ _08097238:
 	lsls r0, r0, #2
 	add r0, ip
 	adds r0, r2, r0
-	ldr r1, _08097280 @ =0x086331EC
+	ldr r1, _08097280 @ =0x086331EC (sBlob_6131c8_63a19c+0x20024)
 	str r1, [r0]
 	movs r0, #0x8f
 	lsls r0, r0, #2
@@ -12860,27 +12860,27 @@ DiedOnSr388CollisionInit: @ 0x080974C4
 	ldr r0, _08097638 @ =0x85000150
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809763C @ =0x086238F4
+	ldr r0, _0809763C @ =0x086238F4 (sBlob_6131c8_63a19c+0x1072C)
 	ldr r1, _08097640 @ =0x06010000
 	bl LZ77UncompVram
-	ldr r0, _08097644 @ =0x08636C38
+	ldr r0, _08097644 @ =0x08636C38 (sBlob_6131c8_63a19c+0x23A70)
 	str r0, [r4]
 	ldr r0, _08097648 @ =0x05000200
 	str r0, [r4, #4]
 	ldr r6, _0809764C @ =0x84000080
 	str r6, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08097650 @ =0x0862B5F4
+	ldr r0, _08097650 @ =0x0862B5F4 (sBlob_6131c8_63a19c+0x1842C)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _08097654 @ =0x08638C14
+	ldr r0, _08097654 @ =0x08638C14 (sBlob_6131c8_63a19c+0x25A4C)
 	ldr r1, _08097658 @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _0809765C @ =0x08639BC4
+	ldr r0, _0809765C @ =0x08639BC4 (sBlob_6131c8_63a19c+0x269FC)
 	ldr r1, _08097660 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _08097664 @ =0x08637038
+	ldr r0, _08097664 @ =0x08637038 (sBlob_6131c8_63a19c+0x23E70)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -12960,7 +12960,7 @@ DiedOnSr388CollisionInit: @ 0x080974C4
 	bl DiedOnSr388CollisionSetupOam
 	bl SpecialCutsceneProcessOam
 	bl SpecialCutsceneDrawAllOam
-	ldr r0, _080976A8 @ =0x0863A19C
+	ldr r0, _080976A8 @ =0x0863A19C (sCutsceneTextNone)
 	mov r1, r8
 	str r0, [r1]
 	str r5, [sp]
@@ -13394,7 +13394,7 @@ _08097978:
 	ldrb r0, [r4, #0x10]
 	cmp r0, #1
 	bne _080979BE
-	ldr r0, _0809799C @ =0x086362B8
+	ldr r0, _0809799C @ =0x086362B8 (sBlob_6131c8_63a19c+0x230F0)
 	str r0, [r4, #0x1c]
 	strb r2, [r4, #0x12]
 	strb r2, [r4, #0x11]
@@ -13618,7 +13618,7 @@ _08097AAC:
 	adds r0, r6, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08097B50 @ =0x08636020
+	ldr r1, _08097B50 @ =0x08636020 (sBlob_6131c8_63a19c+0x22E58)
 	str r1, [r0]
 	adds r0, r6, #0
 	adds r0, #0x20
@@ -13666,7 +13666,7 @@ _08097B58:
 	adds r0, r6, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08097BB0 @ =0x08636038
+	ldr r1, _08097BB0 @ =0x08636038 (sBlob_6131c8_63a19c+0x22E70)
 	str r1, [r0]
 	adds r0, r6, #0
 	adds r0, #0x20
@@ -13693,7 +13693,7 @@ _08097BB8:
 	adds r0, r6, #0
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _08097BF8 @ =0x08636050
+	ldr r1, _08097BF8 @ =0x08636050 (sBlob_6131c8_63a19c+0x22E88)
 	str r1, [r0]
 	adds r0, r6, #0
 	adds r0, #0x20
@@ -13778,7 +13778,7 @@ DiedOnSr388CollisionVblank: @ 0x08097C00
 	adds r0, r1, r2
 	ldrb r0, [r0]
 	lsls r0, r0, #5
-	ldr r1, _08097CCC @ =0x08636A38
+	ldr r1, _08097CCC @ =0x08636A38 (sBlob_6131c8_63a19c+0x23870)
 	adds r0, r0, r1
 	str r0, [r3]
 	ldr r0, _08097CD0 @ =0x05000120
@@ -15691,7 +15691,7 @@ _08098B02:
 	ble _08098B08
 	movs r7, #0xa0
 _08098B08:
-	ldr r0, _08098BBC @ =0x083E3294
+	ldr r0, _08098BBC @ =0x083E3294 (sHaze_PowerBomb_WindowValuesPointers)
 	ldr r6, _08098BC0 @ =0x000001F3
 	adds r1, r1, r6
 	ldrb r1, [r1]
@@ -16168,7 +16168,7 @@ _08098E18:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r0, _08098EA8 @ =0x0863A184
+	ldr r0, _08098EA8 @ =0x0863A184 (sBlob_6131c8_63a19c+0x26FBC)
 	adds r1, r1, r0
 	ldrb r0, [r1]
 	lsls r0, r0, #3
@@ -16381,12 +16381,12 @@ _08098FDC:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r4, _080990A0 @ =0x0863A184
+	ldr r4, _080990A0 @ =0x0863A184 (sBlob_6131c8_63a19c+0x26FBC)
 	adds r0, r1, r4
 	ldrb r0, [r0]
 	lsls r0, r0, #2
 	str r0, [sp, #8]
-	ldr r0, _080990A4 @ =0x0863A190
+	ldr r0, _080990A4 @ =0x0863A190 (sBlob_6131c8_63a19c+0x26FC8)
 	adds r1, r1, r0
 	ldrb r0, [r1]
 	lsls r0, r0, #2
@@ -16498,7 +16498,7 @@ _080990D0:
 	adds r0, r1, #0
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r5, _080993E8 @ =0x080A4FA4
+	ldr r5, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r5
 	movs r2, #0
 	ldrsh r5, [r0, r2]
@@ -16507,7 +16507,7 @@ _080990D0:
 	lsls r3, r3, #0x10
 	asrs r3, r3, #0x10
 	lsls r1, r1, #1
-	ldr r0, _080993E8 @ =0x080A4FA4
+	ldr r0, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r1, r1, r0
 	movs r0, #0
 	ldrsh r1, [r1, r0]
@@ -16677,7 +16677,7 @@ _0809925C:
 	ldrb r0, [r2, #0x15]
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r3, _080993E8 @ =0x080A4FA4
+	ldr r3, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r3
 	movs r5, #0
 	ldrsh r4, [r0, r5]
@@ -16698,7 +16698,7 @@ _0809925C:
 	mov r2, sb
 	ldrb r0, [r2, #0x15]
 	lsls r0, r0, #1
-	ldr r3, _080993E8 @ =0x080A4FA4
+	ldr r3, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r3
 	movs r5, #0
 	ldrsh r4, [r0, r5]
@@ -16716,7 +16716,7 @@ _0809925C:
 	mov r1, sb
 	ldrb r0, [r1, #0x15]
 	lsls r0, r0, #1
-	ldr r2, _080993E8 @ =0x080A4FA4
+	ldr r2, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r2
 	ldrh r4, [r0]
 	rsbs r4, r4, #0
@@ -16740,7 +16740,7 @@ _0809925C:
 	ldrb r0, [r4, #0x15]
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r5, _080993E8 @ =0x080A4FA4
+	ldr r5, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r5
 	movs r1, #0
 	ldrsh r4, [r0, r1]
@@ -16791,7 +16791,7 @@ _08099328:
 	mov r3, sb
 	ldrb r0, [r3, #0x15]
 	lsls r0, r0, #1
-	ldr r5, _080993E8 @ =0x080A4FA4
+	ldr r5, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r5
 	movs r1, #0
 	ldrsh r5, [r0, r1]
@@ -16809,7 +16809,7 @@ _08099328:
 	mov r2, sb
 	ldrb r0, [r2, #0x15]
 	lsls r0, r0, #1
-	ldr r3, _080993E8 @ =0x080A4FA4
+	ldr r3, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r3
 	ldrh r4, [r0]
 	rsbs r4, r4, #0
@@ -16830,7 +16830,7 @@ _08099328:
 	ldrb r0, [r4, #0x15]
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r5, _080993E8 @ =0x080A4FA4
+	ldr r5, _080993E8 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r5
 	movs r1, #0
 	ldrsh r4, [r0, r1]
@@ -16945,10 +16945,10 @@ _08099458:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r4, _08099784 @ =0x0863A184
+	ldr r4, _08099784 @ =0x0863A184 (sBlob_6131c8_63a19c+0x26FBC)
 	adds r0, r1, r4
 	ldrb r2, [r0]
-	ldr r0, _08099788 @ =0x0863A190
+	ldr r0, _08099788 @ =0x0863A190 (sBlob_6131c8_63a19c+0x26FC8)
 	adds r1, r1, r0
 	ldrb r3, [r1]
 	ldr r1, [sp, #4]
@@ -17049,7 +17049,7 @@ _08099530:
 	adds r0, r1, #0
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r2, _08099790 @ =0x080A4FA4
+	ldr r2, _08099790 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r2
 	movs r2, #0
 	ldrsh r5, [r0, r2]
@@ -17058,7 +17058,7 @@ _08099530:
 	lsls r3, r3, #0x10
 	asrs r3, r3, #0x10
 	lsls r1, r1, #1
-	ldr r0, _08099790 @ =0x080A4FA4
+	ldr r0, _08099790 @ =0x080A4FA4 (sSineTable)
 	adds r1, r1, r0
 	movs r0, #0
 	ldrsh r1, [r1, r0]
@@ -17209,7 +17209,7 @@ _08099696:
 	ldrb r0, [r2, #0x15]
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r3, _08099790 @ =0x080A4FA4
+	ldr r3, _08099790 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r3
 	movs r4, #0
 	ldrsh r5, [r0, r4]
@@ -17230,7 +17230,7 @@ _08099696:
 	mov r1, sb
 	ldrb r0, [r1, #0x15]
 	lsls r0, r0, #1
-	ldr r2, _08099790 @ =0x080A4FA4
+	ldr r2, _08099790 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r2
 	movs r3, #0
 	ldrsh r5, [r0, r3]
@@ -17248,7 +17248,7 @@ _08099696:
 	mov r4, sb
 	ldrb r0, [r4, #0x15]
 	lsls r0, r0, #1
-	ldr r5, _08099790 @ =0x080A4FA4
+	ldr r5, _08099790 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r5
 	ldrh r4, [r0]
 	rsbs r4, r4, #0
@@ -17272,7 +17272,7 @@ _08099696:
 	ldrb r0, [r1, #0x15]
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r2, _08099790 @ =0x080A4FA4
+	ldr r2, _08099790 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r2
 	movs r3, #0
 	ldrsh r4, [r0, r3]
@@ -17905,7 +17905,7 @@ CutsceneElevatorMonologueInit: @ 0x08099C38
 	lsls r1, r1, #0x13
 	mov sb, r1
 	strh r4, [r1]
-	ldr r1, _08099D9C @ =0x0879C514
+	ldr r1, _08099D9C @ =0x0879C514 (sBlob_79c448_79c5a4+0xCC)
 	ldr r6, _08099DA0 @ =gCurrentCutscene
 	ldrb r0, [r6]
 	subs r0, #1
@@ -17914,18 +17914,18 @@ CutsceneElevatorMonologueInit: @ 0x08099C38
 	ldr r0, [r0]
 	ldr r1, _08099DA4 @ =0x06012000
 	bl LZ77UncompVram
-	ldr r0, _08099DA8 @ =0x0865FB5C
+	ldr r0, _08099DA8 @ =0x0865FB5C (sBlob_64e470_662804+0x116EC)
 	ldr r1, _08099DAC @ =0x06017C00
 	bl LZ77UncompVram
 	ldr r4, _08099DB0 @ =0x040000D4
-	ldr r0, _08099DB4 @ =0x086638A0
+	ldr r0, _08099DB4 @ =0x086638A0 (sBlob_6638a0_682fac)
 	str r0, [r4]
 	ldr r0, _08099DB8 @ =0x050003E0
 	str r0, [r4, #4]
 	ldr r0, _08099DBC @ =0x84000008
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r1, _08099DC0 @ =0x0879C4CC
+	ldr r1, _08099DC0 @ =0x0879C4CC (sBlob_79c448_79c5a4+0x84)
 	ldrb r0, [r6]
 	subs r0, #1
 	lsls r0, r0, #2
@@ -17937,7 +17937,7 @@ CutsceneElevatorMonologueInit: @ 0x08099C38
 	ldr r0, _08099DC8 @ =0x84000030
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r1, _08099DCC @ =0x0879C4F0
+	ldr r1, _08099DCC @ =0x0879C4F0 (sBlob_79c448_79c5a4+0xA8)
 	ldrb r0, [r6]
 	subs r0, #1
 	lsls r0, r0, #2
@@ -17946,7 +17946,7 @@ CutsceneElevatorMonologueInit: @ 0x08099C38
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r1, _08099DD0 @ =0x0879C538
+	ldr r1, _08099DD0 @ =0x0879C538 (sBlob_79c448_79c5a4+0xF0)
 	ldrb r0, [r6]
 	subs r0, #1
 	lsls r0, r0, #2
@@ -17954,12 +17954,12 @@ CutsceneElevatorMonologueInit: @ 0x08099C38
 	ldr r0, [r0]
 	ldr r1, _08099DD4 @ =0x0600D000
 	bl LZ77UncompVram
-	ldr r0, _08099DD8 @ =0x08662804
+	ldr r0, _08099DD8 @ =0x08662804 (sIntroTilemap_662804)
 	movs r5, #0x80
 	lsls r5, r5, #0x12
 	adds r1, r5, #0
 	bl LZ77UncompWram
-	ldr r0, _08099DDC @ =0x08663598
+	ldr r0, _08099DDC @ =0x08663598 (sBlob_662cfc_663820+0x89C)
 	ldr r1, _08099DE0 @ =0x0600D800
 	bl LZ77UncompVram
 	str r5, [r4]
@@ -17968,7 +17968,7 @@ CutsceneElevatorMonologueInit: @ 0x08099C38
 	ldr r0, _08099DE8 @ =0x84000200
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _08099DEC @ =0x086636A0
+	ldr r0, _08099DEC @ =0x086636A0 (sBlob_662cfc_663820+0x9A4)
 	str r0, [r4]
 	movs r2, #0xa0
 	lsls r2, r2, #0x13
@@ -17976,7 +17976,7 @@ CutsceneElevatorMonologueInit: @ 0x08099C38
 	ldr r0, _08099DF0 @ =0x84000080
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r1, _08099DF4 @ =0x0879C4A8
+	ldr r1, _08099DF4 @ =0x0879C4A8 (sBlob_79c448_79c5a4+0x60)
 	ldrb r0, [r6]
 	subs r0, #1
 	lsls r0, r0, #2
@@ -18077,7 +18077,7 @@ _08099E16:
 	ldrb r0, [r0]
 	subs r0, #1
 	strh r0, [r2, #0xa]
-	ldr r1, _08099E58 @ =0x0879C5A4
+	ldr r1, _08099E58 @ =0x0879C5A4 (sMonologueTextPointers)
 	ldr r0, _08099E5C @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -18220,7 +18220,7 @@ _08099EF0:
 	lsls r1, r1, #2
 	adds r0, r3, r1
 	adds r0, r5, r0
-	ldr r1, _08099F60 @ =0x08663E5C
+	ldr r1, _08099F60 @ =0x08663E5C (sBlob_6638a0_682fac+0x5BC)
 	str r1, [r0]
 	movs r1, #0x8a
 	lsls r1, r1, #2
@@ -18246,7 +18246,7 @@ _08099F68:
 	lsls r0, r0, #2
 	adds r1, r3, r0
 	adds r1, r5, r1
-	ldr r2, _08099F9C @ =0x0879C55C
+	ldr r2, _08099F9C @ =0x0879C55C (sBlob_79c448_79c5a4+0x114)
 	ldr r0, _08099FA0 @ =gCurrentCutscene
 	ldrb r0, [r0]
 	subs r0, #1
@@ -18279,7 +18279,7 @@ _08099FA8:
 	lsls r0, r0, #2
 	adds r1, r3, r0
 	adds r1, r5, r1
-	ldr r2, _08099FE8 @ =0x0879C55C
+	ldr r2, _08099FE8 @ =0x0879C55C (sBlob_79c448_79c5a4+0x114)
 	ldr r0, _08099FEC @ =gCurrentCutscene
 	ldrb r0, [r0]
 	subs r0, #1
@@ -18310,7 +18310,7 @@ _08099FF4:
 	lsls r1, r1, #2
 	adds r2, r3, r1
 	adds r2, r5, r2
-	ldr r1, _0809A02C @ =0x0879C55C
+	ldr r1, _0809A02C @ =0x0879C55C (sBlob_79c448_79c5a4+0x114)
 	ldr r0, _0809A030 @ =gCurrentCutscene
 	ldrb r0, [r0]
 	subs r0, #1
@@ -18341,7 +18341,7 @@ _0809A038:
 	lsls r1, r1, #2
 	adds r2, r3, r1
 	adds r2, r5, r2
-	ldr r1, _0809A07C @ =0x0879C55C
+	ldr r1, _0809A07C @ =0x0879C55C (sBlob_79c448_79c5a4+0x114)
 	ldr r0, _0809A080 @ =gCurrentCutscene
 	ldrb r0, [r0]
 	subs r0, #1
@@ -18798,18 +18798,18 @@ CutsceneInternalMonologueInit: @ 0x0809A3AC
 	lsls r0, r0, #0x13
 	mov r8, r0
 	strh r6, [r0]
-	ldr r0, _0809A49C @ =0x0865FB5C
+	ldr r0, _0809A49C @ =0x0865FB5C (sBlob_64e470_662804+0x116EC)
 	ldr r1, _0809A4A0 @ =0x06017C00
 	bl LZ77UncompVram
 	ldr r4, _0809A4A4 @ =0x040000D4
-	ldr r0, _0809A4A8 @ =0x086638A0
+	ldr r0, _0809A4A8 @ =0x086638A0 (sBlob_6638a0_682fac)
 	str r0, [r4]
 	ldr r0, _0809A4AC @ =0x050003E0
 	str r0, [r4, #4]
 	ldr r0, _0809A4B0 @ =0x84000008
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809A4B4 @ =0x08662804
+	ldr r0, _0809A4B4 @ =0x08662804 (sIntroTilemap_662804)
 	movs r5, #0x80
 	lsls r5, r5, #0x12
 	adds r1, r5, #0
@@ -18820,7 +18820,7 @@ CutsceneInternalMonologueInit: @ 0x0809A3AC
 	ldr r0, _0809A4BC @ =0x84000200
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809A4C0 @ =0x086636A0
+	ldr r0, _0809A4C0 @ =0x086636A0 (sBlob_662cfc_663820+0x9A4)
 	str r0, [r4]
 	movs r1, #0xa0
 	lsls r1, r1, #0x13
@@ -18854,7 +18854,7 @@ CutsceneInternalMonologueInit: @ 0x0809A3AC
 	ldrb r0, [r0]
 	subs r0, #1
 	strh r0, [r2, #0xa]
-	ldr r1, _0809A4DC @ =0x0879C5A4
+	ldr r1, _0809A4DC @ =0x0879C5A4 (sMonologueTextPointers)
 	ldr r0, _0809A4E0 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -19020,7 +19020,7 @@ _0809A574:
 	lsls r1, r1, #2
 	adds r0, r5, r1
 	adds r0, r3, r0
-	ldr r1, _0809A5FC @ =0x08663E5C
+	ldr r1, _0809A5FC @ =0x08663E5C (sBlob_6638a0_682fac+0x5BC)
 	str r1, [r0]
 	movs r1, #0x8a
 	lsls r1, r1, #2
@@ -19173,25 +19173,25 @@ CutsceneFederationMonologueInit: @ 0x0809A6CC
 	lsls r0, r0, #0x13
 	mov r8, r0
 	strh r6, [r0]
-	ldr r0, _0809A7E4 @ =0x0865FB5C
+	ldr r0, _0809A7E4 @ =0x0865FB5C (sBlob_64e470_662804+0x116EC)
 	ldr r1, _0809A7E8 @ =0x06017C00
 	bl LZ77UncompVram
 	ldr r4, _0809A7EC @ =0x040000D4
-	ldr r0, _0809A7F0 @ =0x086638A0
+	ldr r0, _0809A7F0 @ =0x086638A0 (sBlob_6638a0_682fac)
 	str r0, [r4]
 	ldr r0, _0809A7F4 @ =0x050003E0
 	str r0, [r4, #4]
 	ldr r0, _0809A7F8 @ =0x84000008
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809A7FC @ =0x086724C0
+	ldr r0, _0809A7FC @ =0x086724C0 (sBlob_6638a0_682fac+0xEC20)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _0809A800 @ =0x08674AD8
+	ldr r0, _0809A800 @ =0x08674AD8 (sBlob_6638a0_682fac+0x11238)
 	ldr r1, _0809A804 @ =0x0600D000
 	bl LZ77UncompVram
-	ldr r0, _0809A808 @ =0x08662804
+	ldr r0, _0809A808 @ =0x08662804 (sIntroTilemap_662804)
 	movs r5, #0x80
 	lsls r5, r5, #0x12
 	adds r1, r5, #0
@@ -19202,7 +19202,7 @@ CutsceneFederationMonologueInit: @ 0x0809A6CC
 	ldr r0, _0809A810 @ =0x84000200
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809A814 @ =0x08674958
+	ldr r0, _0809A814 @ =0x08674958 (sBlob_6638a0_682fac+0x110B8)
 	str r0, [r4]
 	movs r1, #0xa0
 	lsls r1, r1, #0x13
@@ -19210,7 +19210,7 @@ CutsceneFederationMonologueInit: @ 0x0809A6CC
 	ldr r0, _0809A818 @ =0x84000060
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809A81C @ =0x08663820
+	ldr r0, _0809A81C @ =0x08663820 (sIntroPal_663820)
 	str r0, [r4]
 	ldr r0, _0809A820 @ =0x05000180
 	str r0, [r4, #4]
@@ -19247,7 +19247,7 @@ CutsceneFederationMonologueInit: @ 0x0809A6CC
 	ldrb r0, [r0]
 	subs r0, #1
 	strh r0, [r2, #0xa]
-	ldr r1, _0809A83C @ =0x0879C5A4
+	ldr r1, _0809A83C @ =0x0879C5A4 (sMonologueTextPointers)
 	ldr r0, _0809A840 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -19419,7 +19419,7 @@ _0809A8D4:
 	lsls r1, r1, #2
 	adds r0, r5, r1
 	adds r0, r3, r0
-	ldr r1, _0809A95C @ =0x08663E5C
+	ldr r1, _0809A95C @ =0x08663E5C (sBlob_6638a0_682fac+0x5BC)
 	str r1, [r0]
 	movs r1, #0x8a
 	lsls r1, r1, #2
@@ -19572,27 +19572,27 @@ CutsceneSecretConversationInit: @ 0x0809AA2C
 	movs r5, #0x80
 	lsls r5, r5, #0x13
 	strh r4, [r5]
-	ldr r0, _0809AB0C @ =0x0867815C
+	ldr r0, _0809AB0C @ =0x0867815C (sBlob_6638a0_682fac+0x148BC)
 	ldr r1, _0809AB10 @ =0x06014000
 	bl LZ77UncompVram
 	ldr r4, _0809AB14 @ =0x040000D4
-	ldr r0, _0809AB18 @ =0x086788A8
+	ldr r0, _0809AB18 @ =0x086788A8 (sBlob_6638a0_682fac+0x15008)
 	str r0, [r4]
 	ldr r0, _0809AB1C @ =0x05000300
 	str r0, [r4, #4]
 	ldr r0, _0809AB20 @ =0x84000010
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809AB24 @ =0x08675098
+	ldr r0, _0809AB24 @ =0x08675098 (sBlob_6638a0_682fac+0x117F8)
 	ldr r1, _0809AB28 @ =0x06000800
 	bl LZ77UncompVram
-	ldr r0, _0809AB2C @ =0x08677914
+	ldr r0, _0809AB2C @ =0x08677914 (sBlob_6638a0_682fac+0x14074)
 	ldr r1, _0809AB30 @ =0x0600C000
 	bl LZ77UncompVram
-	ldr r0, _0809AB34 @ =0x08677C90
+	ldr r0, _0809AB34 @ =0x08677C90 (sBlob_6638a0_682fac+0x143F0)
 	ldr r1, _0809AB38 @ =0x0600C800
 	bl LZ77UncompVram
-	ldr r0, _0809AB3C @ =0x08677874
+	ldr r0, _0809AB3C @ =0x08677874 (sBlob_6638a0_682fac+0x13FD4)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -19600,7 +19600,7 @@ CutsceneSecretConversationInit: @ 0x0809AA2C
 	ldr r0, _0809AB40 @ =0x84000028
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809AB44 @ =0x08677C10
+	ldr r0, _0809AB44 @ =0x08677C10 (sBlob_6638a0_682fac+0x14370)
 	str r0, [r4]
 	ldr r0, _0809AB48 @ =0x050001E0
 	str r0, [r4, #4]
@@ -19792,7 +19792,7 @@ _0809AC06:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _0809AC60 @ =0x086793B0
+	ldr r1, _0809AC60 @ =0x086793B0 (sBlob_6638a0_682fac+0x15B10)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -19811,7 +19811,7 @@ _0809AC68:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _0809AC80 @ =0x08679280
+	ldr r1, _0809AC80 @ =0x08679280 (sBlob_6638a0_682fac+0x159E0)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -19827,7 +19827,7 @@ _0809AC88:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _0809ACA0 @ =0x086793A0
+	ldr r1, _0809ACA0 @ =0x086793A0 (sBlob_6638a0_682fac+0x15B00)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -19843,7 +19843,7 @@ _0809ACA8:
 	adds r0, r3, #0
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _0809ACCC @ =0x086792D0
+	ldr r1, _0809ACCC @ =0x086792D0 (sBlob_6638a0_682fac+0x15A30)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x20
@@ -19873,7 +19873,7 @@ CutsceneSecretConversationProcessNavigationPanel: @ 0x0809ACD4
 	strb r0, [r2, #0x14]
 	strb r1, [r2, #0x12]
 	strb r1, [r2, #0x11]
-	ldr r0, _0809ACF0 @ =0x086792A8
+	ldr r0, _0809ACF0 @ =0x086792A8 (sBlob_6638a0_682fac+0x15A08)
 	str r0, [r2, #0x1c]
 _0809ACEA:
 	pop {r0}
@@ -19912,7 +19912,7 @@ _0809AD16:
 	strb r5, [r4, #0x13]
 	strb r5, [r4, #0x12]
 	strb r5, [r4, #0x11]
-	ldr r0, _0809AD38 @ =0x08679350
+	ldr r0, _0809AD38 @ =0x08679350 (sBlob_6638a0_682fac+0x15AB0)
 	str r0, [r4, #0x1c]
 	b _0809AD5A
 	.align 2, 0
@@ -19983,17 +19983,17 @@ _0809ADB0:
 	beq _0809ADE8
 	b _0809ADFA
 _0809ADBA:
-	ldr r0, _0809ADC0 @ =0x08677C30
+	ldr r0, _0809ADC0 @ =0x08677C30 (sBlob_6638a0_682fac+0x14390)
 	b _0809ADCE
 	.align 2, 0
 _0809ADC0: .4byte sIntroPal_663820+0x14410
 _0809ADC4:
-	ldr r0, _0809ADC8 @ =0x08677C50
+	ldr r0, _0809ADC8 @ =0x08677C50 (sBlob_6638a0_682fac+0x143B0)
 	b _0809ADCE
 	.align 2, 0
 _0809ADC8: .4byte sIntroPal_663820+0x14430
 _0809ADCC:
-	ldr r0, _0809ADDC @ =0x08677C70
+	ldr r0, _0809ADDC @ =0x08677C70 (sBlob_6638a0_682fac+0x143D0)
 _0809ADCE:
 	str r0, [r2]
 	ldr r0, _0809ADE0 @ =0x050001E0
@@ -20007,7 +20007,7 @@ _0809ADDC: .4byte sIntroPal_663820+0x14450
 _0809ADE0: .4byte 0x050001E0
 _0809ADE4: .4byte 0x84000008
 _0809ADE8:
-	ldr r0, _0809AE00 @ =0x08677C10
+	ldr r0, _0809AE00 @ =0x08677C10 (sBlob_6638a0_682fac+0x14370)
 	str r0, [r2]
 	ldr r0, _0809AE04 @ =0x050001E0
 	str r0, [r2, #4]
@@ -20131,28 +20131,28 @@ CutsceneRestrictedLabDetachingInit: @ 0x0809AEA4
 	lsls r0, r0, #0x13
 	mov r8, r0
 	strh r5, [r0]
-	ldr r0, _0809AFB4 @ =0x0867D7CC
+	ldr r0, _0809AFB4 @ =0x0867D7CC (sBlob_6638a0_682fac+0x19F2C)
 	ldr r1, _0809AFB8 @ =0x06010000
 	bl LZ77UncompVram
 	ldr r4, _0809AFBC @ =0x040000D4
-	ldr r0, _0809AFC0 @ =0x0868121C
+	ldr r0, _0809AFC0 @ =0x0868121C (sBlob_6638a0_682fac+0x1D97C)
 	str r0, [r4]
 	ldr r0, _0809AFC4 @ =0x05000200
 	str r0, [r4, #4]
 	ldr r6, _0809AFC8 @ =0x84000080
 	str r6, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809AFCC @ =0x08679420
+	ldr r0, _0809AFCC @ =0x08679420 (sBlob_6638a0_682fac+0x15B80)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _0809AFD0 @ =0x086820A4
+	ldr r0, _0809AFD0 @ =0x086820A4 (sBlob_6638a0_682fac+0x1E804)
 	ldr r1, _0809AFD4 @ =0x0600E000
 	bl LZ77UncompVram
-	ldr r0, _0809AFD8 @ =0x08681A1C
+	ldr r0, _0809AFD8 @ =0x08681A1C (sBlob_6638a0_682fac+0x1E17C)
 	ldr r1, _0809AFDC @ =0x0600E800
 	bl LZ77UncompVram
-	ldr r0, _0809AFE0 @ =0x0868259C
+	ldr r0, _0809AFE0 @ =0x0868259C (sBlob_6638a0_682fac+0x1ECFC)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -20202,7 +20202,7 @@ CutsceneRestrictedLabDetachingInit: @ 0x0809AEA4
 	movs r1, #0xc
 	ldrsh r0, [r0, r1]
 	lsls r0, r0, #5
-	ldr r1, _0809AFF0 @ =0x0868101C
+	ldr r1, _0809AFF0 @ =0x0868101C (sBlob_6638a0_682fac+0x1D77C)
 	adds r0, r0, r1
 	str r0, [r4]
 	ldr r0, _0809AFF4 @ =0x05000120
@@ -20888,7 +20888,7 @@ _0809B494:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _0809B50C @ =0x08680D54
+	ldr r1, _0809B50C @ =0x08680D54 (sBlob_6638a0_682fac+0x1D4B4)
 	b _0809B570
 	.align 2, 0
 _0809B500: .4byte 0x040000D4
@@ -20917,7 +20917,7 @@ _0809B510:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _0809B540 @ =0x08680D64
+	ldr r1, _0809B540 @ =0x08680D64 (sBlob_6638a0_682fac+0x1D4C4)
 	b _0809B570
 	.align 2, 0
 _0809B540: .4byte sIntroPal_663820+0x1D544
@@ -20943,7 +20943,7 @@ _0809B544:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _0809B580 @ =0x08680D74
+	ldr r1, _0809B580 @ =0x08680D74 (sBlob_6638a0_682fac+0x1D4D4)
 _0809B570:
 	str r1, [r0]
 	mov r0, ip
@@ -20976,7 +20976,7 @@ _0809B5A4:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _0809B5B4 @ =0x08680E2C
+	ldr r1, _0809B5B4 @ =0x08680E2C (sBlob_6638a0_682fac+0x1D58C)
 	b _0809B5D6
 	.align 2, 0
 _0809B5B4: .4byte sIntroPal_663820+0x1D60C
@@ -20995,7 +20995,7 @@ _0809B5B8:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _0809B5E4 @ =0x08680E3C
+	ldr r1, _0809B5E4 @ =0x08680E3C (sBlob_6638a0_682fac+0x1D59C)
 _0809B5D6:
 	str r1, [r0]
 	mov r0, ip
@@ -21022,7 +21022,7 @@ _0809B5EC:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _0809B618 @ =0x08680DA4
+	ldr r1, _0809B618 @ =0x08680DA4 (sBlob_6638a0_682fac+0x1D504)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -21048,7 +21048,7 @@ _0809B620:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _0809B64C @ =0x08680D94
+	ldr r1, _0809B64C @ =0x08680D94 (sBlob_6638a0_682fac+0x1D4F4)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -21084,7 +21084,7 @@ _0809B654:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r5, r0
-	ldr r1, _0809B694 @ =0x08680D84
+	ldr r1, _0809B694 @ =0x08680D84 (sBlob_6638a0_682fac+0x1D4E4)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -21118,7 +21118,7 @@ _0809B6B8:
 	adds r0, r7, #0
 	adds r0, #0x34
 	adds r0, r2, r0
-	ldr r1, _0809B6D4 @ =0x08680DCC
+	ldr r1, _0809B6D4 @ =0x08680DCC (sBlob_6638a0_682fac+0x1D52C)
 	str r1, [r0]
 	adds r0, r7, #0
 	adds r0, #0x38
@@ -21157,7 +21157,7 @@ _0809B6DC:
 	adds r0, r7, #0
 	adds r0, #0x34
 	adds r0, r2, r0
-	ldr r1, _0809B724 @ =0x08680FEC
+	ldr r1, _0809B724 @ =0x08680FEC (sBlob_6638a0_682fac+0x1D74C)
 	str r1, [r0]
 	adds r0, r7, #0
 	adds r0, #0x38
@@ -21196,7 +21196,7 @@ _0809B72C:
 	adds r0, r7, #0
 	adds r0, #0x34
 	adds r0, r2, r0
-	ldr r1, _0809B774 @ =0x08680FC4
+	ldr r1, _0809B774 @ =0x08680FC4 (sBlob_6638a0_682fac+0x1D724)
 	str r1, [r0]
 	adds r0, r7, #0
 	adds r0, #0x38
@@ -21270,7 +21270,7 @@ _0809B7C4:
 	adds r0, r7, #0
 	adds r0, #0x34
 	adds r0, r2, r0
-	ldr r1, _0809B804 @ =0x08680F9C
+	ldr r1, _0809B804 @ =0x08680F9C (sBlob_6638a0_682fac+0x1D6FC)
 	str r1, [r0]
 	adds r0, r7, #0
 	adds r0, #0x38
@@ -21288,7 +21288,7 @@ _0809B80C:
 	adds r0, r7, #0
 	adds r0, #0x34
 	adds r0, r2, r0
-	ldr r1, _0809B828 @ =0x08680F74
+	ldr r1, _0809B828 @ =0x08680F74 (sBlob_6638a0_682fac+0x1D6D4)
 	str r1, [r0]
 	adds r0, r7, #0
 	adds r0, #0x38
@@ -21343,7 +21343,7 @@ _0809B854:
 	adds r0, r7, #0
 	adds r0, #0x34
 	adds r0, r2, r0
-	ldr r1, _0809B8A4 @ =0x08680F2C
+	ldr r1, _0809B8A4 @ =0x08680F2C (sBlob_6638a0_682fac+0x1D68C)
 	str r1, [r0]
 	adds r0, r7, #0
 	adds r0, #0x38
@@ -21792,7 +21792,7 @@ _0809BBAE:
 	movs r1, #0xc
 	ldrsh r0, [r3, r1]
 	lsls r0, r0, #5
-	ldr r1, _0809BBF8 @ =0x0868161C
+	ldr r1, _0809BBF8 @ =0x0868161C (sBlob_6638a0_682fac+0x1DD7C)
 	adds r0, r0, r1
 	str r0, [r2]
 	ldr r0, _0809BBFC @ =0x05000220
@@ -21907,7 +21907,7 @@ _0809BC86:
 	movs r1, #0xc
 	ldrsh r0, [r3, r1]
 	lsls r0, r0, #5
-	ldr r1, _0809BCD0 @ =0x0868141C
+	ldr r1, _0809BCD0 @ =0x0868141C (sBlob_6638a0_682fac+0x1DB7C)
 	adds r0, r0, r1
 	str r0, [r2]
 	ldr r0, _0809BCD4 @ =0x05000200
@@ -22059,7 +22059,7 @@ _0809BDA0:
 	movs r1, #0xc
 	ldrsh r0, [r3, r1]
 	lsls r0, r0, #5
-	ldr r1, _0809BDEC @ =0x0868181C
+	ldr r1, _0809BDEC @ =0x0868181C (sBlob_6638a0_682fac+0x1DF7C)
 	adds r0, r0, r1
 	str r0, [r2]
 	ldr r0, _0809BDF0 @ =0x05000260
@@ -22189,7 +22189,7 @@ unk_9be8c: @ 0x0809BE8C
 	cmp r0, #0
 	bne _0809BEBC
 	ldr r1, _0809BEAC @ =0x040000D4
-	ldr r0, _0809BEB0 @ =0x0868101C
+	ldr r0, _0809BEB0 @ =0x0868101C (sBlob_6638a0_682fac+0x1D77C)
 	str r0, [r1]
 	ldr r0, _0809BEB4 @ =0x05000120
 	str r0, [r1, #4]
@@ -22232,7 +22232,7 @@ _0809BEE8:
 	movs r1, #0xc
 	ldrsh r0, [r3, r1]
 	lsls r0, r0, #5
-	ldr r1, _0809BF08 @ =0x0868101C
+	ldr r1, _0809BF08 @ =0x0868101C (sBlob_6638a0_682fac+0x1D77C)
 	adds r0, r0, r1
 	str r0, [r2]
 	ldr r0, _0809BF0C @ =0x05000120
@@ -22575,7 +22575,7 @@ CutsceneRestrictedLabDetachingVblank: @ 0x0809C138
 	movs r2, #0xc
 	ldrsh r0, [r1, r2]
 	lsls r0, r0, #5
-	ldr r1, _0809C1B0 @ =0x0868101C
+	ldr r1, _0809C1B0 @ =0x0868101C (sBlob_6638a0_682fac+0x1D77C)
 	adds r0, r0, r1
 	str r0, [r3]
 	ldr r0, _0809C1B4 @ =0x05000120
@@ -22706,34 +22706,34 @@ CutsceneBslExplodingInit: @ 0x0809C254
 	lsls r0, r0, #0x13
 	mov r8, r0
 	strh r5, [r0]
-	ldr r0, _0809C378 @ =0x0867D7CC
+	ldr r0, _0809C378 @ =0x0867D7CC (sBlob_6638a0_682fac+0x19F2C)
 	ldr r1, _0809C37C @ =0x06010000
 	bl LZ77UncompVram
 	ldr r4, _0809C380 @ =0x040000D4
-	ldr r0, _0809C384 @ =0x0868121C
+	ldr r0, _0809C384 @ =0x0868121C (sBlob_6638a0_682fac+0x1D97C)
 	str r0, [r4]
 	ldr r0, _0809C388 @ =0x05000200
 	str r0, [r4, #4]
 	ldr r6, _0809C38C @ =0x84000080
 	str r6, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809C390 @ =0x08679420
+	ldr r0, _0809C390 @ =0x08679420 (sBlob_6638a0_682fac+0x15B80)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _0809C394 @ =0x08681A1C
+	ldr r0, _0809C394 @ =0x08681A1C (sBlob_6638a0_682fac+0x1E17C)
 	ldr r1, _0809C398 @ =0x0600E000
 	bl LZ77UncompVram
-	ldr r0, _0809C39C @ =0x086820A4
+	ldr r0, _0809C39C @ =0x086820A4 (sBlob_6638a0_682fac+0x1E804)
 	ldr r1, _0809C3A0 @ =0x0600E800
 	bl LZ77UncompVram
-	ldr r0, _0809C3A4 @ =0x086827A8
+	ldr r0, _0809C3A4 @ =0x086827A8 (sBlob_6638a0_682fac+0x1EF08)
 	ldr r1, _0809C3A8 @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _0809C3AC @ =0x08682BFC
+	ldr r0, _0809C3AC @ =0x08682BFC (sBlob_6638a0_682fac+0x1F35C)
 	ldr r1, _0809C3B0 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _0809C3B4 @ =0x0868259C
+	ldr r0, _0809C3B4 @ =0x0868259C (sBlob_6638a0_682fac+0x1ECFC)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -22788,7 +22788,7 @@ CutsceneBslExplodingInit: @ 0x0809C254
 	movs r1, #0xc
 	ldrsh r0, [r0, r1]
 	lsls r0, r0, #5
-	ldr r1, _0809C3D4 @ =0x0868101C
+	ldr r1, _0809C3D4 @ =0x0868101C (sBlob_6638a0_682fac+0x1D77C)
 	adds r0, r0, r1
 	str r0, [r4]
 	ldr r0, _0809C3D8 @ =0x05000120
@@ -23144,7 +23144,7 @@ CutsceneBslExplodingProcessBslFar: @ 0x0809C624
 	bne _0809C67A
 	strb r1, [r2, #0x12]
 	strb r1, [r2, #0x11]
-	ldr r0, _0809C650 @ =0x08680ECC
+	ldr r0, _0809C650 @ =0x08680ECC (sBlob_6638a0_682fac+0x1D62C)
 	str r0, [r2, #0x1c]
 	movs r0, #1
 	strb r0, [r2, #0x14]
@@ -23352,7 +23352,7 @@ _0809C7B0:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _0809C7D8 @ =0x08680FFC
+	ldr r1, _0809C7D8 @ =0x08680FFC (sBlob_6638a0_682fac+0x1D75C)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -23376,7 +23376,7 @@ _0809C7E0:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _0809C808 @ =0x0868100C
+	ldr r1, _0809C808 @ =0x0868100C (sBlob_6638a0_682fac+0x1D76C)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -23400,7 +23400,7 @@ _0809C810:
 	mov r0, ip
 	adds r0, #0x1c
 	adds r0, r4, r0
-	ldr r1, _0809C848 @ =0x08680ECC
+	ldr r1, _0809C848 @ =0x08680ECC (sBlob_6638a0_682fac+0x1D62C)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x20
@@ -23505,7 +23505,7 @@ CutsceneBslExplodingVblank: @ 0x0809C8A8
 	movs r2, #0xc
 	ldrsh r0, [r1, r2]
 	lsls r0, r0, #5
-	ldr r1, _0809C920 @ =0x0868101C
+	ldr r1, _0809C920 @ =0x0868101C (sBlob_6638a0_682fac+0x1D77C)
 	adds r0, r0, r1
 	str r0, [r3]
 	ldr r0, _0809C924 @ =0x05000120
@@ -23587,7 +23587,7 @@ _0809C958:
 	.align 2, 0
 _0809C990: .4byte gChangedInput
 _0809C994:
-	ldr r0, _0809C9B0 @ =0x08663E74
+	ldr r0, _0809C9B0 @ =0x08663E74 (sBlob_6638a0_682fac+0x5D4)
 	str r0, [r2, #0x10]
 	movs r1, #0
 	movs r0, #0x76
@@ -23612,7 +23612,7 @@ _0809C9B4:
 	cmp r1, #0
 	beq _0809C9F4
 _0809C9C2:
-	ldr r0, _0809C9DC @ =0x08663E5C
+	ldr r0, _0809C9DC @ =0x08663E5C (sBlob_6638a0_682fac+0x5BC)
 	str r0, [r2, #0x10]
 	movs r1, #0
 	movs r0, #0x91
@@ -24370,7 +24370,7 @@ _0809CF10:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r2, _0809CF88 @ =0x0868279C
+	ldr r2, _0809CF88 @ =0x0868279C (sBlob_6638a0_682fac+0x1EEFC)
 	adds r1, r1, r2
 	ldrb r0, [r1]
 	lsls r0, r0, #3
@@ -24578,7 +24578,7 @@ _0809D0FA:
 	ble _0809D104
 	movs r7, #0xa0
 _0809D104:
-	ldr r0, _0809D1B8 @ =0x083E3294
+	ldr r0, _0809D1B8 @ =0x083E3294 (sHaze_PowerBomb_WindowValuesPointers)
 	movs r4, #0xa
 	ldrsh r1, [r3, r4]
 	lsls r1, r1, #2
@@ -25004,7 +25004,7 @@ _0809D3B6:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r0, _0809D444 @ =0x0863A184
+	ldr r0, _0809D444 @ =0x0863A184 (sBlob_6131c8_63a19c+0x26FBC)
 	adds r1, r1, r0
 	ldrb r0, [r1]
 	lsls r0, r0, #3
@@ -25201,10 +25201,10 @@ _0809D554:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r4, _0809D7B4 @ =0x0863A184
+	ldr r4, _0809D7B4 @ =0x0863A184 (sBlob_6131c8_63a19c+0x26FBC)
 	adds r0, r1, r4
 	ldrb r2, [r0]
-	ldr r0, _0809D7B8 @ =0x0863A190
+	ldr r0, _0809D7B8 @ =0x0863A190 (sBlob_6131c8_63a19c+0x26FC8)
 	adds r1, r1, r0
 	ldrb r3, [r1]
 	ldr r1, [sp, #4]
@@ -25305,7 +25305,7 @@ _0809D62A:
 	adds r0, r1, #0
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r2, _0809D7C0 @ =0x080A4FA4
+	ldr r2, _0809D7C0 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r2
 	movs r2, #0
 	ldrsh r5, [r0, r2]
@@ -25314,7 +25314,7 @@ _0809D62A:
 	lsls r3, r3, #0x10
 	asrs r3, r3, #0x10
 	lsls r1, r1, #1
-	ldr r0, _0809D7C0 @ =0x080A4FA4
+	ldr r0, _0809D7C0 @ =0x080A4FA4 (sSineTable)
 	adds r1, r1, r0
 	movs r0, #0
 	ldrsh r1, [r1, r0]
@@ -25464,7 +25464,7 @@ _0809D78C:
 	ldrb r0, [r1, #0x15]
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r2, _0809D7C0 @ =0x080A4FA4
+	ldr r2, _0809D7C0 @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r2
 	movs r3, #0
 	ldrsh r5, [r0, r3]
@@ -25569,10 +25569,10 @@ _0809D82E:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r2, _0809DB50 @ =0x0863A184
+	ldr r2, _0809DB50 @ =0x0863A184 (sBlob_6131c8_63a19c+0x26FBC)
 	adds r0, r1, r2
 	ldrb r2, [r0]
-	ldr r3, _0809DB54 @ =0x0863A190
+	ldr r3, _0809DB54 @ =0x0863A190 (sBlob_6131c8_63a19c+0x26FC8)
 	adds r1, r1, r3
 	ldrb r3, [r1]
 	ldr r4, [sp, #4]
@@ -25673,7 +25673,7 @@ _0809D904:
 	adds r0, r1, #0
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r2, _0809DB5C @ =0x080A4FA4
+	ldr r2, _0809DB5C @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r2
 	movs r2, #0
 	ldrsh r5, [r0, r2]
@@ -25682,7 +25682,7 @@ _0809D904:
 	lsls r3, r3, #0x10
 	asrs r3, r3, #0x10
 	lsls r1, r1, #1
-	ldr r0, _0809DB5C @ =0x080A4FA4
+	ldr r0, _0809DB5C @ =0x080A4FA4 (sSineTable)
 	adds r1, r1, r0
 	movs r0, #0
 	ldrsh r1, [r1, r0]
@@ -25829,7 +25829,7 @@ _0809DA62:
 	ldrb r0, [r4, #0x15]
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r1, _0809DB5C @ =0x080A4FA4
+	ldr r1, _0809DB5C @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r1
 	movs r2, #0
 	ldrsh r5, [r0, r2]
@@ -25851,7 +25851,7 @@ _0809DA7E:
 	mov r1, r8
 	ldrb r0, [r1, #0x15]
 	lsls r0, r0, #1
-	ldr r2, _0809DB5C @ =0x080A4FA4
+	ldr r2, _0809DB5C @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r2
 	movs r3, #0
 	ldrsh r5, [r0, r3]
@@ -25869,7 +25869,7 @@ _0809DA7E:
 	mov r4, r8
 	ldrb r0, [r4, #0x15]
 	lsls r0, r0, #1
-	ldr r1, _0809DB5C @ =0x080A4FA4
+	ldr r1, _0809DB5C @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r1
 	ldrh r4, [r0]
 	rsbs r4, r4, #0
@@ -25893,7 +25893,7 @@ _0809DA7E:
 	ldrb r0, [r3, #0x15]
 	adds r0, #0x40
 	lsls r0, r0, #1
-	ldr r4, _0809DB5C @ =0x080A4FA4
+	ldr r4, _0809DB5C @ =0x080A4FA4 (sSineTable)
 	adds r0, r0, r4
 	movs r1, #0
 	ldrsh r4, [r0, r1]

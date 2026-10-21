@@ -63,11 +63,11 @@ _080001C4:
 	bic r3, r3, #0xdf
 	orr r3, r3, #0x1f
 	msr cpsr_fc, r3
-	ldr r1, _0800022C @ =0x080A5224
+	ldr r1, _0800022C @ =0x080A5224 (sBlob_a5224_a5258)
 	add r1, r1, ip
 	ldr r0, [r1]
 	stmdb sp!, {lr}
-	add lr, pc, #0x0 @ =0x08000200
+	add lr, pc, #0x0 @ =0x08000200 (InterruptCode+0xFC)
 	bx r0
 	ldm sp!, {lr}
 	mrs r3, apsr

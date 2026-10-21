@@ -5389,7 +5389,7 @@ _0807C4B0:
 	adds r0, #1
 	movs r5, #0
 	strb r0, [r3]
-	ldr r2, _0807C530 @ =0x0857BEB8
+	ldr r2, _0807C530 @ =0x0857BEB8 (sBlob_5766D4_after+0x1F0)
 	subs r6, #1
 	adds r4, r1, r6
 	ldrb r1, [r4]
@@ -5415,7 +5415,7 @@ _0807C4EE:
 	adds r0, #0xc
 	adds r2, r0, #0
 	movs r1, #0
-	ldr r4, _0807C538 @ =0x0857BD34
+	ldr r4, _0807C538 @ =0x0857BD34 (sBlob_5766D4_after+0x6C)
 _0807C4FC:
 	lsls r0, r2, #1
 	adds r0, r0, r4
@@ -5450,7 +5450,7 @@ _0807C53C:
 	adds r0, #1
 	movs r5, #0
 	strb r0, [r3]
-	ldr r2, _0807C5A8 @ =0x0857BEBC
+	ldr r2, _0807C5A8 @ =0x0857BEBC (sBlob_5766D4_after+0x1F4)
 	movs r1, #0x8b
 	lsls r1, r1, #2
 	adds r4, r6, r1
@@ -5477,7 +5477,7 @@ _0807C574:
 	adds r0, #0xa
 	adds r2, r0, #0
 	movs r1, #0
-	ldr r4, _0807C5B0 @ =0x0857BDB4
+	ldr r4, _0807C5B0 @ =0x0857BDB4 (sBlob_5766D4_after+0xEC)
 _0807C582:
 	lsls r0, r2, #1
 	adds r0, r0, r4
@@ -5512,20 +5512,20 @@ NavigationConversationLoadSpecialGraphics: @ 0x0807C5B4
 	ldrb r0, [r0]
 	cmp r0, #0x35
 	bne _0807C618
-	ldr r0, _0807C5F4 @ =0x0857C0C4
+	ldr r0, _0807C5F4 @ =0x0857C0C4 (sBlob_5766D4_after+0x3FC)
 	movs r1, #0x80
 	lsls r1, r1, #0x12
 	bl LZ77UncompVram
-	ldr r0, _0807C5F8 @ =0x0857FCA0
+	ldr r0, _0807C5F8 @ =0x0857FCA0 (sBlob_5766D4_after+0x3FD8)
 	ldr r1, _0807C5FC @ =0x02006000
 	bl LZ77UncompVram
-	ldr r0, _0807C600 @ =0x08580238
+	ldr r0, _0807C600 @ =0x08580238 (sBlob_5766D4_after+0x4570)
 	ldr r1, _0807C604 @ =0x02006800
 	bl LZ77UncompVram
-	ldr r0, _0807C608 @ =0x085807D0
+	ldr r0, _0807C608 @ =0x085807D0 (sBlob_5766D4_after+0x4B08)
 	ldr r1, _0807C60C @ =0x02007000
 	bl LZ77UncompVram
-	ldr r0, _0807C610 @ =0x08580D68
+	ldr r0, _0807C610 @ =0x08580D68 (sBlob_5766D4_after+0x50A0)
 	ldr r1, _0807C614 @ =0x02007800
 	bl LZ77UncompVram
 	b _0807C626
@@ -5543,7 +5543,7 @@ _0807C614: .4byte 0x02007800
 _0807C618:
 	cmp r0, #0xe
 	bne _0807C626
-	ldr r0, _0807C62C @ =0x0872F2E0
+	ldr r0, _0807C62C @ =0x0872F2E0 (sSaXCloseUpGfx)
 	movs r1, #0x80
 	lsls r1, r1, #0x12
 	bl LZ77UncompVram
@@ -5925,7 +5925,7 @@ _0807C9C0: .4byte gNonGameplayRam
 _0807C9C4: .4byte 0x00000265
 _0807C9C8:
 	ldr r1, _0807C9E0 @ =0x040000D4
-	ldr r0, _0807C9E4 @ =0x0857BEC4
+	ldr r0, _0807C9E4 @ =0x0857BEC4 (sBlob_5766D4_after+0x1FC)
 	str r0, [r1]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -5961,7 +5961,7 @@ _0807CA10:
 	ldrb r0, [r2]
 	adds r0, #1
 	strb r0, [r2]
-	ldr r1, _0807CA40 @ =0x0879C17C
+	ldr r1, _0807CA40 @ =0x0879C17C (sBlob_79c170_79c27c+0xC)
 	lsls r0, r0, #0x18
 	lsrs r0, r0, #0x18
 	ldrb r1, [r1]
@@ -5991,7 +5991,7 @@ _0807CA50:
 	ldrb r0, [r2]
 	adds r0, #1
 	strb r0, [r2]
-	ldr r1, _0807CA80 @ =0x0879C17C
+	ldr r1, _0807CA80 @ =0x0879C17C (sBlob_79c170_79c27c+0xC)
 	lsls r0, r0, #0x18
 	lsrs r0, r0, #0x18
 	ldrb r1, [r1, #1]
@@ -6021,7 +6021,7 @@ _0807CA90:
 	ldrb r0, [r2]
 	adds r0, #1
 	strb r0, [r2]
-	ldr r1, _0807CAC0 @ =0x0879C17C
+	ldr r1, _0807CAC0 @ =0x0879C17C (sBlob_79c170_79c27c+0xC)
 	lsls r0, r0, #0x18
 	lsrs r0, r0, #0x18
 	ldrb r1, [r1, #2]
@@ -6051,7 +6051,7 @@ _0807CAD0:
 	ldrb r0, [r2]
 	adds r0, #1
 	strb r0, [r2]
-	ldr r1, _0807CAF4 @ =0x0879C17C
+	ldr r1, _0807CAF4 @ =0x0879C17C (sBlob_79c170_79c27c+0xC)
 	lsls r0, r0, #0x18
 	lsrs r0, r0, #0x18
 	ldrb r1, [r1, #3]
@@ -6067,10 +6067,10 @@ _0807CAF0: .4byte 0x00000266
 _0807CAF4: .4byte sExploredMinimapBitFlags+0x3A0
 _0807CAF8: .4byte 0x00000265
 _0807CAFC:
-	ldr r0, _0807CB10 @ =0x087338C0
+	ldr r0, _0807CB10 @ =0x087338C0 (sSaXCloseUpTileTable1)
 	ldr r1, _0807CB14 @ =0x06007800
 	bl LZ77UncompVram
-	ldr r0, _0807CB18 @ =0x08733D58
+	ldr r0, _0807CB18 @ =0x08733D58 (sSaXCloseUpTileTable2)
 	ldr r1, _0807CB1C @ =0x0600B800
 	bl LZ77UncompVram
 	b _0807CDE8
@@ -6081,7 +6081,7 @@ _0807CB18: .4byte sSaXCloseUpTileTable2
 _0807CB1C: .4byte 0x0600B800
 _0807CB20:
 	ldr r1, _0807CB40 @ =0x040000D4
-	ldr r0, _0807CB44 @ =0x0872F0E0
+	ldr r0, _0807CB44 @ =0x0872F0E0 (sSaXCloseUpPalGrayscale)
 	str r0, [r1]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -6148,7 +6148,7 @@ _0807CBB0:
 	ldrb r0, [r2]
 	adds r0, #1
 	strb r0, [r2]
-	ldr r1, _0807CBD8 @ =0x0873421C
+	ldr r1, _0807CBD8 @ =0x0873421C (sSaXCloseUpDurations)
 	lsls r0, r0, #0x18
 	lsrs r0, r0, #0x18
 	ldrb r1, [r1]
@@ -6198,7 +6198,7 @@ _0807CC18:
 	ldrb r0, [r2]
 	adds r0, #1
 	strb r0, [r2]
-	ldr r1, _0807CC44 @ =0x0873421C
+	ldr r1, _0807CC44 @ =0x0873421C (sSaXCloseUpDurations)
 	lsls r0, r0, #0x18
 	lsrs r0, r0, #0x18
 	ldrb r1, [r1, #1]
@@ -6238,7 +6238,7 @@ _0807CC4C:
 _0807CC68: .4byte 0x00000265
 _0807CC6C: .4byte 0x00000266
 _0807CC70:
-	ldr r1, _0807CC8C @ =0x08561FA8
+	ldr r1, _0807CC8C @ =0x08561FA8 (sMinimapTilesGfx)
 	ldr r2, _0807CC90 @ =0x06008000
 	movs r3, #0x80
 	lsls r3, r3, #5
@@ -6256,7 +6256,7 @@ _0807CC90: .4byte 0x06008000
 _0807CC94: .4byte gNonGameplayRam
 _0807CC98: .4byte 0x00000265
 _0807CC9C:
-	ldr r1, _0807CCB8 @ =0x08562FA8
+	ldr r1, _0807CCB8 @ =0x08562FA8 (sMinimapTilesGfx+0x1000)
 	ldr r2, _0807CCBC @ =0x06009000
 	movs r3, #0x80
 	lsls r3, r3, #5
@@ -6274,7 +6274,7 @@ _0807CCBC: .4byte 0x06009000
 _0807CCC0: .4byte gNonGameplayRam
 _0807CCC4: .4byte 0x00000265
 _0807CCC8:
-	ldr r1, _0807CCDC @ =0x08563FA8
+	ldr r1, _0807CCDC @ =0x08563FA8 (sMinimapTilesGfx+0x2000)
 	ldr r2, _0807CCE0 @ =0x0600A000
 	movs r3, #0x80
 	lsls r3, r3, #5
@@ -6287,7 +6287,7 @@ _0807CCC8:
 _0807CCDC: .4byte sMinimapTilesGfx+0x2000
 _0807CCE0: .4byte 0x0600A000
 _0807CCE4:
-	ldr r1, _0807CD10 @ =0x08564FA8
+	ldr r1, _0807CD10 @ =0x08564FA8 (sMinimapTilesGfx+0x3000)
 	ldr r2, _0807CD14 @ =0x0600B000
 	movs r3, #0x80
 	lsls r3, r3, #4
@@ -6473,7 +6473,7 @@ _0807CE7A:
 	movs r0, #0x90
 	lsls r0, r0, #2
 	adds r1, r2, r0
-	ldr r0, _0807CEC4 @ =0x08581500
+	ldr r0, _0807CEC4 @ =0x08581500 (sBlob_5766D4_after+0x5838)
 	ldm r0!, {r4, r5, r6}
 	stm r1!, {r4, r5, r6}
 	ldr r0, [r0]
@@ -6491,8 +6491,8 @@ _0807CE7A:
 	ldrb r0, [r3]
 	cmp r0, #0
 	beq _0807CED4
-	ldr r2, _0807CECC @ =0x0857607D
-	ldr r1, _0807CED0 @ =0x08576073
+	ldr r2, _0807CECC @ =0x0857607D (sEvent_57607D)
+	ldr r1, _0807CED0 @ =0x08576073 (sEvent_576073)
 	adds r0, r0, r1
 	ldrb r0, [r0]
 	adds r0, r0, r2
@@ -6509,14 +6509,14 @@ _0807CEC8: .4byte gPauseScreenFlag
 _0807CECC: .4byte sEvent_57607D
 _0807CED0: .4byte sEvent_576073
 _0807CED4:
-	ldr r0, _0807CF48 @ =0x0857607D
+	ldr r0, _0807CF48 @ =0x0857607D (sEvent_57607D)
 	ldrb r1, [r0, #7]
 	movs r4, #0x91
 	lsls r4, r4, #2
 	adds r0, r6, r4
 _0807CEDE:
 	strb r1, [r0]
-	ldr r1, _0807CF4C @ =0x0879C180
+	ldr r1, _0807CF4C @ =0x0879C180 (sBlob_79c170_79c27c+0x10)
 	movs r5, #0x91
 	lsls r5, r5, #2
 	adds r0, r6, r5
@@ -6560,7 +6560,7 @@ _0807CEDE:
 	ldrb r0, [r2]
 	cmp r0, #0
 	beq _0807CF5C
-	ldr r1, _0807CF54 @ =0x08576073
+	ldr r1, _0807CF54 @ =0x08576073 (sEvent_576073)
 	adds r0, r0, r1
 	ldrb r1, [r0]
 	ldr r2, _0807CF58 @ =0x00000249
@@ -6573,7 +6573,7 @@ _0807CF50: .4byte gCurrentArea
 _0807CF54: .4byte sEvent_576073
 _0807CF58: .4byte 0x00000249
 _0807CF5C:
-	ldr r1, _0807CF94 @ =0x085760E8
+	ldr r1, _0807CF94 @ =0x085760E8 (sBlob_5760e8_576168)
 	ldr r0, _0807CF98 @ =gCurrentRoom
 	ldrb r0, [r0]
 	adds r0, #1
@@ -6657,7 +6657,7 @@ _0807CFF8:
 	lsls r1, r4, #1
 	ldr r0, _0807D044 @ =0x05000340
 	adds r1, r1, r0
-	ldr r2, _0807D048 @ =0x08581300
+	ldr r2, _0807D048 @ =0x08581300 (sBlob_5766D4_after+0x5638)
 	ldrb r0, [r3]
 	lsls r0, r0, #4
 	adds r0, r0, r4
@@ -6692,7 +6692,7 @@ _0807D04C: .4byte 0x0000024A
 _0807D050:
 	cmp r0, #3
 	bne _0807D0DA
-	ldr r0, _0807D090 @ =0x0857608A
+	ldr r0, _0807D090 @ =0x0857608A (sEvent_57608A)
 	ldr r1, _0807D094 @ =0x0300004C
 	ldrb r1, [r1]
 	adds r0, r1, r0
@@ -6713,7 +6713,7 @@ _0807D050:
 _0807D078:
 	mov r1, ip
 	adds r1, #0xbe
-	ldr r3, _0807D098 @ =0x0879C1A4
+	ldr r3, _0807D098 @ =0x0879C1A4 (sBlob_79c170_79c27c+0x34)
 	lsls r2, r4, #1
 	adds r2, r2, r4
 	adds r0, r2, r3
@@ -6730,7 +6730,7 @@ _0807D098: .4byte sExploredMinimapBitFlags+0x3C8
 _0807D09C:
 	mov r4, ip
 	adds r4, #0xbe
-	ldr r3, _0807D108 @ =0x0879C210
+	ldr r3, _0807D108 @ =0x0879C210 (sBlob_79c170_79c27c+0xA0)
 	lsls r2, r1, #1
 	adds r2, r2, r1
 	adds r0, r2, r3
@@ -6850,7 +6850,7 @@ _0807D170:
 	ble _0807D18A
 	strb r3, [r2]
 _0807D18A:
-	ldr r1, _0807D198 @ =0x0879C180
+	ldr r1, _0807D198 @ =0x0879C180 (sBlob_79c170_79c27c+0x10)
 	movs r0, #0
 	ldrsb r0, [r2, r0]
 	b _0807D266
@@ -6954,7 +6954,7 @@ _0807D250:
 	movs r0, #0x23
 	strb r0, [r2]
 _0807D258:
-	ldr r1, _0807D278 @ =0x0879C180
+	ldr r1, _0807D278 @ =0x0879C180 (sBlob_79c170_79c27c+0x10)
 	movs r0, #0x91
 	lsls r0, r0, #2
 	add r0, ip
@@ -7019,7 +7019,7 @@ _0807D2D0:
 	adds r0, r3, r1
 	strb r4, [r0]
 _0807D2D6:
-	ldr r1, _0807D328 @ =0x0857607D
+	ldr r1, _0807D328 @ =0x0857607D (sEvent_57607D)
 	ldrb r0, [r5]
 	adds r0, r0, r1
 	ldrb r1, [r0]

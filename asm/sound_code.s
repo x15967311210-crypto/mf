@@ -75,7 +75,7 @@ SoundCodeC: @ 0x08003E1C
 	mov ip, #0
 	sub ip, ip, #1
 	lsr ip, ip, #0x17
-	ldr lr, _08003EB8 @ =0x080A548A
+	ldr lr, _08003EB8 @ =0x080A548A (sArray_a548a)
 	b _08003E40
 _08003E38:
 	subs r2, r2, #1

@@ -230,8 +230,8 @@ variable in a baseline function can change codegen and the baseline SHA.
 - ROM-address comments are being named with `tools/shift/label_comments.py`
   (`--check`/`--write`, `--limit N`, `--scope ldr|references|all`). It resolves
   addresses through `map_symbols.py` and appends ` (Symbol+0xOFF)` only to
-  comments; 100/697 asm occurrences were labelled in the first batch, the rest
-  are mechanically reproducible. The audit still reports 697 `ldr` comments
-  because the comments are reference-only, not relocations.
+  comments. All 699 in-scope ROM comments (697 asm + 2 C) are now labelled in
+  two batches, with 0 unknown/ambiguous. The audit still reports 697 `ldr`
+  comments because the comments are reference-only, not relocations.
 - The generated `hack/gen/content_tables.h` banner comment and the top comment
   in `mk/hack.mk` describe the old empty-overlay state and should be refreshed.

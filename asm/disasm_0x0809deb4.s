@@ -178,17 +178,17 @@ GameOverInit: @ 0x0809DF58
 	strh r4, [r0]
 	adds r0, #2
 	strh r4, [r0]
-	ldr r0, _0809E0E8 @ =0x08739A78
+	ldr r0, _0809E0E8 @ =0x08739A78 (sBlob_73421e_prefix+0x585A)
 	adds r1, r6, #0
 	bl LZ77UncompVram
-	ldr r0, _0809E0EC @ =0x0873C4E4
+	ldr r0, _0809E0EC @ =0x0873C4E4 (sBlob_73421e_prefix+0x82C6)
 	str r0, [r7]
 	ldr r0, _0809E0F0 @ =0x05000200
 	str r0, [r7, #4]
 	ldr r5, _0809E0F4 @ =0x84000080
 	str r5, [r7, #8]
 	ldr r0, [r7, #8]
-	ldr r0, _0809E0F8 @ =0x0873422C
+	ldr r0, _0809E0F8 @ =0x0873422C (sBlob_73421e_prefix+0xE)
 	movs r4, #0xc0
 	lsls r4, r4, #0x13
 	adds r1, r4, #0
@@ -198,7 +198,7 @@ GameOverInit: @ 0x0809DF58
 	ldrsb r0, [r1, r0]
 	cmp r0, #1
 	ble _0809E042
-	ldr r0, _0809E100 @ =0x0879E874
+	ldr r0, _0809E100 @ =0x0879E874 (sBlob_79e868_79eca0+0xC)
 	ldrb r1, [r1]
 	lsls r1, r1, #0x18
 	asrs r1, r1, #0x18
@@ -208,13 +208,13 @@ GameOverInit: @ 0x0809DF58
 	adds r1, r4, #0
 	bl LZ77UncompVram
 _0809E042:
-	ldr r0, _0809E104 @ =0x0873C6E4
+	ldr r0, _0809E104 @ =0x0873C6E4 (sBlob_73421e_prefix+0x84C6)
 	ldr r1, _0809E108 @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _0809E10C @ =0x0873CCA8
+	ldr r0, _0809E10C @ =0x0873CCA8 (sBlob_73421e_prefix+0x8A8A)
 	ldr r1, _0809E110 @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _0809E114 @ =0x0873C2E4
+	ldr r0, _0809E114 @ =0x0873C2E4 (sBlob_73421e_prefix+0x80C6)
 	str r0, [r7]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -366,7 +366,7 @@ _0809E194:
 	adds r0, r3, #0
 	adds r0, #0x14
 	adds r0, r2, r0
-	ldr r1, _0809E1D0 @ =0x0879E868
+	ldr r1, _0809E1D0 @ =0x0879E868 (sBlob_79e868_79eca0)
 	ldr r1, [r1]
 	str r1, [r0]
 	adds r0, r3, #0
@@ -386,7 +386,7 @@ _0809E1D8:
 	adds r0, r3, #0
 	adds r0, #0x14
 	adds r0, r2, r0
-	ldr r1, _0809E1FC @ =0x0873C274
+	ldr r1, _0809E1FC @ =0x0873C274 (sBlob_73421e_prefix+0x8056)
 	str r1, [r0]
 	adds r0, r3, #0
 	adds r0, #0x18
@@ -458,7 +458,7 @@ _0809E252:
 	bl SoundPlay
 	movs r0, #0xa
 	bl FadeMusic
-	ldr r0, _0809E288 @ =0x0879E868
+	ldr r0, _0809E288 @ =0x0879E868 (sBlob_79e868_79eca0)
 	ldr r0, [r0, #4]
 	str r0, [r4, #0x10]
 	ldr r1, _0809E28C @ =gNonGameplayRam
@@ -477,7 +477,7 @@ _0809E290:
 	bl SoundPlay
 	movs r0, #0xa
 	bl FadeMusic
-	ldr r0, _0809E2C4 @ =0x0879E868
+	ldr r0, _0809E2C4 @ =0x0879E868 (sBlob_79e868_79eca0)
 	ldr r0, [r0, #8]
 	str r0, [r4, #0x10]
 	ldr r1, _0809E2C8 @ =gNonGameplayRam
@@ -696,7 +696,7 @@ _0809E3E4:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r2, _0809E45C @ =0x08734220
+	ldr r2, _0809E45C @ =0x08734220 (sBlob_73421e_prefix+0x2)
 	adds r1, r1, r2
 	ldrb r0, [r1]
 	lsls r0, r0, #3
@@ -1159,14 +1159,14 @@ FileSelectInit: @ 0x0809E750
 	strh r6, [r0]
 	adds r0, #2
 	strh r6, [r0]
-	ldr r0, _0809E964 @ =0x08742FB4
+	ldr r0, _0809E964 @ =0x08742FB4 (sBlob_73421e_after+0x22AC)
 	movs r1, #0xc0
 	lsls r1, r1, #0x13
 	bl LZ77UncompVram
-	ldr r0, _0809E968 @ =0x087470E0
+	ldr r0, _0809E968 @ =0x087470E0 (sBlob_73421e_after+0x63D8)
 	ldr r1, _0809E96C @ =0x0600F800
 	bl LZ77UncompVram
-	ldr r0, _0809E970 @ =0x087476A0
+	ldr r0, _0809E970 @ =0x087476A0 (sBlob_73421e_after+0x6998)
 	str r0, [r4]
 	movs r0, #0xa0
 	lsls r0, r0, #0x13
@@ -1175,10 +1175,10 @@ FileSelectInit: @ 0x0809E750
 	ldr r0, _0809E974 @ =0x84000080
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809E978 @ =0x0873CFAC
+	ldr r0, _0809E978 @ =0x0873CFAC (sBlob_73421e_prefix+0x8D8E)
 	ldr r1, _0809E97C @ =0x0600E000
 	bl LZ77UncompVram
-	ldr r0, _0809E980 @ =0x0873D380
+	ldr r0, _0809E980 @ =0x0873D380 (sBlob_73421e_prefix+0x9162)
 	movs r5, #0x80
 	lsls r5, r5, #0x12
 	adds r1, r5, #0
@@ -1189,17 +1189,17 @@ FileSelectInit: @ 0x0809E750
 	ldr r0, _0809E988 @ =0x84000200
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r0, _0809E98C @ =0x0873D5EC
+	ldr r0, _0809E98C @ =0x0873D5EC (sBlob_73421e_prefix+0x93CE)
 	ldr r1, _0809E990 @ =0x0600F000
 	bl LZ77UncompVram
-	ldr r0, _0809E994 @ =0x0873DB84
+	ldr r0, _0809E994 @ =0x0873DB84 (sBlob_73421e_prefix+0x9966)
 	str r0, [r4]
 	mov r2, r8
 	str r2, [r4, #4]
 	ldr r0, _0809E998 @ =0x84000008
 	str r0, [r4, #8]
 	ldr r0, [r4, #8]
-	ldr r1, _0809E99C @ =0x0873DAC4
+	ldr r1, _0809E99C @ =0x0873DAC4 (sBlob_73421e_prefix+0x98A6)
 	str r1, [r4]
 	str r2, [r4, #4]
 	ldr r0, _0809E9A0 @ =0x84000002
@@ -1231,11 +1231,11 @@ _0809E86A:
 	adds r3, #2
 	cmp r3, #0xff
 	bls _0809E86A
-	ldr r0, _0809E9B8 @ =0x0873DC20
+	ldr r0, _0809E9B8 @ =0x0873DC20 (sBlob_73421e_prefix+0x9A02)
 	ldr r1, _0809E9BC @ =0x06010000
 	bl LZ77UncompVram
 	ldr r1, _0809E948 @ =0x040000D4
-	ldr r0, _0809E9C0 @ =0x08740D08
+	ldr r0, _0809E9C0 @ =0x08740D08 (sBlob_73421e_after)
 	str r0, [r1]
 	ldr r0, _0809E9C4 @ =0x05000200
 	str r0, [r1, #4]
@@ -1245,7 +1245,7 @@ _0809E86A:
 	ldr r4, _0809E94C @ =gNonGameplayRam
 	movs r0, #0
 	strh r0, [r4, #8]
-	ldr r1, _0809E9C8 @ =0x0879EC68
+	ldr r1, _0809E9C8 @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _0809E9CC @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -1562,7 +1562,7 @@ _0809EBB0:
 	cmp r0, #1
 	bne _0809EBF4
 	strh r0, [r4, #8]
-	ldr r1, _0809EBEC @ =0x0879EC68
+	ldr r1, _0809EBEC @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _0809EBF0 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -1844,7 +1844,7 @@ _0809EDFE:
 	bne _0809EE24
 	movs r0, #0x18
 	strh r0, [r4, #8]
-	ldr r1, _0809EE1C @ =0x0879EC68
+	ldr r1, _0809EE1C @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _0809EE20 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -2042,7 +2042,7 @@ _0809EF7A:
 	bne _0809EFA0
 	movs r0, #2
 	strh r0, [r2, #8]
-	ldr r1, _0809EF98 @ =0x0879EC68
+	ldr r1, _0809EF98 @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _0809EF9C @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -2183,7 +2183,7 @@ _0809F088:
 	bne _0809F0B0
 	movs r0, #3
 	strh r0, [r2, #8]
-	ldr r1, _0809F0A8 @ =0x0879EC68
+	ldr r1, _0809F0A8 @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _0809F0AC @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -2208,7 +2208,7 @@ _0809F0B6:
 	movs r0, #0x16
 	strh r0, [r2, #0xa]
 	strb r1, [r2, #0x10]
-	ldr r1, _0809F0DC @ =0x0873DBB0
+	ldr r1, _0809F0DC @ =0x0873DBB0 (sBlob_73421e_prefix+0x9992)
 	ldr r0, _0809F0E0 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -2352,7 +2352,7 @@ _0809F1C6:
 	bne _0809F234
 	movs r0, #2
 	strh r0, [r4, #8]
-	ldr r1, _0809F1E4 @ =0x0879EC68
+	ldr r1, _0809F1E4 @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _0809F1E8 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -2390,7 +2390,7 @@ _0809F20E:
 	bne _0809F234
 	movs r0, #2
 	strh r0, [r4, #8]
-	ldr r1, _0809F22C @ =0x0879EC68
+	ldr r1, _0809F22C @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _0809F230 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -2530,7 +2530,7 @@ _0809F310:
 	bne _0809F33C
 	movs r0, #4
 	strh r0, [r5, #8]
-	ldr r1, _0809F334 @ =0x0879EC68
+	ldr r1, _0809F334 @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _0809F338 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -2554,7 +2554,7 @@ _0809F33C:
 _0809F342:
 	movs r4, #1
 	strb r4, [r5, #0x10]
-	ldr r1, _0809F36C @ =0x0873DBBE
+	ldr r1, _0809F36C @ =0x0873DBBE (sBlob_73421e_prefix+0x99A0)
 	ldr r0, _0809F370 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -2884,7 +2884,7 @@ _0809F578:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F5D0 @ =0x08740A48
+	ldr r1, _0809F5D0 @ =0x08740A48 (sSaXCloseUpFrameData)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -2903,7 +2903,7 @@ _0809F5D8:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F5F0 @ =0x08740B48
+	ldr r1, _0809F5F0 @ =0x08740B48 (sSaXCloseUpFrameData+0x100)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -2923,7 +2923,7 @@ _0809F5F8:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F618 @ =0x08740AB8
+	ldr r1, _0809F618 @ =0x08740AB8 (sSaXCloseUpFrameData+0x70)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -2939,7 +2939,7 @@ _0809F620:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F638 @ =0x08740B48
+	ldr r1, _0809F638 @ =0x08740B48 (sSaXCloseUpFrameData+0x100)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -2955,7 +2955,7 @@ _0809F640:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F658 @ =0x08740B48
+	ldr r1, _0809F658 @ =0x08740B48 (sSaXCloseUpFrameData+0x100)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -2974,7 +2974,7 @@ _0809F660:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F680 @ =0x087407E0
+	ldr r1, _0809F680 @ =0x087407E0 (sSaXCloseUpFileSelectFrames)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -2993,7 +2993,7 @@ _0809F688:
 	mov r1, ip
 	adds r1, #0x14
 	adds r1, r4, r1
-	ldr r2, _0809F6B0 @ =0x0879E890
+	ldr r2, _0809F6B0 @ =0x0879E890 (sBlob_79e868_79eca0+0x28)
 	ldr r0, _0809F6B4 @ =0x03000B8D
 	ldrb r0, [r0]
 	lsls r0, r0, #2
@@ -3018,7 +3018,7 @@ _0809F6BC:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F6DC @ =0x087408E0
+	ldr r1, _0809F6DC @ =0x087408E0 (sSaXCloseUpFileSelectFrames+0x100)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -3038,7 +3038,7 @@ _0809F6E4:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F704 @ =0x087408F0
+	ldr r1, _0809F704 @ =0x087408F0 (sSaXCloseUpFileSelectFrames+0x110)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -3054,7 +3054,7 @@ _0809F70C:
 	mov r0, ip
 	adds r0, #0x14
 	adds r0, r4, r0
-	ldr r1, _0809F724 @ =0x08740880
+	ldr r1, _0809F724 @ =0x08740880 (sSaXCloseUpFileSelectFrames+0xA0)
 	str r1, [r0]
 	mov r0, ip
 	adds r0, #0x18
@@ -3082,7 +3082,7 @@ _0809F72C:
 	adds r0, r3, #0
 	adds r0, #0x2c
 	adds r0, r1, r0
-	ldr r2, _0809F764 @ =0x08740918
+	ldr r2, _0809F764 @ =0x08740918 (sSaXCloseUpAnimFrames)
 	str r2, [r0]
 	adds r3, #0x30
 	adds r1, r1, r3
@@ -3111,7 +3111,7 @@ _0809F76C:
 	adds r0, r3, #0
 	adds r0, #0x2c
 	adds r0, r1, r0
-	ldr r2, _0809F7A4 @ =0x08740978
+	ldr r2, _0809F7A4 @ =0x08740978 (sSaXCloseUpAnimFrames+0x60)
 	str r2, [r0]
 	adds r3, #0x30
 	adds r1, r1, r3
@@ -3140,7 +3140,7 @@ _0809F7AC:
 	adds r0, r3, #0
 	adds r0, #0x2c
 	adds r0, r1, r0
-	ldr r2, _0809F7E4 @ =0x08740978
+	ldr r2, _0809F7E4 @ =0x08740978 (sSaXCloseUpAnimFrames+0x60)
 	str r2, [r0]
 	adds r3, #0x30
 	adds r1, r1, r3
@@ -3219,7 +3219,7 @@ _0809F858:
 	adds r0, r5, #0
 	adds r0, #0x2c
 	adds r0, r1, r0
-	ldr r2, _0809F878 @ =0x087409A0
+	ldr r2, _0809F878 @ =0x087409A0 (sSaXCloseUpAnimFrames+0x88)
 	b _0809F8A0
 	.align 2, 0
 _0809F878: .4byte sSaXCloseUpDurations+0xC784
@@ -3242,7 +3242,7 @@ _0809F888:
 	adds r0, r5, #0
 	adds r0, #0x2c
 	adds r0, r1, r0
-	ldr r2, _0809F8B0 @ =0x08740B98
+	ldr r2, _0809F8B0 @ =0x08740B98 (sSaXCloseUpFrameData+0x150)
 _0809F8A0:
 	str r2, [r0]
 	adds r0, r5, #0
@@ -3272,7 +3272,7 @@ _0809F8B8:
 	adds r0, r3, #0
 	adds r0, #0x2c
 	adds r0, r1, r0
-	ldr r2, _0809F8F0 @ =0x08740978
+	ldr r2, _0809F8F0 @ =0x08740978 (sSaXCloseUpAnimFrames+0x60)
 	str r2, [r0]
 	adds r3, #0x30
 	adds r1, r1, r3
@@ -3293,7 +3293,7 @@ _0809F8F8:
 	adds r1, r5, #0
 	adds r1, #0x2c
 	adds r1, r0, r1
-	ldr r2, _0809F928 @ =0x08740B48
+	ldr r2, _0809F928 @ =0x08740B48 (sSaXCloseUpFrameData+0x100)
 	str r2, [r1]
 	adds r1, r5, #0
 	adds r1, #0x30
@@ -3487,7 +3487,7 @@ _0809FA60:
 	bne _0809FA90
 	strb r1, [r4, #7]
 	strb r1, [r4, #6]
-	ldr r0, _0809FA8C @ =0x08740A48
+	ldr r0, _0809FA8C @ =0x08740A48 (sSaXCloseUpFrameData)
 	str r0, [r4, #0x14]
 	strb r1, [r4, #9]
 	b _0809FACC
@@ -3507,7 +3507,7 @@ _0809FAA0:
 	movs r0, #0
 	strb r0, [r4, #7]
 	strb r0, [r4, #6]
-	ldr r0, _0809FAB0 @ =0x08740A70
+	ldr r0, _0809FAB0 @ =0x08740A70 (sSaXCloseUpFrameData+0x28)
 	str r0, [r4, #0x14]
 	movs r0, #0xc8
 	strb r0, [r4, #9]
@@ -3589,7 +3589,7 @@ _0809FB38:
 	strb r0, [r1, #0xe]
 	strb r0, [r4, #7]
 	strb r0, [r4, #6]
-	ldr r0, _0809FB4C @ =0x08740B70
+	ldr r0, _0809FB4C @ =0x08740B70 (sSaXCloseUpFrameData+0x128)
 	str r0, [r4, #0x14]
 	b _0809FC48
 	.align 2, 0
@@ -3650,7 +3650,7 @@ _0809FBA2:
 	beq _0809FC82
 	strb r1, [r4, #7]
 	strb r1, [r4, #6]
-	ldr r0, _0809FBF4 @ =0x08740B70
+	ldr r0, _0809FBF4 @ =0x08740B70 (sSaXCloseUpFrameData+0x128)
 	str r0, [r4, #0x14]
 	ldr r1, _0809FBF8 @ =gNonGameplayRam
 	ldrb r0, [r1, #0xe]
@@ -3742,7 +3742,7 @@ _0809FC6C:
 	movs r1, #0
 	strb r1, [r4, #7]
 	strb r1, [r4, #6]
-	ldr r0, _0809FC8C @ =0x08740B48
+	ldr r0, _0809FC8C @ =0x08740B48 (sSaXCloseUpFrameData+0x100)
 	str r0, [r4, #0x14]
 	strb r1, [r4, #9]
 _0809FC82:
@@ -3826,7 +3826,7 @@ _0809FD0E:
 	strb r0, [r5, #0xf]
 	movs r6, #1
 _0809FD12:
-	ldr r3, _0809FD70 @ =0x0879E8A4
+	ldr r3, _0809FD70 @ =0x0879E8A4 (sBlob_79e868_79eca0+0x3C)
 	adds r2, r5, #0
 	ldrb r1, [r2, #0xd]
 	lsls r0, r1, #1
@@ -3947,7 +3947,7 @@ unk_9fddc: @ 0x0809FDDC
 	beq _0809FE58
 	movs r0, #1
 	strb r0, [r3, #0x10]
-	ldr r1, _0809FE24 @ =0x0873DBB0
+	ldr r1, _0809FE24 @ =0x0873DBB0 (sBlob_73421e_prefix+0x9992)
 	ldr r0, _0809FE28 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -3976,7 +3976,7 @@ _0809FE2C:
 	cmp r0, #0
 	beq _0809FE58
 	strb r2, [r3, #0x10]
-	ldr r1, _0809FE84 @ =0x0873DBB0
+	ldr r1, _0809FE84 @ =0x0873DBB0 (sBlob_73421e_prefix+0x9992)
 	ldr r0, _0809FE88 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -4019,7 +4019,7 @@ _0809FE94:
 	ldr r0, _0809FEA4 @ =0x000001FB
 _0809FE96:
 	bl SoundPlay
-	ldr r0, _0809FEA8 @ =0x08740B70
+	ldr r0, _0809FEA8 @ =0x08740B70 (sSaXCloseUpFrameData+0x128)
 	str r0, [r4, #0x14]
 	movs r0, #1
 	strb r0, [r4, #9]
@@ -4094,7 +4094,7 @@ unk_9ff00: @ 0x0809FF00
 	beq _0809FF7C
 	movs r0, #1
 	strb r0, [r3, #0x10]
-	ldr r1, _0809FF48 @ =0x0873DBBE
+	ldr r1, _0809FF48 @ =0x0873DBBE (sBlob_73421e_prefix+0x99A0)
 	ldr r0, _0809FF4C @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -4123,7 +4123,7 @@ _0809FF50:
 	cmp r0, #0
 	beq _0809FF7C
 	strb r2, [r3, #0x10]
-	ldr r1, _0809FFAC @ =0x0873DBBE
+	ldr r1, _0809FFAC @ =0x0873DBBE (sBlob_73421e_prefix+0x99A0)
 	ldr r0, _0809FFB0 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -4166,7 +4166,7 @@ _0809FFB8:
 	ldr r0, _0809FFC8 @ =0x000001FB
 _0809FFBA:
 	bl SoundPlay
-	ldr r0, _0809FFCC @ =0x08740B70
+	ldr r0, _0809FFCC @ =0x08740B70 (sSaXCloseUpFrameData+0x128)
 	str r0, [r4, #0x14]
 	movs r0, #1
 	strb r0, [r4, #9]
@@ -4233,7 +4233,7 @@ FileSelectProcessAudioLogos: @ 0x080A0024
 	ldrb r3, [r2, #9]
 	cmp r3, #0
 	bne _080A0078
-	ldr r0, _080A0068 @ =0x087407C0
+	ldr r0, _080A0068 @ =0x087407C0 (sBlob_73421e_prefix+0xC5A2)
 	str r0, [r2, #0x14]
 	ldr r0, _080A006C @ =gChangedInput
 	ldrh r1, [r0]
@@ -4243,7 +4243,7 @@ FileSelectProcessAudioLogos: @ 0x080A0024
 	beq _080A00DA
 	movs r0, #1
 	strb r0, [r2, #9]
-	ldr r0, _080A0070 @ =0x087407D0
+	ldr r0, _080A0070 @ =0x087407D0 (sBlob_73421e_prefix+0xC5B2)
 	str r0, [r2, #0x14]
 	strb r3, [r2, #7]
 	strb r3, [r2, #6]
@@ -4262,7 +4262,7 @@ _080A0074: .4byte 0x00000206
 _080A0078:
 	cmp r3, #1
 	bne _080A00DA
-	ldr r0, _080A00AC @ =0x087407D0
+	ldr r0, _080A00AC @ =0x087407D0 (sBlob_73421e_prefix+0xC5B2)
 	str r0, [r2, #0x14]
 	ldr r0, _080A00B0 @ =gChangedInput
 	ldrh r1, [r0]
@@ -4272,7 +4272,7 @@ _080A0078:
 	beq _080A00DA
 	movs r1, #0
 	strb r1, [r2, #9]
-	ldr r0, _080A00B4 @ =0x087407C0
+	ldr r0, _080A00B4 @ =0x087407C0 (sBlob_73421e_prefix+0xC5A2)
 	str r0, [r2, #0x14]
 	strb r1, [r2, #7]
 	strb r1, [r2, #6]
@@ -4291,7 +4291,7 @@ _080A00B8:
 	ldrb r1, [r2, #9]
 	cmp r1, #0
 	bne _080A00CC
-	ldr r0, _080A00C8 @ =0x087407E0
+	ldr r0, _080A00C8 @ =0x087407E0 (sSaXCloseUpFileSelectFrames)
 	str r0, [r2, #0x14]
 	strb r1, [r2, #7]
 	strb r1, [r2, #6]
@@ -4301,7 +4301,7 @@ _080A00C8: .4byte sSaXCloseUpDurations+0xC5C4
 _080A00CC:
 	cmp r1, #1
 	bne _080A00DA
-	ldr r0, _080A00E0 @ =0x087407F0
+	ldr r0, _080A00E0 @ =0x087407F0 (sSaXCloseUpFileSelectFrames+0x10)
 	str r0, [r2, #0x14]
 	movs r0, #0
 	strb r0, [r2, #7]
@@ -4372,7 +4372,7 @@ FileSelectProcessFileOverlay: @ 0x080A0144
 	ldrsh r0, [r1, r3]
 	cmp r0, #0
 	bne _080A015E
-	ldr r0, _080A0168 @ =0x0879E890
+	ldr r0, _080A0168 @ =0x0879E890 (sBlob_79e868_79eca0+0x28)
 	ldrb r1, [r1, #0xd]
 	lsls r1, r1, #2
 	adds r1, r1, r0
@@ -4394,7 +4394,7 @@ unk_a016c: @ 0x080A016C
 	ldrsh r3, [r1, r0]
 	cmp r3, #0
 	bne _080A01C6
-	ldr r0, _080A0194 @ =0x087408E0
+	ldr r0, _080A0194 @ =0x087408E0 (sSaXCloseUpFileSelectFrames+0x100)
 	str r0, [r2, #0x14]
 	ldrb r1, [r1, #0xd]
 	cmp r1, #2
@@ -4426,7 +4426,7 @@ _080A01A8:
 	ands r0, r1
 	cmp r0, #0
 	beq _080A01C6
-	ldr r0, _080A01C0 @ =0x087408D0
+	ldr r0, _080A01C0 @ =0x087408D0 (sSaXCloseUpFileSelectFrames+0xF0)
 	str r0, [r2, #0x14]
 	b _080A01C6
 	.align 2, 0
@@ -4464,7 +4464,7 @@ FileSelectProcessFileActionPanel: @ 0x080A01D0
 	bne _080A0266
 	strb r2, [r4, #7]
 	strb r2, [r4, #6]
-	ldr r0, _080A0200 @ =0x08740940
+	ldr r0, _080A0200 @ =0x08740940 (sSaXCloseUpAnimFrames+0x28)
 	str r0, [r4, #0x14]
 	movs r0, #1
 	strb r0, [r4, #9]
@@ -4497,7 +4497,7 @@ _080A0228:
 	movs r0, #0
 	strb r0, [r4, #7]
 	strb r0, [r4, #6]
-	ldr r0, _080A0244 @ =0x08740950
+	ldr r0, _080A0244 @ =0x08740950 (sSaXCloseUpAnimFrames+0x38)
 	str r0, [r4, #0x14]
 	movs r0, #2
 	strb r0, [r4, #9]
@@ -4546,7 +4546,7 @@ FileSelectProcessCopyFilePanel: @ 0x080A026C
 	bne _080A02FE
 	strb r2, [r4, #7]
 	strb r2, [r4, #6]
-	ldr r0, _080A029C @ =0x087409A0
+	ldr r0, _080A029C @ =0x087409A0 (sSaXCloseUpAnimFrames+0x88)
 	str r0, [r4, #0x14]
 	movs r0, #1
 	strb r0, [r4, #9]
@@ -4577,7 +4577,7 @@ _080A02C0:
 	movs r0, #0
 	strb r0, [r4, #7]
 	strb r0, [r4, #6]
-	ldr r0, _080A02DC @ =0x087409B0
+	ldr r0, _080A02DC @ =0x087409B0 (sSaXCloseUpAnimFrames+0x98)
 	str r0, [r4, #0x14]
 	movs r0, #2
 	strb r0, [r4, #9]
@@ -4626,7 +4626,7 @@ FileSelectProcessEraseFilePanel: @ 0x080A0304
 	bne _080A0396
 	strb r2, [r4, #7]
 	strb r2, [r4, #6]
-	ldr r0, _080A0334 @ =0x087409A0
+	ldr r0, _080A0334 @ =0x087409A0 (sSaXCloseUpAnimFrames+0x88)
 	str r0, [r4, #0x14]
 	movs r0, #1
 	strb r0, [r4, #9]
@@ -4657,7 +4657,7 @@ _080A0358:
 	movs r0, #0
 	strb r0, [r4, #7]
 	strb r0, [r4, #6]
-	ldr r0, _080A0374 @ =0x087409B0
+	ldr r0, _080A0374 @ =0x087409B0 (sSaXCloseUpAnimFrames+0x98)
 	str r0, [r4, #0x14]
 	movs r0, #2
 	strb r0, [r4, #9]
@@ -4706,7 +4706,7 @@ unk_a039c: @ 0x080A039C
 	bne _080A041E
 	strb r2, [r4, #7]
 	strb r2, [r4, #6]
-	ldr r0, _080A03CC @ =0x087409A0
+	ldr r0, _080A03CC @ =0x087409A0 (sSaXCloseUpAnimFrames+0x88)
 	str r0, [r4, #0x14]
 	movs r0, #1
 	strb r0, [r4, #9]
@@ -4726,7 +4726,7 @@ _080A03D0:
 	movs r0, #0
 	strb r0, [r4, #7]
 	strb r0, [r4, #6]
-	ldr r0, _080A03FC @ =0x087409B0
+	ldr r0, _080A03FC @ =0x087409B0 (sSaXCloseUpAnimFrames+0x98)
 	str r0, [r4, #0x14]
 	movs r0, #2
 	strb r0, [r4, #9]
@@ -4821,7 +4821,7 @@ _080A047A:
 	ldrb r0, [r0, #0x10]
 	cmp r0, #0
 	bne _080A04B8
-	ldr r0, _080A04B4 @ =0x08740B70
+	ldr r0, _080A04B4 @ =0x08740B70 (sSaXCloseUpFrameData+0x128)
 	str r0, [r4, #0x14]
 	b _080A04EE
 	.align 2, 0
@@ -4829,7 +4829,7 @@ _080A04AC: .4byte gChangedInput
 _080A04B0: .4byte gNonGameplayRam
 _080A04B4: .4byte sSaXCloseUpDurations+0xC954
 _080A04B8:
-	ldr r0, _080A04C0 @ =0x08740B70
+	ldr r0, _080A04C0 @ =0x08740B70 (sSaXCloseUpFrameData+0x128)
 	str r0, [r4, #0x14]
 	b _080A04EE
 	.align 2, 0
@@ -4991,7 +4991,7 @@ _080A05B0:
 	str r1, [r0, #4]
 	str r2, [r0, #8]
 	ldr r0, [r0, #8]
-	ldr r1, _080A0624 @ =0x0879EC84
+	ldr r1, _080A0624 @ =0x0879EC84 (sBlob_79e868_79eca0+0x41C)
 	ldr r0, _080A0628 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -5135,7 +5135,7 @@ _080A0694:
 	ldr r4, _080A07FC @ =0x84000008
 	movs r2, #0x80
 	lsls r2, r2, #3
-	ldr r5, _080A0800 @ =0x08682FAC
+	ldr r5, _080A0800 @ =0x08682FAC (sCharactersGfx)
 _080A0710:
 	lsls r0, r6, #2
 	add r0, sp
@@ -5209,7 +5209,7 @@ _080A0710:
 	bge _080A07D2
 	adds r2, r5, #0
 	mov r4, r8
-	ldr r0, _080A0808 @ =0x0873DB64
+	ldr r0, _080A0808 @ =0x0873DB64 (sBlob_73421e_prefix+0x9946)
 	mov ip, r0
 	ldr r5, _080A07FC @ =0x84000008
 _080A07AE:
@@ -5248,7 +5248,7 @@ _080A07E2:
 	cmp r1, r0
 	bne _080A0814
 	ldr r1, _080A07F8 @ =0x040000D4
-	ldr r0, _080A0810 @ =0x0873DB04
+	ldr r0, _080A0810 @ =0x0873DB04 (sBlob_73421e_prefix+0x98E6)
 	b _080A0818
 	.align 2, 0
 _080A07F4: .4byte 0x03000011
@@ -5261,7 +5261,7 @@ _080A080C: .4byte 0xFFFFFB60
 _080A0810: .4byte sSaXCloseUpDurations+0x98E8
 _080A0814:
 	ldr r1, _080A0A18 @ =0x040000D4
-	ldr r0, _080A0A1C @ =0x0873DB44
+	ldr r0, _080A0A1C @ =0x0873DB44 (sBlob_73421e_prefix+0x9926)
 _080A0818:
 	str r0, [r1]
 	str r7, [r1, #4]
@@ -5285,7 +5285,7 @@ _080A082A:
 	mov ip, r2
 	ldr r2, _080A0A18 @ =0x040000D4
 	mov r3, r8
-	ldr r5, _080A0A28 @ =0x0873DB24
+	ldr r5, _080A0A28 @ =0x0873DB24 (sBlob_73421e_prefix+0x9906)
 	ldr r4, _080A0A20 @ =0x84000008
 _080A0846:
 	cmp r6, #0xa
@@ -5319,7 +5319,7 @@ _080A0866:
 	adds r7, r7, r0
 _080A087C:
 	ldr r1, _080A0A18 @ =0x040000D4
-	ldr r0, _080A0A2C @ =0x0873DAE4
+	ldr r0, _080A0A2C @ =0x0873DAE4 (sBlob_73421e_prefix+0x98C6)
 	str r0, [r1]
 	str r7, [r1, #4]
 	ldr r0, _080A0A20 @ =0x84000008
@@ -5343,7 +5343,7 @@ _080A088A:
 	bl DivArmMod
 	str r0, [sp, #8]
 	movs r6, #0
-	ldr r5, _080A0A30 @ =0x08682FAC
+	ldr r5, _080A0A30 @ =0x08682FAC (sCharactersGfx)
 	ldr r1, _080A0A18 @ =0x040000D4
 	ldr r4, _080A0A20 @ =0x84000008
 	movs r2, #0x80
@@ -5550,7 +5550,7 @@ FileSelectDrawText: @ 0x080A0A3C
 	adds r2, r0, #0
 	cmp r1, #0x18
 	bne _080A0A80
-	ldr r1, _080A0A78 @ =0x0879E928
+	ldr r1, _080A0A78 @ =0x0879E928 (sBlob_79e868_79eca0+0xC0)
 	ldr r0, _080A0A7C @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -5565,7 +5565,7 @@ _080A0A74: .4byte gNonGameplayRam
 _080A0A78: .4byte sMessageTextPointers+0x1B34
 _080A0A7C: .4byte 0x03000011
 _080A0A80:
-	ldr r1, _080A0AA4 @ =0x0879E928
+	ldr r1, _080A0AA4 @ =0x0879E928 (sBlob_79e868_79eca0+0xC0)
 	ldr r0, _080A0AA8 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -5908,7 +5908,7 @@ _080A0D1C:
 	adds r0, #8
 _080A0D20:
 	strh r0, [r4, #8]
-	ldr r1, _080A0D58 @ =0x0879EC68
+	ldr r1, _080A0D58 @ =0x0879EC68 (sBlob_79e868_79eca0+0x400)
 	ldr r0, _080A0D5C @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -6058,7 +6058,7 @@ _080A0E2E:
 	str r1, [r0, #4]
 	str r2, [r0, #8]
 	ldr r0, [r0, #8]
-	ldr r1, _080A0EA0 @ =0x0879EC84
+	ldr r1, _080A0EA0 @ =0x0879EC84 (sBlob_79e868_79eca0+0x41C)
 	ldr r0, _080A0EA4 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -6353,7 +6353,7 @@ _080A1090:
 	lsls r1, r1, #2
 	adds r0, #0x2c
 	adds r1, r1, r0
-	ldr r3, _080A10B4 @ =0x0879E944
+	ldr r3, _080A10B4 @ =0x0879E944 (sBlob_79e868_79eca0+0xDC)
 	ldr r0, _080A10B8 @ =0x03000011
 	movs r2, #0
 	ldrsb r2, [r0, r2]
@@ -6373,7 +6373,7 @@ _080A10BC:
 	lsls r1, r1, #2
 	adds r0, #0x2c
 	adds r1, r1, r0
-	ldr r3, _080A10E0 @ =0x0879E944
+	ldr r3, _080A10E0 @ =0x0879E944 (sBlob_79e868_79eca0+0xDC)
 	ldr r0, _080A10E4 @ =0x03000011
 	movs r2, #0
 	ldrsb r2, [r0, r2]
@@ -6393,7 +6393,7 @@ _080A10E8:
 	lsls r1, r1, #2
 	adds r0, #0x2c
 	adds r1, r1, r0
-	ldr r3, _080A110C @ =0x0879E944
+	ldr r3, _080A110C @ =0x0879E944 (sBlob_79e868_79eca0+0xDC)
 	ldr r0, _080A1110 @ =0x03000011
 	movs r2, #0
 	ldrsb r2, [r0, r2]
@@ -6413,7 +6413,7 @@ _080A1114:
 	lsls r1, r1, #2
 	adds r0, #0x2c
 	adds r1, r1, r0
-	ldr r3, _080A1138 @ =0x0879E944
+	ldr r3, _080A1138 @ =0x0879E944 (sBlob_79e868_79eca0+0xDC)
 	ldr r0, _080A113C @ =0x03000011
 	movs r2, #0
 	ldrsb r2, [r0, r2]
@@ -6433,7 +6433,7 @@ _080A1140:
 	lsls r1, r1, #2
 	adds r0, #0x2c
 	adds r1, r1, r0
-	ldr r3, _080A1164 @ =0x0879E944
+	ldr r3, _080A1164 @ =0x0879E944 (sBlob_79e868_79eca0+0xDC)
 	ldr r0, _080A1168 @ =0x03000011
 	movs r2, #0
 	ldrsb r2, [r0, r2]
@@ -6453,7 +6453,7 @@ _080A116C:
 	lsls r1, r1, #2
 	adds r0, #0x2c
 	adds r1, r1, r0
-	ldr r3, _080A1190 @ =0x0879E944
+	ldr r3, _080A1190 @ =0x0879E944 (sBlob_79e868_79eca0+0xDC)
 	ldr r0, _080A1194 @ =0x03000011
 	movs r2, #0
 	ldrsb r2, [r0, r2]
@@ -6473,7 +6473,7 @@ _080A1198:
 	lsls r1, r1, #2
 	adds r0, #0x2c
 	adds r1, r1, r0
-	ldr r3, _080A11C4 @ =0x0879E944
+	ldr r3, _080A11C4 @ =0x0879E944 (sBlob_79e868_79eca0+0xDC)
 	ldr r0, _080A11C8 @ =0x03000011
 	movs r2, #0
 	ldrsb r2, [r0, r2]
@@ -6645,7 +6645,7 @@ _080A1298:
 	lsrs r0, r0, #6
 	lsls r0, r0, #2
 	adds r1, r1, r0
-	ldr r2, _080A1310 @ =0x0873DBA4
+	ldr r2, _080A1310 @ =0x0873DBA4 (sBlob_73421e_prefix+0x9986)
 	adds r1, r1, r2
 	ldrb r0, [r1]
 	lsls r0, r0, #3
@@ -6855,8 +6855,8 @@ EndingDrawIgtAndCompletionPercentage: @ 0x080A1480
 	movs r1, #0
 	ldr r0, _080A1548 @ =gInGameTimer
 	ldrb r4, [r0]
-	ldr r7, _080A154C @ =0x0874E650
-	ldr r2, _080A1550 @ =0x0874E8D0
+	ldr r7, _080A154C @ =0x0874E650 (sBlob_74e650_74eb50)
+	ldr r2, _080A1550 @ =0x0874E8D0 (sBlob_74e650_74eb50+0x280)
 	mov ip, r2
 	ldr r5, _080A1554 @ =gNonGameplayRam
 	mov r8, r5
@@ -7122,7 +7122,7 @@ _080A1692:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A16F4 @ =0x0874DE94
+	ldr r2, _080A16F4 @ =0x0874DE94 (sBlob_74dc48_74e620+0x24C)
 	movs r0, #0x95
 	lsls r0, r0, #1
 	adds r4, r5, r0
@@ -7172,7 +7172,7 @@ _080A16F8:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A1758 @ =0x0874DF30
+	ldr r2, _080A1758 @ =0x0874DF30 (sBlob_74dc48_74e620+0x2E8)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7224,7 +7224,7 @@ _080A175C:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A17C0 @ =0x0874E020
+	ldr r2, _080A17C0 @ =0x0874E020 (sBlob_74dc48_74e620+0x3D8)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7274,7 +7274,7 @@ _080A17C4:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A1824 @ =0x0874E0E0
+	ldr r2, _080A1824 @ =0x0874E0E0 (sBlob_74dc48_74e620+0x498)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7326,7 +7326,7 @@ _080A1828:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A188C @ =0x0874E218
+	ldr r2, _080A188C @ =0x0874E218 (sBlob_74dc48_74e620+0x5D0)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7378,7 +7378,7 @@ _080A1890:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A18F4 @ =0x0874E2F0
+	ldr r2, _080A18F4 @ =0x0874E2F0 (sBlob_74dc48_74e620+0x6A8)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7428,7 +7428,7 @@ _080A18F8:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A1958 @ =0x0874E374
+	ldr r2, _080A1958 @ =0x0874E374 (sBlob_74dc48_74e620+0x72C)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7480,7 +7480,7 @@ _080A195C:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A19C0 @ =0x0874E488
+	ldr r2, _080A19C0 @ =0x0874E488 (sBlob_74dc48_74e620+0x840)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7530,7 +7530,7 @@ _080A19C4:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A1A24 @ =0x0874E53C
+	ldr r2, _080A1A24 @ =0x0874E53C (sBlob_74dc48_74e620+0x8F4)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7582,7 +7582,7 @@ _080A1A28:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A1A8C @ =0x0874DC90
+	ldr r2, _080A1A8C @ =0x0874DC90 (sBlob_74dc48_74e620+0x48)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7634,7 +7634,7 @@ _080A1A90:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A1AF4 @ =0x0874DCFC
+	ldr r2, _080A1AF4 @ =0x0874DCFC (sBlob_74dc48_74e620+0xB4)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7684,7 +7684,7 @@ _080A1AF8:
 	movs r3, #0
 	adds r5, r1, #0
 	movs r7, #0x18
-	ldr r2, _080A1B5C @ =0x0874DD80
+	ldr r2, _080A1B5C @ =0x0874DD80 (sBlob_74dc48_74e620+0x138)
 	movs r1, #0x95
 	lsls r1, r1, #1
 	adds r4, r5, r1
@@ -7759,7 +7759,7 @@ _080A1B8A:
 	lsls r1, r1, #1
 	add r1, ip
 	adds r1, r6, r1
-	ldr r5, _080A1BA0 @ =0x0874DE4C
+	ldr r5, _080A1BA0 @ =0x0874DE4C (sBlob_74dc48_74e620+0x204)
 	b _080A1BFA
 	.align 2, 0
 _080A1B9C: .4byte gNonGameplayRam
@@ -7771,7 +7771,7 @@ _080A1BA4:
 	lsls r1, r1, #1
 	add r1, ip
 	adds r1, r6, r1
-	ldr r5, _080A1BB8 @ =0x0874DFD8
+	ldr r5, _080A1BB8 @ =0x0874DFD8 (sBlob_74dc48_74e620+0x390)
 	b _080A1BFA
 	.align 2, 0
 _080A1BB4: .4byte gNonGameplayRam
@@ -7783,7 +7783,7 @@ _080A1BBC:
 	lsls r1, r1, #1
 	add r1, ip
 	adds r1, r6, r1
-	ldr r5, _080A1BD0 @ =0x0874E1D0
+	ldr r5, _080A1BD0 @ =0x0874E1D0 (sBlob_74dc48_74e620+0x588)
 	b _080A1BFA
 	.align 2, 0
 _080A1BCC: .4byte gNonGameplayRam
@@ -7795,7 +7795,7 @@ _080A1BD4:
 	lsls r1, r1, #1
 	add r1, ip
 	adds r1, r6, r1
-	ldr r5, _080A1BE8 @ =0x0874E440
+	ldr r5, _080A1BE8 @ =0x0874E440 (sBlob_74dc48_74e620+0x7F8)
 	b _080A1BFA
 	.align 2, 0
 _080A1BE4: .4byte gNonGameplayRam
@@ -7807,7 +7807,7 @@ _080A1BEC:
 	lsls r1, r1, #1
 	add r1, ip
 	adds r1, r6, r1
-	ldr r5, _080A1C80 @ =0x0874DC48
+	ldr r5, _080A1C80 @ =0x0874DC48 (sBlob_74dc48_74e620)
 _080A1BFA:
 	lsls r3, r6, #1
 	adds r4, r3, r6

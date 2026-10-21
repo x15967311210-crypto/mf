@@ -255,7 +255,7 @@ const u8 sCharacterWidths[] = {
 
 static const u8 sBlob_5766D4_prefix[0x557C] = INCBIN_U8("data/Blob_5766D4_prefix.bin");
 
-// Navigation conversation pop-up graphics descriptors (baseline 0x0857BC50).
+// Navigation conversation pop-up graphics descriptors (baseline 0x0857BC50 (sNavigationConversationPopUpGraphics)).
 // The 0x14-byte preamble describes pop-up 0; each 0x18-byte record adds the
 // pGraphics word in front of a copy of that 0x14-byte descriptor block.  Every
 // ROM pointer is resolved from the prefix blob so it follows the blob when the
@@ -333,7 +333,7 @@ const struct NavigationConversationPopUpGraphicsTable sNavigationConversationPop
             },
         },
     },
-    // Baseline word at +0x74 is 0x08577024 = sBlob_5766D4_prefix + 0x950.
+    // Baseline word at +0x74 is 0x08577024 (sBlob_5766D4_prefix+0x950) = sBlob_5766D4_prefix + 0x950.
     .id4Graphics = (const u8*)sBlob_5766D4_prefix + 0x950,
 };
 
