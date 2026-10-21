@@ -1445,12 +1445,15 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     promotion needs an ADR because `src/data` is baseline-owned
   - resolve tileset 0, bg0/dark-room handling, spawn tables, entry warp
   - fix broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1
-- [TODO] ADR-013 (design/manager) — hack-owned content tables and generated IDs
+- [DONE] ADR-013 (design/manager) — hack-owned content tables and generated IDs
   - decide the narrow engine hook/link boundary that moves rooms, doors,
     tilesets, scrolls, text, events and save IDs that hacks mutate out of
     baseline-owned `src/data` into `hack/content` + generated `hack/gen`
   - D-009 requires `hack/include/hack/ids.h` and `docs/content-tracker.md`;
     no new magic numbers may enter before the ADR lands
+  - landed as **D-013**: baseline `src/data` stays vanilla; `HACK=1` links a
+    generated hack overlay; IDs/text/tables source in `hack/content`, generated
+    into ignored `hack/gen`; one narrow AREA_TEST_1 hook only
 - [DONE] HACK-008a (tools) — YAML ID registry -> ids.h/tracker
   - source `hack/content/ids.yaml`; deterministic generator
     `tools/content/gen_ids.py --check/--write`
@@ -1462,11 +1465,16 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     PASS.  `SPRITE_ECHO_HUNTER=0xCF` is reserved for HACK-008d and requires
     extending `PSPRITE_END`/primary tables before use; text/music/save fields
     remain deliberately unallocated (typed reserved placeholders).
-- [DOING @dev25] HACK-008b (tools) — charmap text pipeline + roundtrip
+- [DONE] HACK-008b (tools) — charmap text pipeline + roundtrip
   - fill `charmap.txt` with the real MF character map; use the existing
     `tools/preproc` charmap support instead of a parallel encoder
   - compile one dialogue block to bytes and decode it back in a host test;
     add a content validator and docs
+  - landed `cbc2a70`: real `charmap.txt` for proven letters/space/controls,
+    `tools/content/text_roundtrip.py` via C `INCTEXT`, golden-path text
+    example, `content-check` round-trip; `make content-check` PASS.
+    Digits/punctuation remain deliberately unproven; text IDs stay
+    unallocated until HACK-008d.
 - [TODO] HACK-008c (tools/engine) — generated C content tables
   - emit room/door/spriteset/scroll/text/event C tables from
     `hack/content` into ignored `hack/gen`; narrow baseline hook from

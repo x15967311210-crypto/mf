@@ -165,3 +165,34 @@ overlap (or recapturing the checkpoint).
 last PASS node in `work/` (ignored), record their SHA256 and the ROM SHA1s in
 the task evidence, and recapture them after a ROM-changing fix when the old
 state no longer loads cleanly.
+
+---
+
+## D-013 — Hack content owns its tables, IDs, text and build overlay
+
+**Decision.** Baseline `src/data` stays vanilla-owned.  New hack content lives
+in `hack/content` (YAML/JSON/Tiled/text) and is generated into ignored
+`hack/gen`.  `hack/include/hack/ids.h` and `docs/content-tracker.md` are
+generated from `hack/content/ids.yaml`.  A `HACK=1` build links the generated
+content overlay; normal, shifted and reordered baseline builds remain unchanged
+and continue to serve parity gates.  Text uses `charmap.txt` plus the existing
+`tools/preproc` C `INCTEXT` path.
+
+**Reasons.** D-009 requires IDs before content, and editing baseline tables for
+every room makes vanilla parity and content changes inseparable.  A separate
+hack overlay lets M1/M2 content grow without rewriting `src/data` or silently
+changing the parity ROMs.
+
+**Implementation contract.**
+- One narrow, reviewed hook selects hack-owned AREA_TEST_1 room/door/text
+  tables when `HACK=1`; no other baseline table edits for content.
+- Generated C tables are deterministic and ignored; only source YAML/JSON,
+  `charmap.txt`, `ids.h` and the tracker are committed.
+- The golden path must be one room + one dialogue + one enemy behavior driven
+  from source, with a validator and a behavior scenario.
+- No hand-written magic IDs; unknown text characters and dangling references
+  fail the generator.
+
+**Forbids.** Hand-editing `src/data` tables to add hack rooms, items, events or
+text; committing generated `hack/gen`; using an ID without the registry;
+guessing charmap codes.
