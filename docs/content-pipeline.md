@@ -184,7 +184,7 @@ vanilla-owned, and a `HACK=1` build links an overlay that the baseline builds
 never see.  HACK-008c1 adds that build boundary with an **empty** overlay.
 
 ```sh
-make content-tables      # hack/content -> hack/gen/rooms/entry_ledge + content_tables.h
+make content-tables      # hack/content -> hack/gen/rooms/entry_ledge + content_tables.h + scroll_tables.h
 make content-tables-check
 make hack-build          # work/hack/mf_us_hack.gba (+ .elf, .map)
 make hack-sha1           # hack-build, then work/hack/mf_us_hack.sha1
@@ -206,13 +206,16 @@ build never replaces `mf_us.gba`/`mf_us.elf`/`mf_us.map`, and the baseline
 objects that a later `make` would relink are untouched.  `make`, `make
 shift-build` and `make shift-reorder` keep their normal flags and SHAs.
 
-The overlay's only baseline hook is in `src/room.c`: under `#ifdef HACK` it
-includes `hack/include/hack/content_tables.h` and uses
+The overlay has two narrow baseline hooks, one per generated header.
+`src/room.c` includes `hack/include/hack/content_tables.h` and uses
 `HACK_AREA_TEST_1_DOORS` / `HACK_AREA_TEST_1_ROOM_ENTRIES` for the
-`AREA_TEST_1` entries of `sAreaDoorPointers` / `sAreaRoomEntryPointers`.  For
-008c1 the header maps both macros to `sTest1Doors` / `sTest1RoomEntries`, so
-the hack ROM is byte-identical to the baseline and boots through the baseline
-Test Area 1 tables.
+`AREA_TEST_1` entries of `sAreaDoorPointers` / `sAreaRoomEntryPointers`.
+`src/scroll.c` includes `hack/include/hack/scroll_tables.h` and uses
+`HACK_AREA_TEST_1_SCROLLS` for the `AREA_TEST_1` entry of
+`sAreaScrollPointers` (HACK-008d1, below).  For 008c1 the content header maps
+both room macros to `sTest1Doors` / `sTest1RoomEntries`, so the hack ROM is
+byte-identical to the baseline and boots through the baseline Test Area 1
+tables.
 
 HACK-008c2 replaces those two defaults with the generated Entry Ledge room 0
 table under the ignored `hack/gen/`.  `make content-tables` runs
@@ -230,11 +233,49 @@ explicitly: without the rewrite GNU ld would load baseline `src/*.o` even
 though `hack-build` compiles private objects.  The normal/shifted/reordered
 builds use the unmodified object paths and keep their SHAs.
 
-The current table intentionally does **not** yet select hack-owned scrolls,
-text, events or music.  Test Area 1 still uses the baseline empty-scroll
-pointer, and text/event table generation belongs to the HACK-008d golden path.
-Do not add hack content directly to `src/data`, and do not commit generated
-tables.
+The current overlay intentionally does **not** yet select hack-owned text,
+events, enemy sprites, active doors or an entry warp.  Test Area 1 uses the
+generated room-entry and scroll tables described below; text/event table
+generation belongs to the HACK-008d golden path.  Do not add hack content
+directly to `src/data`, and do not commit generated tables.
+
+### Scroll tables (HACK-008d1)
+
+`make content-tables` now writes **two** generated headers under the ignored
+`hack/gen/` tree:
+
+| Header | Consumer | Contents |
+|---|---|---|
+| `content_tables.h` | `src/room.c` | bg1/bg2/clipdata RLE, spritesets, `RoomEntryRom`, doors |
+| `scroll_tables.h` | `src/scroll.c` | scroll blocks, `HackAreaScrollEnd`, `HackTest1ScrollPointers` |
+
+The split is deliberate.  Both baseline hooks would otherwise include the same
+header, and every `static const` blob in it would be emitted once per
+translation unit.  `src/room.c` includes only `content_tables.h`; `src/scroll.c`
+includes only `scroll_tables.h`, so each generated object is defined exactly
+once.  The tracked shims `hack/include/hack/content_tables.h` and
+`hack/include/hack/scroll_tables.h` keep the `#ifdef HACK` injection points
+stable and fail the build with an `#error` if the generated file is missing.
+
+The generated scroll block is byte-for-byte the converter's `scrolls.bin`:
+byte 0 is the room index, byte 1 is the record count, then `count` records of
+8 bytes in `x_start, x_end, y_start, y_end, breakable_x, breakable_y,
+extended_direction, extended_value` order.  The declaration uses
+`SCROLL_DATA_SIZE(n)` (`2 + 8*n`).  `HackTest1ScrollPointers` lists one block
+per room and ends with `HackAreaScrollEnd` (`0xFF`), matching the
+`ScrollLoad()` scan (`**ppSrc == gCurrentRoom`, stop on `UCHAR_MAX`).
+
+`tools/content/gen_content_tables.py` validates before emitting: the file
+length is exactly `2 + 8*count`, the room-id byte equals the room index, and
+every field equals the converter manifest's `camera.scrolls` values copied into
+`room.json`.  `--write` writes both headers, `--check` fails if either is
+stale or missing, and `--self-check` exercises bad count, bad length, bad field
+and bad room-id cases plus byte-exact scroll output.
+
+Still missing for the golden path: text, events, enemy sprites, active
+door/room records and the entry warp.  This table only makes `ScrollLoad()`
+find hack-owned data for AREA_TEST_1; room-load/save behaviour is not proven by
+this work.
 
 ## Text pipeline (HACK-008b)
 

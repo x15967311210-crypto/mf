@@ -7,14 +7,24 @@ this tool turns that deterministic output into ``hack/gen/content_tables.h``.
 ``src/room.c`` includes the header through ``hack/include/hack/content_tables.h``
 under ``#ifdef HACK``, so the baseline tables in ``src/data`` are never touched.
 
-The generated header contains:
+The generated headers contain:
 
-* ``static const u8`` blobs for bg1/bg2/clipdata and the default spriteset;
-* empty bg0/bg3 blobs (no bg0 layer yet, and the engine always touches bg3);
-* ``HackTest1Doors`` -- a one-entry ``DOOR_TYPE_NONE`` terminator for 008c2
-  because the authored Entry Ledge doors target rooms outside this one-room
-  table; HACK-008d replaces it with the real pair;
-* ``HackTest1RoomEntries`` with one ``RoomEntryRom`` at index 0.
+* in ``content_tables.h``: ``static const u8`` blobs for bg1/bg2/clipdata and
+  the default spriteset; empty bg0/bg3 blobs (no bg0 layer yet, and the engine
+  always touches bg3); ``HackTest1Doors`` -- a one-entry ``DOOR_TYPE_NONE``
+  terminator for 008c2 because the authored Entry Ledge doors target rooms
+  outside this one-room table, replaced by the real pair in HACK-008d;
+  ``HackTest1RoomEntries`` with one ``RoomEntryRom`` at index 0;
+* in the sibling ``scroll_tables.h``: HACK-008d1's one
+  ``HackTest1Room<N>Scrolls[SCROLL_DATA_SIZE(n)]`` per room (byte-exact with
+  the converter's ``scrolls.bin``), the generated ``HackAreaScrollEnd``
+  terminator, the ``HackTest1ScrollPointers`` scan list and the
+  ``HACK_AREA_TEST_1_SCROLLS`` macro that ``src/scroll.c`` selects.
+
+The split matters: ``src/room.c`` includes only ``content_tables.h`` and
+``src/scroll.c`` includes only ``scroll_tables.h``, so every generated object is
+defined in exactly one translation unit.  A single shared header would emit
+duplicate ``static const`` copies in both objects.
 
 The generator validates the converter output instead of trusting it:
 
@@ -24,6 +34,9 @@ The generator validates the converter output instead of trusting it:
   doors when active doors are requested;
 * spriteset records match their ``.bin`` payload, including the FF FF FF
   terminator;
+* the scroll block is ``2 + 8*n`` bytes, its first byte is the room index, and
+  every record matches the converter manifest's ``camera.scrolls`` values
+  copied into ``room.json`` (bounds, breakable block, extended bound);
 * room indices are contiguous from 0 and every emitted C constant exists in a
   project header.
 
@@ -34,9 +47,11 @@ Usage::
     python3 tools/content/gen_content_tables.py --self-check
 
 ``--write``/``--check`` default to ``hack/gen/rooms/entry_ledge`` and
-``hack/gen/content_tables.h``.  ``--room-dir`` may be repeated; the default door
-mode suppresses active doors.  ``--active-doors`` is the HACK-008d path and is
-exercised by ``--self-check`` only.
+``hack/gen/content_tables.h``; the scroll-only sibling
+``hack/gen/scroll_tables.h`` is always derived from ``--out``.  ``--room-dir``
+may be repeated; the default door mode suppresses active doors.
+``--active-doors`` is the HACK-008d path and is exercised by ``--self-check``
+only.
 
 The tool is standard-library Python only, deterministic and free of timestamps,
 absolute paths and hardcoded ROM addresses.
@@ -67,6 +82,9 @@ PIXEL_PER_BLOCK = 16
 DOOR_RECORD_SIZE = 9
 SPRITESET_TERMINATOR = b"\xff\xff\xff"
 SPRITESET_RECORD_SIZE = 3
+# struct Scroll packs four u8 bounds plus four u8 breakable/extended fields.
+SCROLL_SUB_DATA_COUNT = 8
+SCROLL_TERMINATOR = b"\xff"
 
 # C constants this generator may emit.  A numeric value that is not in one of
 # these tables is an "unknown constant" and fails rather than being written as
@@ -124,6 +142,8 @@ DOOR_HIGH_SYMBOLS = {
 }
 
 HEADER_GUARD = "HACK_GEN_CONTENT_TABLES_H"
+SCROLL_HEADER_GUARD = "HACK_GEN_SCROLL_TABLES_H"
+SCROLL_HEADER_NAME = "scroll_tables.h"
 ARRAY_BYTES_PER_LINE = 12
 
 
@@ -611,7 +631,7 @@ def _load_scrolls(
         raise ContentError(
             f"$.scrolls: {count} record(s); gCurrentScrolls has two slots"
         )
-    if len(data) != 2 + 8 * count:
+    if len(data) != 2 + SCROLL_SUB_DATA_COUNT * count:
         raise ContentError(
             f"$.scrolls: bad counter: {len(data)} bytes for {count} record(s)"
         )
@@ -631,7 +651,7 @@ def _load_scrolls(
         y_end = as_int(record.get("y_end"), f"{path}.y_end", 0, height - 1)
         if x_start > x_end or y_start > y_end:
             raise ContentError(f"{path}: reversed scroll bounds")
-        offset = 2 + i * 8
+        offset = 2 + i * SCROLL_SUB_DATA_COUNT
         packed = list(data[offset : offset + 8])
         expected = [
             x_start,
@@ -645,7 +665,7 @@ def _load_scrolls(
         ]
         if packed != expected:
             raise ContentError(
-                f"{path}: room.json scroll bounds do not match {filename}"
+                f"{path}: room.json camera.scrolls values do not match {filename}"
             )
     return data
 
@@ -928,6 +948,25 @@ def _format_array(lines: list[str], name: str, data: bytes, comment: str) -> Non
     lines.append("")
 
 
+def _format_scroll_array(
+    lines: list[str], name: str, data: bytes, count: int, comment: str
+) -> None:
+    if len(data) != 2 + SCROLL_SUB_DATA_COUNT * count:
+        raise ContentError(
+            f"internal error: {name} is {len(data)} bytes for {count} scroll(s)"
+        )
+    lines.append(f"/* {comment} */")
+    lines.append(
+        f"static const u8 {name}[SCROLL_DATA_SIZE({count})] = {{"
+    )
+    for offset in range(0, len(data), ARRAY_BYTES_PER_LINE):
+        chunk = data[offset : offset + ARRAY_BYTES_PER_LINE]
+        body = ", ".join(f"0x{value:02X}" for value in chunk)
+        lines.append(f"    {body},")
+    lines.append("};")
+    lines.append("")
+
+
 def _format_u32_array(lines: list[str], name: str, values: Sequence[int], comment: str) -> None:
     lines.append(f"/* {comment} */")
     lines.append(f"static const u32 {name}[{len(values)}] = {{")
@@ -954,12 +993,16 @@ def render_header(rooms: Sequence[RoomData], active_doors: bool) -> str:
     lines.append(" *")
     lines.append(" * Generated by tools/content/gen_content_tables.py.  DO NOT EDIT.")
     lines.append(" *")
-    lines.append(" * HACK-008c2 golden-path table:")
+    lines.append(" * HACK-008c2/HACK-008d1 golden-path tables:")
     for room in rooms:
         lines.append(
             f" *   room {room.index} {room.name!r}: {room.width}x{room.height} "
             f"blocks, tileset {room.tileset}, source {room.directory_label}"
         )
+    lines.append(
+        " *   HACK-008c2 room/door/spriteset tables only; scrolls live in the"
+    )
+    lines.append(" *   sibling generated scroll_tables.h (HACK-008d1).")
     if active_doors:
         lines.append(
             f" *   doors: {len(doors)} active record(s) + DOOR_TYPE_NONE terminator"
@@ -998,6 +1041,7 @@ def render_header(rooms: Sequence[RoomData], active_doors: bool) -> str:
     lines.append('#include "constants/room.h"')
     lines.append('#include "structs/connection.h"')
     lines.append('#include "structs/room.h"')
+    lines.append('#include "structs/scroll.h"')
     lines.append("")
 
     # Payload arrays.
@@ -1144,6 +1188,82 @@ def render_header(rooms: Sequence[RoomData], active_doors: bool) -> str:
     return "\n".join(lines)
 
 
+def render_scroll_header(rooms: Sequence[RoomData]) -> str:
+    """Render the scroll-only sibling header.
+
+    HACK-008d1 splits scrolls out of ``content_tables.h`` so that every
+    generated object is defined in exactly one translation unit: ``src/room.c``
+    includes the room/door/spriteset header and ``src/scroll.c`` includes this
+    one.  The two headers carry independent guards and never include each
+    other.
+    """
+
+    rooms = sorted(rooms, key=lambda room: room.index)
+
+    lines: list[str] = []
+    lines.append("/*")
+    lines.append(" * hack/gen/scroll_tables.h -- generated AREA_TEST_1 scroll overlay.")
+    lines.append(" *")
+    lines.append(" * Generated by tools/content/gen_content_tables.py.  DO NOT EDIT.")
+    lines.append(" *")
+    lines.append(" * HACK-008d1: scroll material only, included by src/scroll.c.")
+    lines.append(" * Keeping it out of content_tables.h means src/room.c and")
+    lines.append(" * src/scroll.c each define their own generated objects exactly once.")
+    lines.append(" *")
+    for room in rooms:
+        lines.append(
+            f" *   room {room.index} {room.name!r}: {room.scrolls[1]} scroll "
+            f"record(s), source {room.directory_label}"
+        )
+    lines.append(" *")
+    lines.append(" * The generated file is ignored by Git; `make content-tables`")
+    lines.append(" * (a prerequisite of `make hack-build` and `make content-check`)")
+    lines.append(" * regenerates and checks it.")
+    lines.append(" */")
+    lines.append(f"#ifndef {SCROLL_HEADER_GUARD}")
+    lines.append(f"#define {SCROLL_HEADER_GUARD}")
+    lines.append("")
+    lines.append('#include "types.h"')
+    lines.append('#include "structs/scroll.h"')
+    lines.append("")
+
+    for room in rooms:
+        prefix = f"HackTest1Room{room.index}"
+        _format_scroll_array(
+            lines,
+            f"{prefix}Scrolls",
+            room.scrolls,
+            room.scrolls[1],
+            f"Room {room.index} scrolls: byte-for-byte scrolls.bin "
+            f"({room.scrolls[1]} record(s)).",
+        )
+
+    # ScrollLoad scans this list with **ppSrc, comparing the first byte with
+    # gCurrentRoom and stopping at a 0xFF block.  The terminator is generated
+    # here because sScroll_Empty is static in src/scroll.c.
+    _format_array(
+        lines,
+        "HackAreaScrollEnd",
+        SCROLL_TERMINATOR,
+        "Scroll list terminator; first byte UCHAR_MAX.",
+    )
+    lines.append(
+        "/* AREA_TEST_1 scroll scan list; ScrollLoad stops at HackAreaScrollEnd. */"
+    )
+    lines.append("static const u8* HackTest1ScrollPointers[] = {")
+    for room in rooms:
+        lines.append(f"    HackTest1Room{room.index}Scrolls,")
+    lines.append("    HackAreaScrollEnd,")
+    lines.append("};")
+    lines.append("")
+    lines.append("#define HACK_AREA_TEST_1_SCROLLS HackTest1ScrollPointers")
+    lines.append("")
+    lines.append(f"#endif /* {SCROLL_HEADER_GUARD} */")
+    lines.append("")
+
+    return "\n".join(lines)
+
+
 def _join_ints(values: Sequence[int]) -> str:
     if not values:
         return "none"
@@ -1184,10 +1304,25 @@ def _verify_header_symbols(symbols: Iterable[str]) -> None:
             )
 
 
-def build_header(room_dirs: Sequence[Path], active_doors: bool) -> str:
+def _load_rooms(room_dirs: Sequence[Path]) -> list[RoomData]:
     rooms = [load_room(Path(directory)) for directory in room_dirs]
     validate_room_set(rooms)
-    return render_header(rooms, active_doors)
+    return rooms
+
+
+def build_tables(
+    room_dirs: Sequence[Path], active_doors: bool
+) -> tuple[str, str]:
+    rooms = _load_rooms(room_dirs)
+    return render_header(rooms, active_doors), render_scroll_header(rooms)
+
+
+def build_header(room_dirs: Sequence[Path], active_doors: bool) -> str:
+    return build_tables(room_dirs, active_doors)[0]
+
+
+def build_scroll_header(room_dirs: Sequence[Path], active_doors: bool) -> str:
+    return build_tables(room_dirs, active_doors)[1]
 
 
 # ---------------------------------------------------------------------------
@@ -1459,6 +1594,28 @@ def _expect_error(callback: Callable[[], Any], needle: str) -> None:
     raise ContentError(f"self-check: expected an error containing {needle!r}")
 
 
+def _rewrite_scrolls(directory: Path, data: bytes) -> None:
+    """Replace scrolls.bin and keep the manifest byte count in sync."""
+
+    (directory / "scrolls.bin").write_bytes(data)
+    doc = load_json(directory / "room.json", "room.json")
+    doc["outputs"]["scrolls"]["bytes"] = len(data)
+    if "bytes" in doc.get("scrolls", {}):
+        doc["scrolls"]["bytes"] = len(data)
+    _write_json(directory / "room.json", doc)
+
+
+def _generated_array_bytes(header: str, name: str) -> bytes:
+    pattern = re.compile(
+        r"static const u8 " + re.escape(name) + r"\[[^\]]*\] = \{\n(.*?)\n\};",
+        re.DOTALL,
+    )
+    match = pattern.search(header)
+    if match is None:
+        raise ContentError(f"self-check: generated header lacks array {name!r}")
+    return bytes(int(value, 16) for value in re.findall(r"0x([0-9A-F]{2})", match.group(1)))
+
+
 def self_check() -> None:
     with tempfile.TemporaryDirectory(prefix="mf-content-tables-") as temp:
         root = Path(temp)
@@ -1467,10 +1624,10 @@ def self_check() -> None:
             root, index=1, name="synthetic_next", door=(2, 1, 0)
         )
 
-        # Deterministic single-room no-door output.
-        first = build_header([room0], active_doors=False)
-        second = build_header([room0], active_doors=False)
-        if first != second:
+        # Deterministic single-room no-door output, for both headers.
+        first, first_scrolls = build_tables([room0], active_doors=False)
+        second, second_scrolls = build_tables([room0], active_doors=False)
+        if (first, first_scrolls) != (second, second_scrolls):
             raise ContentError("self-check: generation is not deterministic")
         for needle in (
             "HackTest1Doors",
@@ -1480,9 +1637,38 @@ def self_check() -> None:
         ):
             if needle not in first:
                 raise ContentError(f"self-check: generated header lacks {needle!r}")
+        for needle in (
+            "HackTest1Room0Scrolls",
+            "SCROLL_DATA_SIZE(1)",
+            "HackAreaScrollEnd",
+            "HackTest1ScrollPointers",
+            "#define HACK_AREA_TEST_1_SCROLLS HackTest1ScrollPointers",
+        ):
+            if needle not in first_scrolls:
+                raise ContentError(
+                    f"self-check: scroll header lacks {needle!r}"
+                )
+        # The split must be complete: scroll objects may not appear twice.
+        for symbol in (
+            "HackTest1Room0Scrolls",
+            "HackAreaScrollEnd",
+            "HackTest1ScrollPointers",
+        ):
+            if symbol in first:
+                raise ContentError(
+                    f"self-check: content header still defines {symbol!r}"
+                )
+        if _generated_array_bytes(first_scrolls, "HackTest1Room0Scrolls") != (
+            room0 / "scrolls.bin"
+        ).read_bytes():
+            raise ContentError(
+                "self-check: HackTest1Room0Scrolls is not byte-exact with scrolls.bin"
+            )
+        if _generated_array_bytes(first_scrolls, "HackAreaScrollEnd") != SCROLL_TERMINATOR:
+            raise ContentError("self-check: the generated scroll terminator is not FF")
 
         # Active-door path (HACK-008d shape): two rooms, reciprocal doors.
-        active = build_header([room0, room1], active_doors=True)
+        active, active_scrolls = build_tables([room0, room1], active_doors=True)
         for needle in (
             ".dstDoor = 1,",
             ".dstDoor = 0,",
@@ -1493,16 +1679,37 @@ def self_check() -> None:
                 raise ContentError(
                     f"self-check: active door header lacks {needle!r}"
                 )
+        if (
+            "    HackTest1Room0Scrolls,\n    HackTest1Room1Scrolls,\n"
+            "    HackAreaScrollEnd,\n"
+        ) not in active_scrolls:
+            raise ContentError(
+                "self-check: scroll pointer list is not in room-index order"
+            )
 
-        # Freshness check.
+        # Freshness check: both files must be written and checked independently.
         header_path = root / "content_tables.h"
+        scroll_path = root / SCROLL_HEADER_NAME
         if not write_header(header_path, first):
             raise ContentError("self-check: first write reported no change")
+        if not write_header(scroll_path, first_scrolls):
+            raise ContentError("self-check: first scroll write reported no change")
         check_header(header_path, first)
+        check_header(scroll_path, first_scrolls)
         if write_header(header_path, first):
             raise ContentError("self-check: identical write rewrote the file")
+        if write_header(scroll_path, first_scrolls):
+            raise ContentError("self-check: identical write rewrote the scroll file")
         header_path.write_text(first + "\n", encoding="utf-8")
         _expect_error(lambda: check_header(header_path, first), "stale")
+        check_header(scroll_path, first_scrolls)
+        header_path.write_text(first, encoding="utf-8")
+        scroll_path.write_text(first_scrolls + "\n", encoding="utf-8")
+        _expect_error(lambda: check_header(scroll_path, first_scrolls), "stale")
+        scroll_path.unlink()
+        _expect_error(
+            lambda: check_header(scroll_path, first_scrolls), "missing"
+        )
 
         # Missing file.
         missing_root = root / "missing"
@@ -1529,6 +1736,53 @@ def self_check() -> None:
         _expect_error(
             lambda: build_header([counter_room], active_doors=False),
             "bad counter",
+        )
+
+        # Bad scroll record count: byte 1 says two records, length says one.
+        scroll_count_root = root / "scroll_count"
+        scroll_count_root.mkdir()
+        scroll_count_room = _synthetic_room(scroll_count_root)
+        scroll_data = bytearray((scroll_count_room / "scrolls.bin").read_bytes())
+        scroll_data[1] = 2
+        _rewrite_scrolls(scroll_count_room, bytes(scroll_data))
+        _expect_error(
+            lambda: build_header([scroll_count_room], active_doors=False),
+            "10 bytes for 2 record(s)",
+        )
+
+        # Bad scroll block length: one trailing byte with the manifest updated.
+        scroll_length_root = root / "scroll_length"
+        scroll_length_root.mkdir()
+        scroll_length_room = _synthetic_room(scroll_length_root)
+        scroll_data = (scroll_length_room / "scrolls.bin").read_bytes() + b"\x00"
+        _rewrite_scrolls(scroll_length_room, scroll_data)
+        _expect_error(
+            lambda: build_header([scroll_length_room], active_doors=False),
+            "11 bytes for 1 record(s)",
+        )
+
+        # Bad scroll field: the .bin x_end no longer matches camera.scrolls.
+        scroll_field_root = root / "scroll_field"
+        scroll_field_root.mkdir()
+        scroll_field_room = _synthetic_room(scroll_field_root)
+        scroll_data = bytearray((scroll_field_room / "scrolls.bin").read_bytes())
+        scroll_data[3] = 0
+        _rewrite_scrolls(scroll_field_room, bytes(scroll_data))
+        _expect_error(
+            lambda: build_header([scroll_field_room], active_doors=False),
+            "camera.scrolls values do not match",
+        )
+
+        # Bad room-id byte in the scroll block.
+        scroll_room_root = root / "scroll_room"
+        scroll_room_root.mkdir()
+        scroll_room_room = _synthetic_room(scroll_room_root)
+        scroll_data = bytearray((scroll_room_room / "scrolls.bin").read_bytes())
+        scroll_data[0] = 9
+        _rewrite_scrolls(scroll_room_room, bytes(scroll_data))
+        _expect_error(
+            lambda: build_header([scroll_room_room], active_doors=False),
+            "room index 9 does not match room 0",
         )
 
         # Dangling room reference: index must be contiguous from 0.
@@ -1587,7 +1841,10 @@ def self_check() -> None:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Generate hack/gen/content_tables.h from converted rooms."
+        description=(
+            "Generate hack/gen/content_tables.h and its scroll-only sibling "
+            "hack/gen/scroll_tables.h from converted rooms."
+        )
     )
     parser.add_argument(
         "--room-dir",
@@ -1599,7 +1856,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--out",
         default=DEFAULT_OUT,
-        help=f"generated header path (default {DEFAULT_OUT})",
+        help=(
+            f"generated room/door/spriteset header path (default {DEFAULT_OUT}); "
+            f"the scroll-only sibling {SCROLL_HEADER_NAME} is written beside it"
+        ),
     )
     parser.add_argument(
         "--active-doors",
@@ -1607,8 +1867,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="emit active door records (HACK-008d); default is a terminator only",
     )
     mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--write", action="store_true", help="write the header")
-    mode.add_argument("--check", action="store_true", help="fail if stale")
+    mode.add_argument("--write", action="store_true", help="write both headers")
+    mode.add_argument("--check", action="store_true", help="fail if either is stale")
     mode.add_argument("--self-check", action="store_true", help="run the tool suite")
     args = parser.parse_args(argv)
 
@@ -1622,16 +1882,24 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     room_dirs = [Path(path) for path in (args.room_dir or DEFAULT_ROOM_DIRS)]
     out = Path(args.out)
+    scroll_out = out.with_name(SCROLL_HEADER_NAME)
     try:
-        content = build_header(room_dirs, args.active_doors)
+        content, scrolls = build_tables(room_dirs, args.active_doors)
         if args.write:
             changed = write_header(out, content)
             state = "wrote" if changed else "unchanged"
             print(f"CONTENT-TABLES: {state} {display_path(out)}")
+            changed = write_header(scroll_out, scrolls)
+            state = "wrote" if changed else "unchanged"
+            print(f"CONTENT-TABLES: {state} {display_path(scroll_out)}")
             print("CONTENT-TABLES: PASS")
         else:
             check_header(out, content)
-            print(f"CONTENT-TABLES: PASS ({display_path(out)} is fresh)")
+            check_header(scroll_out, scrolls)
+            print(
+                f"CONTENT-TABLES: PASS ({display_path(out)} and "
+                f"{display_path(scroll_out)} are fresh)"
+            )
     except ContentError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2

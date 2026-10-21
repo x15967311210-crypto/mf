@@ -27,6 +27,18 @@
 #include "structs/samus.h"
 #include "structs/screen_shake.h"
 
+// HACK-008d1 / D-013: AREA_TEST_1 is the scroll-table hook.  Under HACK=1 the
+// scroll overlay header owns the generated scroll blocks and their
+// 0xFF-terminated scan list; baseline builds keep the empty baseline scroll
+// pointer.  Together with src/room.c this is one of the two narrow `#ifdef
+// HACK` hooks in baseline code.
+#ifdef HACK
+#include "hack/scroll_tables.h"
+#define AREA_TEST_1_SCROLLS HACK_AREA_TEST_1_SCROLLS
+#else
+#define AREA_TEST_1_SCROLLS sScrollPointer_Empty
+#endif
+
 #define SCROLL_VELOCITY_CAP BLOCK_TO_SUB_PIXEL(.75f)
 
 static const u8* sScrollPointer_Empty[] = {
@@ -198,7 +210,7 @@ static const u8** sAreaScrollPointers[AREA_END] = {
     [AREA_SECTOR_4] = sSector4Scrolls,
     [AREA_SECTOR_5] = sSector5Scrolls,
     [AREA_SECTOR_6] = sSector6Scrolls,
-    [AREA_TEST_1] = sScrollPointer_Empty,
+    [AREA_TEST_1] = AREA_TEST_1_SCROLLS,
     [AREA_TEST_2] = sScrollPointer_Empty,
     [AREA_TEST_3] = sScrollPointer_Empty
 };

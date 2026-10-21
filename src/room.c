@@ -35,10 +35,12 @@
 #include "structs/screen_shake.h"
 #include "structs/scroll.h"
 
-// HACK-008c1 / D-013: AREA_TEST_1 is the single baseline hook that lets the
-// HACK=1 overlay replace room/door tables.  The overlay header defaults to the
-// baseline tables while the overlay is empty; baseline builds do not see it.
-// This is the only `#ifdef HACK` in baseline code.
+// HACK-008c1 / D-013: AREA_TEST_1 is the room/door baseline hook that lets the
+// HACK=1 overlay replace room/door tables.  This file includes the generated
+// content_tables.h (room/door/spriteset tables); src/scroll.c includes the
+// sibling scroll_tables.h.  Baseline builds do not see either header.
+// Together with src/scroll.c this is one of the two narrow `#ifdef HACK` hooks
+// in baseline code.
 #ifdef HACK
 #include "hack/content_tables.h"
 #define AREA_TEST_1_DOORS HACK_AREA_TEST_1_DOORS
