@@ -348,7 +348,9 @@ def parse_c_enum(header: Path, start_pattern: str) -> dict[str, int]:
         text = header.read_text(encoding="utf-8")
     except OSError:
         return {}
-    match = re.search(start_pattern + r"\s*\{(.*?)\n\};", text, re.S)
+    # Stop at the closing brace, not at "};": the hack registry uses
+    # "typedef enum HackSpriteId { ... } HackSpriteId;".
+    match = re.search(start_pattern + r"\s*\{(.*?)\n\}", text, re.S)
     if not match:
         return {}
     body = re.sub(r"/\*.*?\*/", "", match.group(1), flags=re.S)
@@ -388,10 +390,20 @@ def load_clipdata_names() -> dict[str, int]:
 
 
 def load_sprite_ids() -> dict[str, int]:
-    return parse_c_enum(
+    table = parse_c_enum(
         REPO_ROOT / "include/constants/sprite.h",
         r"enum PrimarySpriteId",
     )
+    # HACK-008d3: hack-owned primary sprite IDs (SPRITE_ECHO_HUNTER = 0xCF)
+    # live in the overlay registry, past the vanilla PSPRITE_END.  Merging them
+    # here also raises the accepted maximum id for spriteset tables/records.
+    table.update(
+        parse_c_enum(
+            REPO_ROOT / "hack/include/hack/ids.h",
+            r"enum HackSpriteId",
+        )
+    )
+    return table
 
 
 # ---------------------------------------------------------------------------

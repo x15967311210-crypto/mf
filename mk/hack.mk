@@ -51,6 +51,8 @@ HACK_TABLES ?= hack/gen/content_tables.h
 HACK_SCROLL_TABLES ?= $(patsubst %content_tables.h,%scroll_tables.h,$(HACK_TABLES))
 # HACK-008d2: per-area message-banner text table from hack/content/text.
 HACK_TEXT_TABLES ?= hack/gen/text_tables.h
+# HACK-008d3: per-room (spriteId, gfxSlot) spriteset tables, beside HACK_TABLES.
+HACK_SPRITE_TABLES ?= $(patsubst %content_tables.h,%sprite_tables.h,$(HACK_TABLES))
 
 # Objects for the private tree.  The split mirrors ASMSRC: C sources are
 # preprocessed/compiled there, while checked-in .s files are assembled from
@@ -84,6 +86,8 @@ $(OBJ_DIR)/src/scroll.s: $(HACK_SCROLL_TABLES)
 $(OBJ_DIR)/src/scroll.o: $(OBJ_DIR)/src/scroll.s $(HACK_SCROLL_TABLES)
 $(OBJ_DIR)/src/text.s: $(HACK_TEXT_TABLES)
 $(OBJ_DIR)/src/text.o: $(OBJ_DIR)/src/text.s $(HACK_TEXT_TABLES)
+$(OBJ_DIR)/src/sprite.s: $(HACK_SPRITE_TABLES)
+$(OBJ_DIR)/src/sprite.o: $(OBJ_DIR)/src/sprite.s $(HACK_SPRITE_TABLES)
 
 # Same per-file optimisation overrides as the baseline build (Makefile).
 $(OBJ_DIR)/src/dma.s: CFLAGS = -O1 -mthumb-interwork -fhex-asm
@@ -115,9 +119,11 @@ content-tables:
 		--room-dir $(HACK_ROOM_DIR) --out $(HACK_TABLES) --write
 	$(PYTHON) tools/content/gen_text_tables.py \
 		--out $(HACK_TEXT_TABLES) --write
+# gen_content_tables.py writes content_tables.h, scroll_tables.h and
+# sprite_tables.h together; HACK_SPRITE_TABLES must match that sibling path.
 
-# --check verifies $(HACK_TABLES), the sibling scroll header derived from it and
-# the HACK-008d2 text table.
+# --check verifies $(HACK_TABLES), its scroll and sprite siblings, and the
+# HACK-008d2 text table.
 content-tables-check:
 	$(PYTHON) tools/content/gen_content_tables.py \
 		--room-dir $(HACK_ROOM_DIR) --out $(HACK_TABLES) --check

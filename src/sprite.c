@@ -13,6 +13,35 @@
 #include "structs/sprite_debris.h"
 #include "structs/room.h"
 
+// HACK-008d3 / D-013: AREA_TEST_1 spritesets and the Echo Hunter id live in
+// the hack overlay.  The vanilla tables/ids below are unchanged; the hooks only
+// choose the generated table for one area and map 0xCF to a baseline sprite's
+// data so no baseline array is indexed past PSPRITE_END.
+#ifdef HACK
+#include "hack/ids.h"
+#include "hack/sprite_tables.h"
+#endif
+
+#ifdef HACK
+static u8 SpriteHackProxyId(u8 spriteId)
+{
+    if (spriteId == SPRITE_ECHO_HUNTER)
+        return PSPRITE_HORNOAD;
+
+    return spriteId;
+}
+
+// HACK-008d3: the room entry cannot name a generated spriteset, so select the
+// AREA_TEST_1 table here.  The non-HACK expansion is the original expression
+// verbatim, keeping the baseline ROM byte-identical.
+#define SPRITESET_TABLE(index) \
+    ((gCurrentArea == AREA_TEST_1 && gCurrentRoom < HACK_AREA_TEST_1_ROOM_COUNT) \
+        ? HACK_AREA_TEST_1_DEFAULT_SPRITESETS[gCurrentRoom] \
+        : sSpritesetPointers[index])
+#else
+#define SPRITESET_TABLE(index) sSpritesetPointers[index]
+#endif
+
 /**
  * @brief e7a8 | 40 | Updates the sprite random number
  * 
@@ -855,8 +884,8 @@ void SpriteLoadSpriteset(void)
     for (j = 0, i = 0; i < MAX_AMOUNT_OF_SPRITE_TYPES; i++)
     {
         // Get sprite id and graphics slot
-        spriteId = sSpritesetPointers[spriteset][j * 2 + 0];
-        gfxSlot = sSpritesetPointers[spriteset][j * 2 + 1];
+        spriteId = SPRITESET_TABLE(spriteset)[j * 2 + 0];
+        gfxSlot = SPRITESET_TABLE(spriteset)[j * 2 + 1];
 
         j++;
 
@@ -878,6 +907,10 @@ void SpriteLoadSpriteset(void)
         if (gfxSlot == 8)
             continue;
 
+#ifdef HACK
+        // The Echo Hunter has no baseline gfx/pal entry; use Hornoad's.
+        spriteId = SpriteHackProxyId(spriteId);
+#endif
         spriteId -= 0x10;
 
         // Load graphics
@@ -897,6 +930,9 @@ void SpriteLoadSpriteset(void)
  */
 void SpriteLoadGfx(u8 spriteId, u8 gfxRow, u8 srcOffset)
 {
+#ifdef HACK
+    spriteId = SpriteHackProxyId(spriteId);
+#endif
     spriteId -= 0x10;
     
     DMA3_COPY_16(sSpritesGraphicsPointers[spriteId] + srcOffset * 0x200, VRAM_BASE + 0x14000 + gfxRow * 0x800 + srcOffset * 0x200, 0x200 / 2);
@@ -911,6 +947,9 @@ void SpriteLoadGfx(u8 spriteId, u8 gfxRow, u8 srcOffset)
  */
 void SpriteLoadPal(u8 spriteId, u8 gfxRow, u8 length)
 {
+#ifdef HACK
+    spriteId = SpriteHackProxyId(spriteId);
+#endif
     spriteId -= 0x10;
 
     DMA3_COPY_16(sSpritesPalettePointers[spriteId], PALRAM_OBJ + 0x100 + gfxRow * 16 * sizeof(u16), length * 16);
@@ -1009,6 +1048,14 @@ void SpriteInitPrimary(u8 spritesetSlot, u16 yPosition, u16 xPosition, u8 roomSl
             gSpriteData[i].spritesetGfxSlot = 0;
             gSpriteData[i].spriteId = spritesetSlot - 1;
         }
+
+#ifdef HACK
+        // HACK-008d3: keep 0xCF in the generated spriteset/spawn data, but run
+        // the baseline Hornoad data for it so AI, stats, health/damage macros
+        // and projectiles never index the PSPRITE_END-sized tables at 0xCF.
+        if (gSpriteData[i].spriteId == SPRITE_ECHO_HUNTER)
+            gSpriteData[i].spriteId = PSPRITE_HORNOAD;
+#endif
 
         // Clear properties
         gSpriteData[i].properties = 0;

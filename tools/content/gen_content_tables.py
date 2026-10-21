@@ -144,6 +144,14 @@ DOOR_HIGH_SYMBOLS = {
 HEADER_GUARD = "HACK_GEN_CONTENT_TABLES_H"
 SCROLL_HEADER_GUARD = "HACK_GEN_SCROLL_TABLES_H"
 SCROLL_HEADER_NAME = "scroll_tables.h"
+SPRITE_HEADER_GUARD = "HACK_GEN_SPRITE_TABLES_H"
+SPRITE_HEADER_NAME = "sprite_tables.h"
+# HACK-008d3: gSpritesetSpriteGfxSlots masks the table slot with 7 and the
+# spriteset graphics loader uses gfxSlot * 2048 bytes, so only slots 0..7
+# exist.  Sprite ID 0x00 is PSPRITE_TARGET_CIRCLES, the table terminator.
+SPRITESET_GFX_SLOT_MAX = 7
+SPRITE_ID_MAX = 0xCF  # SPRITE_ECHO_HUNTER (hack/include/hack/ids.h)
+SPRITE_ID_TERMINATOR = 0x00
 ARRAY_BYTES_PER_LINE = 12
 
 
@@ -327,6 +335,7 @@ class RoomData:
     layers: dict[str, bytes] = field(default_factory=dict)
     doors: list[DoorRecord] = field(default_factory=list)
     spritesets: dict[str, bytes] = field(default_factory=dict)
+    spriteset_tables: dict[str, dict[int, int]] = field(default_factory=dict)
     scrolls: bytes = b""
 
 
@@ -387,13 +396,53 @@ def _load_layers(
     return result
 
 
+def _load_spriteset_table(
+    info: dict[str, Any] | None, name: str
+) -> dict[int, int]:
+    """Parse one ``spritesets.<name>.table`` slot -> sprite-ID map.
+
+    HACK-008d3 emits the default table as ``(spriteId, gfxSlot)`` pairs for
+    ``SpriteLoadSpriteset``; the engine indexes ``gSpritesetSpriteIds`` by pair
+    order, so the slots must be contiguous from 0.  Only graphics slots 0..7
+    exist in the sprite graphics loader.
+    """
+
+    if info is None:
+        return {}
+    raw = expect_object(info.get("table", {}), f"$.spritesets.{name}.table")
+    table: dict[int, int] = {}
+    for key, value in raw.items():
+        path = f"$.spritesets.{name}.table[{key!r}]"
+        try:
+            slot = int(key, 0)
+        except (TypeError, ValueError):
+            raise ContentError(f"{path}: slot key is not an integer") from None
+        if not 0 <= slot <= SPRITESET_GFX_SLOT_MAX:
+            raise ContentError(
+                f"{path}: gfx slot {slot} is outside 0..{SPRITESET_GFX_SLOT_MAX} "
+                "(SpriteLoadSpriteset addresses eight 2048-byte gfx slots)"
+            )
+        if slot in table:
+            raise ContentError(f"{path}: duplicate gfx slot {slot}")
+        sprite_id = as_int(value, path, 1, SPRITE_ID_MAX)
+        table[slot] = sprite_id
+    ordered = sorted(table)
+    if ordered != list(range(len(ordered))):
+        raise ContentError(
+            f"$.spritesets.{name}.table: gfx slots must be contiguous from 0 "
+            f"because the engine reads the pairs in order; got {ordered}"
+        )
+    return {slot: table[slot] for slot in ordered}
+
+
 def _load_spritesets(
     directory: Path, doc: dict[str, Any], width: int, height: int
-) -> dict[str, bytes]:
+) -> tuple[dict[str, bytes], dict[str, dict[int, int]]]:
     outputs = expect_object(doc.get("outputs"), "$.outputs")
     raw = doc.get("spritesets", {})
     raw = expect_object(raw, "$.spritesets")
     result: dict[str, bytes] = {}
+    tables: dict[str, dict[int, int]] = {}
     for name in ("default", "first", "second"):
         info = raw.get(name)
         out_info = outputs.get(f"spriteset_{name}")
@@ -405,9 +454,11 @@ def _load_spritesets(
             # The converter normally writes an empty FF FF FF set.  Accept a
             # missing empty set and synthesize the same terminator.
             result[name] = SPRITESET_TERMINATOR
+            tables[name] = {}
             continue
         if info is not None:
             info = expect_object(info, f"$.spritesets.{name}")
+        tables[name] = _load_spriteset_table(info, name)
         out_info = (
             expect_object(out_info, f"$.outputs.spriteset_{name}")
             if out_info is not None
@@ -483,8 +534,28 @@ def _load_spritesets(
                     )
             as_int(x, f"$.spritesets.{name}.records[{i}].x", 0, width - 1)
             as_int(y, f"$.spritesets.{name}.records[{i}].y", 0, height - 1)
+            # A table-indexed record resolves through gSpritesetSpriteIds, so
+            # the emitted table and the record must agree.  Direct records
+            # (no table-index property bits) carry their sprite ID in byte 2.
+            if byte & 0x70:
+                path = f"$.spritesets.{name}.records[{i}]"
+                slot = as_int(record.get("slot"), f"{path}.slot", 0, 0x7F)
+                sprite_id = as_int(
+                    record.get("sprite_id"), f"{path}.sprite_id", 1, SPRITE_ID_MAX
+                )
+                if slot not in tables[name]:
+                    raise ContentError(
+                        f"{path}.slot: slot {slot} is not declared in "
+                        f"$.spritesets.{name}.table"
+                    )
+                if tables[name][slot] != sprite_id:
+                    raise ContentError(
+                        f"{path}.sprite_id: {sprite_id} does not match "
+                        f"$.spritesets.{name}.table slot {slot} "
+                        f"({tables[name][slot]})"
+                    )
         result[name] = data
-    return result
+    return result, tables
 
 
 def _load_doors(
@@ -798,7 +869,7 @@ def load_room(directory: Path) -> RoomData:
 
     entry = _load_room_entry(doc, index, tileset, width, height)
     layers = _load_layers(directory, doc, width, height)
-    spritesets = _load_spritesets(directory, doc, width, height)
+    spritesets, spriteset_tables = _load_spritesets(directory, doc, width, height)
     doors = _load_doors(directory, doc, width, height, index)
     scrolls = _load_scrolls(directory, doc, width, height, index)
 
@@ -835,6 +906,7 @@ def load_room(directory: Path) -> RoomData:
         layers=layers,
         doors=doors,
         spritesets=spritesets,
+        spriteset_tables=spriteset_tables,
         scrolls=scrolls,
     )
 
@@ -1264,6 +1336,85 @@ def render_scroll_header(rooms: Sequence[RoomData]) -> str:
     return "\n".join(lines)
 
 
+def render_sprite_header(rooms: Sequence[RoomData]) -> str:
+    """Render the spriteset-only sibling header.
+
+    HACK-008d3: the room entry's ``defaultSpriteset`` is an index into the
+    vanilla ``sSpritesetPointers`` and cannot name a generated table.  This
+    header carries the hack-owned ``(spriteId, gfxSlot)`` pair tables instead;
+    ``src/sprite.c`` selects them under ``#ifdef HACK`` for AREA_TEST_1 so the
+    spawn records resolve to the ids declared in the room manifest.
+    """
+
+    rooms = sorted(rooms, key=lambda room: room.index)
+
+    lines: list[str] = []
+    lines.append("/*")
+    lines.append(" * hack/gen/sprite_tables.h -- generated AREA_TEST_1 spritesets.")
+    lines.append(" *")
+    lines.append(" * Generated by tools/content/gen_content_tables.py.  DO NOT EDIT.")
+    lines.append(" *")
+    lines.append(" * HACK-008d3: per-room default spriteset tables, included by")
+    lines.append(" * src/sprite.c.  Each table is (spriteId, gfxSlot) byte pairs")
+    lines.append(" * terminated by 0x00 0x00 (PSPRITE_TARGET_CIRCLES), exactly the")
+    lines.append(" * shape SpriteLoadSpriteset reads from sSpritesetPointers.")
+    lines.append(" *")
+    for room in rooms:
+        table = room.spriteset_tables.get("default", {})
+        lines.append(
+            f" *   room {room.index} {room.name!r}: {len(table)} sprite(s), "
+            f"gfx slots 0..{max(table) if table else 0}"
+        )
+    lines.append(" *")
+    lines.append(" * The generated file is ignored by Git; `make content-tables`")
+    lines.append(" * (a prerequisite of `make hack-build` and `make content-check`)")
+    lines.append(" * regenerates and checks it.")
+    lines.append(" */")
+    lines.append(f"#ifndef {SPRITE_HEADER_GUARD}")
+    lines.append(f"#define {SPRITE_HEADER_GUARD}")
+    lines.append("")
+    lines.append('#include "types.h"')
+    lines.append("")
+
+    for room in rooms:
+        table = room.spriteset_tables.get("default", {})
+        prefix = f"HackTest1Room{room.index}"
+        lines.append(
+            f"/* Room {room.index} default spriteset: (spriteId, gfxSlot) pairs. */"
+        )
+        lines.append(
+            f"static const u8 {prefix}DefaultSpriteset"
+            f"[{2 * (len(table) + 1)}] = {{"
+        )
+        pairs: list[int] = []
+        for slot in sorted(table):
+            pairs.extend((table[slot], slot))
+        pairs.extend((SPRITE_ID_TERMINATOR, SPRITE_ID_TERMINATOR))
+        for offset in range(0, len(pairs), 12):
+            body = ", ".join(f"0x{value:02X}" for value in pairs[offset : offset + 12])
+            lines.append(f"    {body},")
+        lines.append("};")
+        lines.append("")
+
+    lines.append("/* AREA_TEST_1 room -> default spriteset table. */")
+    lines.append(
+        "static const u8* const HackTest1DefaultSpritesets[] = {"
+    )
+    for room in rooms:
+        lines.append(f"    HackTest1Room{room.index}DefaultSpriteset,")
+    lines.append("};")
+    lines.append("")
+    lines.append("#define HACK_AREA_TEST_1_ROOM_COUNT "
+                 f"{len(rooms)}")
+    lines.append(
+        "#define HACK_AREA_TEST_1_DEFAULT_SPRITESETS HackTest1DefaultSpritesets"
+    )
+    lines.append("")
+    lines.append(f"#endif /* {SPRITE_HEADER_GUARD} */")
+    lines.append("")
+    return "\n".join(lines)
+
+
 def _join_ints(values: Sequence[int]) -> str:
     if not values:
         return "none"
@@ -1312,9 +1463,13 @@ def _load_rooms(room_dirs: Sequence[Path]) -> list[RoomData]:
 
 def build_tables(
     room_dirs: Sequence[Path], active_doors: bool
-) -> tuple[str, str]:
+) -> tuple[str, str, str]:
     rooms = _load_rooms(room_dirs)
-    return render_header(rooms, active_doors), render_scroll_header(rooms)
+    return (
+        render_header(rooms, active_doors),
+        render_scroll_header(rooms),
+        render_sprite_header(rooms),
+    )
 
 
 def build_header(room_dirs: Sequence[Path], active_doors: bool) -> str:
@@ -1323,6 +1478,10 @@ def build_header(room_dirs: Sequence[Path], active_doors: bool) -> str:
 
 def build_scroll_header(room_dirs: Sequence[Path], active_doors: bool) -> str:
     return build_tables(room_dirs, active_doors)[1]
+
+
+def build_sprite_header(room_dirs: Sequence[Path], active_doors: bool) -> str:
+    return build_tables(room_dirs, active_doors)[2]
 
 
 # ---------------------------------------------------------------------------
@@ -1551,6 +1710,7 @@ def _synthetic_room(
                 "file": "spriteset_default.bin",
                 "bytes": len(default_sprites),
                 "count": 1,
+                "table": {"0": 1},
                 "records": [
                     {
                         "id": 1,
@@ -1625,9 +1785,17 @@ def self_check() -> None:
         )
 
         # Deterministic single-room no-door output, for both headers.
-        first, first_scrolls = build_tables([room0], active_doors=False)
-        second, second_scrolls = build_tables([room0], active_doors=False)
-        if (first, first_scrolls) != (second, second_scrolls):
+        first, first_scrolls, first_sprites = build_tables(
+            [room0], active_doors=False
+        )
+        second, second_scrolls, second_sprites = build_tables(
+            [room0], active_doors=False
+        )
+        if (first, first_scrolls, first_sprites) != (
+            second,
+            second_scrolls,
+            second_sprites,
+        ):
             raise ContentError("self-check: generation is not deterministic")
         for needle in (
             "HackTest1Doors",
@@ -1667,8 +1835,36 @@ def self_check() -> None:
         if _generated_array_bytes(first_scrolls, "HackAreaScrollEnd") != SCROLL_TERMINATOR:
             raise ContentError("self-check: the generated scroll terminator is not FF")
 
+        # HACK-008d3: the spriteset header carries (spriteId, gfxSlot) pairs.
+        for needle in (
+            "HackTest1Room0DefaultSpriteset",
+            "HackTest1DefaultSpritesets",
+            "#define HACK_AREA_TEST_1_ROOM_COUNT 1",
+            "#define HACK_AREA_TEST_1_DEFAULT_SPRITESETS HackTest1DefaultSpritesets",
+        ):
+            if needle not in first_sprites:
+                raise ContentError(
+                    f"self-check: sprite header lacks {needle!r}"
+                )
+        if _generated_array_bytes(
+            first_sprites, "HackTest1Room0DefaultSpriteset"
+        ) != bytes((1, 0, 0, 0)):
+            raise ContentError(
+                "self-check: default spriteset is not the expected id/slot pairs"
+            )
+        for symbol in (
+            "HackTest1Room0DefaultSpriteset",
+            "HackTest1DefaultSpritesets",
+        ):
+            if symbol in first:
+                raise ContentError(
+                    f"self-check: content header still defines {symbol!r}"
+                )
+
         # Active-door path (HACK-008d shape): two rooms, reciprocal doors.
-        active, active_scrolls = build_tables([room0, room1], active_doors=True)
+        active, active_scrolls, _ = build_tables(
+            [room0, room1], active_doors=True
+        )
         for needle in (
             ".dstDoor = 1,",
             ".dstDoor = 0,",
@@ -1690,25 +1886,35 @@ def self_check() -> None:
         # Freshness check: both files must be written and checked independently.
         header_path = root / "content_tables.h"
         scroll_path = root / SCROLL_HEADER_NAME
+        sprite_path = root / SPRITE_HEADER_NAME
         if not write_header(header_path, first):
             raise ContentError("self-check: first write reported no change")
         if not write_header(scroll_path, first_scrolls):
             raise ContentError("self-check: first scroll write reported no change")
+        if not write_header(sprite_path, first_sprites):
+            raise ContentError("self-check: first sprite write reported no change")
         check_header(header_path, first)
         check_header(scroll_path, first_scrolls)
+        check_header(sprite_path, first_sprites)
         if write_header(header_path, first):
             raise ContentError("self-check: identical write rewrote the file")
         if write_header(scroll_path, first_scrolls):
             raise ContentError("self-check: identical write rewrote the scroll file")
+        if write_header(sprite_path, first_sprites):
+            raise ContentError("self-check: identical write rewrote the sprite file")
         header_path.write_text(first + "\n", encoding="utf-8")
         _expect_error(lambda: check_header(header_path, first), "stale")
         check_header(scroll_path, first_scrolls)
+        check_header(sprite_path, first_sprites)
         header_path.write_text(first, encoding="utf-8")
         scroll_path.write_text(first_scrolls + "\n", encoding="utf-8")
         _expect_error(lambda: check_header(scroll_path, first_scrolls), "stale")
-        scroll_path.unlink()
+        scroll_path.write_text(first_scrolls, encoding="utf-8")
+        sprite_path.write_text(first_sprites + "\n", encoding="utf-8")
+        _expect_error(lambda: check_header(sprite_path, first_sprites), "stale")
+        sprite_path.unlink()
         _expect_error(
-            lambda: check_header(scroll_path, first_scrolls), "missing"
+            lambda: check_header(sprite_path, first_sprites), "missing"
         )
 
         # Missing file.
@@ -1832,6 +2038,31 @@ def self_check() -> None:
             "terminator",
         )
 
+        # HACK-008d3: a gfx slot outside 0..7 is rejected (the engine only
+        # addresses eight 2048-byte slots).
+        slot_root = root / "sprite_slot"
+        slot_root.mkdir()
+        slot_room = _synthetic_room(slot_root)
+        slot_doc = load_json(slot_room / "room.json", "room.json")
+        slot_doc["spritesets"]["default"]["table"] = {"0": 1, "8": 1}
+        _write_json(slot_room / "room.json", slot_doc)
+        _expect_error(
+            lambda: build_header([slot_room], active_doors=False),
+            "outside 0..7",
+        )
+
+        # The emitted table and the table-indexed spawn record must agree.
+        mismatch_root = root / "sprite_mismatch"
+        mismatch_root.mkdir()
+        mismatch_room = _synthetic_room(mismatch_root)
+        mismatch_doc = load_json(mismatch_room / "room.json", "room.json")
+        mismatch_doc["spritesets"]["default"]["table"] = {"0": 2}
+        _write_json(mismatch_room / "room.json", mismatch_doc)
+        _expect_error(
+            lambda: build_header([mismatch_room], active_doors=False),
+            "does not match",
+        )
+
     print("CONTENT-TABLES: PASS (self-check)")
 
 
@@ -1858,7 +2089,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=DEFAULT_OUT,
         help=(
             f"generated room/door/spriteset header path (default {DEFAULT_OUT}); "
-            f"the scroll-only sibling {SCROLL_HEADER_NAME} is written beside it"
+            f"the scroll-only sibling {SCROLL_HEADER_NAME} and the spriteset "
+            f"sibling {SPRITE_HEADER_NAME} are written beside it"
         ),
     )
     parser.add_argument(
@@ -1883,22 +2115,30 @@ def main(argv: Sequence[str] | None = None) -> int:
     room_dirs = [Path(path) for path in (args.room_dir or DEFAULT_ROOM_DIRS)]
     out = Path(args.out)
     scroll_out = out.with_name(SCROLL_HEADER_NAME)
+    sprite_out = out.with_name(SPRITE_HEADER_NAME)
     try:
-        content, scrolls = build_tables(room_dirs, args.active_doors)
+        content, scrolls, sprites = build_tables(room_dirs, args.active_doors)
         if args.write:
-            changed = write_header(out, content)
-            state = "wrote" if changed else "unchanged"
-            print(f"CONTENT-TABLES: {state} {display_path(out)}")
-            changed = write_header(scroll_out, scrolls)
-            state = "wrote" if changed else "unchanged"
-            print(f"CONTENT-TABLES: {state} {display_path(scroll_out)}")
+            for path, text in (
+                (out, content),
+                (scroll_out, scrolls),
+                (sprite_out, sprites),
+            ):
+                changed = write_header(path, text)
+                state = "wrote" if changed else "unchanged"
+                print(f"CONTENT-TABLES: {state} {display_path(path)}")
             print("CONTENT-TABLES: PASS")
         else:
-            check_header(out, content)
-            check_header(scroll_out, scrolls)
+            for path, text in (
+                (out, content),
+                (scroll_out, scrolls),
+                (sprite_out, sprites),
+            ):
+                check_header(path, text)
             print(
-                f"CONTENT-TABLES: PASS ({display_path(out)} and "
-                f"{display_path(scroll_out)} are fresh)"
+                f"CONTENT-TABLES: PASS ({display_path(out)}, "
+                f"{display_path(scroll_out)} and {display_path(sprite_out)} "
+                "are fresh)"
             )
     except ContentError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

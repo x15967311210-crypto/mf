@@ -359,6 +359,43 @@ Known limits: the warp is HACK-only and applies to a fresh file load; normal
 door transitions, save/load persistence and the route back into Entry Ledge are
 still baseline behaviour.
 
+### Spritesets and Echo Hunter (HACK-008d3)
+
+The room entry's `defaultSpriteset` is an index into the vanilla
+`sSpritesetPointers` array, not a pointer, so the manifest's `spritesets` table
+never reached the engine: an invalid index fell back to
+`sSpritesetPointers[129]`, an empty table, and every spawn slot resolved to
+`PSPRITE_UNUSED_16` (0x10).  HACK-008d3 fixes this with one more generated
+sibling, `hack/gen/sprite_tables.h`:
+
+| Table | Contents |
+|---|---|
+| `HackTest1Room<N>DefaultSpriteset` | `(spriteId, gfxSlot)` byte pairs, `0x00 0x00` terminator |
+| `HackTest1DefaultSpritesets[]` | room-indexed pointers |
+| `HACK_AREA_TEST_1_DEFAULT_SPRITESETS` | selection macro for `src/sprite.c` |
+
+`SpriteLoadSpriteset()` uses the generated table under `#ifdef HACK` when
+`gCurrentArea == AREA_TEST_1`; all other areas keep `sSpritesetPointers`.  This
+also makes the save pad, data pad and message banner spawn with their real ids
+instead of 0x10 placeholders.
+
+`SPRITE_ECHO_HUNTER = 0xCF` sits one past the vanilla `PSPRITE_END`, so the
+baseline `sPrimarySpritesAiPointers`, `sPrimarySpriteStats` and gfx/pal/length
+arrays must not be extended (that would move symbols and change the baseline
+SHA).  Instead:
+
+- the content converter resolves `SPRITE_ECHO_HUNTER` from
+  `hack/include/hack/ids.h` and allows it in a spriteset table/record;
+- `SpriteInitPrimary()` keeps the id in `gSpritesetSpriteIds`/spawn data but
+  rewrites the stored `gSpriteData[].spriteId` to `PSPRITE_HORNOAD`, so AI,
+  stats, damage/weakness macros and projectiles use Hornoad data;
+- the spriteset graphics load and `SpriteLoadGfx`/`SpriteLoadPal` proxy 0xCF to
+  `PSPRITE_HORNOAD` before subtracting 0x10.
+
+The result is a Hornoad data clone with the Echo Hunter's id in the content
+tables.  Custom AI, animation and art are HACK-004b work, not part of this
+golden path.
+
 
 ## Text pipeline (HACK-008b)
 

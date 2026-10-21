@@ -50,7 +50,8 @@
         "2": "PSPRITE_HORNOAD",
         "3": "PSPRITE_GERON_MISSILE_1",
         "4": "PSPRITE_BOX",
-        "5": "PSPRITE_MESSAGE_BANNER"
+        "5": "PSPRITE_MESSAGE_BANNER",
+        "6": "SPRITE_ECHO_HUNTER"
       }
     },
     "room_entry": {

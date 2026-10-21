@@ -10,7 +10,7 @@
   "tilewidth": 16,
   "tileheight": 16,
   "nextlayerid": 6,
-  "nextobjectid": 103,
+  "nextobjectid": 104,
   "tilesets": [
     {
       "firstgid": 1,
@@ -698,6 +698,38 @@
               "name": "slot",
               "type": "int",
               "value": 5
+            },
+            {
+              "name": "properties",
+              "type": "string",
+              "value": "SSP_UNINFECTED_OR_BOSS"
+            }
+          ]
+        },
+        {
+          "id": 103,
+          "name": "echo_hunter",
+          "type": "",
+          "point": true,
+          "x": 192,
+          "y": 128,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "sprite_id",
+              "type": "string",
+              "value": "SPRITE_ECHO_HUNTER"
+            },
+            {
+              "name": "spriteset",
+              "type": "string",
+              "value": "default"
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "value": 6
             },
             {
               "name": "properties",
