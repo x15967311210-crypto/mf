@@ -19,8 +19,8 @@ map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
 Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
-HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1
-(ID/text/overlay/generated Entry Ledge room + scroll tables), QA-020 (native normal/shifted/
+HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2
+(ID/text/overlay/generated Entry Ledge room, scroll and message tables), QA-020 (native normal/shifted/
 reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
 `git log`.
 
@@ -1523,24 +1523,33 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     -f Makefile.shift test` (boot + 4k input), `audit`, `check_relocs` PASS
   - still missing: no active doors/entry warp, so `ScrollLoad()` with this
     table is linked but not yet exercised in a room-load scenario
-- [DOING @dev29] HACK-008d2 (tools/engine) — text ID space and hack-owned message table
-  - design fixed by the manager: `TEXT_*` IDs are global (ids.yaml), while the
-    engine lookup is per area and per `messageId` (`TextDrawMessageBanner`
-    clamps `messageId` to 21, then uses index `messageId + 21`); a strict
-    `hack/content/text/messages.json` maps `(area, message_id, text_id)` to a
-    committed INCTEXT source + literal index
-  - `tools/content/gen_text_tables.py` runs the real `tools/preproc` path
-    (reuse `text_roundtrip.py` helpers, no second encoder) and emits
-    `hack/gen/text_tables.h` with one `u16` block per message plus a
-    `[message_id]`-indexed pointer table; tracked shim
-    `hack/include/hack/text_tables.h`
-  - one narrow `#ifdef HACK` hook in `src/text.c`: only when
-    `gCurrentArea == AREA_TEST_1` and the generated slot is non-NULL, use the
-    hack block; otherwise take the unchanged vanilla `sMessageTextPointers`
-    path. No baseline table edits, no guessed charmap glyphs
-  - proof without an entry warp: generator `--self-check`/`--check`,
-    `content-check`, `hack-build`, and the linked `HackText*` words in the hack
-    ELF/ROM equal the preproc words; display in game is deferred to 008d4
+- [DONE] HACK-008d2 (tools/engine) — text ID space and hack-owned message table
+  - `TEXT_*` IDs are global (`ids.yaml`: first `TEXT_ENTRY_LEDGE_SIGNAL = 0x0`,
+    area-scoped; `gen_ids.py` now accepts `area` on text entries); the engine
+    lookup is per area and per `message_id`, which is the banner spawn's
+    `roomSlot` (spawn record index from `SpriteInitPrimary`, not the spriteset
+    slot); `TextDrawMessageBanner` clamps it at 21 and adds 21 for vanilla
+  - `hack/content/text/messages.json` (`mf-hack.text-messages/v1`) maps
+    `(area, message_id, text_id)` to a committed INCTEXT source + literal;
+    Entry Ledge's new `signal_banner` spawn (Tiled object 102, spriteset slot
+    5) is record 2, so the mapping is `message_id: 2`
+  - `tools/content/gen_text_tables.py` reuses `text_roundtrip.py`
+    (`tools/preproc`, no second encoder) and emits `hack/gen/text_tables.h`
+    with one `u16` block per TEXT id, `HACK_<AREA>_TEXT_COUNT 22` and a
+    `[message_id]` pointer list; tracked shim
+    `hack/include/hack/text_tables.h`; strict schema/registry/range/source
+    validation plus self-check negatives
+  - one narrow `#ifdef HACK` hook in `src/text.c` uses the hack slot only when
+    `gCurrentArea == AREA_TEST_1` and the entry is non-NULL; otherwise the
+    vanilla `sMessageTextPointers` path is unchanged
+  - landed `a148b76`; gates: `content-check`, `content-tables-check`,
+    `hack-build`, `hack-smoke` (static + 600-frame boot) PASS; normal
+    `ca33f434…`, shifted `5888a563…`, reordered `9dac0a4b…` unchanged;
+    `make -f Makefile.shift test` (boot + 4k input), `audit`, `check_relocs`
+    PASS; linked `HackTextEntryLedgeSignal` (`0x0879b9a8`) ROM bytes equal the
+    preproc words
+  - display in game is still unproven: no entry warp yet, so the banner is
+    never drawn (HACK-008d4)
   - out of scope: entry warp, enemy, doors, save/load
 - [TODO] HACK-008d3 (engine/content) — Echo Hunter primary sprite
   - extend `PSPRITE_END` and every primary sprite table (behaviour, gfx, pal,
