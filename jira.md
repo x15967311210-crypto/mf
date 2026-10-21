@@ -1490,12 +1490,14 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - still missing (004a2b): event block 0x6E..0x77, broad
     `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks, dedicated door-transition /
     save-load scenario, custom Echo Hunter AI
-- [TODO] HACK-004a2b (engine/content/qa) — events, pads and 5-room playtest
+- [TODO] HACK-004a2b (engine/content/qa) — events, pads and transition scenario
+  - M2-enabling work; M1 is already handed off and does not depend on it
   - add the authored `AREA_TEST_1` event block (0x6E..0x77) and fix the broad
-    `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1 (save/navigation/
-    recharge pads)
-  - transition entry positions, room-load/save-load scenario across the five
-    rooms, then the `PLAYTEST-001` M1 handoff package
+    `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before the pulse (save/
+    navigation/recharge pads); decide the ADR path for any baseline table
+    growth so normal/shifted/reordered SHAs stay unchanged
+  - transition entry positions and a dedicated cross-room door/save-load
+    scenario for the five rooms
 - [DONE] ADR-013 (design/manager) — hack-owned content tables and generated IDs
   - decide the narrow engine hook/link boundary that moves rooms, doors,
     tilesets, scrolls, text, events and save IDs that hacks mutate out of
@@ -1680,7 +1682,16 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - load the save in the hack build, assert `area=7 room=0`, the saved
     `gEventCounter` and that the banner/enemy/spriteset still load
 
-- [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a2a, HACK-004a2b]
+- [PARK] PLAYTEST-001 (human) — M1 blockout playtest handed off 2026-10-21
+  - artifact: `work/playtest/M1-2026-10-21/mf_us_M1.gba` (commit `e5eb486`,
+    SHA1 `098414b9a5a6f4b479f4f77e20458756d335e7c1`), README + feedback
+    template in the same directory
+  - scope per `docs/playtest.md`: 5-room flow, doors, camera, readability, save
+    pad; pulse/boss/logs/art are explicitly out of scope
+  - waiting on the human verdict (`PLAYTEST-PASS` / blocking `BUG-*` /
+    `PLAYTEST-*`).  Do not start HACK-004b or any dependent task before sign-off
+  - HACK-004a2b (event block + broad pad checks + dedicated transition/save
+    scenario) stays queued for the M2 cycle; it does not block M1
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
 - [TODO] PLAYTEST-002 (human) — M2 pulse playtest  [deps: HACK-004b]
 - [TODO] HACK-004c (engine/content) — The Cantor prototype  [deps: PLAYTEST-002]
