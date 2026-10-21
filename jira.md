@@ -1438,18 +1438,28 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - generated `hack/gen/rooms/` stays ignored; README has the HACK-004a2
     integration checklist. Door IDs 10/11 are a provisional post-boss return
     pair and need design sign-off before the 13-entry door table is committed.
-- [TODO] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms
+- [DOING @dev33] HACK-004a2a (content/tools) — generate all 5 Test Area 1 rooms
   - **unblocked**: HACK-008d landed the generated room/door/spriteset/scroll/
     text tables and the entry warp; new rooms no longer need `src/data` edits
-  - extend the generated room set to 5 and the door table to the 12 authored
-    records with reciprocal `dstDoor` pairs; keep the one-area overlay
+  - convert all five authored `.tmj` (`entry_ledge`, `silent_atrium`,
+    `resonance_chamber`, `hidden_conduit`, `choir_nest`) and generate one
+    `content_tables.h`/`scroll_tables.h`/`sprite_tables.h` covering rooms 0..4;
+    keep per-room gfx slots independent
+  - enable the 12 authored door records with reciprocal `dstDoor` pairs
+    (`--active-doors`), validated against the manifest; the generated table is
+    what `RoomLoad` uses, so transitions between the five rooms must resolve
+  - keep the entry warp at room 0; no event block, no broad-check fix, no
+    save/load work in this half
+  - gates: `content-check`, `hack-build`, `hack-smoke`, `hack-room-check`,
+    `hack-liveness-check`, unchanged normal/shifted/reordered SHAs; update
+    `docs/content-pipeline.md` (5-room generation, door activation) and note
+    what is still missing
+- [TODO] HACK-004a2b (engine/content/qa) — events, pads and 5-room playtest
   - add the authored `AREA_TEST_1` event block (0x6E..0x77) and fix the broad
     `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1 (save/navigation/
     recharge pads)
-  - resolve tileset 0, bg0/dark-room handling, spawn tables, transition entry
-    positions, and a 5-room room-load/save-load scenario
-  - ADR for any remaining `src/data` promotion; 008d's isolated one-room path
-    is the baseline to extend
+  - transition entry positions, room-load/save-load scenario across the five
+    rooms, then the `PLAYTEST-001` M1 handoff package
 - [DONE] ADR-013 (design/manager) — hack-owned content tables and generated IDs
   - decide the narrow engine hook/link boundary that moves rooms, doors,
     tilesets, scrolls, text, events and save IDs that hacks mutate out of
