@@ -1603,12 +1603,33 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - limits: HACK-only first-load warp; no door reciprocity, no save/load
     persistence, no route back into Entry Ledge, and the banner/enemy are now
     reachable but not yet exercised by a scenario
-- [TODO] HACK-008d4b (engine/content/qa) — doors, save/load and golden-path doc
-  - reciprocal Entry Ledge door records or an isolated one-room path, then the
-    save/load persistence scenario and the one-page golden-path doc
-  - acceptance for the whole 008d: normal/shifted/reordered build; behaviour
-    scenario; save/load; `content-check`; no baseline table editing
-  - HACK-004a2 starts only after this is green
+- [DOING @dev32] HACK-008d4b (qa/content) — liveness gate + golden-path doc
+  - door decision: keep the **isolated one-room path** for 008d (doors stay
+    suppressed; the entry warp is the only entrance).  Reciprocal records and
+    the 12-entry `sTest1Doors` shape belong to HACK-004a2; do not renumber
+    `dstDoor` in this task
+  - add a repeatable sprite-liveness check on top of `hack-room-check`:
+    replay a deterministic prefix of the committed 30k input (~input frame
+    28450, the window where all spawns are alive), dump IWRAM, and assert
+    `gSpritesetSpriteIds[0..6] == 1F 1E 12 41 62 21 CF`, gfx slots 0..6, and
+    live sprites with roomSlots 0..3 and ids `1F,1E,21,12`; read the addresses
+    from the hack ELF (`nm`), exit 77 without a harness, and wire it into
+    `mk/hack.mk`/`HACK_HELP` without slowing `hack-smoke`
+  - write the one-page `docs/golden-path.md`: build/run commands, entry-warp
+    explanation, controls, what to see (Entry Ledge, save pad, data pad,
+    banner text "ENTRY LEDGE / THE SIGNAL IS WEAK", Echo Hunter clone), how to
+    run every check, and known limits (doors off, enemy is a Hornoad data
+    clone, no automated save/load yet, no music assertion)
+  - manual save/load on the save pad goes into the doc's playtest steps;
+    automated SaveRAM save/load is split out to QA-030 below
+  - acceptance for the whole 008d after this: normal/shifted/reordered build;
+    room-load + liveness scenario; `content-check`; no baseline table editing.
+    HACK-004a2 starts only after this is green
+- [TODO] QA-030 (qa/tools) — automated hack save/load on the Entry Ledge pad
+  - needs a valid SaveRAM (checksum) or a TAS save sequence; depends on QA-027
+    for `Sram_CheckLoadSaveFile` coverage
+  - load the save in the hack build, assert `area=7 room=0`, the saved
+    `gEventCounter` and that the banner/enemy/spriteset still load
 
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a2]
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
