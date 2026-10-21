@@ -1468,22 +1468,28 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - generated `hack/gen/rooms/` stays ignored; README has the HACK-004a2
     integration checklist. Door IDs 10/11 are a provisional post-boss return
     pair and need design sign-off before the 13-entry door table is committed.
-- [DOING @dev33] HACK-004a2a (content/tools) — generate all 5 Test Area 1 rooms
-  - **unblocked**: HACK-008d landed the generated room/door/spriteset/scroll/
-    text tables and the entry warp; new rooms no longer need `src/data` edits
-  - convert all five authored `.tmj` (`entry_ledge`, `silent_atrium`,
-    `resonance_chamber`, `hidden_conduit`, `choir_nest`) and generate one
-    `content_tables.h`/`scroll_tables.h`/`sprite_tables.h` covering rooms 0..4;
-    keep per-room gfx slots independent
-  - enable the 12 authored door records with reciprocal `dstDoor` pairs
-    (`--active-doors`), validated against the manifest; the generated table is
-    what `RoomLoad` uses, so transitions between the five rooms must resolve
-  - keep the entry warp at room 0; no event block, no broad-check fix, no
-    save/load work in this half
-  - gates: `content-check`, `hack-build`, `hack-smoke`, `hack-room-check`,
-    `hack-liveness-check`, unchanged normal/shifted/reordered SHAs; update
-    `docs/content-pipeline.md` (5-room generation, door activation) and note
-    what is still missing
+- [DONE] HACK-004a2a (content/tools) — generate all 5 Test Area 1 rooms
+  - `HACK_ROOMS` converts `entry_ledge`, `silent_atrium`,
+    `resonance_chamber`, `hidden_conduit`, `choir_nest` (15x10, 15x30, 30x10,
+    45x10, 15x20) and `gen_content_tables.py` emits one room-indexed
+    `content_tables.h`/`scroll_tables.h`/`sprite_tables.h` for rooms 0..4;
+    per-room gfx slots stay independent
+  - all 12 authored doors are active with reciprocal `dstDoor` pairs
+    (0/1, 2/3, 4/5, 6/7, 8/9, 10/11); the generated `HackTest1Doors` is
+    `0x9C` bytes = 12 records x 12-byte agbcc stride + terminator (the
+    9-byte `doors.bin` is the file format only)
+  - `hack-room-check` replays a deterministic **29500-frame prefix** (generated
+    from the 30k fixture into `work/emulator/`): the full 30k replay now
+    legitimately walks through door 0 at ~frame 29657, so door chaining is
+    left to 004a2b; the entry warp still asserts `area=7 room=0`
+  - landed `698a66a`; `content-tables-check`, `content-check`, `hack-build`,
+    `hack-smoke`, `hack-room-check` (`FINAL_EVENT ... area=7 room=0`,
+    `main=1`), `hack-liveness-check` (7-entry spriteset + 4 live spawns) PASS;
+    normal `ca33f434…`, shifted `5888a563…`, reordered `9dac0a4b…` unchanged;
+    `Makefile.shift test`, `audit`, `check_relocs` PASS
+  - still missing (004a2b): event block 0x6E..0x77, broad
+    `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks, dedicated door-transition /
+    save-load scenario, custom Echo Hunter AI
 - [TODO] HACK-004a2b (engine/content/qa) — events, pads and 5-room playtest
   - add the authored `AREA_TEST_1` event block (0x6E..0x77) and fix the broad
     `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1 (save/navigation/

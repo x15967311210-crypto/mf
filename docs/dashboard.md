@@ -8,11 +8,11 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **27 TODO / 1 DOING / 59 DONE / 3 PARK** (90 entries).
+Counts: **27 TODO / 0 DOING / 60 DONE / 3 PARK** (90 entries).
 
 ### In progress (DOING)
 
-- `HACK-004a2a` — generate all 5 Test Area 1 rooms
+_none_
 
 ### Next TODO (first 5 in file order)
 
