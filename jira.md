@@ -1563,13 +1563,31 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     dispatch helper for the four `sPrimarySpritesAiPointers[...]` call sites
     and a proxy id for the gfx/pal/length loads, so 0xCF runs a baseline-sprite
     data clone without touching `src/data`; custom AI/animation is HACK-004b
+  - **latent 008c2 bug found while preparing d3** (dev31 + manager IWRAM dump):
+    the generated room entry sets `defaultSpriteset = 255`, so
+    `SpriteLoadSpriteset` falls back to `sSpritesetPointers[129]`, which is an
+    empty table (first pair `0x00` = `PSPRITE_TARGET_CIRCLES`); every spawn
+    slot therefore resolves through `gSpritesetSpriteIds[] = 0x10`
+    (`PSPRITE_UNUSED_16`).  The manifest `spritesets` table is converter-only
+    and never reaches the engine.  Save pad, data pad and message banner have
+    been spawning as placeholders; d3 must fix this for the enemy and the
+    banner text to work
+  - fix: generate `hack/gen/sprite_tables.h` from the manifest table
+    (`(spriteId, gfxSlot)` byte pairs + `0x00` terminator), add a tracked shim,
+    and select it in `SpriteLoadSpriteset` under `#ifdef HACK` when
+    `gCurrentArea == AREA_TEST_1`
   - tool: `tiled_to_room.py` must resolve `SPRITE_ECHO_HUNTER` from
-    `hack/include/hack/ids.h` (or accept it via the manifest) and allow the
-    id in a spriteset table even though the vanilla enum stops at 0xCE
-  - content: one Entry Ledge spawn record + manifest spriteset slot
+    `hack/include/hack/ids.h` and allow it in a spriteset table even though the
+    vanilla enum stops at 0xCE
+  - runtime proxy: keep 0xCF in the generated table/spawn data, but rewrite the
+    stored `gSpriteData[].spriteId` from 0xCF to `PSPRITE_HORNOAD` inside
+    `SpriteInitPrimary`, so AI, stats, health macros, projectile weakness and
+    gfx/pal/length all read the Hornoad entries and nothing indexes past a
+    baseline array; the spriteset graphics load must proxy 0xCF too
+  - content: one Entry Ledge spawn record + manifest spriteset slot 6
   - gates: `hack-room-check` must still end in `area=7 room=0` with a live
-    frame counter (a bad table read would stall/crash), `hack-smoke`, and
-    unchanged normal/shifted/reordered SHAs
+    frame counter, and the dump must show spawned sprite ids (not 0x10
+    placeholders), `hack-smoke`, and unchanged normal/shifted/reordered SHAs
 - [DONE] HACK-008d4a (engine/qa) — hack entry warp + room-load check
   - ordering changed by the manager: without an entry warp neither the d2 text
     nor the d3 enemy can be behaviour-tested, so the warp landed first
