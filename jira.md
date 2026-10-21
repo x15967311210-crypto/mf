@@ -1503,13 +1503,35 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - scope note: this task generated room/door/spriteset data only.  Hack-owned
     scrolls, text, events and music remain for HACK-008d; the two authored
     Entry Ledge doors stay suppressed until their destinations exist.
-- [TODO] HACK-008d (content/engine) — golden path: 1 room + 1 dialogue + 1 enemy
-  - end-to-end from content source to playable build: room, door, text,
-    one enemy behavior/event, save entry warp, validator and one-page docs
-  - also emit/select the hack-owned scroll, text and event tables; add the
-    reciprocal Entry Ledge door records or keep the one-room path isolated
-  - acceptance: normal/shifted/reordered build; behavior scenario; save/load;
-    `content-check`; no baseline table editing
+- [DOING @dev28] HACK-008d1 (tools/engine) — hack-owned scroll table for AREA_TEST_1
+  - extend `tools/content/gen_content_tables.py` to emit the Entry Ledge scroll
+    block from `scrolls.bin` plus a `const u8*` per-room list and an `0xFF`
+    terminator; validate the decoded records against the room manifest
+  - one narrow `#ifdef HACK` hook in `src/scroll.c` (mirroring `src/room.c`)
+    selecting the generated list for `sAreaScrollPointers[AREA_TEST_1]`;
+    baseline builds keep their exact text/scroll tables
+  - evidence: generator `--self-check`/`--check`, `make content-tables-check`,
+    `hack-build`/`hack-smoke`, the generated symbols present in the hack ELF
+    and referenced by `sAreaScrollPointers`, and unchanged normal/shifted/
+    reordered SHAs
+  - out of scope: text, events, enemy, doors, room entry/save-load
+- [TODO] HACK-008d2 (tools/engine) — text ID space and hack-owned message table
+  - define the first `TEXT_*` ID and a relocatable hack-owned text pointer
+    table; add one narrow `#ifdef HACK` lookup hook in `src/text.c` with a
+    baseline fallback; wire the `hack/content/text` golden-path dialogue to the
+    Entry Ledge message banner
+  - no baseline `sMessageTextPointers` edits and no guessed charmap glyphs
+- [TODO] HACK-008d3 (engine/content) — Echo Hunter primary sprite
+  - extend `PSPRITE_END` and every primary sprite table (behaviour, gfx, pal,
+    oam, sizes) with `SPRITE_ECHO_HUNTER = 0xCF`; one room spawn record and a
+    host/static check that the ID resolves; no baseline vanilla sprite change
+- [TODO] HACK-008d4 (engine/content/qa) — room entry, doors and save/load gate
+  - explicit entry warp into `AREA_TEST_1` room 0 for the hack build (or an
+    equivalent documented scenario save), reciprocal Entry Ledge door records
+    or an isolated one-room path, room-load + save/load behaviour scenario and
+    the one-page golden-path doc
+  - acceptance for the whole 008d: normal/shifted/reordered build; behaviour
+    scenario; save/load; `content-check`; no baseline table editing
   - HACK-004a2 starts only after this is green
 
 - [TODO] PLAYTEST-001 (human) — M1 blockout playtest  [deps: HACK-004a2]
