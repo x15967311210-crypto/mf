@@ -1,0 +1,16 @@
+{
+  "schema": "mf-hack.text-messages/v1",
+  "areas": [
+    {
+      "area": "AREA_TEST_1",
+      "messages": [
+        {
+          "text_id": "TEXT_ENTRY_LEDGE_SIGNAL",
+          "message_id": 2,
+          "source": "golden_path.c",
+          "literal": 0
+        }
+      ]
+    }
+  ]
+}

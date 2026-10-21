@@ -1,10 +1,11 @@
 # mk/hack.mk — HACK=1 overlay build (HACK-008c1 / D-013).
 #
 # The hack build is the same engine and baseline data as `all`, compiled with
-# -DHACK (C) and --defsym HACK=1 (assembly).  The baseline hooks are two narrow
+# -DHACK (C) and --defsym HACK=1 (assembly).  The baseline hooks are three narrow
 # `#ifdef HACK` selections: src/room.c includes
-# hack/include/hack/content_tables.h (room/door/spriteset tables) and
-# src/scroll.c includes hack/include/hack/scroll_tables.h (scroll blocks).  For
+# hack/include/hack/content_tables.h (room/door/spriteset tables), src/scroll.c
+# includes hack/include/hack/scroll_tables.h (scroll blocks) and src/text.c
+# includes hack/include/hack/text_tables.h (message-banner text).  For
 # HACK-008c1 those headers fall back to the baseline AREA_TEST_1 tables, so the
 # overlay is empty; HACK-008c2/HACK-008d1 replace them with generated tables
 # from the ignored hack/gen/ tree without touching this build boundary.
@@ -43,6 +44,8 @@ HACK_ROOM_DIR ?= hack/gen/rooms/$(HACK_ROOM)
 HACK_TABLES ?= hack/gen/content_tables.h
 # HACK-008d1: the generator writes this scroll-only sibling beside HACK_TABLES.
 HACK_SCROLL_TABLES ?= $(patsubst %content_tables.h,%scroll_tables.h,$(HACK_TABLES))
+# HACK-008d2: per-area message-banner text table from hack/content/text.
+HACK_TEXT_TABLES ?= hack/gen/text_tables.h
 
 # Objects for the private tree.  The split mirrors ASMSRC: C sources are
 # preprocessed/compiled there, while checked-in .s files are assembled from
@@ -74,6 +77,8 @@ $(OBJ_DIR)/src/room.s: $(HACK_TABLES)
 $(OBJ_DIR)/src/room.o: $(OBJ_DIR)/src/room.s $(HACK_TABLES)
 $(OBJ_DIR)/src/scroll.s: $(HACK_SCROLL_TABLES)
 $(OBJ_DIR)/src/scroll.o: $(OBJ_DIR)/src/scroll.s $(HACK_SCROLL_TABLES)
+$(OBJ_DIR)/src/text.s: $(HACK_TEXT_TABLES)
+$(OBJ_DIR)/src/text.o: $(OBJ_DIR)/src/text.s $(HACK_TEXT_TABLES)
 
 # Same per-file optimisation overrides as the baseline build (Makefile).
 $(OBJ_DIR)/src/dma.s: CFLAGS = -O1 -mthumb-interwork -fhex-asm
@@ -93,8 +98,8 @@ $(HACK_LD_SCRIPT): linker.ld tools/shift/prefix_linker_objects.py
 
 .PHONY: content-tables content-tables-check hack-build hack-sha1 hack-smoke
 
-# HACK-008c2/HACK-008d1: the only generated-content step.  The room converter
-# output and both C headers are under ignored hack/gen/.
+# HACK-008c2/HACK-008d1/HACK-008d2: the only generated-content step.  The room
+# converter output and all C headers are under ignored hack/gen/.
 content-tables:
 	@mkdir -p hack/gen/rooms
 	$(PYTHON) tools/content/tiled_to_room.py \
@@ -103,11 +108,16 @@ content-tables:
 		--out $(HACK_ROOM_DIR) --force
 	$(PYTHON) tools/content/gen_content_tables.py \
 		--room-dir $(HACK_ROOM_DIR) --out $(HACK_TABLES) --write
+	$(PYTHON) tools/content/gen_text_tables.py \
+		--out $(HACK_TEXT_TABLES) --write
 
-# --check verifies $(HACK_TABLES) and the sibling scroll header derived from it.
+# --check verifies $(HACK_TABLES), the sibling scroll header derived from it and
+# the HACK-008d2 text table.
 content-tables-check:
 	$(PYTHON) tools/content/gen_content_tables.py \
 		--room-dir $(HACK_ROOM_DIR) --out $(HACK_TABLES) --check
+	$(PYTHON) tools/content/gen_text_tables.py \
+		--out $(HACK_TEXT_TABLES) --check
 
 hack-build: content-tables
 	@mkdir -p $(HACK_WORK)
@@ -126,8 +136,8 @@ hack-smoke: hack-build
 		--scenario $(HACK_SCENARIO) --frames $(HACK_FRAMES)
 
 define HACK_HELP
-	@echo "  content-tables      generate hack/gen/rooms/entry_ledge + content_tables.h + scroll_tables.h"
-	@echo "  content-tables-check verify both generated one-room headers are fresh"
+	@echo "  content-tables      generate hack/gen/rooms/entry_ledge + content_tables.h + scroll_tables.h + text_tables.h"
+	@echo "  content-tables-check verify the generated one-room headers and text table are fresh"
 	@echo "  hack-build          build the HACK=1 overlay ROM into work/hack/ (D-013)"
 	@echo "  hack-sha1           hack-build, then write work/hack/mf_us_hack.sha1"
 	@echo "  hack-smoke          hack-build + static smoke + boot smoke (77 if no harness)"

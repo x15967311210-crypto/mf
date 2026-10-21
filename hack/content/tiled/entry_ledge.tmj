@@ -673,6 +673,38 @@
               "value": "SSP_UNINFECTED_OR_BOSS"
             }
           ]
+        },
+        {
+          "id": 102,
+          "name": "signal_banner",
+          "type": "",
+          "point": true,
+          "x": 96,
+          "y": 64,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "sprite_id",
+              "type": "string",
+              "value": "PSPRITE_MESSAGE_BANNER"
+            },
+            {
+              "name": "spriteset",
+              "type": "string",
+              "value": "default"
+            },
+            {
+              "name": "slot",
+              "type": "int",
+              "value": 5
+            },
+            {
+              "name": "properties",
+              "type": "string",
+              "value": "SSP_UNINFECTED_OR_BOSS"
+            }
+          ]
         }
       ]
     }

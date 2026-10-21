@@ -55,10 +55,9 @@ typedef enum HackEventId {
 } HackEventId;
 /* events reserved 0x78..0xFF: After the slice block: EVENT_END must become 0x78 in the extended enum (HACK-004a); no IDs allocated here. */
 
-/* text: no IDs assigned in schema 1. */
-/* Reserved: No TEXT_* ID is allocated in schema 1. HACK-008b must define the text-block ID space before a TEXT_* entry is added; never reuse a pointer or message index. */
+/* text: Hack-owned TEXT_* IDs identify one generated u16 text block each; the in-area message index stays separate (message_id in hack/content/text/messages.json). */
 typedef enum HackTextId {
-    TEXT_RESERVED = -1, /* placeholder only; not a valid content ID */
+    TEXT_ENTRY_LEDGE_SIGNAL = 0x0, /* AREA_TEST_1; HACK-008d2; active; Entry Ledge signal banner; message_id 2 (signal_banner spawn record) in the AREA_TEST_1 message table, source hack/content/text/golden_path.c literal 0. */
 } HackTextId;
 
 /* music: no IDs assigned in schema 1. */

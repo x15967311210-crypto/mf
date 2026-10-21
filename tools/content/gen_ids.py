@@ -539,13 +539,14 @@ def validate_registry(document: Any) -> Registry:
                         f"{entry_ctx}.area: unknown area {area!r}; add it to areas first"
                     )
                 fields["area"] = area
-            if name == "rooms":
-                if "area" not in fields:
-                    raise ContentIdError(f"{entry_ctx}: room entries require 'area'")
-            elif "area" in entry_raw:
-                raise ContentIdError(
-                    f"{entry_ctx}.area: only room entries may declare an area"
-                )
+            if "area" in entry_raw:
+                if name not in ("rooms", "text"):
+                    raise ContentIdError(
+                        f"{entry_ctx}.area: only room and text entries may "
+                        "declare an area"
+                    )
+            elif name == "rooms":
+                raise ContentIdError(f"{entry_ctx}: room entries require 'area'")
 
             if "kind" in entry_raw:
                 kind = _get_str(entry_raw["kind"], f"{entry_ctx}.kind")

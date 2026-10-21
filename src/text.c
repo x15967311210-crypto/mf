@@ -13,6 +13,14 @@
 #include "structs/event.h"
 #include "structs/samus.h"
 
+/* HACK-008d2 / D-013: AREA_TEST_1 message-banner hook.  The generated table is
+ * hack-owned; the vanilla sMessageTextPointers path below stays unchanged. */
+#ifdef HACK
+#include "constants/connection.h"
+#include "structs/connection.h"
+#include "hack/text_tables.h"
+#endif
+
 static u32 sArray_79c128[9] = {
     [0] = UINT_MAX ^ (UINT_MAX << 0 * sizeof(u32)),
     [1] = UINT_MAX ^ (UINT_MAX << 1 * sizeof(u32)),
@@ -457,12 +465,23 @@ void TextDrawMessageBanner(u8 messageId, u8 gfxSlot, u8 stage)
 
     if (stage == 4 || stage == 5)
     {
-        index = messageId;
-        if (index > 21)
-            index = 21;
-        
-        index += 21;
-        pText = sMessageTextPointers[gLanguage][index];
+#ifdef HACK
+        if (gCurrentArea == AREA_TEST_1
+            && messageId < HACK_AREA_TEST_1_TEXT_COUNT
+            && HackAreaTest1Text[messageId] != NULL)
+        {
+            pText = HackAreaTest1Text[messageId];
+        }
+        else
+#endif
+        {
+            index = messageId;
+            if (index > 21)
+                index = 21;
+
+            index += 21;
+            pText = sMessageTextPointers[gLanguage][index];
+        }
     }
 
     if (stage == 7)

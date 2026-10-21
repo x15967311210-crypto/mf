@@ -240,9 +240,14 @@ categories:
     min_id: 0
     max_id: 65535
     radix: hex
-    note: "Baseline text blocks are pointer-addressed; there is no numeric text-block ID table to extend."
-    reserved_note: "No TEXT_* ID is allocated in schema 1. HACK-008b must define the text-block ID space before a TEXT_* entry is added; never reuse a pointer or message index."
-    entries: []
+    note: "Hack-owned TEXT_* IDs identify one generated u16 text block each; the in-area message index stays separate (message_id in hack/content/text/messages.json)."
+    entries:
+      - name: entry_ledge_signal
+        id: 0x0000
+        area: AREA_TEST_1
+        owner: HACK-008d2
+        status: active
+        note: "Entry Ledge signal banner; message_id 2 (signal_banner spawn record) in the AREA_TEST_1 message table, source hack/content/text/golden_path.c literal 0."
 
   - name: music
     prefix: MUSIC

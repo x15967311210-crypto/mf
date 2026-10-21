@@ -22,6 +22,7 @@ python3 tools/content/fixtures/generate_fixture.py --check
 python3 tools/content/tiled_to_room.py --self-check
 python3 tools/content/gen_ids.py --self-check
 python3 tools/content/gen_ids.py --check
+python3 tools/content/gen_text_tables.py --self-check
 ```
 
 The self-check runs the synthetic fixture twice, diffs the output, and covers
@@ -72,11 +73,12 @@ The checker enforces:
 - reciprocal door links and existing room/door/event/text/sprite references;
 - every category either has entries or an explicit `reserved_note`.
 
-Text, music and save-field IDs are deliberately **reserved placeholders** in
-schema 1:
+Music and save-field IDs are deliberately **reserved placeholders** in schema
+1; text now has one active entry:
 
-- baseline text is pointer-addressed, so there is no numeric text-block table
-  to extend; HACK-008b must define that space;
+- `TEXT_*` IDs name one hack-owned `u16` text block each.  The in-area
+  message index is separate (`message_id` in `hack/content/text/messages.json`);
+  see “Text tables (HACK-008d2)”;
 - there is no free music ID: `0x00..0x63` are vanilla tracks and `0x64` is
   `SOUND_64`, the first SFX, because `unk_3bd4` tests `sound < MUSIC_COUNT`;
 - M1 adds no saved field: it rides the existing `gEventCounter` at save `+0x21`,
@@ -206,16 +208,18 @@ build never replaces `mf_us.gba`/`mf_us.elf`/`mf_us.map`, and the baseline
 objects that a later `make` would relink are untouched.  `make`, `make
 shift-build` and `make shift-reorder` keep their normal flags and SHAs.
 
-The overlay has two narrow baseline hooks, one per generated header.
+The overlay has three narrow baseline hooks, one per generated header.
 `src/room.c` includes `hack/include/hack/content_tables.h` and uses
 `HACK_AREA_TEST_1_DOORS` / `HACK_AREA_TEST_1_ROOM_ENTRIES` for the
 `AREA_TEST_1` entries of `sAreaDoorPointers` / `sAreaRoomEntryPointers`.
 `src/scroll.c` includes `hack/include/hack/scroll_tables.h` and uses
 `HACK_AREA_TEST_1_SCROLLS` for the `AREA_TEST_1` entry of
-`sAreaScrollPointers` (HACK-008d1, below).  For 008c1 the content header maps
-both room macros to `sTest1Doors` / `sTest1RoomEntries`, so the hack ROM is
-byte-identical to the baseline and boots through the baseline Test Area 1
-tables.
+`sAreaScrollPointers` (HACK-008d1, below).  `src/text.c` includes
+`hack/include/hack/text_tables.h` and uses `HackAreaTest1Text` for the
+`AREA_TEST_1` message-banner slots (HACK-008d2, below).  For 008c1 the content
+header maps both room macros to `sTest1Doors` / `sTest1RoomEntries`, so the
+hack ROM is byte-identical to the baseline and boots through the baseline Test
+Area 1 tables.
 
 HACK-008c2 replaces those two defaults with the generated Entry Ledge room 0
 table under the ignored `hack/gen/`.  `make content-tables` runs
@@ -272,10 +276,61 @@ every field equals the converter manifest's `camera.scrolls` values copied into
 stale or missing, and `--self-check` exercises bad count, bad length, bad field
 and bad room-id cases plus byte-exact scroll output.
 
-Still missing for the golden path: text, events, enemy sprites, active
+Still missing for the golden path: events, enemy sprites, active
 door/room records and the entry warp.  This table only makes `ScrollLoad()`
 find hack-owned data for AREA_TEST_1; room-load/save behaviour is not proven by
 this work.
+
+### Text tables (HACK-008d2)
+
+Hack-owned message-banner text has two separate identifiers:
+
+| Layer | Identifier | Meaning |
+|---|---|---|
+| Content registry | `TEXT_*` (`hack/include/hack/ids.h`) | one generated `u16` text block |
+| In-area message table | `message_id` 0..21 | the banner spawn's record index in the room |
+
+`TextDrawMessageBanner` clamps `messageId` at 21 and adds 21 to index the
+vanilla `sMessageTextPointers`, so `message_id` is a per-area slot, not a
+global text ID.  The message-banner sprite passes its `roomSlot`, which
+`SpriteInitPrimary` sets to the spawn record index in the room's enemy data
+(`SpriteInitPrimary(slot, y, x, i)`), not the spriteset slot.  Entry Ledge's
+third spawn record (Tiled object `102`, `signal_banner`, spriteset slot 5) is
+therefore `message_id: 2` in `AREA_TEST_1`; adding or reordering spawns changes
+this index, so `messages.json` must be updated with the room content.
+
+`hack/content/text/messages.json` (`mf-hack.text-messages/v1`) maps them:
+
+```json
+{"schema": "mf-hack.text-messages/v1",
+ "areas": [{"area": "AREA_TEST_1", "messages": [
+   {"text_id": "TEXT_ENTRY_LEDGE_SIGNAL", "message_id": 2,
+    "source": "golden_path.c", "literal": 0}]}]}
+```
+
+`source` is relative to `hack/content/text/` and `literal` selects one
+`INCTEXT` block in that file.  The generator reuses
+`tools/content/text_roundtrip.py`, so the words are produced by the real
+`tools/preproc`/`charmap.txt` path and round-trip checked; it does not contain
+a second encoder.
+
+`tools/content/gen_text_tables.py` validates the area against the `Area` enum,
+the `TEXT_*` ID against `hack/content/ids.yaml`, unique `message_id`/`text_id`
+values, the 0..21 range, the source path and literal index, then writes the
+ignored `hack/gen/text_tables.h` with one
+`HackText<Id>[]` block, `HACK_AREA_TEST_1_TEXT_COUNT 22` and
+`HackAreaTest1Text[22]`.  The tracked shim
+`hack/include/hack/text_tables.h` is the only injection point; `src/text.c`
+includes it under `#ifdef HACK` and uses the hack slot only when
+`gCurrentArea == AREA_TEST_1` and the entry is non-NULL.  Every other area,
+slot and stage falls through to the unchanged vanilla index math.
+`TextDisplayMessage` (event/ability messages) is not modified.
+
+`make content-tables` writes the table, `make content-tables-check` fails if it
+is stale or missing, and `python3 tools/content/gen_text_tables.py
+--self-check` covers the generator without a ROM.  This proves the linked
+table, not the in-game display: a message banner is still only reachable after
+HACK-008d4 adds the Entry Ledge entry warp.
 
 ## Text pipeline (HACK-008b)
 
@@ -316,12 +371,10 @@ errors**.  Do not add guessed mappings; prove them against the text blob or
 glyph atlas first.  The alternate `0x81..0x9A` uppercase/small-caps set is
 documented but intentionally unmapped.
 
-Text IDs stay unallocated in `hack/content/ids.yaml`: vanilla text is
-pointer-table addressed (`sMessageTextPointers`/`sLocationTextPointers`), not
-a numeric message table.  HACK-008d must add a relocatable hack-owned text
-pointer table and assign the first `TEXT_*` ID before wiring dialogue into a
-room.  Width/line wrapping and the in-game message banner are also 008d work;
-this task only proves the compile/round-trip path.
+HACK-008d2 now allocates the first `TEXT_*` ID and emits the hack-owned
+message table described above; this section only proves the compile/round-trip
+path.  Width/line wrapping still needs its own proof, and the in-game message
+banner is not exercised until HACK-008d4 adds the Entry Ledge entry warp.
 
 ## Known gaps
 
@@ -341,9 +394,10 @@ this task only proves the compile/round-trip path.
   scripting; doors are static records only.
 - **ID allocation:** rooms, doors and the slice event block are seeded;
   `SPRITE_ECHO_HUNTER=0xCF` is reserved for HACK-008d and requires extending
-  `PSPRITE_END`/primary tables before use. Text, music and save-field
-  categories are typed reserved placeholders because no safe numeric space
-  exists yet (see “ID registry” and “Text pipeline”).
+  `PSPRITE_END`/primary tables before use. Text now has one active
+  `TEXT_*` entry and a generated per-area message table (HACK-008d2); music
+  and save-field categories remain typed reserved placeholders because no safe
+  numeric space exists yet (see “ID registry” and “Text pipeline”).
 - **Sub-block placement:** point spawns are floored to block coordinates; the
   engine applies its own `BLOCK_SIZE`/half-block offsets.
 - **RLE scope:** only the mode-1 8-bit-count stream is emitted; the decoder

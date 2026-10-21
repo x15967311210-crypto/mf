@@ -5,7 +5,7 @@ Schema version: **1**.  Source: `hack/content/ids.yaml`.
 
 Generated files: `hack/include/hack/ids.h` (C constants) and this tracker.  Edit the YAML and run `--write`; never hand-edit either generated file.
 
-Allocated IDs: **28** (rooms 5, doors 12, sprites 1, events 10, text 0, music 0, save fields 0).
+Allocated IDs: **29** (rooms 5, doors 12, sprites 1, events 10, text 1, music 0, save fields 0).
 
 ## Rooms
 
@@ -71,9 +71,11 @@ Reserved ranges:
 
 ## Text
 
-Baseline text blocks are pointer-addressed; there is no numeric text-block ID table to extend.
+Hack-owned TEXT_* IDs identify one generated u16 text block each; the in-area message index stays separate (message_id in hack/content/text/messages.json).
 
-No IDs assigned in schema 1.  Reserved: No TEXT_* ID is allocated in schema 1. HACK-008b must define the text-block ID space before a TEXT_* entry is added; never reuse a pointer or message index.
+| Constant | ID | Owner / Area | Status | Notes |
+| --- | --- | --- | --- | --- |
+| `TEXT_ENTRY_LEDGE_SIGNAL` | `0x0` | `HACK-008d2` / `AREA_TEST_1` | active | Entry Ledge signal banner; message_id 2 (signal_banner spawn record) in the AREA_TEST_1 message table, source hack/content/text/golden_path.c literal 0. |
 
 ## Music
 
