@@ -1,65 +1,103 @@
-# Metroid Fusion Decomp
+# mf-hack — Metroid Fusion: shiftable C engine + Sector Null hack
 
-This is a work in progress decompilation of Metroid Fusion.
+This repository is two things in one tree:
 
-3212/3607 functions decompiled (89.05%, 395 left)
+- a **decompilation baseline** of Metroid Fusion (USA) — **3212/3607 functions
+  (89.05%, 395 left)** in C and **0x5c2ff0/0x6f9d24 bytes of data outside blobs
+  (82.59%, 0x136d34 left)** — a clean-room decompilation derived from
+  [metroidret/mf](https://github.com/metroidret/mf); the code is MIT-licensed
+  (see [LICENSE](LICENSE)) and contributions follow
+  [CONTRIBUTING.md](CONTRIBUTING.md);
+- a **shiftable C engine** built on that baseline — code and ROM data may change
+  size and order while the game still boots and behaves the same — plus the
+  **Sector Null** hack overlay, which is only linked when `HACK=1`.
 
-0x5c2ff0/0x6f9d24 bytes of data not in blobs (82.59%, 0x136d34 left)
+Baseline progress is tracked in the
+[decompilation spreadsheet](https://docs.google.com/spreadsheets/d/1HvJ-jynb-4P9tfEBVJmkQFpIg6mJRDRUBvDIBiLxQIo/).
 
-Progress can be seen here: https://docs.google.com/spreadsheets/d/1HvJ-jynb-4P9tfEBVJmkQFpIg6mJRDRUBvDIBiLxQIo/
+A normal build produces `mf_us.gba`; the shift targets write padded and
+reordered artifacts under `work/shift/`, and the hack build writes
+`work/hack/mf_us_hack.gba`. Only `make` replaces `mf_us.gba`.
 
-**This decomp is not shiftable, don't use it as a base to work on anything**
+## Quick start
 
-This repository can be used to build multiple ROMs. The ROMs are named like this: `mf_{region}.gba` (or `mf_{region}_debug.gba`)
+```sh
+# One-time: pinned agbcc, extracted data, baserom check.
+make setup-agbcc                # or `make setup` (setup-agbcc + doctor)
+python3 tools/extractor.py      # data/ from mf_us_baserom.gba (ignored by Git)
 
-Region indicates which region the ROM targets:
-- us: USA, North America `sha1: ca33f4348c2c05dd330d37b97e2c5a69531dfe87`
-- eu: Europe **(Not yet supported)**
-- jp: Japan **(Not yet supported)**
-- cn: China **(Not yet supported)**
-- eu_beta: Europe beta version **(Not yet supported)**
+make -j                         # mf_us.gba
+make check                      # baseline SHA1 check
 
-Debug simply indicates whether the ROM contains the debug features, it is optional.
+make shift-build                # padded-layout build (relocation gate)
+make shift-test                 # padded build + behavior scenario
+make shift-reorder              # .rodata reorder test
+make hack-build                 # HACK=1 overlay -> work/hack/mf_us_hack.gba
+make hack-smoke                 # hack build + static/600-frame boot smoke
+make test                       # static + headless boot + 4k input replay
+make -f Makefile.shift test     # legacy wrapper; `make test` is the same run
+make content-check              # content pipeline + D-009 ID registry
+make jira-check                 # validate jira.md
+make dashboard                  # regenerate docs/dashboard.md
+make help                       # every normal, shift, hack and PM target
+```
 
-**Debug is not supported yet**
+Targets that need the emulator/harness report **SKIP (77)** instead of a pass
+when it is not installed; they never pass falsely.
 
-The default built ROM is mf_us.gba
+## Where to look
 
-**Discords**:
-- https://discord.gg/2MGB9Xbr9y Metroidret
-- https://discord.gg/WtekHKb MAGConst
+| Path | Contents |
+|---|---|
+| [docs/roadmap.md](docs/roadmap.md) | phases S0–S4, gates, current status |
+| [docs/golden-path.md](docs/golden-path.md) | shortest path to a playable hack slice (Entry Ledge) |
+| [docs/content-pipeline.md](docs/content-pipeline.md) | Tiled/PNG → room data, spritesets, scrolls, text, ID registry |
+| [docs/playtest.md](docs/playtest.md) | human playtest protocol and milestone gates |
+| [docs/style.md](docs/style.md) | C format contract (`make format`, `make format-check`) |
+| [docs/architecture/](docs/architecture/) | engine architecture overview (DOC-003, landing in the current docs phase) |
+| [docs/howto/](docs/howto/) | add a room/door, dialogue, enemy behaviour (DOC-004…006, landing) |
+| [jira.md](jira.md) | backlog and task status (source of truth) |
+| [docs/dashboard.md](docs/dashboard.md) | generated project summary |
+| [AGENTS.md](AGENTS.md) | house rules for humans and agents |
 
-## CI
+## Status
 
-Public (no baserom) and protected (private runner) CI layers, plus the symbols
-artifact they publish, are documented in [tools/ci/README.md](tools/ci/README.md).
+- **M0 shiftable-boot gate: PASS (2026-10-21).** Normal, padded
+  (`. += 0x1000`) and `.rodata`-reordered builds all complete the native
+  339001-frame TAS with the same final state
+  (`DISPCNT=1900 main=9 s1=2 s2=0100 event=109 area=0 room=63`), and the native
+  Any% run passes at 259176 frames for all three. `check-relocs-strict` passes.
+- **M1 blockout: built, not signed off.** The `HACK=1` overlay links five
+  Test Area 1 rooms, 12 reciprocal doors, a generated blockout tileset and a
+  HACK-only entry warp into `work/hack/mf_us_hack.gba`. The human playtest
+  failed on rendering, and M1 rendering is paused at the human's request:
+  **BUG-024** (player sprite invisible), **BUG-025** (room tile colours) and
+  **BUG-026** (HUD/minimap textures). M1 stays failed/blocked, so `HACK-004b`
+  (Resonance Pulse) and M2 do not start.
+- **Next:** documentation/readability work (`DOC-*`), then M1 rendering when
+  the human reopens it. The remaining engine gates (S3a hack-critical C, S3b
+  full C engine) are in [docs/roadmap.md](docs/roadmap.md); the backlog in
+  [jira.md](jira.md) is the only schedule.
 
-## Dependencies
+## Regions, dependencies and setup
 
-- [agbcc](https://github.com/pret/agbcc)
-- `binutils-arm-none-eabi`
-- A baserom for each ROM desired to be built (i.e.`mf_us_baserom.gba` if you wish to build `mf_us.gba`).
-- `python3`
-- `g++`
+ROMs are named `mf_{region}.gba` (or `mf_{region}_debug.gba`). Only `us` is
+supported (`sha1: ca33f4348c2c05dd330d37b97e2c5a69531dfe87`); `eu`, `jp`, `cn`
+and `eu_beta` are **not yet supported**. The default build is `mf_us.gba`, and
+debug builds are **not supported yet**.
 
-## Setup
+Requirements: [agbcc](https://github.com/pret/agbcc) (pinned in
+`tools/agbcc-version`), `binutils-arm-none-eabi`, `python3`, `make`, a host C
+compiler (`g++`/`cc`), and a baserom (`mf_us_baserom.gba`). The baserom is
+copyrighted and is **never** committed.
 
-- **WINDOWS ONLY**: Install and setup [WSL](https://docs.microsoft.com/en-us/windows/wsl/install)
-- Run `sudo apt update` just in case
-- Install `binutils-arm-none-eabi` by running this command: `sudo apt-get install binutils-arm-none-eabi`
-- Install `git` by running this command: `sudo apt-get install git`
-- Install `make` by running this command: `sudo apt-get install make`
+- **Windows only:** install [WSL](https://docs.microsoft.com/en-us/windows/wsl/install).
+- Install host tools: `sudo apt-get install binutils-arm-none-eabi git make`.
+- Build agbcc (`git clone https://github.com/pret/agbcc && cd agbcc &&
+  ./build.sh`) and either install it into this tree (`./install.sh <repo>`) or
+  put it on `PATH`. `make setup-agbcc` does the pinned version for you.
 
-- Clone [agbcc](https://github.com/pret/agbcc) by running this command: `git clone https://github.com/pret/agbcc`
-- Enter the agbcc folder (run `cd agbcc`) and build it (run `./build.sh`)
-- Add agbcc to your path (`export PATH="<agbcc_path>:$PATH"`, where `<agbcc_path>` is the full path to the agbcc directory)
-- Either:
-  - Install agbcc into this project (by using its `./install.sh <path>` script, where `<path>` is the path to the root of this repository), or
-  - Add agbcc to your path (`export PATH="<agbcc_path>:$PATH"`, where `<agbcc_path>` is the full path to the agbcc directory)
-
-## Toolchain and environment checks
-
-The pinned toolchain and baserom are checked without building the ROM:
+The toolchain and baserom are checked without building the ROM:
 
 ```sh
 make doctor-source   # Python, host tools, and tool self-checks (no baserom)
@@ -67,65 +105,66 @@ make setup-agbcc     # clone/build the pinned agbcc into tools/agbcc
 make doctor          # full check: ARM binutils, agbcc, and baserom SHA1
 ```
 
-The agbcc commit is pinned in `tools/agbcc-version` and built from
-<https://github.com/pret/agbcc>. The setup script is idempotent and keeps its
-scratch checkout in `${TMPDIR:-/tmp}/opencode/agbcc-src` (override with
-`AGBCC_SRC`, or run `tools/setup_agbcc.sh --check-only` to verify an install
-without building). `make setup` runs `setup-agbcc` followed by `doctor`.
-
-`doctor` and the build resolve `as`/`ld`/`objcopy` through `TOOLCHAIN`. The
-toolchain is expected in `~/.local/bin`; when `arm-none-eabi-as` is not on
-`PATH`, `make` auto-detects `$HOME/.local/bin/arm-none-eabi-` for you, so
-non-interactive shells and CI do not need to source your profile. `make doctor`
-verifies the result, and an explicit `TOOLCHAIN` always wins:
+`make setup` runs `setup-agbcc` then `doctor`. `doctor` and the build resolve
+`as`/`ld`/`objcopy` through `TOOLCHAIN`; when `arm-none-eabi-*` is not on
+`PATH`, `make` auto-detects `$HOME/.local/bin/arm-none-eabi-`, so
+non-interactive shells and CI work without sourcing a profile. An explicit
+`TOOLCHAIN` always wins:
 
 ```sh
 make check TOOLCHAIN=$HOME/.local/bin/arm-none-eabi-
 ```
 
-The baserom check compares `mf_us_baserom.gba` with `tools/baserom.sha1`; the
-baserom is copyrighted and is never committed. For a machine-readable report,
-run `python3 tools/doctor.py --json-out work/doctor.json`; the doctor's own
-parsing/comparison helpers have a synthetic `--self-check`.
+The baserom check compares `mf_us_baserom.gba` with `tools/baserom.sha1`; for a
+machine-readable report run `python3 tools/doctor.py --json-out
+work/doctor.json`.
 
 ## Build
 
-- Run `make clean` if necessary
-  - Use `make clean DATA=1` to remove data as well
-- Run the data extractor if necessary: `python3 tools/extractor.py`
-  - Use the `-r` flag to specify a region other than `us` (ex: `-r jp`)
-  - Use the `-d` flag to extract only debug data from the US beta ROM (required for building a ROM with debug features)
-- Run `make` (using the `-j` option is recommended to speed up the process)
-- To build another version of the ROM you can do either of the following:
-  - Specify it directly (ex: `make us_debug` for the US ROM with debug features)
-  - Specify the flags, REGION (takes the region name, defaults to `us`) and DEBUG (takes 0 or 1, defaults to 0)
-- Optionally, you can combine the commands to make it easier: `python3 tools/extractor.py && make -j`
+1. `make clean` if needed (`make clean DATA=1` also removes the extracted data).
+2. `python3 tools/extractor.py` (once per baserom; `-r <region>` selects a
+   region, `-d` extracts US-beta debug data).
+3. `make -j`.
 
-### Shift, audit and test targets
+Pick another configuration with `make us_debug`, or with the flags `REGION`
+(default `us`) and `DEBUG` (default `0`). `python3 tools/extractor.py &&
+make -j` is the combined form.
 
-The shiftability and behavior-harness targets are now part of the same build
-entry point:
+### Shift, audit and test
+
+`make audit`, `audit-*`, `check-relocs[-strict]`, `check-linker`,
+`postlink-scan[-strict]`, `smoke`, `content-check`, `test`, `shift-build`,
+`shift-test`, `shift-check`, `shift-screen`, `oam-diff`, `event-diff`,
+`shift-reorder` and `shift-check-all` live in `mk/shift.mk` and are exported
+from the single entry point; `make help` lists them all and `make shift-help`
+lists only this group. `make -f Makefile.shift <target>` stays as a thin
+compatibility wrapper for existing scripts, but new work should use `make
+<target>`. Audit targets that read extracted blobs take `DATA_ROOT=<path>`
+(default `data`); the map comes from a normal `make` build unless `MAP=<path>`
+is given.
+
+### Hack overlay (`HACK=1`, D-013)
 
 ```sh
-make audit                 # regenerate symbols/relocation audit/blobs/report
-make smoke                 # static ROM/header checks (no emulator)
-make check-relocs-strict   # gate: hardcoded ROM refs and raw pointer blobs
-make host-test             # host-compiler unit tests (no toolchain/baserom)
-make shift-build           # padded-layout build (TOOLCHAIN=... if not on PATH)
-make help                  # every normal and shift target
+make content-tables        # hack/content -> hack/gen/*.h (ignored)
+make hack-build            # work/hack/mf_us_hack.gba (+ .elf/.map)
+make hack-sha1             # hack-build + work/hack/mf_us_hack.sha1
+make hack-smoke            # hack-build + static smoke + boot smoke
+make hack-room-check       # 29500-frame replay: require Entry Ledge (area 7 room 0)
+make hack-liveness-check   # 28450-frame replay: spriteset + four live spawns
 ```
 
-`make shift-help` lists only the shift/audit/test targets. `make -f
-Makefile.shift <target>` remains a thin compatibility wrapper for existing
-scripts; new work should use `make <target>`. Audit targets that read extracted
-blobs take `DATA_ROOT=<path>` (default `data`), and the map comes from a normal
-`make` build unless `MAP=<path>` is given.
+The hack build compiles the same engine and baseline data with `-DHACK` /
+`--defsym HACK=1` into a private `work/hack/obj` tree and its own linker
+script, so it never overwrites `mf_us.gba` or the baseline objects. Hack-owned
+content must not go into `src/data`; see
+[docs/content-pipeline.md](docs/content-pipeline.md).
 
 ### Extracted data manifest and cache key
 
-`data/` and `sound/direct_sound_samples/` are generated by
-`tools/extractor.py` and ignored by Git. To make them cacheable and verifiable
-without committing any ROM-derived bytes:
+`data/` and `sound/direct_sound_samples/` are generated by the extractor and
+ignored by Git. To make them cacheable and verifiable without committing
+ROM-derived bytes:
 
 ```sh
 make data-manifest     # write tools/data-manifest.json (paths, sizes, SHA256)
@@ -133,15 +172,19 @@ make data-verify       # exit 1 on missing, extra, resized or changed files
 make data-cache-key    # <baserom-sha1>-<manifest-sha256>, one line
 ```
 
-The committed manifest is text-only and uses repository-relative POSIX paths
-such as `data/Blob_....bin` and `sound/direct_sound_samples/....bin`. It is
-deterministic (sorted, no timestamps), so a clean extraction from the same
-baserom produces an identical file. `python3 tools/data_manifest.py
---self-check` exercises write/verify, same-size mutation, missing, extra,
-symlinked-root and cache-key determinism in temporary directories; `--json`
-emits machine-readable reports. `data-verify` is deliberately not part of
-`make all` or `make check`.
+The committed manifest is text-only, uses repository-relative POSIX paths, and
+is deterministic (sorted, no timestamps). `python3 tools/data_manifest.py
+--self-check` covers write/verify, mutation, missing/extra, symlinked-root and
+cache-key cases. `data-verify` is deliberately not part of `make all` or
+`make check`.
 
-## Contributing
+## CI and contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md)
+Public (no baserom) and protected (private runner) CI layers, plus the symbols
+artifact they publish, are documented in [tools/ci/README.md](tools/ci/README.md).
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the clean-room rule and change
+process, [AGENTS.md](AGENTS.md) for the agent house rules and path ownership,
+and [docs/style.md](docs/style.md) for the C format contract. Never commit a
+ROM, extracted blobs, savestates or emulator screenshots of original graphics;
+release artifacts are BPS patches.

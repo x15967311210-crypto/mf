@@ -1,0 +1,60 @@
+# mf-hack C format contract (DOC-002).
+#
+# The rules are described in docs/style.md.  The tree is NOT mass-reformatted
+# yet: this file describes the agreed style, and `make format` / `make
+# format-check` (mk/format.mk) are opt-in tools for new or touched code.
+#
+# Run from the repository root; `--style=file` picks this file up for every
+# path under src/, include/ and hack/.
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+# Indentation: 4 spaces, never tabs, 4-column continuation.
+UseTab: Never
+TabWidth: 4
+IndentWidth: 4
+ContinuationIndentWidth: 4
+
+# Allman braces: function, struct, enum, if/else, switch, loop bodies all put
+# the opening brace on its own line.
+BreakBeforeBraces: Allman
+
+# No short single-line constructs; single-statement bodies stay brace-less
+# (InsertBraces is off), the way the existing engine sources are written.
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# `const u8* p`, never `const u8 *p`.
+PointerAlignment: Left
+DerivePointerAlignment: false
+
+# Wrapped call arguments indent one level instead of aligning to '('.
+AlignAfterOpenBracket: DontAlign
+
+# Keep operators at the end of the line and `switch` case labels one level in.
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: false
+IndentCaseLabels: false
+IndentPPDirectives: None
+
+# 120 columns: the engine sources already exceed 100 in long tables, and a
+# smaller limit would rewrite data lines without improving readability.
+ColumnLimit: 120
+
+# Do not reorder includes or reflow comments; both would rewrite history for
+# no behavioural gain.  One blank line between blocks is enough.
+SortIncludes: false
+IncludeBlocks: Preserve
+ReflowComments: false
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# `(u8*)p` and `if (x)`: no space after a C cast, one space before a
+# control-statement parenthesis, none before a function-call parenthesis.
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements

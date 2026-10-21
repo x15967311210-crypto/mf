@@ -183,7 +183,8 @@ RULES_NO_SCAN += symbols audit-asm audit-blobs rewrite report audit \
 	shift-check shift-reorder shift-start shift-input shift-input-30k \
 	shift-screen screen-diff oam-diff event-diff shift-check-all \
 	postlink-scan postlink-scan-strict shift-help \
-	content-tables content-tables-check hack-build hack-sha1 hack-smoke
+	content-tables content-tables-check hack-build hack-sha1 hack-smoke \
+	format format-check format-list
 
 # Generate tools before building anything
 SETUP_PREREQS ?= 1
@@ -302,6 +303,11 @@ include mk/hack.mk
 # `all`/`help` target, matching mk/shift.mk and mk/hack.mk.
 include mk/pm.mk
 
+# Format contract (DOC-002): `format`, `format-check`, `format-list`.
+# Contributes $(FORMAT_HELP); it owns no `all`/`help` target and never runs
+# without being asked, so a normal build is unchanged.
+include mk/format.mk
+
 .PHONY: help
 help:
 	@echo 'Targets:'
@@ -327,6 +333,9 @@ help:
 	@echo ''
 	@echo 'Project management (jira.md is the backlog source of truth):'
 	$(PM_HELP)
+	@echo ''
+	@echo 'Format contract (DOC-002; style in .clang-format and docs/style.md):'
+	$(FORMAT_HELP)
 	@echo ''
 	@echo 'Flags:'
 	@echo '  V=1: enable verbose output'
