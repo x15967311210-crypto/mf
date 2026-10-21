@@ -1098,9 +1098,15 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - `docs/howto/add-enemy.md`: PSPRITE_END constraint, proxy pattern, spriteset
     slot vs roomSlot, hack/*.c is not compiled, custom-AI options
   - landed `c035f9b`
-- [TODO] TECH-001 (tools) — symbolise hardcoded ROM literals
-  - use `tools/shift/map_symbols.py` and the audit ledger to replace the 697
-    `ldr` comments/raw addresses with semantic symbols where known
+- [DONE] TECH-001 (tools) — symbolise hardcoded ROM literals
+  - `tools/shift/label_comments.py`: resolves ROM addresses via
+    `map_symbols.py` and appends ` (Symbol+0xOFF)` to comments only;
+    `--check/--write/--json/--limit/--scope`, `--self-check` 21/21
+  - all **699** in-scope comments (697 asm + 2 C) labelled in two batches,
+    0 unknown/ambiguous; code prefixes unchanged, normal `ca33f434…` stays,
+    smoke/audit/check_relocs PASS
+  - landed `6def7b9` + `b870374`; remaining `ldr` count in the audit is
+    reference-only, not unresolved relocations
 - [TODO] TECH-002 (decomp) — split the giant disasm files
   - prioritise `disasm_0x0808F5C4.s` (335 ROM refs) and the other five large
     files; split by function/concern and name the entry points
