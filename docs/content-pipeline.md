@@ -10,16 +10,81 @@ engine, emit C tables, or convert final tileset graphics yet.  All generated
 output is deterministic: sorted JSON, fixed filenames, no paths, timestamps or
 ROM addresses.
 
+The D-009 content ID registry is a separate source file, `hack/content/ids.yaml`;
+it is checked by the same `content-check` target and generates
+`hack/include/hack/ids.h` plus `docs/content-tracker.md`.  See “ID registry”
+below.
+
 ## Quick check
 
 ```sh
 python3 tools/content/fixtures/generate_fixture.py --check
 python3 tools/content/tiled_to_room.py --self-check
+python3 tools/content/gen_ids.py --self-check
+python3 tools/content/gen_ids.py --check
 ```
 
 The self-check runs the synthetic fixture twice, diffs the output, and covers
 ten invalid-input cases (including the 4bpp palette budget).  It needs no ROM
 or emulator.
+
+## ID registry
+
+**Decision:** `docs/decisions.md` D-009 requires every new room, door,
+sprite/enemy, event, text block, music track and saved field to have an ID
+before use.  `hack/content/ids.yaml` is the source of truth; two committed
+files are generated from it and must not be hand-edited:
+
+| File | Purpose |
+|---|---|
+| `hack/include/hack/ids.h` | C enums with `<CATEGORY>_<NAME>` constants |
+| `docs/content-tracker.md` | allocation tables with owner/area, status and notes |
+
+Workflow:
+
+```sh
+# after editing ids.yaml
+python3 tools/content/gen_ids.py --write
+
+# gate: validates ids.yaml and fails if either generated file is stale
+python3 tools/content/gen_ids.py --check
+
+# tool regression suite; no ROM or emulator
+python3 tools/content/gen_ids.py --self-check
+```
+
+Schema (`schema_version: 1`): a top-level `areas` allowlist and a fixed,
+ordered list of seven categories — `rooms`, `doors`, `sprites`, `events`,
+`text`, `music`, `save_fields`.  Each category declares a C `prefix`, an
+inclusive `min_id`/`max_id`, a `radix` (`decimal` or `hex`), an optional note,
+and either `entries` or a typed `reserved_note`.  Each entry has `name`,
+integer `id`, `note`, optional `owner`/`status`, and optional references.
+Rooms require `area`; doors require `room` and a reciprocal `link`; sprites
+require `kind` (`primary`/`secondary`).  Optional `room`, `door`, `event`,
+`text` and `sprite` keys are cross-references.
+
+The checker enforces:
+
+- unique category names, prefixes, entry names and full C constants;
+- integer IDs within the category range and unique within the category;
+- canonical order (categories, entries by `(id, name)`, reserved ranges);
+- non-overlapping reserved ranges, with no entry inside a reserved range;
+- reciprocal door links and existing room/door/event/text/sprite references;
+- every category either has entries or an explicit `reserved_note`.
+
+Text, music and save-field IDs are deliberately **reserved placeholders** in
+schema 1:
+
+- baseline text is pointer-addressed, so there is no numeric text-block table
+  to extend; HACK-008b must define that space;
+- there is no free music ID: `0x00..0x63` are vanilla tracks and `0x64` is
+  `SOUND_64`, the first SFX, because `unk_3bd4` tests `sound < MUSIC_COUNT`;
+- M1 adds no saved field: it rides the existing `gEventCounter` at save `+0x21`,
+  and `SaveFile`/the `0x6E00..0x6FFF` gap stay unchanged.
+
+Adding an ID: choose the next free value in the category (not a reserved
+range), add the entry and its references, run `--write`, and commit
+`hack/content/ids.yaml` together with both generated files.
 
 ## Convert a room
 
@@ -105,7 +170,9 @@ HACK-004a should consume the output directory, not the Tiled file directly:
    (see `docs/design/content-ids.md`; `src/data` is baseline-owned, so this is
    an ADR/build-data change).
 3. Add the room/door C data and a Test Area 1 entry warp.
-4. Rebuild normal/shifted/reordered and run the M1 boot/scene gates.
+4. Use `ROOM_*`, `DOOR_*` and `EVENT_*` from `hack/include/hack/ids.h`; do not
+   add numeric IDs to generated or engine code.
+5. Rebuild normal/shifted/reordered and run the M1 boot/scene gates.
 
 The exact room IDs and provisional door indices are in
 `docs/design/content-ids.md`; they are not duplicated here.
@@ -126,6 +193,10 @@ The exact room IDs and provisional door indices are in
   tileset or scroll C-table emission; HACK-004a does that integration.
 - **Scripts/events:** no puzzle, event, lock, text, music or transition
   scripting; doors are static records only.
+- **ID allocation:** rooms, doors and the slice event block are seeded;
+  `SPRITE_ECHO_HUNTER` reserves the first free primary sprite ID. Text, music
+  and save-field categories are typed reserved placeholders because no safe
+  numeric space exists yet (see “ID registry”).
 - **Sub-block placement:** point spawns are floored to block coordinates; the
   engine applies its own `BLOCK_SIZE`/half-block offsets.
 - **RLE scope:** only the mode-1 8-bit-count stream is emitted; the decoder

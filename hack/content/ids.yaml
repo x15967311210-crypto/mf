@@ -1,0 +1,263 @@
+# Sector Null content ID registry (D-009).
+#
+# Source of truth for content IDs.  Edit this file, then run:
+#   python3 tools/content/gen_ids.py --write
+# and commit hack/content/ids.yaml together with:
+#   hack/include/hack/ids.h
+#   docs/content-tracker.md
+#
+# The generated files are committed and never hand-edited.  IDs are unique
+# within a category; the same number may appear in different categories because
+# rooms, doors, sprites, events, text, music and saved fields are separate
+# engine namespaces.  Entries are sorted by (id, name); reserved ranges are
+# sorted by start.
+
+schema_version: 1
+
+# Engine area constants that a room or event entry may reference.  Only Test
+# Area 1 is in scope for M1 (docs/design/content-ids.md).
+areas:
+  - AREA_TEST_1
+
+categories:
+  - name: rooms
+    prefix: ROOM
+    min_id: 0
+    max_id: 255
+    radix: decimal
+    note: "AREA_TEST_1 room indices for sTest1RoomEntries; M1 uses rooms 0..4."
+    entries:
+      - name: entry_ledge
+        id: 0
+        area: AREA_TEST_1
+        owner: HACK-004a2
+        status: reserved
+        note: "M1 room 0: save pad and Deck 07 log placeholder (content-ids section 3)."
+      - name: silent_atrium
+        id: 1
+        area: AREA_TEST_1
+        owner: HACK-004a2
+        status: reserved
+        note: "M1 room 1: vertical set-piece and optional missile/log route."
+      - name: resonance_chamber
+        id: 2
+        area: AREA_TEST_1
+        owner: HACK-004a2
+        status: reserved
+        note: "M1 room 2: Resonance Pulse pickup room."
+      - name: hidden_conduit
+        id: 3
+        area: AREA_TEST_1
+        owner: HACK-004a2
+        status: reserved
+        note: "M1 room 3: pulse/stealth route with the Cantor-origin log."
+      - name: choir_nest
+        id: 4
+        area: AREA_TEST_1
+        owner: HACK-004a2
+        status: reserved
+        note: "M1 room 4: Cantor arena and data-core pedestal."
+
+  - name: doors
+    prefix: DOOR
+    min_id: 0
+    max_id: 255
+    radix: decimal
+    note: "Indices in sTest1Doors[12]; final geometry uses the content-ids pairs 0/1, 2/3, 4/5, 6/7, 8/9 and the blockout return pair 10/11."
+    entries:
+      - name: entry_ledge_to_silent_atrium_a
+        id: 0
+        room: entry_ledge
+        link: entry_ledge_to_silent_atrium_b
+        owner: HACK-004a2
+        status: reserved
+        note: "Entry Ledge right exit to Silent Atrium; no hatch."
+      - name: entry_ledge_to_silent_atrium_b
+        id: 1
+        room: silent_atrium
+        link: entry_ledge_to_silent_atrium_a
+        owner: HACK-004a2
+        status: reserved
+        note: "Silent Atrium lower-left entry from Entry Ledge; no hatch."
+      - name: silent_atrium_to_resonance_chamber_a
+        id: 2
+        room: silent_atrium
+        link: silent_atrium_to_resonance_chamber_b
+        owner: HACK-004a2
+        status: reserved
+        note: "Silent Atrium top-right exit to Resonance Chamber; hatch-can-lock."
+      - name: silent_atrium_to_resonance_chamber_b
+        id: 3
+        room: resonance_chamber
+        link: silent_atrium_to_resonance_chamber_a
+        owner: HACK-004a2
+        status: reserved
+        note: "Resonance Chamber left entry from Silent Atrium; hatch-can-lock."
+      - name: resonance_chamber_to_hidden_conduit_a
+        id: 4
+        room: resonance_chamber
+        link: resonance_chamber_to_hidden_conduit_b
+        owner: HACK-004a2
+        status: reserved
+        note: "Resonance Chamber sealed right exit to Hidden Conduit; hatch-can-lock."
+      - name: resonance_chamber_to_hidden_conduit_b
+        id: 5
+        room: hidden_conduit
+        link: resonance_chamber_to_hidden_conduit_a
+        owner: HACK-004a2
+        status: reserved
+        note: "Hidden Conduit left entry from Resonance Chamber; hatch-can-lock."
+      - name: hidden_conduit_to_choir_nest_a
+        id: 6
+        room: hidden_conduit
+        link: hidden_conduit_to_choir_nest_b
+        owner: HACK-004a2
+        status: reserved
+        note: "Hidden Conduit right exit to Choir Nest; hatch-can-lock."
+      - name: hidden_conduit_to_choir_nest_b
+        id: 7
+        room: choir_nest
+        link: hidden_conduit_to_choir_nest_a
+        owner: HACK-004a2
+        status: reserved
+        note: "Choir Nest arena entrance from Hidden Conduit; hatch-can-lock."
+      - name: hidden_conduit_to_silent_atrium_a
+        id: 8
+        room: hidden_conduit
+        link: hidden_conduit_to_silent_atrium_b
+        owner: HACK-004a2
+        status: reserved
+        note: "Hidden Conduit ceiling shortcut to Silent Atrium; no hatch."
+      - name: hidden_conduit_to_silent_atrium_b
+        id: 9
+        room: silent_atrium
+        link: hidden_conduit_to_silent_atrium_a
+        owner: HACK-004a2
+        status: reserved
+        note: "Silent Atrium two-way shortcut landing from Hidden Conduit; hatch-can-lock."
+      - name: choir_nest_to_entry_ledge_a
+        id: 10
+        room: choir_nest
+        link: choir_nest_to_entry_ledge_b
+        owner: HACK-004a2
+        status: reserved
+        note: "Choir Nest post-boss exit to Entry Ledge; blockout return pair."
+      - name: choir_nest_to_entry_ledge_b
+        id: 11
+        room: entry_ledge
+        link: choir_nest_to_entry_ledge_a
+        owner: HACK-004a2
+        status: reserved
+        note: "Entry Ledge post-boss return from Choir Nest; blockout return pair."
+
+  - name: sprites
+    prefix: SPRITE
+    min_id: 0
+    max_id: 255
+    radix: hex
+    note: "Sprite IDs are u8 (struct SpriteData.spriteId); primary and secondary sprite tables are separate."
+    entries:
+      - name: echo_hunter
+        id: 0xCF
+        kind: primary
+        owner: HACK-008d
+        status: reserved
+        note: "Reserved for HACK-008d; baseline PSPRITE_END = 0xCF counts indices 0..0xCE, so HACK-008d must extend PSPRITE_END and all primary sprite tables before using this ID. Golden-path enemy; not currently dereferenceable."
+
+  - name: events
+    prefix: EVENT
+    min_id: 0
+    max_id: 255
+    radix: hex
+    note: "Values for the extended gEventCounter enum (u8); content-ids section 2 block 0x6E..0x77."
+    reserved:
+      - start: 0x78
+        end: 0xFF
+        note: "After the slice block: EVENT_END must become 0x78 in the extended enum (HACK-004a); no IDs allocated here."
+    entries:
+      - name: slice_null_started
+        id: 0x6E
+        room: entry_ledge
+        owner: HACK-004a
+        status: reserved
+        note: "Slice start / entry warp; set at Entry Ledge."
+      - name: resonance_pulse_acquired
+        id: 0x6F
+        room: resonance_chamber
+        owner: HACK-004a
+        status: reserved
+        note: "Resonance Pulse obtained; pulse check is gEventCounter >= this value."
+      - name: log_deck_07_sealed
+        id: 0x70
+        room: entry_ledge
+        owner: HACK-004d
+        status: reserved
+        note: "Reserved log event; re-readable and not set by the M1 slice."
+      - name: log_choir_experiment
+        id: 0x71
+        owner: HACK-004d
+        status: reserved
+        note: "Reserved log event; re-readable and not set by the M1 slice."
+      - name: log_cantor_origin
+        id: 0x72
+        room: hidden_conduit
+        owner: HACK-004d
+        status: reserved
+        note: "Reserved Cantor-origin log event; re-readable and not set in M1."
+      - name: log_director_final
+        id: 0x73
+        room: choir_nest
+        owner: HACK-004d
+        status: reserved
+        note: "Reserved final log event; re-readable and not set in M1."
+      - name: echo_hunter_intro_seen
+        id: 0x74
+        room: silent_atrium
+        owner: HACK-004b
+        status: reserved
+        note: "Optional Echo Hunter intro trigger."
+      - name: cantor_engaged
+        id: 0x75
+        room: choir_nest
+        owner: HACK-004c
+        status: reserved
+        note: "Cantor fight started; engaged set and defeated clear means respawn at the arena entrance."
+      - name: cantor_defeated
+        id: 0x76
+        room: choir_nest
+        owner: HACK-004c
+        status: reserved
+        note: "Cantor defeated; unlocks the post-boss exit."
+      - name: data_core_recovered
+        id: 0x77
+        room: choir_nest
+        owner: HACK-004d
+        status: reserved
+        note: "Data core recovered / slice complete; exit gate."
+
+  - name: text
+    prefix: TEXT
+    min_id: 0
+    max_id: 65535
+    radix: hex
+    note: "Baseline text blocks are pointer-addressed; there is no numeric text-block ID table to extend."
+    reserved_note: "No TEXT_* ID is allocated in schema 1. HACK-008b must define the text-block ID space before a TEXT_* entry is added; never reuse a pointer or message index."
+    entries: []
+
+  - name: music
+    prefix: MUSIC
+    min_id: 0
+    max_id: 255
+    radix: hex
+    note: "Music track IDs are the enum Sound values below MUSIC_COUNT."
+    reserved_note: "No free music ID: 0x00..0x63 are vanilla tracks and 0x64 is SOUND_64, the first SFX (unk_3bd4 tests sound < MUSIC_COUNT). HACK-008c must change that split before allocating MUSIC_*."
+    entries: []
+
+  - name: save_fields
+    prefix: SAVE_FIELD
+    min_id: 0
+    max_id: 4607
+    radix: hex
+    note: "Save-field IDs are byte offsets into the 0x1200-byte SaveFile; the record layout is not changed in M1."
+    reserved_note: "No new saved field: M1 rides gEventCounter at save +0x21. SaveFile stays u8[0x1200], the 0x6E00..0x6FFF gap is not used (content-ids section 4), and any future field needs a proven-free offset inside the 0x900-byte checksum span."
+    entries: []
