@@ -37,6 +37,9 @@ HACK_OBJ_DIR ?= $(HACK_WORK)/obj
 HACK_LD_SCRIPT ?= $(HACK_WORK)/linker.ld.pp
 HACK_FRAMES ?= 600
 HACK_SCENARIO ?= boot_smoke
+HACK_ROOM ?= entry_ledge
+HACK_ROOM_DIR ?= hack/gen/rooms/$(HACK_ROOM)
+HACK_TABLES ?= hack/gen/content_tables.h
 
 # Objects for the private tree.  The split mirrors ASMSRC: C sources are
 # preprocessed/compiled there, while checked-in .s files are assembled from
@@ -62,6 +65,10 @@ $(HACK_DIRECT_OBJ): $(OBJ_DIR)/%.o: %.s
 	@mkdir -p $(dir $@)
 	$Q$(AS) $(ASFLAGS) $< -o $@
 
+# The one baseline hook includes the generated table header; make must rebuild
+# it when content-tables regenerates that header.
+$(OBJ_DIR)/src/room.o: $(HACK_TABLES)
+
 # Same per-file optimisation overrides as the baseline build (Makefile).
 $(OBJ_DIR)/src/dma.s: CFLAGS = -O1 -mthumb-interwork -fhex-asm
 $(OBJ_DIR)/src/sram/%.s: CFLAGS = -O1 -mthumb-interwork -fhex-asm
@@ -70,9 +77,32 @@ $(OBJ_DIR)/src/sram/%.s: CFLAGS = -O1 -mthumb-interwork -fhex-asm
 $(OBJ_DIR)/sound/track_data.o: $(wildcard sound/tracks/*.s)
 endif
 
-.PHONY: hack-build hack-sha1 hack-smoke
+# HACK linker script: the same layout as linker.ld, but every source object is
+# under the private $(HACK_OBJ_DIR) tree.  GNU ld loads objects named in the
+# script, so this is what keeps baseline src/*.o out of the hack link.
+$(HACK_LD_SCRIPT): linker.ld tools/shift/prefix_linker_objects.py
+	@mkdir -p $(HACK_WORK)
+	$(CPP) $(CPPFLAGS) $< -o $@
+	$(PYTHON) tools/shift/prefix_linker_objects.py $@ --obj-dir $(HACK_OBJ_DIR)
 
-hack-build:
+.PHONY: content-tables content-tables-check hack-build hack-sha1 hack-smoke
+
+# HACK-008c2: the only generated-content step.  The room converter output and
+# the C header are both under ignored hack/gen/.
+content-tables:
+	@mkdir -p hack/gen/rooms
+	$(PYTHON) tools/content/tiled_to_room.py \
+		--map hack/content/tiled/$(HACK_ROOM).tmj \
+		--manifest hack/content/tiled/$(HACK_ROOM).room.json \
+		--out $(HACK_ROOM_DIR) --force
+	$(PYTHON) tools/content/gen_content_tables.py \
+		--room-dir $(HACK_ROOM_DIR) --out $(HACK_TABLES) --write
+
+content-tables-check:
+	$(PYTHON) tools/content/gen_content_tables.py \
+		--room-dir $(HACK_ROOM_DIR) --out $(HACK_TABLES) --check
+
+hack-build: content-tables
 	@mkdir -p $(HACK_WORK)
 	$(MAKE) -f Makefile HACK=1 \
 		ROM_STEM=$(HACK_STEM) OBJ_DIR=$(HACK_OBJ_DIR) \
@@ -89,6 +119,8 @@ hack-smoke: hack-build
 		--scenario $(HACK_SCENARIO) --frames $(HACK_FRAMES)
 
 define HACK_HELP
+	@echo "  content-tables      generate hack/gen/rooms/entry_ledge + content_tables.h"
+	@echo "  content-tables-check verify the generated one-room table is fresh"
 	@echo "  hack-build          build the HACK=1 overlay ROM into work/hack/ (D-013)"
 	@echo "  hack-sha1           hack-build, then write work/hack/mf_us_hack.sha1"
 	@echo "  hack-smoke          hack-build + static smoke + boot smoke (77 if no harness)"

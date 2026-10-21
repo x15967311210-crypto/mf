@@ -1084,6 +1084,7 @@ SECTIONS {
         src/data/ending_data.o(.rodata);
         src/data/sprite_pointers.o(.rodata);
         src/data/frame_data_pointers.o(.rodata);
+        src/room.o(.rodata);
     } >rom
 
     .data : ALIGN(2) {

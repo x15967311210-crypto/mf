@@ -15,8 +15,20 @@
 #ifndef HACK_CONTENT_TABLES_H
 #define HACK_CONTENT_TABLES_H
 
-/* AREA_TEST_1 has 12 baseline doors and 4 baseline room entries. */
-#define HACK_AREA_TEST_1_DOORS sTest1Doors
-#define HACK_AREA_TEST_1_ROOM_ENTRIES sTest1RoomEntries
+/* HACK-008c2: generated from hack/content/rooms/entry_ledge.  The header is
+ * ignored generated output; `make content-tables` creates it before a HACK
+ * build.  Keep this include as the only generated-content injection point. */
+#if defined(__has_include)
+#if __has_include("../../gen/content_tables.h")
+#include "../../gen/content_tables.h"
+#else
+#error "missing hack/gen/content_tables.h; run make content-tables"
+#endif
+#else
+#include "../../gen/content_tables.h"
+#endif
+
+#define HACK_AREA_TEST_1_DOORS HackTest1Doors
+#define HACK_AREA_TEST_1_ROOM_ENTRIES HackTest1RoomEntries
 
 #endif /* HACK_CONTENT_TABLES_H */

@@ -228,6 +228,32 @@ spriteset_second.bin
     `smoke` and the M1 room scenario.  No ROMs or generated `hack/gen/` files
     belong in Git.
 
+## HACK-008c2 generated table (Entry Ledge room 0)
+
+`make content-tables` is the one reproducible step from this directory to the
+HACK overlay:
+
+```sh
+make content-tables
+make content-tables-check
+make hack-build
+```
+
+It writes `hack/gen/rooms/entry_ledge/` and `hack/gen/content_tables.h` (both
+ignored).  The generated table currently contains:
+
+- room 0 (Entry Ledge), 15x10 blocks, tileset 0, mapX/mapY from the manifest;
+- bg1/bg2/clipdata RLE and the default spriteset records;
+- a safe empty bg3 record (`BG_PROP_NONE` still requires a loadable pointer);
+- one `DOOR_TYPE_NONE` terminator, not the two authored doors.
+
+The two authored doors are intentionally suppressed until the destination
+rooms exist.  HACK-008d adds the first dialogue/enemy/event path; HACK-004a2
+adds the full five-room blockout and the reciprocal door records.  Scrolls,
+text, events, music, animated tiles and LZ77 bg0 remain out of this table.
+
+Do not hand-edit `hack/gen` or copy generated tables into `src/data`.
+
 ## Known blockout gaps
 
 - The Resonance Chamber one-way drop back to the Atrium is marked with a grate

@@ -183,7 +183,7 @@ RULES_NO_SCAN += symbols audit-asm audit-blobs rewrite report audit \
 	shift-check shift-reorder shift-start shift-input shift-input-30k \
 	shift-screen screen-diff oam-diff event-diff shift-check-all \
 	postlink-scan postlink-scan-strict shift-help \
-	hack-build hack-sha1 hack-smoke
+	content-tables content-tables-check hack-build hack-sha1 hack-smoke
 
 # Generate tools before building anything
 SETUP_PREREQS ?= 1
@@ -336,9 +336,11 @@ $(ELF) $(MAP): $(OBJ) $(LD_SCRIPT)
 	$(MSG) LD $@
 	$Q$(LD) $(LDFLAGS) -n -T $(LD_SCRIPT) -Map=$(MAP) $(LIBS) -o $@
 
+ifneq ($(HACK),1)
 $(LD_SCRIPT): linker.ld
 	$(MSG) CPP $@
 	$Q$(CPP) $(CPPFLAGS) $< -o $@
+endif
 
 %.dump: %.gba
 	$(MSG) OBJDUMP $@

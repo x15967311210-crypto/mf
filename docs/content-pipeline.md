@@ -184,9 +184,11 @@ vanilla-owned, and a `HACK=1` build links an overlay that the baseline builds
 never see.  HACK-008c1 adds that build boundary with an **empty** overlay.
 
 ```sh
-make hack-build   # work/hack/mf_us_hack.gba (+ .elf, .map)
-make hack-sha1    # hack-build, then work/hack/mf_us_hack.sha1
-make hack-smoke   # hack-build + static smoke + boot_smoke (77 if no harness)
+make content-tables      # hack/content -> hack/gen/rooms/entry_ledge + content_tables.h
+make content-tables-check
+make hack-build          # work/hack/mf_us_hack.gba (+ .elf, .map)
+make hack-sha1           # hack-build, then work/hack/mf_us_hack.sha1
+make hack-smoke          # hack-build + static smoke + boot_smoke (77 if no harness)
 ```
 
 The target runs one sub-make with:
@@ -212,10 +214,27 @@ includes `hack/include/hack/content_tables.h` and uses
 the hack ROM is byte-identical to the baseline and boots through the baseline
 Test Area 1 tables.
 
-HACK-008c2 replaces those two defaults with the generated tables (declared
-`extern` in the same header) under the ignored `hack/gen/`; no linker, object
-or `src/data` change is needed.  Do not add hack content directly to
-`src/data`, and do not commit generated tables.
+HACK-008c2 replaces those two defaults with the generated Entry Ledge room 0
+table under the ignored `hack/gen/`.  `make content-tables` runs
+`tools/content/tiled_to_room.py` and `tools/content/gen_content_tables.py`; the
+generated header contains the room's bg1/bg2/clipdata RLE, default spriteset
+records, one `RoomEntryRom`, and a single `DOOR_TYPE_NONE` terminator because
+the one-room table has no destination doors yet.  The source room has two
+authored doors; HACK-008d/HACK-004a2 adds the reciprocal room/door records
+before those doors become active.
+
+The hack linker script is generated from the same `linker.ld`, then rewritten
+by `tools/shift/prefix_linker_objects.py` so every input object lives under
+`work/hack/obj`.  This matters because `linker.ld` names input objects
+explicitly: without the rewrite GNU ld would load baseline `src/*.o` even
+though `hack-build` compiles private objects.  The normal/shifted/reordered
+builds use the unmodified object paths and keep their SHAs.
+
+The current table intentionally does **not** yet select hack-owned scrolls,
+text, events or music.  Test Area 1 still uses the baseline empty-scroll
+pointer, and text/event table generation belongs to the HACK-008d golden path.
+Do not add hack content directly to `src/data`, and do not commit generated
+tables.
 
 ## Text pipeline (HACK-008b)
 
