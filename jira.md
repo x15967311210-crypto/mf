@@ -1552,14 +1552,42 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     never drawn (HACK-008d4)
   - out of scope: entry warp, enemy, doors, save/load
 - [TODO] HACK-008d3 (engine/content) — Echo Hunter primary sprite
-  - extend `PSPRITE_END` and every primary sprite table (behaviour, gfx, pal,
-    oam, sizes) with `SPRITE_ECHO_HUNTER = 0xCF`; one room spawn record and a
-    host/static check that the ID resolves; no baseline vanilla sprite change
-- [TODO] HACK-008d4 (engine/content/qa) — room entry, doors and save/load gate
-  - explicit entry warp into `AREA_TEST_1` room 0 for the hack build (or an
-    equivalent documented scenario save), reciprocal Entry Ledge door records
-    or an isolated one-room path, room-load + save/load behaviour scenario and
-    the one-page golden-path doc
+  - design constraint found in 008d2 research: `PSPRITE_END` (0xCF) sizes
+    `sPrimarySpritesAiPointers`, `sPrimarySpriteStats`, `sSpritesGraphicsPointers`,
+    `sSpritesPalettePointers` and `sSpritesGraphicsLength`; appending an entry
+    to those baseline `src/data` arrays shifts later symbols and changes the
+    baseline SHA, so "extend every table in place" is not allowed
+  - use a HACK-only dispatch wrapper instead: `SPRITE_ECHO_HUNTER = 0xCF`
+    stays out of the baseline arrays, and one narrow `#ifdef HACK` lookup
+    helper in `src/sprite.c` (plus the gfx/pal/length/stats accessors) returns
+    the hack entry for 0xCF and the unchanged baseline table otherwise; the AI
+    entry is hack-owned, not `src/data`
+  - one Entry Ledge spawn record, a host/static check that the ID resolves, and
+    unchanged normal/shifted/reordered SHAs
+- [DOING @dev30] HACK-008d4a (engine/qa) — hack entry warp + room-load scenario
+  - ordering changed by the manager: without an entry warp neither the d2 text
+    nor the d3 enemy can be behaviour-tested, so the warp lands first
+  - hook the existing C file-load path (`InGameLoad`, `src/in_game.c`, the
+    function that clears `gIsLoadingFile`): under `#ifdef HACK`, before
+    `RoomLoad()`, set `gCurrentArea = AREA_TEST_1`, `gLastDoorUsed = 0`
+    (door 0 has `srcRoom = 0`) and a valid Samus position, because the
+    `gIsLoadingFile` branch in `RoomLoadEntry` returns before placing Samus for
+    non-Main-Deck rooms
+  - add one headless room-load check that replays the committed 30k input
+    (the first fixture that reaches in-game) and asserts `area == 7`,
+    `room == 0`, main mode in-game and a live frame counter; wire it into
+    `tests/emulator/run.py` (new expected-event option) and a make target.
+    No `harness.c` change: the mGBA build tree is not available here, so the
+    committed harness binary cannot be rebuilt; the check must use the existing
+    binary's `--final` output
+  - baseline builds must keep their exact SHAs; the warp is HACK-only and
+    documented as the M1 test-entry shortcut
+  - out of scope: door reciprocity, save/load persistence, the one-page doc
+- [TODO] HACK-008d3 (engine/content) — Echo Hunter primary sprite
+  - behaviour proof depends on HACK-008d4a's entry warp; start after it lands
+- [TODO] HACK-008d4b (engine/content/qa) — doors, save/load and golden-path doc
+  - reciprocal Entry Ledge door records or an isolated one-room path, then the
+    save/load persistence scenario and the one-page golden-path doc
   - acceptance for the whole 008d: normal/shifted/reordered build; behaviour
     scenario; save/load; `content-check`; no baseline table editing
   - HACK-004a2 starts only after this is green
