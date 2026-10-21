@@ -37,7 +37,7 @@ typedef enum HackDoorId {
 
 /* sprites: Sprite IDs are u8 (struct SpriteData.spriteId); primary and secondary sprite tables are separate. */
 typedef enum HackSpriteId {
-    SPRITE_ECHO_HUNTER = 0xCF, /* primary; HACK-008d; reserved; Reserved for HACK-008d; baseline PSPRITE_END = 0xCF counts indices 0..0xCE, so HACK-008d must extend PSPRITE_END and all primary sprite tables before using this ID. Golden-path enemy; not currently dereferenceable. */
+    SPRITE_ECHO_HUNTER = 0xCF, /* primary; HACK-008d; reserved; Outside baseline PSPRITE_END = 0xCF (indices 0..0xCE). Do not extend the baseline sprite tables; src/sprite.c proxies this id to PSPRITE_HORNOAD at runtime (AI/stats/gfx) while the generated spriteset/spawn data keep 0xCF. Golden-path enemy; custom AI is HACK-004b. */
 } HackSpriteId;
 
 /* events: Values for the extended gEventCounter enum (u8); content-ids section 2 block 0x6E..0x77. */

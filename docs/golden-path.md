@@ -24,8 +24,8 @@ mgba work/hack/mf_us_hack.gba
 `Sram_CheckLoadSaveFile`) it sets `gCurrentArea = AREA_TEST_1`, `gLastDoorUsed =
 0` and spawns Samus at block (11,8).  That is why a New Game / empty-slot load
 lands in Entry Ledge (area 7, room 0) instead of the baseline start room.  Door
-transitions clear `gUnk_3000be3` afterwards, so they keep the baseline
-destination; in this build doors are suppressed anyway.
+transitions clear `gUnk_3000be3` afterwards; the 12 reciprocal Test Area 1
+door records drive the five-room route.
 
 ## Controls
 
@@ -65,9 +65,9 @@ installed; they never pass falsely.
 
 ## Known limits
 
-- **Doors are suppressed until HACK-004a2.**  The entry warp is the only way
-  into Entry Ledge and there is no routed way back out; reciprocal door records
-  and the 12-entry `sTest1Doors` shape land with HACK-004a2.
+- **Doors are static reciprocal records.**  The five rooms and all 12 doors are
+  active, but hatch locks, cutscenes and a dedicated cross-room transition /
+  save-load scenario are still HACK-004a2b.
 - **The enemy is a data clone until HACK-004b.**  The Echo Hunter spawns as
   `PSPRITE_HORNOAD`; behaviour, damage and the Resonance Pulse are later work.
 - **Automated save/load is QA-030.**  There is no SaveRAM fixture or TAS save

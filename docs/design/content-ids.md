@@ -137,18 +137,21 @@ room 4  Choir Nest
 active rooms, keep the door array shape/terminator, and document the change as
 an ADR because `src/data` is baseline-owned.
 
-Door indices (provisional, to be checked against the final door table):
+Door indices (implemented in the generated HACK overlay):
 
 ```text
-0/1  Entry Ledge <-> Silent Atrium
-2/3  Silent Atrium <-> Resonance Chamber
-4/5  Resonance Chamber <-> Hidden Conduit
-6/7  Hidden Conduit <-> Choir Nest
-8/9  Hidden Conduit <-> Silent Atrium (optional shortcut)
+0/1   Entry Ledge <-> Silent Atrium
+2/3   Silent Atrium <-> Resonance Chamber
+4/5   Resonance Chamber <-> Hidden Conduit
+6/7   Hidden Conduit <-> Choir Nest
+8/9   Hidden Conduit <-> Silent Atrium (optional shortcut)
+10/11 Choir Nest <-> Entry Ledge (post-boss return)
 ```
 
-Known audit item: `sTest1Doors[0]` currently self-loops in the baseline table;
-the final geometry must be checked before HACK-004a places doors.
+`HACK-004a2a` emits all 12 records with reciprocal `dstDoor` values and a
+`DOOR_TYPE_NONE` terminator; the baseline `sTest1Doors[0]` self-loop is not
+used by the overlay. Door transitions and hatch/lock behaviour still need the
+dedicated scenario in `HACK-004a2b`.
 
 ## 4. Save version
 
