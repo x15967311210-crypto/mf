@@ -19,8 +19,8 @@ map, blob classification, literal and C-literal rewrites, raw FrameData/Sa-X/
 intro/popup descriptor/map-OAM relocation, padded and section-reordered boot,
 Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
-HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2/008d3/008d4a
-(ID/text/overlay/generated Entry Ledge room, scroll, message and sprite tables + entry warp), QA-020 (native normal/shifted/
+HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2/008d3/008d4a/008d4b
+(ID/text/overlay/generated Entry Ledge room, scroll, message and sprite tables + entry warp and liveness gate), QA-020 (native normal/shifted/
 reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
 `git log`.
 
@@ -1438,14 +1438,18 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - generated `hack/gen/rooms/` stays ignored; README has the HACK-004a2
     integration checklist. Door IDs 10/11 are a provisional post-boss return
     pair and need design sign-off before the 13-entry door table is committed.
-- [PARK] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms
-  - parked until the content golden path lands: new rooms still require
-    hand-editing baseline-owned `src/data` tables and there is no text,
-    ID or script pipeline
-  - extend `sTest1RoomEntries` to 5 and `sTest1Doors` to 13; room/door data
-    promotion needs an ADR because `src/data` is baseline-owned
-  - resolve tileset 0, bg0/dark-room handling, spawn tables, entry warp
-  - fix broad `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1
+- [TODO] HACK-004a2 (engine/content) — integrate 5 Test Area 1 rooms
+  - **unblocked**: HACK-008d landed the generated room/door/spriteset/scroll/
+    text tables and the entry warp; new rooms no longer need `src/data` edits
+  - extend the generated room set to 5 and the door table to the 12 authored
+    records with reciprocal `dstDoor` pairs; keep the one-area overlay
+  - add the authored `AREA_TEST_1` event block (0x6E..0x77) and fix the broad
+    `>= EVENT_ORBIT_CHANGE_IMPLEMENTED` checks before M1 (save/navigation/
+    recharge pads)
+  - resolve tileset 0, bg0/dark-room handling, spawn tables, transition entry
+    positions, and a 5-room room-load/save-load scenario
+  - ADR for any remaining `src/data` promotion; 008d's isolated one-room path
+    is the baseline to extend
 - [DONE] ADR-013 (design/manager) — hack-owned content tables and generated IDs
   - decide the narrow engine hook/link boundary that moves rooms, doors,
     tilesets, scrolls, text, events and save IDs that hacks mutate out of
@@ -1603,33 +1607,27 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - limits: HACK-only first-load warp; no door reciprocity, no save/load
     persistence, no route back into Entry Ledge, and the banner/enemy are now
     reachable but not yet exercised by a scenario
-- [DOING @dev32] HACK-008d4b (qa/content) — liveness gate + golden-path doc
-  - door decision: keep the **isolated one-room path** for 008d (doors stay
-    suppressed; the entry warp is the only entrance).  Reciprocal records and
-    the 12-entry `sTest1Doors` shape belong to HACK-004a2; do not renumber
-    `dstDoor` in this task
-  - add a repeatable sprite-liveness check on top of `hack-room-check`:
-    replay input prefix **28450** of the committed 30k input (verified stable:
-    three runs, identical IWRAM; `frames=28451 frame_counter=28312`), dump
-    IWRAM, and assert the exact table `gSpritesetSpriteIds[0..6] ==
-    1F 1E 12 41 62 21 CF` with gfx slots `0..6`, plus live sprite-table
-    indices 0..3 with ids/status/roomSlot
-    `1F/0003/0`, `1E/0003/1`, `21/0013/255`, `12/8003/3`.
-    `struct SpriteData` stride is **0x38** on GBA (derive it from
-    `(gSpritesetSpriteIds - gSpriteData) / 24`); the banner's roomSlot is
-    `UCHAR_MAX` (MessageBannerInit), not its spawn index.  Read addresses with
-    `nm` (PATH, then `/home/x1596/.local/bin`), exit 77 without a harness, and
-    wire it into `mk/hack.mk`/`HACK_HELP` without slowing `hack-smoke`
-  - write the one-page `docs/golden-path.md`: build/run commands, entry-warp
-    explanation, controls, what to see (Entry Ledge, save pad, data pad,
-    banner text "ENTRY LEDGE / THE SIGNAL IS WEAK", Echo Hunter clone), how to
-    run every check, and known limits (doors off, enemy is a Hornoad data
-    clone, no automated save/load yet, no music assertion)
-  - manual save/load on the save pad goes into the doc's playtest steps;
-    automated SaveRAM save/load is split out to QA-030 below
-  - acceptance for the whole 008d after this: normal/shifted/reordered build;
-    room-load + liveness scenario; `content-check`; no baseline table editing.
-    HACK-004a2 starts only after this is green
+- [DONE] HACK-008d4b (qa/content) — liveness gate + golden-path doc
+  - door decision: kept the **isolated one-room path** (doors stay suppressed;
+    the entry warp is the only entrance).  Reciprocal records and the
+    12-entry `sTest1Doors` shape belong to HACK-004a2
+  - `tests/emulator/hack_room_check.py` + `make hack-liveness-check`: replays
+    the verified input prefix 28450 (`frames=28451 frame_counter=28312`,
+    IWRAM sha256 `e5347570…81a2`), resolves IWRAM symbols via `nm` (D-002
+    fallback), and asserts the 7-entry spriteset
+    `1F 1E 12 41 62 21 CF` / gfx slots `0..6` plus the four live spawns
+    `1F/0003/0`, `1E/0003/1`, `21/0013/255`, `12/8003/3`
+    (`SpriteData` stride 0x38; banner roomSlot is `UCHAR_MAX`)
+  - negative paths verified: wrong table, wrong live entry and missing harness
+    fail/skip with non-zero status; committed assertions were not weakened
+  - `docs/golden-path.md`: build/run, entry warp, controls, what to see
+    (room, pads, banner text, Echo Hunter clone), all check commands, known
+    limits and the manual save/reset/continue step
+  - landed `82364cf`; `hack-liveness-check`, `hack-room-check`, `hack-smoke`,
+    `content-check`, normal `ca33f434…`, shifted `5888a563…`, reordered
+    `9dac0a4b…`, `Makefile.shift test`, `audit`, `check_relocs` all PASS
+  - automated save/load remains QA-030 (needs a valid SaveRAM fixture);
+    HACK-008d is otherwise complete
 - [TODO] QA-030 (qa/tools) — automated hack save/load on the Entry Ledge pad
   - needs a valid SaveRAM (checksum) or a TAS save sequence; depends on QA-027
     for `Sram_CheckLoadSaveFile` coverage
