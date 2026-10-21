@@ -8,7 +8,7 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **30 TODO / 0 DOING / 71 DONE / 4 PARK** (105 entries).
+Counts: **31 TODO / 0 DOING / 71 DONE / 4 PARK** (106 entries).
 
 ### In progress (DOING)
 

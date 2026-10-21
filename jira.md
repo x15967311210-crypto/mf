@@ -1116,6 +1116,15 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - landed `ae0499b`; `ld -r` of the proposed parts is byte-identical
   - note: room load/backgrounds/clipdata/scroll/text are already C; the
     remaining hack-relevant asm is the SRAM/status/pause/navigation set
+- [TODO] TECH-003 (tools/decomp) — objdiff + decomp-permuter scratch workflow
+  - document/provide a scratch loop for C-ification: build a candidate C
+    function in `work/` or `/tmp`, compare it with the baseline object using
+    objdiff (or `arm-none-eabi-objdump`), and optionally run decomp-permuter
+    for register/scheduling variants
+  - the shiftable engine does not require byte-matching, but objdiff catches
+    behavior-relevant codegen differences before a C port is accepted; never
+    commit scratch output or third-party tool trees
+  - start with the SRAM functions in the TECH-002a priority list
 - [TODO] TECH-002b (decomp) — execute the first disasm split
   - split `asm/disasm_0x0808F5C4.s` into the four validated parts, replace its
     `linker.ld` line in ascending order, and require normal
