@@ -1485,7 +1485,7 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     `src/room.c` selecting `hack/include/hack/content_tables.h`.
   - empty overlay is byte-identical to baseline: normal/hack SHA
     `ca33f434...`; hack `boot_smoke` PASS; `content-check` PASS.
-- [TODO] HACK-008c2 (tools/content) — generated C content tables
+- [DOING @dev27] HACK-008c2 (tools/content) — generated C content tables
   - emit room/door/spriteset/scroll/text/event C tables from
     `hack/content` into ignored `hack/gen`; wire through the 008c1 hook
   - no hand edits to `src/data`
