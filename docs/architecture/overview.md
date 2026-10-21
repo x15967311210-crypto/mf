@@ -227,7 +227,11 @@ variable in a baseline function can change codegen and the baseline SHA.
 - `UpdateAudio` is still asm; audio timing is unverified.
 - Six large `asm/disasm_*.s` files remain; `disasm_0x0808F5C4.s` alone holds
   335 ROM references.
-- 697 `ldr` comments still carry raw ROM addresses; use
-  `tools/shift/map_symbols.py` and the audit ledger to name them.
+- ROM-address comments are being named with `tools/shift/label_comments.py`
+  (`--check`/`--write`, `--limit N`, `--scope ldr|references|all`). It resolves
+  addresses through `map_symbols.py` and appends ` (Symbol+0xOFF)` only to
+  comments; 100/697 asm occurrences were labelled in the first batch, the rest
+  are mechanically reproducible. The audit still reports 697 `ldr` comments
+  because the comments are reference-only, not relocations.
 - The generated `hack/gen/content_tables.h` banner comment and the top comment
   in `mk/hack.mk` describe the old empty-overlay state and should be refreshed.

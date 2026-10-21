@@ -257,7 +257,7 @@ _08079CC0:
 	bne _08079CE4
 	adds r3, #1
 _08079CE4:
-	ldr r1, _08079D28 @ =0x0879C0F0
+	ldr r1, _08079D28 @ =0x0879C0F0 (sBlob_79bec0_79c128+0x230)
 	ldr r0, _08079D2C @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -836,7 +836,7 @@ _0807A124:
 	add r1, ip
 	mov r8, r1
 _0807A13A:
-	ldr r1, _0807A174 @ =0x0879CDF4
+	ldr r1, _0807A174 @ =0x0879CDF4 (sMessageTextPointers)
 	ldr r0, _0807A178 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -1062,7 +1062,7 @@ NavigationConversationGetCurrentConversation: @ 0x0807A2DC
 	push {r4, r5, lr}
 	ldr r0, _0807A330 @ =gEventCounter
 	ldrb r2, [r0]
-	ldr r3, _0807A334 @ =0x08575A60
+	ldr r3, _0807A334 @ =0x08575A60 (sEventLocationAndNavigationInfo)
 	ldr r4, _0807A338 @ =gNonGameplayRam
 	ldr r5, _0807A33C @ =gPreviousNavigationConversation
 	cmp r2, #0
@@ -1256,7 +1256,7 @@ _0807A468:
 	beq _0807A4A6
 	adds r3, #1
 _0807A4A6:
-	ldr r1, _0807A4DC @ =0x0879C0F0
+	ldr r1, _0807A4DC @ =0x0879C0F0 (sBlob_79bec0_79c128+0x230)
 	ldr r0, _0807A4E0 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -1440,7 +1440,7 @@ _0807A5F2:
 	adds r1, r1, r0
 	lsls r1, r1, #2
 	adds r1, r1, r3
-	ldr r2, _0807A62C @ =0x085766E0
+	ldr r2, _0807A62C @ =0x085766E0 (sBlob_5766D4_prefix+0xC)
 	ldrb r0, [r3, #0x18]
 	lsls r0, r0, #1
 	adds r2, #1
@@ -1483,7 +1483,7 @@ _0807A630:
 	adds r1, r1, r0
 	lsls r1, r1, #2
 	adds r1, r1, r3
-	ldr r2, _0807A688 @ =0x085766E0
+	ldr r2, _0807A688 @ =0x085766E0 (sBlob_5766D4_prefix+0xC)
 	ldrb r0, [r3, #0x18]
 	lsls r0, r0, #1
 	adds r0, r0, r2
@@ -1512,7 +1512,7 @@ _0807A68C:
 	adds r2, r2, r0
 	lsls r2, r2, #2
 	adds r2, r2, r3
-	ldr r0, _0807A6BC @ =0x085766E0
+	ldr r0, _0807A6BC @ =0x085766E0 (sBlob_5766D4_prefix+0xC)
 	ldrb r1, [r3, #0x18]
 	lsls r1, r1, #1
 	adds r1, r1, r0
@@ -2131,7 +2131,7 @@ _0807AB4A:
 	adds r1, r1, r0
 	lsls r1, r1, #2
 	adds r1, r1, r4
-	ldr r2, _0807ABB0 @ =0x085766E0
+	ldr r2, _0807ABB0 @ =0x085766E0 (sBlob_5766D4_prefix+0xC)
 	ldrb r0, [r4, #0x18]
 	lsls r0, r0, #1
 	adds r0, r0, r2
@@ -2472,7 +2472,7 @@ _0807ADE8:
 	adds r1, r1, r0
 	lsls r1, r1, #2
 	adds r1, r1, r2
-	ldr r3, _0807AE50 @ =0x085766E0
+	ldr r3, _0807AE50 @ =0x085766E0 (sBlob_5766D4_prefix+0xC)
 	ldrb r0, [r2, #0x18]
 	lsls r0, r0, #1
 	adds r0, r0, r3
@@ -2583,7 +2583,7 @@ NavigationConversationSetupOam: @ 0x0807AE54
 	movs r5, #0x85
 	lsls r5, r5, #2
 	adds r1, r6, r5
-	ldr r0, _0807AF64 @ =0x085766D4
+	ldr r0, _0807AF64 @ =0x085766D4 (sBlob_5766D4_prefix)
 	ldm r0!, {r3, r4, r5}
 	stm r1!, {r3, r4, r5}
 	mov r0, sb
@@ -2698,7 +2698,7 @@ NavigationConversationUpdateTarget: @ 0x0807AF8C
 	adds r2, r1, #0
 	cmp r0, #1
 	bne _0807AFDC
-	ldr r1, _0807AFD8 @ =0x085767EC
+	ldr r1, _0807AFD8 @ =0x085767EC (sBlob_5766D4_prefix+0x118)
 	adds r3, #0x6a
 	adds r0, r2, r3
 	ldrb r0, [r0]
@@ -2785,7 +2785,7 @@ _0807B060:
 	movs r4, #0
 	movs r2, #0
 	adds r7, r0, #0
-	ldr r6, _0807B0BC @ =0x085766E4
+	ldr r6, _0807B0BC @ =0x085766E4 (sBlob_5766D4_prefix+0x10)
 	movs r1, #0x88
 	lsls r1, r1, #2
 	adds r0, r5, r1
@@ -2807,7 +2807,7 @@ _0807B086:
 	adds r2, r0, r6
 	ldrb r0, [r2, #1]
 	strb r0, [r7]
-	ldr r1, _0807B0C0 @ =0x08576066
+	ldr r1, _0807B0C0 @ =0x08576066 (sNavigationTargetLocationAreas)
 	ldrb r0, [r7]
 	adds r0, r0, r1
 	ldrb r0, [r0]
@@ -2836,7 +2836,7 @@ _0807B0CC: .4byte 0x0000020F
 _0807B0D0:
 	cmp r1, #0
 	bne _0807B0F4
-	ldr r2, _0807B0EC @ =0x08576218
+	ldr r2, _0807B0EC @ =0x08576218 (sBlob_576217_576234+0x1)
 	ldrb r0, [r6]
 	lsls r0, r0, #1
 	adds r1, r0, r2
@@ -2852,7 +2852,7 @@ _0807B0D0:
 _0807B0EC: .4byte sMaintainedInputDelays+0x8
 _0807B0F0: .4byte 0x0000020F
 _0807B0F4:
-	ldr r0, _0807B110 @ =0x08576226
+	ldr r0, _0807B110 @ =0x08576226 (sBlob_576217_576234+0xF)
 	ldrb r1, [r3]
 	lsls r1, r1, #1
 	adds r2, r1, r0
@@ -2956,7 +2956,7 @@ _0807B1B8:
 	movs r4, #0xd5
 	lsls r4, r4, #1
 	adds r0, r7, r4
-	ldr r1, _0807B208 @ =0x085767EC
+	ldr r1, _0807B208 @ =0x085767EC (sBlob_5766D4_prefix+0x118)
 	ldrb r0, [r0]
 	ldrb r3, [r1]
 	cmp r0, r3
@@ -3031,7 +3031,7 @@ _0807B256:
 	ldrb r0, [r0]
 	cmp r0, #1
 	bne _0807B280
-	ldr r1, _0807B278 @ =0x085767EC
+	ldr r1, _0807B278 @ =0x085767EC (sBlob_5766D4_prefix+0x118)
 	ldr r2, _0807B27C @ =0x00000213
 	adds r0, r7, r2
 	ldrb r0, [r0]
@@ -3154,7 +3154,7 @@ _0807B34E:
 	ldrb r0, [r3]
 	cmp r0, #0
 	bne _0807B37C
-	ldr r2, _0807B374 @ =0x08576218
+	ldr r2, _0807B374 @ =0x08576218 (sBlob_576217_576234+0x1)
 	ldr r4, _0807B378 @ =0x00000212
 	adds r3, r7, r4
 	ldrb r0, [r3]
@@ -3170,7 +3170,7 @@ _0807B370: .4byte 0x0000020E
 _0807B374: .4byte sMaintainedInputDelays+0x8
 _0807B378: .4byte 0x00000212
 _0807B37C:
-	ldr r2, _0807B3E0 @ =0x08576226
+	ldr r2, _0807B3E0 @ =0x08576226 (sBlob_576217_576234+0xF)
 	ldrb r0, [r3]
 	lsls r0, r0, #1
 	adds r0, r0, r2
@@ -3654,7 +3654,7 @@ _0807B73C:
 	ldrh r1, [r0]
 	adds r1, #0x11
 	strh r1, [r0]
-	ldr r0, _0807B778 @ =0x08576802
+	ldr r0, _0807B778 @ =0x08576802 (sBlob_5766D4_prefix+0x12E)
 	lsls r1, r1, #0x10
 	lsrs r1, r1, #0x10
 	ldrb r0, [r0]
@@ -3872,7 +3872,7 @@ ProcessPauseScreenText: @ 0x0807B8D4
 	adds r2, r4, #0
 	bl BitFill
 	movs r6, #0
-	ldr r2, _0807B940 @ =0x0879C10C
+	ldr r2, _0807B940 @ =0x0879C10C (sBlob_79bec0_79c128+0x24C)
 	ldr r0, _0807B944 @ =0x03000011
 	movs r1, #0
 	ldrsb r1, [r0, r1]
@@ -4041,7 +4041,7 @@ _0807BA30:
 	ldr r1, _0807BA80 @ =0x0200D000
 	mov sl, r1
 _0807BA3C:
-	ldr r1, _0807BA8C @ =0x0879CDF4
+	ldr r1, _0807BA8C @ =0x0879CDF4 (sMessageTextPointers)
 	ldr r0, _0807BA90 @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -4166,7 +4166,7 @@ _0807BB24:
 	ble _0807BA30
 	ldr r2, _0807BB64 @ =0x0200F000
 	mov sl, r2
-	ldr r1, _0807BB68 @ =0x0879CDF4
+	ldr r1, _0807BB68 @ =0x0879CDF4 (sMessageTextPointers)
 	ldr r0, _0807BB6C @ =0x03000011
 	ldrb r0, [r0]
 	lsls r0, r0, #0x18
@@ -4272,7 +4272,7 @@ GetFlashingSectorNumber: @ 0x0807BBF0
 	ldr r1, _0807BC84 @ =gEventCounter
 	ldrb r2, [r1]
 	adds r6, r0, #0
-	ldr r1, _0807BC88 @ =0x08575A60
+	ldr r1, _0807BC88 @ =0x08575A60 (sEventLocationAndNavigationInfo)
 	ldr r7, _0807BC8C @ =gPreviousNavigationConversation
 	cmp r2, #0
 	ble _0807BC2A
@@ -4307,7 +4307,7 @@ _0807BC2A:
 	bne _0807BC76
 	movs r3, #0
 	movs r2, #0
-	ldr r0, _0807BC90 @ =0x085766E4
+	ldr r0, _0807BC90 @ =0x085766E4 (sBlob_5766D4_prefix+0x10)
 	movs r1, #0
 	ldrsb r1, [r0, r1]
 	adds r5, r0, #0
@@ -4333,7 +4333,7 @@ _0807BC68:
 	lsls r0, r2, #3
 	adds r0, r0, r5
 	ldrb r2, [r0, #1]
-	ldr r0, _0807BC94 @ =0x08576066
+	ldr r0, _0807BC94 @ =0x08576066 (sNavigationTargetLocationAreas)
 	adds r0, r2, r0
 	ldrb r0, [r0]
 	strb r0, [r6]
@@ -4360,7 +4360,7 @@ NavigationConversationLoadPopUpGraphics: @ 0x0807BC98
 	lsls r1, r1, #2
 	adds r0, r0, r1
 	ldrb r2, [r0]
-	ldr r0, _0807BD6C @ =0x0857BCC8
+	ldr r0, _0807BD6C @ =0x0857BCC8 (sBlob_5766D4_after)
 	movs r1, #8
 	ldrsb r1, [r0, r1]
 	adds r3, r0, #0
@@ -4386,7 +4386,7 @@ _0807BCC8:
 	ldrb r0, [r4, #1]
 	cmp r0, #0
 	beq _0807BCF0
-	ldr r2, _0807BD70 @ =0x0857BC50
+	ldr r2, _0807BD70 @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	adds r1, r0, #0
 	lsls r0, r1, #1
 	adds r0, r0, r1
@@ -4401,7 +4401,7 @@ _0807BCF0:
 	ldrb r0, [r4, #2]
 	cmp r0, #0
 	beq _0807BD0C
-	ldr r2, _0807BD70 @ =0x0857BC50
+	ldr r2, _0807BD70 @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	adds r1, r0, #0
 	lsls r0, r1, #1
 	adds r0, r0, r1
@@ -4415,7 +4415,7 @@ _0807BD0C:
 	ldrb r0, [r4, #3]
 	cmp r0, #0
 	beq _0807BD28
-	ldr r2, _0807BD70 @ =0x0857BC50
+	ldr r2, _0807BD70 @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	adds r1, r0, #0
 	lsls r0, r1, #1
 	adds r0, r0, r1
@@ -4485,7 +4485,7 @@ NavigationConversationUpdatePopUp: @ 0x0807BD90
 	ldrb r0, [r1]
 	adds r0, #1
 	strb r0, [r1]
-	ldr r1, _0807BDD8 @ =0x0879C170
+	ldr r1, _0807BDD8 @ =0x0879C170 (sBlob_79c170_79c27c)
 	ldrb r0, [r2]
 	subs r0, #1
 	lsls r0, r0, #2
@@ -4521,7 +4521,7 @@ unk_7bde0: @ 0x0807BDE0
 	lsls r1, r1, #2
 	adds r0, r2, r1
 	ldrb r4, [r0]
-	ldr r0, _0807BE34 @ =0x0857BCC8
+	ldr r0, _0807BE34 @ =0x0857BCC8 (sBlob_5766D4_after)
 	movs r1, #8
 	ldrsb r1, [r0, r1]
 	adds r6, r2, #0
@@ -4632,7 +4632,7 @@ _0807BEC4:
 	lsls r0, r0, #0x12
 _0807BECE:
 	str r0, [r1]
-	ldr r2, _0807BF28 @ =0x0857BC50
+	ldr r2, _0807BF28 @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	ldr r1, _0807BF2C @ =0x0000021A
 	adds r0, r6, r1
 	ldrb r1, [r0]
@@ -4764,7 +4764,7 @@ NavigationConversationFadeInPopUpPalette: @ 0x0807BFD4
 	mov r5, r8
 	push {r5, r6, r7}
 	sub sp, #8
-	ldr r2, _0807C068 @ =0x0857BC50
+	ldr r2, _0807C068 @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	ldr r3, _0807C06C @ =gNonGameplayRam
 	ldr r1, _0807C070 @ =0x0000021A
 	adds r0, r3, r1
@@ -4891,7 +4891,7 @@ _0807C0BE:
 NavigationConversationUpdateXParasitePopUp: @ 0x0807C0D0
 	push {r4, r5, r6, r7, lr}
 	bl unk_7c3b4
-	ldr r0, _0807C148 @ =0x0857BC50
+	ldr r0, _0807C148 @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	mov ip, r0
 	ldr r3, _0807C14C @ =gNonGameplayRam
 	ldr r1, _0807C150 @ =0x0000021A
@@ -4976,7 +4976,7 @@ _0807C174:
 	lsls r0, r0, #0x12
 _0807C17E:
 	str r0, [r1]
-	ldr r3, _0807C1F0 @ =0x0857BC50
+	ldr r3, _0807C1F0 @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	ldr r2, _0807C1F4 @ =gNonGameplayRam
 	ldr r1, _0807C1F8 @ =0x0000021A
 	adds r0, r2, r1
@@ -5108,7 +5108,7 @@ _0807C280:
 	lsls r0, r0, #0x12
 _0807C28A:
 	str r0, [r1]
-	ldr r3, _0807C2FC @ =0x0857BC50
+	ldr r3, _0807C2FC @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	ldr r2, _0807C300 @ =gNonGameplayRam
 	ldr r1, _0807C304 @ =0x0000021A
 	adds r0, r2, r1
@@ -5250,7 +5250,7 @@ _0807C3B0: .4byte 0x00000219
 	thumb_func_start unk_7c3b4
 unk_7c3b4: @ 0x0807C3B4
 	push {r4, r5, r6, lr}
-	ldr r4, _0807C42C @ =0x0857BC50
+	ldr r4, _0807C42C @ =0x0857BC50 (sNavigationConversationPopUpGraphics)
 	ldr r5, _0807C430 @ =gNonGameplayRam
 	ldr r0, _0807C434 @ =0x0000021A
 	adds r2, r5, r0
@@ -5327,7 +5327,7 @@ unk_7c440: @ 0x0807C440
 	adds r0, #1
 	movs r7, #0
 	strb r0, [r5]
-	ldr r3, _0807C520 @ =0x0857BEB4
+	ldr r3, _0807C520 @ =0x0857BEB4 (sBlob_5766D4_after+0x1EC)
 	movs r1, #0x89
 	lsls r1, r1, #2
 	adds r4, r2, r1
@@ -5351,7 +5351,7 @@ unk_7c440: @ 0x0807C440
 _0807C47A:
 	movs r3, #0xa0
 	lsls r3, r3, #0x13
-	ldr r1, _0807C524 @ =0x0857BCD4
+	ldr r1, _0807C524 @ =0x0857BCD4 (sBlob_5766D4_after+0xC)
 	ldrb r0, [r4]
 	lsls r0, r0, #1
 	adds r0, r0, r1
@@ -5364,7 +5364,7 @@ _0807C47A:
 	strh r0, [r3, #0x26]
 	adds r1, r3, #0
 	adds r1, #0x44
-	ldr r2, _0807C528 @ =0x0857BCF4
+	ldr r2, _0807C528 @ =0x0857BCF4 (sBlob_5766D4_after+0x2C)
 	ldrb r0, [r4]
 	lsls r0, r0, #1
 	adds r0, r0, r2

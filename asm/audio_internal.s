@@ -299,7 +299,7 @@ _080047A0:
 	thumb_func_start UpdateAudio
 UpdateAudio: @ 0x080047A8
 	push {r4, r5, r6, lr}
-	ldr r4, _08004810 @ =0x080A8CDC
+	ldr r4, _08004810 @ =0x080A8CDC (sMusicTrackDataRom)
 	ldr r6, _08004814 @ =gMusicInfo
 	movs r0, #0x21
 	ldrb r0, [r6, r0]

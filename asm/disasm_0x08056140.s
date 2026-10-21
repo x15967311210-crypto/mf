@@ -202,7 +202,7 @@ GunshipEndInit: @ 0x08056278
 	adds r1, #0x24
 	movs r0, #1
 	strb r0, [r1]
-	ldr r0, _08056300 @ =0x0839EC68
+	ldr r0, _08056300 @ =0x0839EC68 (sBlob_39aa34_39f4b0+0x4234)
 	str r0, [r4, #0x18]
 	strb r2, [r4, #0x1c]
 	strh r3, [r4, #0x16]
@@ -346,7 +346,7 @@ GunshipEndWaitingToEnter: @ 0x080563E8
 	adds r0, r0, r3
 	mov ip, r0
 	ldrb r2, [r0]
-	ldr r5, _0805643C @ =0x0839AAE0
+	ldr r5, _0805643C @ =0x0839AAE0 (sBlob_39aa34_39f4b0+0xAC)
 	lsls r0, r2, #1
 	adds r0, r0, r5
 	ldrh r4, [r0]
@@ -399,7 +399,7 @@ GunshipEndEntering: @ 0x08056444
 	add r1, ip
 	mov r8, r1
 	ldrb r2, [r1]
-	ldr r4, _080564B4 @ =0x0839AAE0
+	ldr r4, _080564B4 @ =0x0839AAE0 (sBlob_39aa34_39f4b0+0xAC)
 	lsls r0, r2, #1
 	adds r0, r0, r4
 	ldrh r3, [r0]
@@ -420,7 +420,7 @@ _0805646E:
 	adds r4, r0, r3
 	movs r5, #0
 	strh r4, [r1, #2]
-	ldr r2, _080564BC @ =0x0839AC90
+	ldr r2, _080564BC @ =0x0839AC90 (sBlob_39aa34_39f4b0+0x25C)
 	mov r6, ip
 	adds r6, #0x2e
 	ldrb r3, [r6]
@@ -458,7 +458,7 @@ _080564C0:
 	adds r1, #0x24
 	movs r0, #0x1a
 	strb r0, [r1]
-	ldr r0, _08056588 @ =0x0839EB48
+	ldr r0, _08056588 @ =0x0839EB48 (sBlob_39aa34_39f4b0+0x4114)
 	str r0, [r3, #0x18]
 	strb r5, [r3, #0x1c]
 	strh r7, [r3, #0x16]
@@ -500,7 +500,7 @@ _080564C0:
 	strh r0, [r6]
 	adds r2, #0x18
 	adds r1, r1, r2
-	ldr r0, _08056594 @ =0x0839EC30
+	ldr r0, _08056594 @ =0x0839EC30 (sBlob_39aa34_39f4b0+0x41FC)
 	str r0, [r1]
 	strb r5, [r6, #0x1c]
 	strh r7, [r6, #0x16]
@@ -709,7 +709,7 @@ GunshipEndStartingEngine1: @ 0x080566A8
 	movs r3, #0
 	movs r0, #0x3a
 	strb r0, [r1]
-	ldr r0, _0805671C @ =0x0839EC68
+	ldr r0, _0805671C @ =0x0839EC68 (sBlob_39aa34_39f4b0+0x4234)
 	str r0, [r4, #0x18]
 	strb r3, [r4, #0x1c]
 	movs r2, #0
@@ -737,7 +737,7 @@ GunshipEndStartingEngine1: @ 0x080566A8
 	lsls r0, r0, #3
 	adds r0, r0, r1
 	strh r3, [r0]
-	ldr r0, _08056724 @ =0x082F474E
+	ldr r0, _08056724 @ =0x082F474E (sGunshipBeamOam_Idle_Frame2+0x6C)
 	ldr r1, _08056728 @ =0x040000D4
 	str r0, [r1]
 	ldr r0, _0805672C @ =0x05000336
@@ -769,7 +769,7 @@ GunshipEndStartingEngine2: @ 0x08056738
 	adds r0, r0, r2
 	mov ip, r0
 	ldrb r3, [r0]
-	ldr r5, _08056798 @ =0x0839ABC4
+	ldr r5, _08056798 @ =0x0839ABC4 (sBlob_39aa34_39f4b0+0x190)
 	lsls r0, r3, #1
 	adds r0, r0, r5
 	ldrh r4, [r0]
@@ -801,7 +801,7 @@ _0805675A:
 	lsls r0, r0, #0x18
 	cmp r0, #0
 	bne _080567FE
-	ldr r0, _080567A0 @ =0x0839EC08
+	ldr r0, _080567A0 @ =0x0839EC08 (sBlob_39aa34_39f4b0+0x41D4)
 	str r0, [r2, #0x18]
 	strb r4, [r2, #0x1c]
 	strh r1, [r2, #0x16]
@@ -827,7 +827,7 @@ _080567A4:
 	lsrs r1, r0, #0x18
 	cmp r1, #0
 	bne _080567FE
-	ldr r0, _080567CC @ =0x0839EC78
+	ldr r0, _080567CC @ =0x0839EC78 (sBlob_39aa34_39f4b0+0x4244)
 	str r0, [r2, #0x18]
 	strb r4, [r2, #0x1c]
 	strh r1, [r2, #0x16]
@@ -917,7 +917,7 @@ _08056858:
 	strb r0, [r3]
 _0805685A:
 	ldr r3, _0805688C @ =gCurrentSprite
-	ldr r1, _08056890 @ =0x0839ACD0
+	ldr r1, _08056890 @ =0x0839ACD0 (sBlob_39aa34_39f4b0+0x29C)
 	adds r2, r3, #0
 	adds r2, #0x2e
 	ldrb r0, [r2]
@@ -932,7 +932,7 @@ _0805685A:
 	asrs r0, r0, #2
 	lsls r0, r0, #0x18
 	lsrs r0, r0, #0x18
-	ldr r1, _08056894 @ =0x0839AC84
+	ldr r1, _08056894 @ =0x0839AC84 (sBlob_39aa34_39f4b0+0x250)
 	adds r0, r0, r1
 	ldrb r1, [r0]
 	adds r0, r3, #0
@@ -968,7 +968,7 @@ GunshipEndBottomIdle: @ 0x0805689C
 	adds r3, #0x2e
 	ldrb r0, [r3]
 	lsls r0, r0, #5
-	ldr r1, _080568E4 @ =0x082F474E
+	ldr r1, _080568E4 @ =0x082F474E (sGunshipBeamOam_Idle_Frame2+0x6C)
 	adds r0, r0, r1
 	ldr r1, _080568E8 @ =0x040000D4
 	str r0, [r1]
@@ -1048,7 +1048,7 @@ GunshiEndpBeamInit: @ 0x08056910
 	strh r1, [r2, #0xc]
 	strh r0, [r2, #0xe]
 	strh r1, [r2, #0x10]
-	ldr r0, _08056980 @ =0x0839EBB8
+	ldr r0, _08056980 @ =0x0839EBB8 (sBlob_39aa34_39f4b0+0x4184)
 	str r0, [r2, #0x18]
 	strb r3, [r2, #0x1c]
 	strh r4, [r2, #0x16]
