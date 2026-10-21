@@ -177,6 +177,52 @@ HACK-004a should consume the output directory, not the Tiled file directly:
 The exact room IDs and provisional door indices are in
 `docs/design/content-ids.md`; they are not duplicated here.
 
+## Text pipeline (HACK-008b)
+
+Text uses the repository `charmap.txt` through `tools/preproc`'s **C
+`INCTEXT`** path.  The assembly `.string` reader in this tree is a stub; do not
+use it for content.
+
+```c
+#include "constants/text.h"
+const u16 sGoldenPathText[] = INCTEXT(
+    "ENTRY LEDGE{NEW_LINE}"
+    "THE SIGNAL IS WEAK"
+);
+```
+
+Compile/check it with:
+
+```sh
+make -C tools/preproc
+python3 tools/content/text_roundtrip.py --self-check
+python3 tools/content/text_roundtrip.py --file hack/content/text/golden_path.c
+```
+
+Proven mappings (US text blob, low-byte glyph codes):
+
+| Source | Word | Meaning |
+|---|---:|---|
+| `A..Z` | `0x00C1..0x00DA` | uppercase glyphs |
+| `a..z` | `0x00E1..0x00FA` | lowercase glyphs |
+| space | `0x0040` | space |
+| `{NEW_LINE}` | `0xFE00` | line break |
+| `{WIDTH(n)}` | `0x80NN` | width escape |
+| `{INDENT(n)}` | `0x83NN` | indent escape |
+| terminator | `0xFF00` | end of text |
+
+Unknown characters, including unproven digits and punctuation, are **hard
+errors**.  Do not add guessed mappings; prove them against the text blob or
+glyph atlas first.  The alternate `0x81..0x9A` uppercase/small-caps set is
+documented but intentionally unmapped.
+
+Text IDs stay unallocated in `hack/content/ids.yaml`: vanilla text is
+pointer-table addressed (`sMessageTextPointers`/`sLocationTextPointers`), not
+a numeric message table.  HACK-008d must add a relocatable hack-owned text
+pointer table and assign the first `TEXT_*` ID before wiring dialogue into a
+room.  Width/line wrapping and the in-game message banner are also 008d work;
+this task only proves the compile/round-trip path.
+
 ## Known gaps
 
 - **Clipdata capacity:** fixed in HACK-003a; rooms with a clip layer are
@@ -194,9 +240,10 @@ The exact room IDs and provisional door indices are in
 - **Scripts/events:** no puzzle, event, lock, text, music or transition
   scripting; doors are static records only.
 - **ID allocation:** rooms, doors and the slice event block are seeded;
-  `SPRITE_ECHO_HUNTER` reserves the first free primary sprite ID. Text, music
-  and save-field categories are typed reserved placeholders because no safe
-  numeric space exists yet (see “ID registry”).
+  `SPRITE_ECHO_HUNTER=0xCF` is reserved for HACK-008d and requires extending
+  `PSPRITE_END`/primary tables before use. Text, music and save-field
+  categories are typed reserved placeholders because no safe numeric space
+  exists yet (see “ID registry” and “Text pipeline”).
 - **Sub-block placement:** point spawns are floored to block coordinates; the
   engine applies its own `BLOCK_SIZE`/half-block offsets.
 - **RLE scope:** only the mode-1 8-bit-count stream is emitted; the decoder

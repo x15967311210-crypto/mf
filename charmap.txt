@@ -1,1 +1,91 @@
-@ TODO
+@ Metroid Fusion (US) text charmap for tools/preproc's C INCTEXT path.
+@
+@ Encoding.  The engine stores text as little-endian u16 words
+@ (src/text.c: TextDrawLocationTextCharacters takes a `const u16*`).  The
+@ character glyph code is in the LOW byte: 'A' is the word 0x00C1.  Control
+@ words use the HIGH byte: {NEW_LINE} is 0xFE00, {WIDTH(n)} is 0x80NN,
+@ {INDENT(n)} is 0x83NN and CHAR_TERMINATOR is 0xFF00.  CHAR_MASK
+@ (include/constants/text.h) tests that high byte only, which is why control
+@ words can be recognised without disturbing the glyph codes.
+@
+@ preproc's ReadSequence treats a one-byte mapping as the high byte, so a
+@ character row is written as two bytes: `'A' = 00 C1`, not `'A' = C1`.
+@
+@ Evidence (US text blob; ROM bytes are read for evidence and never committed).
+@   0x086B489A: words 0093 00C5 00C3 00D5 00D2 00C9 00D4 00D9 0040 ...
+@   That is "SECURITY LEVEL 1 UNLOCKED" with 0x00C5 = E, 0x00C3 = C,
+@   0x00D5 = U, 0x00D4 = T, 0x0040 = space.  The same record contains
+@   0x8012 (WIDTH) and ends in 0xFF00 (CHAR_TERMINATOR).  Note the raw byte
+@   order: `C5 00` for E, `40 00` for space, `12 80` for WIDTH(n), and
+@   `00 FF` for the terminator.
+@
+@ Only the proven, in-scope mappings are listed.  Unknown characters --
+@ including all digits and punctuation -- make preproc fail on purpose.
+@ Do not add guessed codes; prove them against a text blob or glyph first.
+@
+@ Uppercase A..Z = 0xC1..0xDA (low-byte glyph codes).
+'A' = 00 C1
+'B' = 00 C2
+'C' = 00 C3
+'D' = 00 C4
+'E' = 00 C5
+'F' = 00 C6
+'G' = 00 C7
+'H' = 00 C8
+'I' = 00 C9
+'J' = 00 CA
+'K' = 00 CB
+'L' = 00 CC
+'M' = 00 CD
+'N' = 00 CE
+'O' = 00 CF
+'P' = 00 D0
+'Q' = 00 D1
+'R' = 00 D2
+'S' = 00 D3
+'T' = 00 D4
+'U' = 00 D5
+'V' = 00 D6
+'W' = 00 D7
+'X' = 00 D8
+'Y' = 00 D9
+'Z' = 00 DA
+@ Lowercase a..z = 0xE1..0xFA (low-byte glyph codes).
+'a' = 00 E1
+'b' = 00 E2
+'c' = 00 E3
+'d' = 00 E4
+'e' = 00 E5
+'f' = 00 E6
+'g' = 00 E7
+'h' = 00 E8
+'i' = 00 E9
+'j' = 00 EA
+'k' = 00 EB
+'l' = 00 EC
+'m' = 00 ED
+'n' = 00 EE
+'o' = 00 EF
+'p' = 00 F0
+'q' = 00 F1
+'r' = 00 F2
+'s' = 00 F3
+'t' = 00 F4
+'u' = 00 F5
+'v' = 00 F6
+'w' = 00 F7
+'x' = 00 F8
+'y' = 00 F9
+'z' = 00 FA
+@ Space = 0x40 (word 0x0040).
+' ' = 00 40
+@ Control words (high-byte codes).  {WIDTH(n)} and {INDENT(n)} OR n into the
+@ low byte, e.g. {WIDTH(8)} -> 0x8008.
+NEW_LINE = FE 00
+TERMINATOR = FF 00
+WIDTH = 80 00
+INDENT = 83 00
+@ The second uppercase/small-caps set 0x81..0x9A exists and vanilla text uses
+@ it (the string above has 0x0093 for S and 0x008C for L).  It is deliberately
+@ left unmapped: the golden path uses the normal 0xC1..0xDA set and the
+@ alternate glyphs need a content decision plus the same kind of evidence.
