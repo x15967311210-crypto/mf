@@ -1107,9 +1107,21 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     smoke/audit/check_relocs PASS
   - landed `6def7b9` + `b870374`; remaining `ldr` count in the audit is
     reference-only, not unresolved relocations
-- [TODO] TECH-002 (decomp) — split the giant disasm files
-  - prioritise `disasm_0x0808F5C4.s` (335 ROM refs) and the other five large
-    files; split by function/concern and name the entry points
+- [DONE] TECH-002a (decomp) — giant disasm split plan
+  - `docs/architecture/disasm-split-plan.md`: inventory of the six files
+    (52,883 lines), validated byte-identical cut points for
+    `disasm_0x0808F5C4.s` (4 parts at `IntroSamusInShipProcess`,
+    `EndingHandler`, `CutsceneHandler`) and the other five, exact `linker.ld`
+    insertion order, C-ification top-10 and a safe-execution checklist
+  - landed `ae0499b`; `ld -r` of the proposed parts is byte-identical
+  - note: room load/backgrounds/clipdata/scroll/text are already C; the
+    remaining hack-relevant asm is the SRAM/status/pause/navigation set
+- [TODO] TECH-002b (decomp) — execute the first disasm split
+  - split `asm/disasm_0x0808F5C4.s` into the four validated parts, replace its
+    `linker.ld` line in ascending order, and require normal
+    `ca33f434…`, `audit`, `smoke`, `test`, `check_relocs` all green
+  - then repeat for `disasm_0x0807e678.s` / `0x0809deb4.s` / `0x08079afc.s` /
+    `0x080765f8.s` / `0x08056140.s` one file at a time
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
