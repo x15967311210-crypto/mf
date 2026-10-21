@@ -1475,10 +1475,15 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     example, `content-check` round-trip; `make content-check` PASS.
     Digits/punctuation remain deliberately unproven; text IDs stay
     unallocated until HACK-008d.
-- [TODO] HACK-008c (tools/engine) — generated C content tables
+- [DOING @dev26] HACK-008c1 (engine/tools) — HACK=1 build overlay scaffold
+  - add a separate hack build target/artifact that defines `HACK=1` and links
+    a narrow AREA_TEST_1 selection hook; empty overlay falls back to baseline
+    so normal/shifted/reordered SHAs stay unchanged
+  - no generated tables yet; prove the build/boot and no-baseline-edit contract
+- [TODO] HACK-008c2 (tools/content) — generated C content tables
   - emit room/door/spriteset/scroll/text/event C tables from
-    `hack/content` into ignored `hack/gen`; narrow baseline hook from
-    ADR-013; no hand edits to `src/data`
+    `hack/content` into ignored `hack/gen`; wire through the 008c1 hook
+  - no hand edits to `src/data`
 - [TODO] HACK-008d (content/engine) — golden path: 1 room + 1 dialogue + 1 enemy
   - end-to-end from content source to playable build: room, door, text,
     one enemy behavior/event, save entry warp, validator and one-page docs
