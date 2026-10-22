@@ -80,7 +80,8 @@ POSTLINK_RELINK = $(MAKE) -f Makefile ELF=$(POSTLINK_ELF) \
         screen-diff oam-diff event-diff shift-check-all content-check \
         data-manifest data-verify data-cache-key \
         postlink-scan postlink-scan-strict shift-help \
-        public-gate protected-gate collect-symbols
+        public-gate protected-gate collect-symbols \
+        compare-text c-port-check
 
 symbols:
 	$(PYTHON) tools/shift/map_symbols.py --map $(MAP) --out $(SYMBOLS)
@@ -136,6 +137,41 @@ check-linker:
 
 smoke:
 	$(PYTHON) tests/emulator/run.py --static --rom $(ROM)
+
+# TECH-003a: compare one symbol's code bytes between the baseline ELF and a
+# scratch candidate ELF (see docs/howto/c-port-scratch.md).  With no
+# CANDIDATE_ELF it runs the tool's self-check; host/Python-only, no build.
+#
+#   make compare-text
+#   make compare-text BASELINE_ELF=mf_us.elf \
+#       CANDIDATE_ELF=/tmp/mf-cport/mf_us.elf SYMBOL=RoomLoad \
+#       COMPARE_ARGS=--disasm
+#   make c-port-check CANDIDATE_ELF=/tmp/mf-cport/mf_us.elf SYMBOL=RoomLoad
+COMPARE_TOOL = $(PYTHON) tools/decomp/compare_text.py
+BASELINE_ELF ?= $(ELF)
+CANDIDATE_ELF ?=
+SYMBOL ?=
+COMPARE_ARGS ?=
+
+compare-text:
+	@if [ -z "$(CANDIDATE_ELF)" ]; then \
+		$(COMPARE_TOOL) --self-check; \
+	else \
+		$(COMPARE_TOOL) --baseline "$(BASELINE_ELF)" \
+			--candidate "$(CANDIDATE_ELF)" \
+			$(if $(SYMBOL),--symbol "$(SYMBOL)") $(COMPARE_ARGS); \
+	fi
+
+# Self-check first, then the comparison; fails if either leg fails (the tool's
+# 0/1/2 status is passed through).
+c-port-check:
+	@if [ -z "$(CANDIDATE_ELF)" ] || [ -z "$(SYMBOL)" ]; then \
+		echo "usage: make c-port-check CANDIDATE_ELF=path/to/mf_us.elf SYMBOL=Function [BASELINE_ELF=...] [COMPARE_ARGS=--disasm]"; \
+		exit 2; \
+	fi
+	$(COMPARE_TOOL) --self-check
+	$(COMPARE_TOOL) --baseline "$(BASELINE_ELF)" \
+		--candidate "$(CANDIDATE_ELF)" --symbol "$(SYMBOL)" $(COMPARE_ARGS)
 
 # HACK-003/HACK-008a: deterministic Tiled/PNG room pipeline and the D-009
 # content ID registry.  This is emulator-free and ROM-free; it is not part of
@@ -586,6 +622,8 @@ define SHIFT_HELP
 	@echo "  postlink-scan       report raw pointer runs in --emit-relocs data sections"
 	@echo "  postlink-scan-strict fail on any unwhitelisted structured pointer run"
 	@echo "  smoke               static ROM/header smoke"
+	@echo "  compare-text        self-check compare_text.py, or compare SYMBOL in CANDIDATE_ELF"
+	@echo "  c-port-check        self-check + compare one symbol against BASELINE_ELF (mf_us.elf)"
 	@echo "  content-check       content pipeline + D-009 ID registry check (no ROM)"
 	@echo "  data-manifest       write tools/data-manifest.json from extracted data"
 	@echo "  data-verify         fail if extracted data is missing, extra, or changed"

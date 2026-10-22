@@ -183,6 +183,7 @@ RULES_NO_SCAN += symbols audit-asm audit-blobs rewrite report audit \
 	shift-check shift-reorder shift-start shift-input shift-input-30k \
 	shift-screen screen-diff oam-diff event-diff shift-check-all \
 	postlink-scan postlink-scan-strict shift-help \
+	compare-text c-port-check \
 	content-tables content-tables-check hack-build hack-sha1 hack-smoke \
 	format format-check format-list
 
