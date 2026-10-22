@@ -8,11 +8,11 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **29 TODO / 0 DOING / 78 DONE / 4 PARK** (111 entries).
+Counts: **30 TODO / 1 DOING / 79 DONE / 4 PARK** (114 entries).
 
 ### In progress (DOING)
 
-_none_
+- `TECH-004` — sync upstream intro-landing decomp (`a6d6187`)
 
 ### Next TODO (first 5 in file order)
 

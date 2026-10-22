@@ -1136,9 +1136,8 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     (boot + 4k input), check_relocs PASS
   - landed `373c228`; `docs/howto/c-port-scratch.md` now records the
     split-and-insert plus orphan-`.rodata` `/DISCARD/` rule
-  - next: `Sram_CheckLoadSaveFile` / `SramRead_WorldData` /
-    `SramWrite_WorldData` / `Sram_InitSaveFile` with the same loop, which
-    unlocks QA-027/QA-030
+  - next: `SramWrite_WorldData` / `Sram_InitSaveFile` with the same loop,
+    which unlocks QA-027/QA-030
 - [DONE] TECH-003c (decomp) — port `Sram_CheckLoadSaveFile` to C
   - `src/sram/sram_check_save.c`, own object placed at 0x08080664 between the
     split asm parts; a sized `SramFileInfoSlot` struct gives the baseline's
@@ -1154,6 +1153,45 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - landed `265cfcb`; lesson recorded in `docs/howto/c-port-scratch.md`:
     struct-member offsets and an `s32` sign-extended local are often what make
     agbcc reproduce a baseline register shape
+- [DONE] TECH-003d (decomp) — port `SramRead_WorldData` to C
+  - `src/sram/sram_world_read.c`, own object at 0x0807FF7C between the split
+    asm parts `_0807eea4` and the new `_08080068`; 236 bytes byte-identical
+  - the last 4 bytes were an agbcc register choice: the raw
+    `((u8*)IWRAM_BASE + 0x33/0x3B)` macros were really the existing named
+    arrays `gNumberOfNeverReformBlocks[8]` / `gNumberOfCollectedTanks[8]`;
+    using the `symbol_ref` form restored `ldr r0 / adds r0, r5, r0`
+  - `src/sram/%.s` defaults to `-O1`; this object needs a documented per-file
+    `-O2` exception in `Makefile` to match the baseline's `push {r4-r7,lr}`,
+    live `r8` save pointer and single `r7` offset
+  - compare_text 236/236; `Sram_CheckLoadSaveFile` 224, `Sram_WriteFileInfo`
+    156, `RoomLoadEntry` 344 all still identical; `sUnk_582274` stays at
+    `0x08582274`; normal `ca33f434…`; audit 693 ROM refs; smoke/test (0.6
+    harness) and check_relocs PASS
+  - landed `a61c830` (+ generated-audit refresh `9b3fe02`)
+  - next: `SramWrite_WorldData`, `Sram_InitSaveFile`, then QA-027/QA-030
+- [DOING @dev50] TECH-004 (decomp) — sync upstream intro-landing decomp (`a6d6187`)
+  - `upstream/main` is 4 commits ahead of our merge-base `fdf3e43`; the code
+    change is `186257b`/`637fd8a`: `src/new_file_intro.c` +1218 lines,
+    `src/data/new_file_intro_data.c` +1473, new intro headers/constants, and
+    deletion of `asm/disasm_0x0808F5C4.s`
+  - our tree already split that asm into `_090d60`/`_09223c`/`_094e84`/
+    `_09994c` and rewrote C ROM literals in `src/new_file_intro.c` (SHIFT-006),
+    so do **not** merge `upstream/main` wholesale; the new functions are the
+    `NewFileIntroLandingOnBsl*` block that currently lives in `_090d60.s`
+  - integrate the new C block (new object, or into the existing C file),
+    remove only the asm range it replaces, place the new data at the exact
+    address, and keep linker order byte-identical; preserve upstream
+    attribution in the commit message
+  - gate: normal `ca33f434…`, `compare_text` for every moved function,
+    audit/smoke/test (0.6 harness), check_relocs
+- [TODO] TECH-005 (docs) — decomp.me preset 250 reference workflow
+  - preset 250 is Metroid Fusion/agbcc (owner SpineSh4rk); 600 scratches, but
+    only 2 currently full-score, so treat it as a target/attempt board rather
+    than a solved-source dump
+  - document in `docs/howto/c-port-scratch.md`: find a function target, read
+    its asm/context, compare a scratch's C locally with `compare_text`, and
+    the attribution/licensing rule (do not bulk-copy or commit third-party
+    scratch text)
 - [DONE] BUG-027 (env) — harness now builds against the project's mGBA 0.6
   - `tests/emulator/build_harness06.sh` compiles `harness.c` against
     `tools/headless/.cache/mgba-0.6-bizhawk` + static
