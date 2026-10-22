@@ -496,6 +496,7 @@ SECTIONS {
 
         asm/disasm_0x0807e678_0807e678.o(.text);
         asm/disasm_0x0807e678_0807eea4_0807eea4.o(.text);
+        src/sram/sram_world_write.o(.text);
         src/sram/sram_world_read.o(.text);
         asm/disasm_0x0807e678_0807eea4_08080068.o(.text);
         src/sram/sram_check_save.o(.text);
@@ -1124,5 +1125,5 @@ SECTIONS {
        symbol keeps the baseline's separate literal pool entry. */
     gBootOptionsSrc = sUnk_582280 + 0x64;
 
-    /DISCARD/ : { src/sram/sram_file_info.o(.rodata) src/sram/sram_check_save.o(.rodata) }
+    /DISCARD/ : { src/sram/sram_file_info.o(.rodata) src/sram/sram_check_save.o(.rodata) src/sram/sram_world_write.o(.rodata) }
 }
