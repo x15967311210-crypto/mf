@@ -172,7 +172,9 @@ static void usage(const char* argv0) {
         "       --final prints final OAM/EVENT/SCREEN; --dump-prefix writes\n"
         "       final OAM/PAL/VRAM/IO/IWRAM/EWRAM and screen PPM\n"
         "       --state loads an mGBA savestate before the input replay\n"
-        "       --save loads a SaveRAM before reset\n",
+        "       --save loads a SaveRAM before reset\n"
+        "       --bios FILE uses the given GBA BIOS image\n"
+        "       --skip-bios skips the BIOS boot animation\n",
         argv0, argv0, argv0, argv0
     );
 }
@@ -1000,6 +1002,8 @@ int main(int argc, char** argv) {
     const char* expect_path = NULL;
     const char* state_path = NULL;
     const char* save_path = NULL;
+    const char* bios_path = NULL;
+    int skip_bios = 0;
     int final = 0;
     int scenario_set = 0;
     int frames = 0;
@@ -1048,6 +1052,14 @@ int main(int argc, char** argv) {
                 return 2;
             }
             save_path = argv[i];
+        } else if (strcmp(argv[i], "--bios") == 0) {
+            if (++i >= argc) {
+                usage(argv[0]);
+                return 2;
+            }
+            bios_path = argv[i];
+        } else if (strcmp(argv[i], "--skip-bios") == 0) {
+            skip_bios = 1;
         } else if (strcmp(argv[i], "--final") == 0) {
             final = 1;
         } else if (strcmp(argv[i], "--dump-prefix") == 0) {
@@ -1133,6 +1145,13 @@ int main(int argc, char** argv) {
     }
     mCoreInitConfig(core, NULL);
     mCoreConfigSetDefaultIntValue(&core->config, "logToStdout", 0);
+    if (bios_path) {
+        mCoreConfigSetValue(&core->config, "gba.bios", bios_path);
+        mCoreConfigSetOverrideIntValue(&core->config, "useBios", 1);
+    }
+    if (skip_bios) {
+        mCoreConfigSetOverrideIntValue(&core->config, "skipBios", 1);
+    }
     if (!mCoreLoadFile(core, rom)) {
         fprintf(stderr, "FAIL: could not load %s\n", rom);
         core->deinit(core);
