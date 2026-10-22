@@ -8,11 +8,11 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **30 TODO / 0 DOING / 82 DONE / 4 PARK** (116 entries).
+Counts: **30 TODO / 1 DOING / 82 DONE / 5 PARK** (118 entries).
 
 ### In progress (DOING)
 
-_none_
+- `TECH-006` — pilot decomp.me perfect scratch: `PauseScreenSetPauseDebugWindow`
 
 ### Next TODO (first 5 in file order)
 

@@ -1184,6 +1184,13 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d/e
     audit 657 ROM refs; smoke/test/check_relocs and `shift-test`
     (`5888a563…`, `SHIFT-DYNAMIC`) PASS
   - landed `a172968`; audit refresh `7ffd97c`
+- [PARK] TECH-003f (decomp) — `SramWrite_MostRecentSaveFile` (kept asm)
+  - 140-byte function at `0x08080068`; the C port reached a **17-byte**
+    difference (checksum third load `r1` vs `r2`, epilogue `ldr r0` vs
+    `ldr r2; adds r0,r2,#0`, 2-byte pad) but no source shape or tested `-O1`
+    flag closed it
+  - worktree reverted cleanly; function stays asm and SHA/gates unchanged;
+    revisit only with a targeted epilogue/checksum shape, or accept asm
 - [DONE] TECH-004a (decomp) — sync upstream intro data carve (`a6d6187`)
   - replaced `Blob_5f6990_60093c.bin` (0x9FAC) in `database.json` with
     `Blob_5f6990_5f7190.bin` (0x800) plus eight `new_file_intro/*` assets
@@ -1231,6 +1238,17 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d/e
     `thumb_func_start` in `asm/`; each port must pass `compare_text` in this
     tree and credit the scratch author in the commit
   - never commit third-party scratch source; reference/adapt only
+- [DOING @dev52] TECH-006 (decomp) — pilot decomp.me perfect scratch: `PauseScreenSetPauseDebugWindow`
+  - scratch `nM76W` (biosp4rk, `0/1800`, 100%), saved as
+    `work/decompme/PauseScreenSetPauseDebugWindow.c`; the function is still
+    asm at `0x080773F8` in `asm/disasm_0x080765f8_08077084.s`
+  - the 9-instruction function only uses `gBackgroundPositions`,
+    `SCREEN_SIZE_Y` and `WRITE_16(REG_WIN0V, …)`; split the asm, insert the C
+    object at the exact address, and verify byte-identically
+  - larger pause-screen scratch `GoKlR` (`PauseScreenProcessOam`, 0/66700) is
+    also saved in `work/decompme/` for a later task
+  - gate: `compare_text`, normal `ca33f434…`, audit/smoke/test/check_relocs,
+    `shift-test`; credit biosp4rk/decomp.me
 - [DONE] BUG-027 (env) — harness now builds against the project's mGBA 0.6
   - `tests/emulator/build_harness06.sh` compiles `harness.c` against
     `tools/headless/.cache/mgba-0.6-bizhawk` + static
