@@ -482,7 +482,8 @@ SECTIONS {
         src/minimap.o(.text);
         src/menus/pause_screen_map.o(.text);
 
-        asm/disasm_0x080765f8.o(.text);
+        asm/disasm_0x080765f8_080765f8.o(.text);
+        asm/disasm_0x080765f8_08077084.o(.text);
 
         src/text.o(.text);
 
