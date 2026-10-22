@@ -1146,11 +1146,18 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     audit/smoke/test (boot + 4k input), `shift-test`, `shift-reorder`,
     `check_relocs` PASS; bodies concatenate byte-identically minus headers
   - landed `acf2301` + `4b92bc9` (+ refreshed audit table)
-- [TODO] TECH-002d (decomp) — split the remaining disasm files
-  - `disasm_0x08079afc.s` (2 parts, cut at 3857), `disasm_0x080765f8.s`
-    (2 parts, cut at 1227), `disasm_0x08056140.s` (2 parts, candidate)
-  - same rule: function boundary, 3-line header, ascending `linker.ld` order,
-    `ca33f434…` unchanged or revert
+- [DONE] TECH-002d (decomp) — split the remaining disasm files
+  - `disasm_0x08079afc.s` -> `_08079afc` / `_0807b8d4`
+    (`ProcessPauseScreenText`), 0x1DD8 + 0x1A78 = 0x3850
+  - `disasm_0x080765f8.s` -> `_080765f8` / `_08077084`
+    (`GetMinimapData`), 0xA8C + 0x2094 = 0x2B20
+  - `disasm_0x08056140.s` -> `_08056140` / `_080566a8`
+    (`GunshipEndStartingEngine1`), 0x568 + 0x57C = 0xAE4 (candidate verified
+    by inspecting all 20 boundaries)
+  - normal `ca33f434…`, shifted `5888a563…`, reordered `9dac0a4b…` unchanged;
+    audit/smoke/test/shift-test/shift-reorder/check_relocs PASS; parts
+    concatenate byte-identically
+  - landed `1fa6519` + `a0d3025` + `4fef4c6` (+ refreshed audit/plan)
 - [TODO] BUG-014 (shift/engine) — post-link scan: raw pointer runs remain
   - new gate `tools/shift/postlink_pointer_scan.py` (landed `ebf1f9c`):
     relinks with `--emit-relocs`, scans non-executable ROM data, ignores
