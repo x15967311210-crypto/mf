@@ -5,7 +5,10 @@
  * of frames, and reads fixed IWRAM addresses from linker.ld.  It deliberately
  * contains no ROM data and no game assets; the ROM is a runtime argument.
  *
- * Build with tests/emulator/build_harness.sh against an mGBA source/build tree.
+ * Build with tests/emulator/build_harness06.sh against the canonical mGBA 0.6
+ * (BizHawk 2.3.0.1) source/static-library tree, or with build_harness.sh
+ * against a newer shared-library build.  harness_compat06.h bridges the two
+ * APIs.
  *
  * Scenarios:
  *   boot_smoke  (default)  run N frames, prove the main loop is alive.
@@ -36,7 +39,8 @@
 #include <mgba/internal/gba/gba.h>
 #include <mgba/internal/gba/input.h>
 #include <mgba/internal/gba/memory.h>
-#include <mgba-util/image.h>
+
+#include "harness_compat06.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -988,6 +992,8 @@ static int run_input(
 }
 
 int main(int argc, char** argv) {
+    mf_harness_quiet_logs();
+
     const char* rom = NULL;
     const char* scenario = "boot_smoke";
     const char* input_path = NULL;
@@ -1145,7 +1151,7 @@ int main(int argc, char** argv) {
         input_replay_free(&replay);
         return 1;
     }
-    if (save_path && !mCoreLoadSaveFile(core, save_path, false)) {
+    if (save_path && !mf_harness_load_save(core, save_path)) {
         fprintf(stderr, "FAIL: could not load SaveRAM %s\n", save_path);
         core->deinit(core);
         input_expectations_free(&expect);

@@ -14,18 +14,20 @@ size and optional SHA1.  It is enough to catch a broken build.
 
 ## With the headless harness (preferred)
 
-Build mGBA's shared library once, then build the tiny harness:
+The canonical harness is built against the project's pinned **mGBA 0.6**
+(BizHawk 2.3.0.1, `TASVideos/mgba` `bizhawk-0.6`), the same core used by
+`tools/headless`. Build that core once, then build the harness:
 
 ```sh
-git clone --depth 1 https://github.com/mgba-emu/mgba.git
-cmake -S mgba -B mgba-build -DBUILD_QT=OFF -DBUILD_SDL=OFF \
-  -DBUILD_LIBRETRO=OFF -DBUILD_GL=OFF -DENABLE_SCRIPTING=OFF \
-  -DUSE_LIBZIP=OFF -DUSE_LUA=OFF -DCMAKE_BUILD_TYPE=Release
-cmake --build mgba-build -j4 --target mgba
-
-MGBA_SRC=$PWD/mgba MGBA_BUILD=$PWD/mgba-build \
-  tests/emulator/build_harness.sh tests/emulator/bin/mgba-harness
+tools/headless/build06.sh                 # produces build06/core/libmgba.a
+tests/emulator/build_harness06.sh tests/emulator/bin/mgba-harness
 ```
+
+`build_harness06.sh` compiles `harness.c` with the 0.6 headers and links the
+static `libmgba.a` (`-DCOLOR_16_BIT`, `-lz -lm -lpthread`). `harness.c` stays
+compatible with newer mGBA through `harness_compat06.h`; the old shared-library
+flow (`build_harness.sh` with `MGBA_SRC`/`MGBA_BUILD`) still exists for a 0.11
+tree if one is available, but 0.6 is the supported default.
 
 Then:
 
@@ -34,7 +36,12 @@ make -f Makefile.shift test
 ```
 
 `run.py` prefers `tests/emulator/bin/mgba-harness` (or `MF_MGBA_HARNESS`);
-it runs the ROM without a window and reports the fixed IWRAM values.
+it runs the ROM without a window and reports the fixed IWRAM values. If neither
+the 0.6 `libmgba.a` nor the harness is available the dynamic leg is a
+**SKIP (77)**, never a pass.
+
+Note: the 0.6 harness has no `mCoreLoadSaveFile`; `--save` goes through
+`core->loadSave`, and `--state` only accepts 0.6-format savestates.
 
 ## With the mGBA frontend
 
