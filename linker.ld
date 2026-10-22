@@ -157,6 +157,7 @@ SECTIONS {
         . = 0x00000b8b; gIsLoadingFile = .;
         . = 0x00000b8d; gMostRecentSaveFile = .;
         . = 0x00000b8f; gUnk_3000b8f = .;
+        . = 0x00000b94; gSramFileInfo = .;
         . = 0x00000bd0; gBootDebugOptions = .;
         . = 0x00000bdc; gCurrentCutscene = .;
         . = 0x00000bde; gMainGameMode = .;
@@ -495,6 +496,8 @@ SECTIONS {
 
         asm/disasm_0x0807e678_0807e678.o(.text);
         asm/disasm_0x0807e678_0807eea4_0807eea4.o(.text);
+        src/sram/sram_check_save.o(.text);
+        asm/disasm_0x0807e678_0807eea4_08080744.o(.text);
         src/sram/sram_file_info.o(.text);
         asm/disasm_0x0807e678_0807eea4_08080950.o(.text);
         asm/disasm_0x0807e678_080809f0.o(.text);
@@ -1114,5 +1117,10 @@ SECTIONS {
         src/new_file_intro.o(.data);
         src/ending.o(.data);
     } >rom
-    /DISCARD/ : { src/sram/sram_file_info.o(.rodata) }
+
+    /* ROM data alias: the boot-debug block inside sUnk_582280.  A distinct
+       symbol keeps the baseline's separate literal pool entry. */
+    gBootOptionsSrc = sUnk_582280 + 0x64;
+
+    /DISCARD/ : { src/sram/sram_file_info.o(.rodata) src/sram/sram_check_save.o(.rodata) }
 }
