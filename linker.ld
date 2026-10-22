@@ -496,6 +496,8 @@ SECTIONS {
 
         asm/disasm_0x0807e678_0807e678.o(.text);
         asm/disasm_0x0807e678_0807eea4_0807eea4.o(.text);
+        src/sram/sram_world_read.o(.text);
+        asm/disasm_0x0807e678_0807eea4_08080068.o(.text);
         src/sram/sram_check_save.o(.text);
         asm/disasm_0x0807e678_0807eea4_08080744.o(.text);
         src/sram/sram_file_info.o(.text);

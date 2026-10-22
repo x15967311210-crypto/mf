@@ -383,6 +383,11 @@ src/dma.s: src/dma.c
 src/sram/%.s: CFLAGS = -O1 -mthumb-interwork -fhex-asm
 src/sram/%.s: src/sram/%.c
 
+# SramRead_WorldData matches the baseline only at -O2 (push {r4-r7,lr}, live
+# r8 save pointer, single r7 offset).  Keep the rest of src/sram at -O1.
+src/sram/sram_world_read.s: CFLAGS = -Werror -O2 -mthumb-interwork -fhex-asm
+$(OBJ_DIR)/src/sram/sram_world_read.s: CFLAGS = -Werror -O2 -mthumb-interwork -fhex-asm
+
 .PHONY: us
 # us_debug eu eu_debug eu_beta jp jp_debug cn cn_debug
 
