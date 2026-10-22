@@ -1191,17 +1191,25 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     currently ends exactly at `0x08090D60`
   - trim `asm/disasm_0x0808F5C4_090d60.s` to `unk_9209c` at
     `0x0809209C` (or split a new `_09209c.s`); keep linker order
+  - `unk_9209c` has a perfect scratch (`l8g1R`, SpineSh4rk), saved as
+    `work/decompme/unk_9209c.c`; prefer porting it so the whole `_090d60.s`
+    can be deleted, but keep the asm if the port does not match
   - gate: unchanged `ca33f434…`, `compare_text` for all 19 moved functions
     and neighbours (`IntroSamusInShipProcess`, `unk_9209c`,
     `NewFileIntroArrivingAtBslProcessOam_Empty`), audit/smoke/test/check_relocs
-- [TODO] TECH-005 (docs) — decomp.me preset 250 reference workflow
-  - preset 250 is Metroid Fusion/agbcc (owner SpineSh4rk); 600 scratches, but
-    only 2 currently full-score, so treat it as a target/attempt board rather
-    than a solved-source dump
-  - document in `docs/howto/c-port-scratch.md`: find a function target, read
-    its asm/context, compare a scratch's C locally with `compare_text`, and
-    the attribution/licensing rule (do not bulk-copy or commit third-party
-    scratch text)
+- [TODO] TECH-005 (tools/decomp) — decomp.me preset 250 reference corpus
+  - preset 250 is Metroid Fusion/agbcc; of 600 owned scratches **561 are
+    perfect** (score 0 = 100%; `score == max_score` means 0%, the opposite),
+    e.g. `PauseScreenProcessOam` [GoKlR], `unk_9209c` [l8g1R], the whole
+    `NewFileIntroLandingOnBsl*` block
+  - build a read-only corpus under `work/decompme/` (ignored): slug, name,
+    owner, score, source, target asm; fetch through the browser API
+    `/api/scratch?preset=250&...` and `/api/scratch/<slug>` (Cloudflare
+    blocks plain curl)
+  - queue port candidates by mapping perfect names to symbols still
+    `thumb_func_start` in `asm/`; each port must pass `compare_text` in this
+    tree and credit the scratch author in the commit
+  - never commit third-party scratch source; reference/adapt only
 - [DONE] BUG-027 (env) — harness now builds against the project's mGBA 0.6
   - `tests/emulator/build_harness06.sh` compiles `harness.c` against
     `tools/headless/.cache/mgba-0.6-bizhawk` + static
