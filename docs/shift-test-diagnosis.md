@@ -1,7 +1,9 @@
 # Shift-test diagnosis (SHIFT-006c)
 
-Status: **open — shifted boot still fails at `frame_counter=3`**.
-Every static/relocation gate is green; the remaining failure is dynamic.
+Status: **resolved (2026-10-22)** — shifted build passes `SHIFT-DYNAMIC`
+(`5888a563…`) and section-reordered passes `SHIFT-REORDER-DYNAMIC`
+(`9dac0a4b…`); normal SHA stays `ca33f434…`.  The diagnosis below is kept as
+historical evidence.
 
 ## Green gates
 

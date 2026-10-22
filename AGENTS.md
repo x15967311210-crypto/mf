@@ -5,10 +5,11 @@ This file is the contract for every agent and human working in the tree.
 
 ## Current phase
 
-**SHIFT-001 / SHIFT-002 done; SHIFT-003 mapping done.**  Next: SHIFT-004/005/006
-(blob tables, hardcoded-ref rewrites, relocatable linker).  Do not start content
-production or a full C conversion before the shiftability gates in
-`docs/roadmap.md` are green.
+**Shiftability gates are green (2026-10-22).**  Normal `ca33f434…`, padded
+`5888a563…` (`SHIFT-DYNAMIC` PASS) and section-reordered `9dac0a4b…`
+(`SHIFT-REORDER-DYNAMIC` PASS) all build and pass static + dynamic smoke.  Next:
+hack-critical C (S3a) and the upstream intro sync; M1 rendering/playtest remains
+paused by the human.
 
 ## Team
 

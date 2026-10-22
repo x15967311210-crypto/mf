@@ -105,9 +105,10 @@ Baseline evidence (2026-10-17):
   pseudo-literals, and **1034 C ROM literals** rewritten to symbols.
 - Static gates are green: `make check`, `audit`, `check-relocs-strict`,
   `smoke`.
-- Shifted build (`. += 0x1000` after `intr_main`): static **PASS**, dynamic
-  **FAIL** — `frame_counter=3`.  The remaining failure is a runtime/pointer
-  issue documented in `docs/shift-test-diagnosis.md`; it is not an unclassified
-  literal.
-- Boot smoke now requires **450/600** frames, not just nonzero, so an early
+- 2026-10-22: shifted build (`. += 0x1000` after `intr_main`) **PASS**
+  (`5888a563…`, `SHIFT-DYNAMIC` PASS) and section-reordered build **PASS**
+  (`9dac0a4b…`, `SHIFT-REORDER-DYNAMIC` PASS); normal SHA stays
+  `ca33f434…`.  The earlier `frame_counter=3` failure is resolved and
+  `docs/shift-test-diagnosis.md` is historical.
+- Boot smoke requires **450/600** frames, not just nonzero, so an early
   crash cannot pass.

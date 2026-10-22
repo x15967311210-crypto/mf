@@ -1169,21 +1169,23 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     harness) and check_relocs PASS
   - landed `a61c830` (+ generated-audit refresh `9b3fe02`)
   - next: `SramWrite_WorldData`, `Sram_InitSaveFile`, then QA-027/QA-030
-- [DOING @dev50] TECH-004a (decomp) — sync upstream intro data carve (`a6d6187`)
-  - `upstream/main` is 4 commits ahead of our merge-base `fdf3e43`; the data
-    change replaces `Blob_5f6990_60093c.bin` (0x9FAC) in `database.json` with
+- [DONE] TECH-004a (decomp) — sync upstream intro data carve (`a6d6187`)
+  - replaced `Blob_5f6990_60093c.bin` (0x9FAC) in `database.json` with
     `Blob_5f6990_5f7190.bin` (0x800) plus eight `new_file_intro/*` assets
-    (landing bg/obj gfx, palettes, space/hangar tilemaps)
-  - manager-approved pathspec extension: `database.json`,
-    `src/data/new_file_intro_data.c`, `include/data/new_file_intro_data.h`;
-    `data/` outputs stay ignored; `tools/extractor.py` only if genuinely
-    required (upstream did not change it)
-  - replace the existing `sBlob_5f6990_prefix[0x79E0]` / `_middle[0x1098]` /
-    `_after[0x1234]` section with upstream's `sBlob_5f6990_5f7190` + named
-    arrays, keeping every SHIFT-006 rewrite elsewhere; gate is the **unchanged**
-    normal SHA `ca33f434…` before any code change
+    (landing bg/obj gfx, palettes, space/hangar tilemaps); no
+    `tools/extractor.py` change was needed
+  - `src/data/new_file_intro_data.c` now uses the named arrays in ascending
+    address order; `sBlob_5f6990_5f7190` `0x085F6990`, `sIntroLandingOnBslBgGfx`
+    `0x085F7190`, `sIntroLandingOnBslHangarTilemap` `0x0860030C`,
+    `sIntroSamusSittingGfx` follows at `0x0860093C`; all SHIFT-006 rewrites
+    elsewhere untouched
+  - normal SHA stays `ca33f4348c2c05dd330d37b97e2c5a69531dfe87` **before any
+    code change**; audit 693 ROM refs, smoke/test/check_relocs PASS
+  - `shift-test` is now **PASS** (`5888a563…`, `SHIFT-DYNAMIC` PASS) and
+    `shift-reorder` is **PASS** (`9dac0a4b…`, `SHIFT-REORDER-DYNAMIC` PASS);
+    both were previously expected to fail at boot
+  - landed `18b9b6f`; audit refresh `076b823` (symbols 24650 → 24719)
 - [TODO] TECH-004b (decomp) — sync upstream intro landing C block
-  - `[deps: TECH-004a]`
   - append upstream's `NewFileIntroLandingOnBsl*` block (upstream
     `src/new_file_intro.c` lines 8347–9490, `0x08090D60..0x08092098`) to our
     `src/new_file_intro.c`; add `music_wrappers.h`, the
