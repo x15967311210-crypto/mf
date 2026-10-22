@@ -1169,21 +1169,31 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     harness) and check_relocs PASS
   - landed `a61c830` (+ generated-audit refresh `9b3fe02`)
   - next: `SramWrite_WorldData`, `Sram_InitSaveFile`, then QA-027/QA-030
-- [DOING @dev50] TECH-004 (decomp) — sync upstream intro-landing decomp (`a6d6187`)
-  - `upstream/main` is 4 commits ahead of our merge-base `fdf3e43`; the code
-    change is `186257b`/`637fd8a`: `src/new_file_intro.c` +1218 lines,
-    `src/data/new_file_intro_data.c` +1473, new intro headers/constants, and
-    deletion of `asm/disasm_0x0808F5C4.s`
-  - our tree already split that asm into `_090d60`/`_09223c`/`_094e84`/
-    `_09994c` and rewrote C ROM literals in `src/new_file_intro.c` (SHIFT-006),
-    so do **not** merge `upstream/main` wholesale; the new functions are the
-    `NewFileIntroLandingOnBsl*` block that currently lives in `_090d60.s`
-  - integrate the new C block (new object, or into the existing C file),
-    remove only the asm range it replaces, place the new data at the exact
-    address, and keep linker order byte-identical; preserve upstream
-    attribution in the commit message
-  - gate: normal `ca33f434…`, `compare_text` for every moved function,
-    audit/smoke/test (0.6 harness), check_relocs
+- [DOING @dev50] TECH-004a (decomp) — sync upstream intro data carve (`a6d6187`)
+  - `upstream/main` is 4 commits ahead of our merge-base `fdf3e43`; the data
+    change replaces `Blob_5f6990_60093c.bin` (0x9FAC) in `database.json` with
+    `Blob_5f6990_5f7190.bin` (0x800) plus eight `new_file_intro/*` assets
+    (landing bg/obj gfx, palettes, space/hangar tilemaps)
+  - manager-approved pathspec extension: `database.json`,
+    `src/data/new_file_intro_data.c`, `include/data/new_file_intro_data.h`;
+    `data/` outputs stay ignored; `tools/extractor.py` only if genuinely
+    required (upstream did not change it)
+  - replace the existing `sBlob_5f6990_prefix[0x79E0]` / `_middle[0x1098]` /
+    `_after[0x1234]` section with upstream's `sBlob_5f6990_5f7190` + named
+    arrays, keeping every SHIFT-006 rewrite elsewhere; gate is the **unchanged**
+    normal SHA `ca33f434…` before any code change
+- [TODO] TECH-004b (decomp) — sync upstream intro landing C block
+  - `[deps: TECH-004a]`
+  - append upstream's `NewFileIntroLandingOnBsl*` block (upstream
+    `src/new_file_intro.c` lines 8347–9490, `0x08090D60..0x08092098`) to our
+    `src/new_file_intro.c`; add `music_wrappers.h`, the
+    `IntroLandingOnBslOamType` enum and prototypes; `src/new_file_intro.o`
+    currently ends exactly at `0x08090D60`
+  - trim `asm/disasm_0x0808F5C4_090d60.s` to `unk_9209c` at
+    `0x0809209C` (or split a new `_09209c.s`); keep linker order
+  - gate: unchanged `ca33f434…`, `compare_text` for all 19 moved functions
+    and neighbours (`IntroSamusInShipProcess`, `unk_9209c`,
+    `NewFileIntroArrivingAtBslProcessOam_Empty`), audit/smoke/test/check_relocs
 - [TODO] TECH-005 (docs) — decomp.me preset 250 reference workflow
   - preset 250 is Metroid Fusion/agbcc (owner SpineSh4rk); 600 scratches, but
     only 2 currently full-score, so treat it as a target/attempt board rather
