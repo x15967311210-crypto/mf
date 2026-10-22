@@ -1,6 +1,9 @@
 # Giant disasm split plan (TECH-002)
 
-Status: **plan only**. No `asm/` file has been moved yet. The cut points below
+Status: **executed**. All six files were split in TECH-002b/c/d; the normal
+ROM SHA stayed `ca33f434…` and every split's parts concatenate back to the
+original body. The plan is kept as the record of the cut points and rules.
+Original note: **plan only**. The cut points below
 were validated by assembling the proposed parts and `ld -r`-ing them back
 together; the result was byte-identical to the original `.text` in every tested
 case. The residual risk is the explicit `linker.ld` edit, which must keep the
