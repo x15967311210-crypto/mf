@@ -21,7 +21,8 @@ Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
 HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2/008d3/008d4a/008d4b
 (ID/text/overlay/generated Entry Ledge room, scroll, message and sprite tables + entry warp and liveness gate), QA-020 (native normal/shifted/
-reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
+reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d
+(SRAM C ports) and TECH-004a/004b (upstream intro landing data + C).  Details in
 `git log`.
 
 ---
@@ -1185,20 +1186,24 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     `shift-reorder` is **PASS** (`9dac0a4b…`, `SHIFT-REORDER-DYNAMIC` PASS);
     both were previously expected to fail at boot
   - landed `18b9b6f`; audit refresh `076b823` (symbols 24650 → 24719)
-- [DOING @dev50] TECH-004b (decomp) — sync upstream intro landing C block
-  - append upstream's `NewFileIntroLandingOnBsl*` block (upstream
-    `src/new_file_intro.c` lines 8347–9490, `0x08090D60..0x08092098`) to our
-    `src/new_file_intro.c`; add `music_wrappers.h`, the
-    `IntroLandingOnBslOamType` enum and prototypes; `src/new_file_intro.o`
-    currently ends exactly at `0x08090D60`
-  - trim `asm/disasm_0x0808F5C4_090d60.s` to `unk_9209c` at
-    `0x0809209C` (or split a new `_09209c.s`); keep linker order
-  - `unk_9209c` has a perfect scratch (`l8g1R`, SpineSh4rk), saved as
-    `work/decompme/unk_9209c.c`; prefer porting it so the whole `_090d60.s`
-    can be deleted, but keep the asm if the port does not match
-  - gate: unchanged `ca33f434…`, `compare_text` for all 19 moved functions
-    and neighbours (`IntroSamusInShipProcess`, `unk_9209c`,
-    `NewFileIntroArrivingAtBslProcessOam_Empty`), audit/smoke/test/check_relocs
+- [DONE] TECH-004b (decomp) — sync upstream intro landing C block
+  - appended upstream's 19-function block (`NewFileIntroLandingOnBslInit` …
+    `unk_92098`, `0x08090D60..0x08092098`) to `src/new_file_intro.c`; added
+    `music_wrappers.h`, `IntroLandingOnBslOamType`, prototypes and the
+    same-layout `struct IntroData` field names
+  - trimmed `asm/disasm_0x0808F5C4_090d60.s` from 2661 to 176 lines, now only
+    `unk_9209c` at `0x0809209C`; `_09223c.s` still starts at `0x0809223C`.
+    `unk_9209c` stays asm: the perfect `l8g1R` scratch names symbols
+    differently and carries the author's BLDALPHA tmp-pointer workaround, so
+    it was not claimed
+  - normal `ca33f434…`; all 19 moved functions byte-identical (use
+    `compare_text --size` when the baseline `[next-global]` size includes
+    2-byte alignment padding); neighbours `IntroSamusInShipProcess`,
+    `unk_9209c`, `NewFileIntroArrivingAtBslProcessOam_Empty` unchanged
+  - audit 693 → 658 ROM refs; smoke/test/check_relocs, `shift-test`
+    (`5888a563…`, `SHIFT-DYNAMIC`) and `shift-reorder` (`9dac0a4b…`,
+    `SHIFT-REORDER-DYNAMIC`) all PASS
+  - landed `651bbdd`; audit refresh `6ba5226`
 - [TODO] TECH-005 (tools/decomp) — decomp.me preset 250 reference corpus
   - preset 250 is Metroid Fusion/agbcc; of 600 owned scratches **561 are
     perfect** (score 0 = 100%; `score == max_score` means 0%, the opposite),
