@@ -494,7 +494,9 @@ SECTIONS {
         src/menus/pause_debug.o(.text);
 
         asm/disasm_0x0807e678_0807e678.o(.text);
-        asm/disasm_0x0807e678_0807eea4.o(.text);
+        asm/disasm_0x0807e678_0807eea4_0807eea4.o(.text);
+        src/sram/sram_file_info.o(.text);
+        asm/disasm_0x0807e678_0807eea4_08080950.o(.text);
         asm/disasm_0x0807e678_080809f0.o(.text);
 
         src/projectile.o(.text);
@@ -1112,4 +1114,5 @@ SECTIONS {
         src/new_file_intro.o(.data);
         src/ending.o(.data);
     } >rom
+    /DISCARD/ : { src/sram/sram_file_info.o(.rodata) }
 }

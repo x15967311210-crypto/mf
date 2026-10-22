@@ -4,6 +4,8 @@
 #include "io.h"
 #include "macros.h"
 
+#include "data/sram_pointers.h"
+
 static const char sSramVersion[] = "SRAM_V112";
 
 static void SramWriteUncheckedInternal(u8* src, u8* dest, u32 size)

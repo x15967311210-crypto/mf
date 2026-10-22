@@ -261,3 +261,29 @@ committed.
 - `objdiff` and `decomp-permuter` are not installed in this environment. The
   objdump path documented above is the supported default; do not add those
   trees to the repository.
+
+## Keeping the baseline layout (the last mile)
+
+A C port can be byte-identical per function yet still change the ROM SHA if the
+new object is placed differently or contributes an extra section. The
+`Sram_WriteFileInfo` port is the worked example:
+
+1. split the source asm object around the function into two parts
+   (`..._<before>.s` / `..._<after>.s`) and delete the original function body;
+2. put the C function in its own source/object and list, in `linker.ld`, the
+   before-part, the C object and the after-part **in that address order**;
+3. if the C object emits a small **orphan `.rodata`** (agbcc can emit a 4-byte
+   zero constant), the linker places it elsewhere and shifts later data even
+   though the function bytes match. If the section is unreferenced, discard it
+   explicitly inside `SECTIONS`:
+
+   ```ld
+   /DISCARD/ : { src/sram/sram_file_info.o(.rodata) }
+   ```
+
+4. verify with `compare_text.py` on the target **and** on a nearby function
+   (e.g. `RoomLoadEntry`) plus `sha1sum mf_us.gba`; the SHA is the final layout
+   check, `compare_text` alone only proves the function bytes.
+
+The result for `Sram_WriteFileInfo`: 156-byte identical function, `RoomLoadEntry`
+unchanged, normal ROM `ca33f434…`, audit/smoke/test/check_relocs green.
