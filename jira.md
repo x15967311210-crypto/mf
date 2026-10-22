@@ -1127,13 +1127,18 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     objdump-is-the-default note (objdiff/decomp-permuter are not installed)
   - `make compare-text` (self-check) and `make c-port-check
     CANDIDATE_ELF=… SYMBOL=…`; landed `86b517b`; self-check 5/5 PASS
-- [TODO] TECH-003b (decomp) — first C port: SRAM metadata writer
-  - port `Sram_WriteFileInfo` (84 lines, 0 calls) from
-    `asm/disasm_0x0807e678_0807eea4.s` to C using the TECH-003a loop; keep the
-    normal SHA `ca33f434…` and behavior gates green
-  - then `Sram_CheckLoadSaveFile` / `SramRead_WorldData` /
-    `SramWrite_WorldData` / `Sram_InitSaveFile`; these unlock QA-027/QA-030
-  - scratch candidates live in `/tmp` or ignored `work/` only
+- [DONE] TECH-003b (decomp) — first C port: SRAM metadata writer
+  - `Sram_WriteFileInfo` ported to `src/sram/sram_file_info.c` (own object,
+    placed at 0x080808B4 between the two split asm parts); the unused 4-byte
+    orphan `.rodata` is discarded in `linker.ld` so the layout is unchanged
+  - 156-byte function byte-identical to the baseline (compare_text PASS), and
+    `RoomLoadEntry` also re-checked; normal `ca33f434…` stays; audit/smoke/test
+    (boot + 4k input), check_relocs PASS
+  - landed `373c228`; `docs/howto/c-port-scratch.md` now records the
+    split-and-insert plus orphan-`.rodata` `/DISCARD/` rule
+  - next: `Sram_CheckLoadSaveFile` / `SramRead_WorldData` /
+    `SramWrite_WorldData` / `Sram_InitSaveFile` with the same loop, which
+    unlocks QA-027/QA-030
 - [DONE] TECH-002b (decomp) — first disasm split
   - `asm/disasm_0x0808F5C4.s` split into `_090d60` / `_09223c` / `_094e84` /
     `_09994c` at the validated function boundaries; `linker.ld` lists the four
