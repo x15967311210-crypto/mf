@@ -21,7 +21,7 @@ Start/file-select gate, headless TAS input 4k/30k, screenshot/OAM parity,
 578/600 and input/visual parity), PLAYTEST-000 (controlled map pass; full M0 reopened), and
 HACK-001/001a/006 (GDD, layout, Cantor), HACK-008a/008b/008c1/008c2/008d1/008d2/008d3/008d4a/008d4b
 (ID/text/overlay/generated Entry Ledge room, scroll, message and sprite tables + entry warp and liveness gate), QA-020 (native normal/shifted/
-reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d
+reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d/e
 (SRAM C ports) and TECH-004a/004b (upstream intro landing data + C).  Details in
 `git log`.
 
@@ -1169,7 +1169,21 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d
     `0x08582274`; normal `ca33f434…`; audit 693 ROM refs; smoke/test (0.6
     harness) and check_relocs PASS
   - landed `a61c830` (+ generated-audit refresh `9b3fe02`)
-  - next: `SramWrite_WorldData`, `Sram_InitSaveFile`, then QA-027/QA-030
+  - next: `Sram_InitSaveFile`, then QA-027/QA-030
+- [DONE] TECH-003e (decomp) — port `SramWrite_WorldData` to C
+  - `src/sram/sram_world_write.c`, object at `0x0807FEA4`; 214 bytes
+    byte-identical (216 including the baseline's 2-byte alignment padding)
+  - `asm("" : "+r"(idx))` is a no-instruction register barrier: it stops agbcc
+    from CSE-ing `idx = i` back to `i`, so the baseline's `cmp r1` is
+    reproduced instead of `cmp r5`; the reason is commented in the source
+  - the C object emits 16 bytes of orphan `.rodata`; adding
+    `src/sram/sram_world_write.o(.rodata)` to `/DISCARD/` restores the data
+    layout and the whole-ROM SHA
+  - neighbours unchanged: `SramRead_WorldData` 236, `SramWrite_MostRecentSaveFile`
+    140, `Sram_InitSaveFile` 332, `RoomLoadEntry` 344; normal `ca33f434…`;
+    audit 657 ROM refs; smoke/test/check_relocs and `shift-test`
+    (`5888a563…`, `SHIFT-DYNAMIC`) PASS
+  - landed `a172968`; audit refresh `7ffd97c`
 - [DONE] TECH-004a (decomp) — sync upstream intro data carve (`a6d6187`)
   - replaced `Blob_5f6990_60093c.bin` (0x9FAC) in `database.json` with
     `Blob_5f6990_5f7190.bin` (0x800) plus eight `new_file_intro/*` assets
