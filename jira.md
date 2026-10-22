@@ -1185,7 +1185,7 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
     `shift-reorder` is **PASS** (`9dac0a4b…`, `SHIFT-REORDER-DYNAMIC` PASS);
     both were previously expected to fail at boot
   - landed `18b9b6f`; audit refresh `076b823` (symbols 24650 → 24719)
-- [TODO] TECH-004b (decomp) — sync upstream intro landing C block
+- [DOING @dev50] TECH-004b (decomp) — sync upstream intro landing C block
   - append upstream's `NewFileIntroLandingOnBsl*` block (upstream
     `src/new_file_intro.c` lines 8347–9490, `0x08090D60..0x08092098`) to our
     `src/new_file_intro.c`; add `music_wrappers.h`, the
