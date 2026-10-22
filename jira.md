@@ -1116,15 +1116,24 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - landed `ae0499b`; `ld -r` of the proposed parts is byte-identical
   - note: room load/backgrounds/clipdata/scroll/text are already C; the
     remaining hack-relevant asm is the SRAM/status/pause/navigation set
-- [TODO] TECH-003 (tools/decomp) — objdiff + decomp-permuter scratch workflow
-  - document/provide a scratch loop for C-ification: build a candidate C
-    function in `work/` or `/tmp`, compare it with the baseline object using
-    objdiff (or `arm-none-eabi-objdump`), and optionally run decomp-permuter
-    for register/scheduling variants
-  - the shiftable engine does not require byte-matching, but objdiff catches
-    behavior-relevant codegen differences before a C port is accepted; never
-    commit scratch output or third-party tool trees
-  - start with the SRAM functions in the TECH-002a priority list
+- [DONE] TECH-003a (tools/decomp) — C-port scratch loop + compare tool
+  - `tools/decomp/compare_text.py`: compares one symbol's code bytes between a
+    baseline and candidate ELF via `nm`/`objdump`, with size/first-diff/count,
+    normalized `--disasm`, `--json`, `--size` overrides and a 5-case
+    `--self-check` (identical, modified, truncated, disasm diff/no-diff)
+  - `docs/howto/c-port-scratch.md`: function selection, scratch tree, build +
+    compare commands, the four-part acceptance rule (byte-identical,
+    `ca33f434…`, behavior suite, relocs), worked dry-runs, and the
+    objdump-is-the-default note (objdiff/decomp-permuter are not installed)
+  - `make compare-text` (self-check) and `make c-port-check
+    CANDIDATE_ELF=… SYMBOL=…`; landed `86b517b`; self-check 5/5 PASS
+- [TODO] TECH-003b (decomp) — first C port: SRAM metadata writer
+  - port `Sram_WriteFileInfo` (84 lines, 0 calls) from
+    `asm/disasm_0x0807e678_0807eea4.s` to C using the TECH-003a loop; keep the
+    normal SHA `ca33f434…` and behavior gates green
+  - then `Sram_CheckLoadSaveFile` / `SramRead_WorldData` /
+    `SramWrite_WorldData` / `Sram_InitSaveFile`; these unlock QA-027/QA-030
+  - scratch candidates live in `/tmp` or ignored `work/` only
 - [DONE] TECH-002b (decomp) — first disasm split
   - `asm/disasm_0x0808F5C4.s` split into `_090d60` / `_09223c` / `_094e84` /
     `_09994c` at the validated function boundaries; `linker.ld` lists the four
