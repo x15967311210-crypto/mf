@@ -1139,6 +1139,27 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - next: `Sram_CheckLoadSaveFile` / `SramRead_WorldData` /
     `SramWrite_WorldData` / `Sram_InitSaveFile` with the same loop, which
     unlocks QA-027/QA-030
+- [DONE] TECH-003c (decomp) — port `Sram_CheckLoadSaveFile` to C
+  - `src/sram/sram_check_save.c`, own object placed at 0x08080664 between the
+    split asm parts; a sized `SramFileInfoSlot` struct gives the baseline's
+    `[r0,#0x10]` offsets, and an `s32 loading` local reproduces the
+    `lsls/asrs r5` sign-extension
+  - compare_text: `Sram_CheckLoadSaveFile` 224 bytes identical;
+    `Sram_WriteFileInfo`, `RoomLoadEntry`, `Sram_EraseFile` also PASS;
+    normal `ca33f434…` unchanged; audit/smoke/check_relocs PASS
+  - dynamic `test` is currently blocked by the environment: the committed
+    harness needs `libmgba.so.0.11`, which is not present (only 0.7.2), so it
+    exits 127 before running; static smoke + byte-identical code are the
+    evidence.  Filed as BUG-027
+  - landed `265cfcb`; lesson recorded in `docs/howto/c-port-scratch.md`:
+    struct-member offsets and an `s32` sign-extended local are often what make
+    agbcc reproduce a baseline register shape
+- [TODO] BUG-027 (env) — headless harness cannot run (libmgba.so.0.11 missing)
+  - `tests/emulator/bin/mgba-harness` links against `libmgba.so.0.11`; only
+    `libmgba.so.0.7.2` exists under `work/tools/mgba-0.7.2/`, so dynamic
+    scenarios exit 127 before running
+  - rebuild the harness against an available mGBA or install the matching
+    shared library; do not treat dynamic SKIP/127 as a code pass
 - [DONE] TECH-002b (decomp) — first disasm split
   - `asm/disasm_0x0808F5C4.s` split into `_090d60` / `_09223c` / `_094e84` /
     `_09994c` at the validated function boundaries; `linker.ld` lists the four
