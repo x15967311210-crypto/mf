@@ -438,7 +438,8 @@ SECTIONS {
         src/sprites_AI/box_2.o(.text);
         src/sprites_AI/omega_metroid.o(.text);
 
-        asm/disasm_0x08056140.o(.text);
+        asm/disasm_0x08056140_08056140.o(.text);
+        asm/disasm_0x08056140_080566a8.o(.text);
 
         src/sprites_AI/electric_water_damage_box2.o(.text);
         src/sprites_AI/frozen_ridley.o(.text);
