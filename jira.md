@@ -1154,12 +1154,21 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  Details in
   - landed `265cfcb`; lesson recorded in `docs/howto/c-port-scratch.md`:
     struct-member offsets and an `s32` sign-extended local are often what make
     agbcc reproduce a baseline register shape
-- [TODO] BUG-027 (env) — headless harness cannot run (libmgba.so.0.11 missing)
-  - `tests/emulator/bin/mgba-harness` links against `libmgba.so.0.11`; only
-    `libmgba.so.0.7.2` exists under `work/tools/mgba-0.7.2/`, so dynamic
-    scenarios exit 127 before running
-  - rebuild the harness against an available mGBA or install the matching
-    shared library; do not treat dynamic SKIP/127 as a code pass
+- [DONE] BUG-027 (env) — harness now builds against the project's mGBA 0.6
+  - `tests/emulator/build_harness06.sh` compiles `harness.c` against
+    `tools/headless/.cache/mgba-0.6-bizhawk` + static
+    `tools/headless/build06/core/libmgba.a`; `tests/emulator/harness_compat06.h`
+    shims the small 0.11→0.6 API differences; the 0.11 shared-library path is
+    no longer the default
+  - `ldd` no longer depends on `libmgba.so`; `make -f Makefile.shift test` is
+    back to PASS (boot `frame_counter=584`, 4k `INPUT_CHECK 4/4 failed=0`),
+    `--screen`/`--final` paths exercised; `ca33f434…` unchanged
+  - landed `506ef56` (+ `c887940` for the previously uncommitted
+    `--bios`/`--skip-bios` harness options, now verified against 0.6)
+  - boundary: `mf_bizhawk_linux` remains the movie/golden parity runner;
+    `mgba-harness` is the scenario/assertion runner, both on the same 0.6 core
+  - known limit: 0.6 has no `mCoreLoadSaveFile`, so `--save` uses
+    `core->loadSave` and `--state` accepts 0.6 savestates only
 - [DONE] TECH-002b (decomp) — first disasm split
   - `asm/disasm_0x0808F5C4.s` split into `_090d60` / `_09223c` / `_094e84` /
     `_09994c` at the validated function boundaries; `linker.ld` lists the four
