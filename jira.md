@@ -1263,6 +1263,18 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d/e
   - accept: a candidate that `compare_text` accepts, or a measured report that
     the search cannot close it; no baseline/SHA changes, no vendored source or
     binaries committed
+- [DOING @dev54] TECH-008 (tools/decomp) — objdiff-cli adapter (ARM32)
+  - objdiff supports ARM32 and its CLI can diff target/base `.o` one-shot:
+    `objdiff-cli diff -1 target.o -2 base.o -o - --format json <symbol>`
+  - pin a release/commit, install the binary under `work/tools/objdiff`
+    (ignored); add `tools/decomp/objdiff/setup.sh`, `diff.sh`, and
+    `docs/howto/objdiff.md`; optional `make objdiff`, never a gate
+  - pilot `SramWrite_MostRecentSaveFile`: target `.o` from asm, base `.o`
+    from the 435 seed; report match %, instruction/relocation differences and
+    compare the result with `compare_text`
+  - keep `compare_text`/whole-ROM SHA as the authoritative gate; objdiff is a
+    human diagnostic for close matches and the permuter loop; no engine
+    changes and no binaries/third-party source committed
 - [DONE] BUG-027 (env) — harness now builds against the project's mGBA 0.6
   - `tests/emulator/build_harness06.sh` compiles `harness.c` against
     `tools/headless/.cache/mgba-0.6-bizhawk` + static
