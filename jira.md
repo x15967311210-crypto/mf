@@ -17,9 +17,11 @@ Last updated: 2026-10-23.
   - 561/600 scratches are perfect (score 0 = 100%). Fetch read-only into
     `work/decompme/`, map names to `thumb_func_start` symbols, port with
     `compare_text`, credit the author. Never commit scratch source.
-- [DOING @dev56] SHIFT-009 (REA) — SRAM/Status 54 functions → C
-  - `SramRead_WorldData` / `SramWrite_WorldData` done; next `Sram_InitSaveFile`.
-    `SramWrite_MostRecentSaveFile` is parked (TECH-003f).
+- [TODO] SHIFT-009 (REA) — SRAM/Status 54 functions → C
+  - `SramRead_WorldData` / `SramWrite_WorldData` done. `Sram_InitSaveFile`
+    candidate is blocked on `gEquipment`/door register shape and the
+    `0x4C/0x4D` fold; `yEnd`/`yExit` are confirmed (struct offsets 5/8).
+    Use the m2c draft next. `SramWrite_MostRecentSaveFile` is parked.
 - [TODO] SHIFT-010 (REA) — Pause 25 + Navigation 27 functions → C
   - `PauseScreenSetPauseDebugWindow` done; use decomp.me sources, objdiff and
     permuter for the rest.
@@ -46,7 +48,7 @@ Last updated: 2026-10-23.
 
 - [TODO] SHIFT-001a (baseline) — title/new-game/pause/save scenarios
 - [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox
-- [TODO] QA-027 (tools) — host save validation/checksum
+- [DOING @dev57] QA-027 (tools) — host save validation/checksum
   - `Sram_CheckLoadSaveFile` is now C; add `tests/host/save_test.c` with
     synthetic buffers. Do not duplicate the algorithm; native suite remains
     authoritative.

@@ -12,15 +12,15 @@ Counts: **29 TODO / 1 DOING / 0 DONE / 5 PARK** (35 entries).
 
 ### In progress (DOING)
 
-- `SHIFT-009` — SRAM/Status 54 functions → C
+- `QA-027` — host save validation/checksum
 
 ### Next TODO (first 5 in file order)
 
 - `TECH-005` — decomp.me preset 250 corpus
+- `SHIFT-009` — SRAM/Status 54 functions → C
 - `SHIFT-010` — Pause 25 + Navigation 27 functions → C
 - `SHIFT-011` — hack-critical behavior suite [deps: SHIFT-009, SHIFT-010]
 - `SHIFT-012` — FileSelect/GameOver 53 functions → C [deps: SHIFT-011]
-- `SHIFT-013` — Intro/Ending/Cutscene 217 functions → C [deps: SHIFT-011]
 
 ### Most recent DONE (last 5 in file order)
 
