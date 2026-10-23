@@ -222,6 +222,12 @@ static u32 sBlob_79bec0_79c128[154] = {
 typedef char sBlob_79bec0_79c128_size_check[sizeof(sBlob_79bec0_79c128) == 616 ? 1 : -1];
 /* END GENERATED: sBlob_79bec0_79c128 */
 
+/* Typed view of the generated table above, for PauseScreenProcessOam.  The
+   alias adds no storage and no bytes: it names the same address with the
+   const struct FrameData* element type the pause screen indexes it by. */
+extern const struct FrameData* const sUnk_79bec0[154]
+    __attribute__((alias("sBlob_79bec0_79c128")));
+
 /**
  * @brief 7552c | 214 | Pause screen map main loop
  * 
