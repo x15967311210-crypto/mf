@@ -1,0 +1,346 @@
+#!/usr/bin/env bash
+# run.sh -- run the pinned decomp-permuter on ONE already-extracted function.
+#
+# Inputs: a C seed with the function body, and the target assembly or object
+# for that function alone.  The script builds the permuter input directory,
+# generates the agbcc `compile.sh` used by every candidate, and runs a bounded
+# search with --stop-on-zero.
+#
+# Pipeline for candidates (matches the normal ROM build flags):
+#   cpp -nostdinc -Iinclude -DREGION_US
+#     | tools/agbcc/bin/agbcc -O1 -mthumb-interwork -fhex-asm
+#     -> append ".align 2, 0"
+#     -> arm-none-eabi-as -mcpu=arm7tdmi -I<root>
+#
+# Scoring is decomp-permuter's instruction/register diff, not a byte-equality
+# gate.  See docs/howto/decomp-permuter.md.  Nothing here is committed and
+# nothing runs in CI.
+#
+# Usage:
+#   tools/decomp/permuter/run.sh --seed SEED.c --target TARGET.s [options]
+#
+# Options:
+#   --seed PATH       C seed containing exactly one function (required)
+#   --target PATH     standalone .s for that function, or a prebuilt .o
+#   --name NAME       permuter function name (default: seed basename)
+#   --dir PATH        input directory (default: work/permuter/<name>)
+#   --timeout SECS    hard wall-clock bound, default 600 (recommended 600-900)
+#   --jobs N          parallel workers (default: nproc)
+#   --debug           only print the base score and diff; do not search
+#   --self-check      verify the build pipeline on a tiny fixture, then exit
+#   -h, --help
+
+set -euo pipefail
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+ROOT=$(cd -- "$SCRIPT_DIR/../../.." && pwd)
+
+PERMUTER_DIR="$ROOT/work/tools/decomp-permuter"
+VENV_PY="$ROOT/work/tools/permuter-venv/bin/python"
+AGBCC="$ROOT/tools/agbcc/bin/agbcc"
+
+SEED=""
+TARGET=""
+NAME=""
+DIR=""
+TIMEOUT_S=600
+JOBS=$(nproc 2>/dev/null || echo 4)
+DEBUG_ONLY=0
+SELF_CHECK=0
+
+msg()  { printf 'permuter-run: %s\n' "$*"; }
+die()  { printf 'permuter-run: ERROR: %s\n' "$*" >&2; exit 1; }
+usage() {
+    cat <<'EOF'
+Usage: tools/decomp/permuter/run.sh --seed SEED.c --target TARGET.s [options]
+
+Builds a decomp-permuter input directory for one function and runs a bounded
+search.  See docs/howto/decomp-permuter.md.
+
+Options:
+  --seed PATH       C seed containing exactly one function (required)
+  --target PATH     standalone .s for that function, or a prebuilt .o
+  --name NAME       permuter function name (default: seed basename)
+  --dir PATH        input directory (default: work/permuter/<name>)
+  --timeout SECS    hard wall-clock bound, default 600 (recommended 600-900)
+  --jobs N          parallel workers (default: nproc)
+  --debug           only print the base score and diff; do not search
+  --self-check      verify the build pipeline on a tiny fixture, then exit
+  -h, --help
+EOF
+}
+
+need_value() {
+    [ $# -ge 2 ] && [ -n "$2" ] || die "option $1 needs a value"
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --seed)     need_value "$@"; SEED=$2; shift 2 ;;
+        --target)   need_value "$@"; TARGET=$2; shift 2 ;;
+        --name)     need_value "$@"; NAME=$2; shift 2 ;;
+        --dir)      need_value "$@"; DIR=$2; shift 2 ;;
+        --timeout)  need_value "$@"; TIMEOUT_S=$2; shift 2 ;;
+        --jobs)     need_value "$@"; JOBS=$2; shift 2 ;;
+        --debug)    DEBUG_ONLY=1; shift ;;
+        --self-check) SELF_CHECK=1; shift ;;
+        -h|--help)  usage; exit 0 ;;
+        *) usage >&2; die "unknown argument: $1" ;;
+    esac
+done
+
+case "$TIMEOUT_S" in
+    ''|*[!0-9]*) die "--timeout must be an integer number of seconds" ;;
+esac
+if [ "$TIMEOUT_S" -lt 30 ] || [ "$TIMEOUT_S" -gt 3600 ]; then
+    die "--timeout must be between 30 and 3600 seconds (600-900 recommended)"
+fi
+case "$JOBS" in
+    ''|*[!0-9]*) die "--jobs must be a positive integer" ;;
+esac
+[ "$JOBS" -ge 1 ] || die "--jobs must be a positive integer"
+
+# The ARM binutils usually live in ~/.local/bin.
+if [ -d "$HOME/.local/bin" ] && ! command -v arm-none-eabi-as >/dev/null 2>&1; then
+    PATH="$HOME/.local/bin:$PATH"
+    export PATH
+fi
+
+require_tool() { command -v "$1" >/dev/null 2>&1 || die "missing $1"; }
+
+check_build_tools() {
+    require_tool cpp
+    require_tool arm-none-eabi-as
+    require_tool arm-none-eabi-objdump
+    [ -x "$AGBCC" ] || die "missing $AGBCC; run tools/setup_agbcc.sh"
+}
+
+check_toolchain() {
+    check_build_tools
+    require_tool timeout
+    [ -x "$VENV_PY" ] || die "missing $VENV_PY; run tools/decomp/permuter/setup.sh"
+    [ -d "$PERMUTER_DIR" ] || die "missing $PERMUTER_DIR; run tools/decomp/permuter/setup.sh"
+    "$VENV_PY" -c 'import toml' >/dev/null 2>&1 \
+        || die "toml is not importable from $VENV_PY; run tools/decomp/permuter/setup.sh"
+}
+
+# ---------------------------------------------------------------------------
+# Input directory construction
+# ---------------------------------------------------------------------------
+
+write_compile_sh() {
+    local dir=$1
+    cat >"$dir/compile.sh" <<EOF
+#!/bin/bash
+# Generated by tools/decomp/permuter/run.sh -- do not edit.
+# Invoked by decomp-permuter as: ./compile.sh input.c -o output.o
+set -e
+ROOT=$(printf '%q' "$ROOT")
+export PATH="\$HOME/.local/bin:\$PATH"
+in="\$1"; shift
+out=""
+while [ \$# -gt 0 ]; do
+    case "\$1" in
+        -o) out="\$2"; shift 2 ;;
+        *) shift ;;
+    esac
+done
+[ -n "\$out" ] || { echo "compile.sh: missing -o" >&2; exit 2; }
+s="\$out.s"
+trap 'rm -f "\$s"' EXIT
+cpp -P -nostdinc -I"\$ROOT/include" -DREGION_US "\$in" \\
+    | "\$ROOT/tools/agbcc/bin/agbcc" -O1 -mthumb-interwork -fhex-asm -o "\$s"
+printf '\\t.align 2, 0 @ dont insert nops\\n' >>"\$s"
+arm-none-eabi-as -mcpu=arm7tdmi -I"\$ROOT" "\$s" -o "\$out"
+EOF
+    chmod +x "$dir/compile.sh"
+}
+
+build_input_dir() {
+    local seed=$1 target=$2 dir=$3 name=$4
+
+    case "$dir" in
+        "$ROOT/work/"*) : ;;
+        *) die "--dir must live under $ROOT/work (refusing to delete $dir)" ;;
+    esac
+    rm -rf "$dir"
+    mkdir -p "$dir"
+
+    msg "preprocessing seed -> $dir/base.c"
+    cpp -P -nostdinc -I"$ROOT/include" -DREGION_US "$seed" >"$dir/base.c" \
+        || die "cpp failed on $seed"
+
+    case "$target" in
+        *.s)
+            msg "assembling target -> $dir/target.o"
+            arm-none-eabi-as -mcpu=arm7tdmi -I"$ROOT" "$target" -o "$dir/target.o" \
+                || die "arm-none-eabi-as failed on $target"
+            cp "$target" "$dir/target.s"
+            ;;
+        *.o)
+            cp "$target" "$dir/target.o"
+            ;;
+        *)
+            die "--target must be a .s or .o file: $target"
+            ;;
+    esac
+
+    arm-none-eabi-nm -P --defined-only "$dir/target.o" 2>/dev/null \
+        | awk -v f="$name" '$1 == f && $2 ~ /^[TtWw]$/ { found = 1 } END { exit !found }' \
+        || die "symbol '$name' not found in $dir/target.o (check --name)"
+
+    write_compile_sh "$dir"
+
+    cat >"$dir/settings.toml" <<EOF
+func_name = "$name"
+compiler_type = "gcc"
+EOF
+
+    msg "compiling base candidate"
+    ( cd "$dir" && ./compile.sh base.c -o base.o ) \
+        || die "the generated compile.sh failed on base.c"
+}
+
+# ---------------------------------------------------------------------------
+# Self-check: a two-instruction fixture proves the whole build pipeline
+# (cpp -> agbcc -> as -> objdump) without starting the search.
+# ---------------------------------------------------------------------------
+
+# Holds the self-check scratch directory.  It must be global: an EXIT trap
+# installed inside self_check() fires after the function has returned, so a
+# `local` would already be out of scope (`set -u` would then abort the script).
+SELFCHECK_TMP=""
+self_check_cleanup() {
+    if [ -n "$SELFCHECK_TMP" ]; then
+        rm -rf "$SELFCHECK_TMP"
+        SELFCHECK_TMP=""
+    fi
+}
+
+self_check() {
+    check_build_tools
+    local tmp
+    tmp=$(mktemp -d "${TMPDIR:-/tmp}/permuter-selfcheck.XXXXXX")
+    SELFCHECK_TMP=$tmp
+    trap self_check_cleanup EXIT
+
+    cat >"$tmp/seed.c" <<'EOF'
+int selfcheck_add(int a, int b)
+{
+    return a + b;
+}
+EOF
+    cat >"$tmp/target.s" <<'EOF'
+    .syntax unified
+    .thumb
+
+    .global selfcheck_add
+    .thumb_func
+selfcheck_add:
+    adds r0, r0, r1
+    bx lr
+EOF
+
+    DIR="$ROOT/work/permuter/.selfcheck"
+    build_input_dir "$tmp/seed.c" "$tmp/target.s" "$DIR" selfcheck_add
+
+    local got want
+    got=$(arm-none-eabi-objdump -d "$DIR/base.o" | awk '/^[[:space:]]*[0-9a-f]+:/ { $1=""; print }')
+    want=$(arm-none-eabi-objdump -d "$DIR/target.o" | awk '/^[[:space:]]*[0-9a-f]+:/ { $1=""; print }')
+    if [ "$got" != "$want" ]; then
+        printf 'permuter-run: got:\n%s\npermuter-run: want:\n%s\n' "$got" "$want" >&2
+        die "self-check FAILED: generated compile.sh does not reproduce the target"
+    fi
+    msg "self-check PASS: cpp -> agbcc -O1 -mthumb-interwork -> as -> objdump"
+    self_check_cleanup
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+if [ "$SELF_CHECK" = 1 ]; then
+    self_check
+    exit 0
+fi
+
+[ -n "$SEED" ] || { usage >&2; die "--seed is required"; }
+[ -n "$TARGET" ] || { usage >&2; die "--target is required"; }
+[ -f "$SEED" ] || die "no such seed: $SEED"
+[ -f "$TARGET" ] || die "no such target: $TARGET"
+
+if [ -z "$NAME" ]; then
+    NAME=$(basename "$SEED")
+    NAME=${NAME%.*}
+fi
+case "$NAME" in
+    *[!A-Za-z0-9_]*) die "--name must be a C identifier: $NAME" ;;
+esac
+[ -n "$DIR" ] || DIR="$ROOT/work/permuter/$NAME"
+# Relative --dir values are resolved against the repository root so that
+# `--dir work/...` works from any cwd (the guard below compares absolute paths).
+case "$DIR" in
+    /*) : ;;
+    *) DIR="$ROOT/$DIR" ;;
+esac
+
+check_toolchain
+build_input_dir "$SEED" "$TARGET" "$DIR" "$NAME"
+
+if [ "$DEBUG_ONLY" = 1 ]; then
+    # Run the permuter in debug mode without a pipeline, so the exit status is
+    # unambiguous and the full diff is preserved in base-debug.log.
+    set +e
+    ( cd "$DIR" && "$VENV_PY" "$PERMUTER_DIR/permuter.py" . --debug ) \
+        >"$DIR/base-debug.log" 2>&1
+    status=$?
+    set -e
+    [ "$status" -eq 0 ] || die "permuter --debug failed (see $DIR/base-debug.log)"
+
+    grep -E 'base score =|Penalty List|Differences:|Reorderings:|Insertions:|Deletions:' \
+        "$DIR/base-debug.log" || true
+    base_score=$(grep -oE 'base score = [0-9]+' "$DIR/base-debug.log" \
+        | tail -1 | awk '{ print $NF }')
+    [ -n "$base_score" ] \
+        || die "could not read the base score from $DIR/base-debug.log"
+    msg "base score: $base_score (diff: $DIR/base-debug.log)"
+    exit 0
+fi
+
+msg "searching for $NAME (timeout ${TIMEOUT_S}s, $JOBS jobs, --stop-on-zero)"
+set +e
+( cd "$DIR" && timeout "$TIMEOUT_S" "$VENV_PY" "$PERMUTER_DIR/permuter.py" . \
+    -j"$JOBS" --stop-on-zero ) 2>&1 | tee "$DIR/permuter.log"
+status=${PIPESTATUS[0]}
+set -e
+
+# timeout(1) returns 124 when the bound is reached; that is a normal result for
+# a bounded pilot, not a tool failure.
+if [ "$status" -eq 124 ]; then
+    msg "bounded search stopped at the ${TIMEOUT_S}s timeout"
+elif [ "$status" -ne 0 ]; then
+    die "permuter failed with exit status $status (see $DIR/permuter.log)"
+fi
+
+best=""
+best_score=""
+for d in "$DIR"/output-*; do
+    [ -d "$d" ] || continue
+    s=$(cat "$d/score.txt" 2>/dev/null) || continue
+    case "$s" in ''|*[!0-9]*) continue ;; esac
+    if [ -z "$best_score" ] || [ "$s" -lt "$best_score" ]; then
+        best_score=$s
+        best=$d
+    fi
+done
+
+if [ -n "$best" ]; then
+    msg "best candidate: score $best_score  ($best/source.c)"
+    if [ "$best_score" -eq 0 ]; then
+        msg "MATCH: copy $best/source.c for a scratch-build verification"
+    fi
+else
+    msg "no candidate output was written"
+fi
+
+msg "log: $DIR/permuter.log"

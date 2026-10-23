@@ -183,7 +183,7 @@ RULES_NO_SCAN += symbols audit-asm audit-blobs rewrite report audit \
 	shift-check shift-reorder shift-start shift-input shift-input-30k \
 	shift-screen screen-diff oam-diff event-diff shift-check-all \
 	postlink-scan postlink-scan-strict shift-help \
-	compare-text c-port-check \
+	compare-text c-port-check permute \
 	content-tables content-tables-check hack-build hack-sha1 hack-smoke \
 	format format-check format-list
 
@@ -309,6 +309,10 @@ include mk/pm.mk
 # without being asked, so a normal build is unchanged.
 include mk/format.mk
 
+# Manual decomp-permuter pilot (TECH-007).  Contributes $(PERMUTE_HELP); it
+# owns no `all`/`help` target and is never a gate.
+include mk/permute.mk
+
 .PHONY: help
 help:
 	@echo 'Targets:'
@@ -337,6 +341,9 @@ help:
 	@echo ''
 	@echo 'Format contract (DOC-002; style in .clang-format and docs/style.md):'
 	$(FORMAT_HELP)
+	@echo ''
+	@echo 'Manual decomp tooling (never part of a gate):'
+	$(PERMUTE_HELP)
 	@echo ''
 	@echo 'Flags:'
 	@echo '  V=1: enable verbose output'
