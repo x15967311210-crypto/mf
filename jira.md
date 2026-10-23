@@ -1263,18 +1263,23 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d/e
   - accept: a candidate that `compare_text` accepts, or a measured report that
     the search cannot close it; no baseline/SHA changes, no vendored source or
     binaries committed
-- [DOING @dev54] TECH-008 (tools/decomp) — objdiff-cli adapter (ARM32)
-  - objdiff supports ARM32 and its CLI can diff target/base `.o` one-shot:
-    `objdiff-cli diff -1 target.o -2 base.o -o - --format json <symbol>`
-  - pin a release/commit, install the binary under `work/tools/objdiff`
-    (ignored); add `tools/decomp/objdiff/setup.sh`, `diff.sh`, and
-    `docs/howto/objdiff.md`; optional `make objdiff`, never a gate
-  - pilot `SramWrite_MostRecentSaveFile`: target `.o` from asm, base `.o`
-    from the 435 seed; report match %, instruction/relocation differences and
-    compare the result with `compare_text`
-  - keep `compare_text`/whole-ROM SHA as the authoritative gate; objdiff is a
-    human diagnostic for close matches and the permuter loop; no engine
-    changes and no binaries/third-party source committed
+- [DONE] TECH-008 (tools/decomp) — objdiff-cli adapter (ARM32)
+  - pinned `objdiff-cli` **v3.8.3** (`objdiff-cli-linux-x86_64`, sha256
+    `e823ae93…65008`), installed under `work/tools/objdiff` (ignored);
+    `setup.sh`, `diff.sh`, `summary.py`, `pilot_sram_recent.sh` and
+    `docs/howto/objdiff.md` landed; no `make objdiff` target and no CI gate
+  - `diff.sh` accepts target/base `.o` + symbol and prints a concise match
+    summary; `pilot_sram_recent.sh` builds the target from asm and the base
+    from the 435 seed, with `--from-c` for permuter candidates
+  - pilot `SramWrite_MostRecentSaveFile`: **90.71%**, 138 B vs 136 B, 15
+    differing rows (prologue `r6`, checksum `r2` vs `r1`, epilogue
+    `ldr r2; mov r0,r2; sub` vs `sub r0,r6,r1`, literal/padding);
+    `compare_text` on the same pair still FAIL (0x8c vs 0x88, 52/140)
+  - `summary.py` self-check 12/12, `diff.sh --self-check` PASS; normal
+    `ca33f434…`, audit/smoke/test/check_relocs PASS
+  - landed `bfc7c15`; credit `encounter/objdiff` (Apache-2.0). `compare_text`
+    + whole-ROM SHA remain the authoritative gate; objdiff is a diagnostic
+    for close matches and the permuter loop
 - [DONE] BUG-027 (env) — harness now builds against the project's mGBA 0.6
   - `tests/emulator/build_harness06.sh` compiles `harness.c` against
     `tools/headless/.cache/mgba-0.6-bizhawk` + static

@@ -8,12 +8,11 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **30 TODO / 2 DOING / 83 DONE / 5 PARK** (120 entries).
+Counts: **30 TODO / 1 DOING / 84 DONE / 5 PARK** (120 entries).
 
 ### In progress (DOING)
 
 - `TECH-007` — decomp-permuter adapter (ARM32/agbcc)
-- `TECH-008` — objdiff-cli adapter (ARM32)
 
 ### Next TODO (first 5 in file order)
 
