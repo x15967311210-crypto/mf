@@ -8,11 +8,11 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **29 TODO / 1 DOING / 0 DONE / 5 PARK** (35 entries).
+Counts: **29 TODO / 0 DOING / 0 DONE / 5 PARK** (34 entries).
 
 ### In progress (DOING)
 
-- `QA-027` — host save validation/checksum
+_none_
 
 ### Next TODO (first 5 in file order)
 

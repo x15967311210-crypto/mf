@@ -48,10 +48,6 @@ Last updated: 2026-10-23.
 
 - [TODO] SHIFT-001a (baseline) — title/new-game/pause/save scenarios
 - [TODO] SHIFT-001b (emulator) — room-sweep scenario and telemetry mailbox
-- [DOING @dev57] QA-027 (tools) — host save validation/checksum
-  - `Sram_CheckLoadSaveFile` is now C; add `tests/host/save_test.c` with
-    synthetic buffers. Do not duplicate the algorithm; native suite remains
-    authoritative.
 - [TODO] QA-009 (emulator) — checkpoint memory parity
   - exact OAM/PAL/VRAM/IO; normalized IWRAM/EWRAM 32-bit ROM pointers.
 - [TODO] QA-007 (emulator) — later map/dialog/Enter regression checkpoint
@@ -72,8 +68,9 @@ Last updated: 2026-10-23.
     normal/shifted/reordered SHAs unchanged; add the cross-room save/load
     scenario. M2-enabling, not an M1 blocker.
 - [TODO] QA-030 (qa/tools) — automated hack save/load on the Entry Ledge pad
-  - needs QA-027; assert `area=7 room=0`, saved `gEventCounter`, banner/enemy/
-    spriteset after load.
+  - needs a valid SaveRAM or TAS save sequence; QA-027 host coverage is done.
+    Assert `area=7 room=0`, saved `gEventCounter`, banner/enemy/spriteset
+    after load.
 - [TODO] HACK-004b (engine/content) — Resonance Pulse prototype  [deps: PLAYTEST-001]
 - [TODO] PLAYTEST-002 (human) — M2 pulse playtest  [deps: HACK-004b]
 - [TODO] HACK-004c (engine/content) — The Cantor prototype  [deps: PLAYTEST-002]
