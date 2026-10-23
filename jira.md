@@ -1249,6 +1249,19 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d/e
     also saved in `work/decompme/` for a later task
   - gate: `compare_text`, normal `ca33f434…`, audit/smoke/test/check_relocs,
     `shift-test`; credit biosp4rk/decomp.me
+- [DOING @dev53] TECH-007 (tools/decomp) — decomp-permuter adapter (ARM32/agbcc)
+  - decomp-permuter supports ARM32; pin a commit and clone it under
+    `work/tools/decomp-permuter` (ignored), with a venv under
+    `work/tools/permuter-venv`; do not vendor the tool source into git
+  - add `tools/decomp/permuter/` setup/run/import wrappers, a minimal context
+    and `docs/howto/decomp-permuter.md`; optional `make permute`, never a CI
+    gate
+  - pilot: `SramWrite_MostRecentSaveFile` (the PARKed 17-byte diff at
+    `0x08080068`); build a standalone target `.o` from its asm, seed from the
+    closest C, and run a bounded random/manual permutation
+  - accept: a candidate that `compare_text` accepts, or a measured report that
+    the search cannot close it; no baseline/SHA changes, no vendored source or
+    binaries committed
 - [DONE] BUG-027 (env) — harness now builds against the project's mGBA 0.6
   - `tests/emulator/build_harness06.sh` compiles `harness.c` against
     `tools/headless/.cache/mgba-0.6-bizhawk` + static
