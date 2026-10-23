@@ -484,7 +484,9 @@ SECTIONS {
         src/minimap.o(.text);
         src/menus/pause_screen_map.o(.text);
 
-        asm/disasm_0x080765f8_080765f8.o(.text);
+        asm/disasm_0x080765f8_080765f8_080765f8.o(.text);
+        src/menus/pause_vblank_unused.o(.text);
+        asm/disasm_0x080765f8_080765f8_08076984.o(.text);
         asm/disasm_0x080765f8_08077084_08077084.o(.text);
         src/menus/pause_debug_window.o(.text);
         asm/disasm_0x080765f8_08077084_08077420.o(.text);
@@ -1126,6 +1128,10 @@ SECTIONS {
     /* ROM data alias: the boot-debug block inside sUnk_582280.  A distinct
        symbol keeps the baseline's separate literal pool entry. */
     gBootOptionsSrc = sUnk_582280 + 0x64;
+
+    /* IWRAM BG3CNT shadow in the pause screen's scratch block; named here so
+       the C port never has to spell out the RAM address. */
+    gUnk_300000a = 0x0300000A;
 
     /DISCARD/ : { src/sram/sram_file_info.o(.rodata) src/sram/sram_check_save.o(.rodata) src/sram/sram_world_write.o(.rodata) }
 }
