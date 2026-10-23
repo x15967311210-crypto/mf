@@ -13,10 +13,6 @@ Last updated: 2026-10-23.
 
 ## Engine and decompilation
 
-- [DOING @dev55] TECH-009 (tools/decomp) — m2c adapter (GBA/ARM)
-  - m2c supports target `gba`; pin in `work/tools`, add setup/run/context +
-    how-to. Pilot `SramWrite_MostRecentSaveFile` or `Sram_InitSaveFile`; feed
-    the result to objdiff/permuter. Not a gate.
 - [TODO] TECH-005 (tools/decomp) — decomp.me preset 250 corpus
   - 561/600 scratches are perfect (score 0 = 100%). Fetch read-only into
     `work/decompme/`, map names to `thumb_func_start` symbols, port with

@@ -8,11 +8,10 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **29 TODO / 2 DOING / 0 DONE / 5 PARK** (36 entries).
+Counts: **29 TODO / 1 DOING / 0 DONE / 5 PARK** (35 entries).
 
 ### In progress (DOING)
 
-- `TECH-009` — m2c adapter (GBA/ARM)
 - `SHIFT-009` — SRAM/Status 54 functions → C
 
 ### Next TODO (first 5 in file order)
