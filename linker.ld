@@ -494,6 +494,8 @@ SECTIONS {
         asm/disasm_0x080765f8_08077084_08077270.o(.text);
         src/menus/pause_debug_window.o(.text);
         asm/disasm_0x080765f8_08077084_08077420.o(.text);
+        src/menus/pause_setup_oam.o(.text);
+        asm/disasm_0x080765f8_080783f0_08078a74.o(.text);
         src/menus/check_maintained_input.o(.text);
         asm/disasm_0x080765f8_08078a74_08078af0.o(.text);
         src/menus/pause_nav_text_panel.o(.text);
@@ -1140,6 +1142,13 @@ SECTIONS {
     /* IWRAM BG3CNT shadow in the pause screen's scratch block; named here so
        the C port never has to spell out the RAM address. */
     gUnk_300000a = 0x0300000A;
+
+    /* Pause-screen OAM tables in the trailing event-data blob.  The blob
+       starts right after sSecurityUnlockEvents (which is 0x20 bytes) and the
+       tables sit at blob+0x5A and blob+0x70.  Anchoring on that exported
+       symbol keeps both arrays relocatable with the data they live in. */
+    sUnk_576142 = sSecurityUnlockEvents + 0x7A;
+    sUnk_576158 = sSecurityUnlockEvents + 0x90;
 
     /DISCARD/ : { src/sram/sram_file_info.o(.rodata) src/sram/sram_check_save.o(.rodata) src/sram/sram_world_write.o(.rodata) }
 }
