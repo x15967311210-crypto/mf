@@ -491,7 +491,8 @@ SECTIONS {
         asm/disasm_0x080765f8_080765f8_08076984.o(.text);
         asm/disasm_0x080765f8_08077084_08077084.o(.text);
         src/menus/pause_call_current_handler.o(.text);
-        asm/disasm_0x080765f8_08077084_08077270.o(.text);
+        src/menus/pause_move_debug_cursor.o(.text);
+        asm/disasm_0x080765f8_08077270_08077318.o(.text);
         src/menus/pause_debug_window.o(.text);
         asm/disasm_0x080765f8_08077084_08077420.o(.text);
         src/menus/pause_setup_oam.o(.text);
