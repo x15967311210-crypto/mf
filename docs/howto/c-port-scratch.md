@@ -7,10 +7,13 @@ tree. It does not change the decompilation policy: the shiftable engine does
 not require byte-matching, but a **baseline C port** must keep the normal ROM
 SHA `ca33f4348c2c05dd330d37b97e2c5a69531dfe87`.
 
-Tooling in this repository is deliberately dependency-light. `objdiff` and
-`decomp-permuter` are **not installed here**; the default path is
-`arm-none-eabi-objdump` plus `tools/decomp/compare_text.py`. Do not clone
-third-party tool trees into this repository.
+Tooling in this repository is deliberately dependency-light. The default path
+is `arm-none-eabi-objdump` plus `tools/decomp/compare_text.py`; for a fuzzy
+instruction-level view there is a pinned `objdiff-cli` adapter
+(`tools/decomp/objdiff/`, see `docs/howto/objdiff.md`). `decomp-permuter` is
+still **not installed**, and no third-party tool tree may be cloned into this
+repository — the objdiff release asset is downloaded into the ignored `work/`
+and SHA-256-verified.
 
 ## 0. Pick a function
 
@@ -160,7 +163,11 @@ engine would tolerate non-matching C. The baseline SHA gate is the stricter
 contract. Use `--disasm` to see whether the difference is a register choice, a
 branch width, or a literal-pool ordering; that is the point where a
 register/scheduling permutation loop (decomp-permuter) would normally help, but
-it is not installed here, so iterate by hand and re-run the comparison.
+it is not installed here. Use the objdiff diagnostic
+(`tools/decomp/objdiff/pilot_sram_recent.sh --from-c FILE`, see
+`docs/howto/objdiff.md`) to rank and read the remaining instruction differences,
+then iterate by hand and re-run the comparison. objdiff's percentage is a fuzzy
+instruction score, never the acceptance decision.
 
 A port that only needs to be *shiftable* (not part of the vanilla baseline) may
 be accepted with a behavior scenario and a green `shift-check`, but it must not
@@ -251,16 +258,21 @@ committed.
 ## Tool limitations
 
 - `compare_text.py` is a flat byte comparison of the symbol range. It does not
-  relocate operands the way `objdiff` does; if the candidate build moves data,
-  literal-pool words can differ even when the instruction sequence is the same.
-  The normalized `--disasm` diff is the fallback for reading those differences.
+  align instruction rows or tolerate insertions the way `objdiff` does; if the
+  candidate build moves data, literal-pool words can differ even when the
+  instruction sequence is the same. Use `tools/decomp/objdiff/diff.sh` (see
+  `docs/howto/objdiff.md`) to read that difference as instructions, and the
+  normalized `--disasm` diff as the objdump-native fallback.
 - For asm symbols without `.size`, the inferred extent runs to the next global
   text symbol (the next `thumb_func_start`) and therefore **includes the
   literal pool** and alignment padding. Use `--size`/`--candidate-size` for a
   tighter range.
-- `objdiff` and `decomp-permuter` are not installed in this environment. The
-  objdump path documented above is the supported default; do not add those
-  trees to the repository.
+- `objdiff-cli` (pinned `v3.8.3`) is available through
+  `tools/decomp/objdiff/setup.sh`, which verifies the SHA-256 and installs into
+  the ignored `work/tools/objdiff/`; see `docs/howto/objdiff.md`.
+  `decomp-permuter` is still not installed. The objdump path documented above
+  remains the supported default; do not add either tool's source tree to the
+  repository.
 
 ## Keeping the baseline layout (the last mile)
 
