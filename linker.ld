@@ -492,6 +492,8 @@ SECTIONS {
         asm/disasm_0x080765f8_08077084_08077270.o(.text);
         src/menus/pause_debug_window.o(.text);
         asm/disasm_0x080765f8_08077084_08077420.o(.text);
+        src/menus/pause_nav_text_panel.o(.text);
+        asm/disasm_0x080765f8_08078ba4_08078c44.o(.text);
 
         src/text.o(.text);
 
