@@ -1238,17 +1238,18 @@ reordered full TAS and Any%), and PLAYTEST-000 (M0 human PASS).  TECH-003b/c/d/e
     `thumb_func_start` in `asm/`; each port must pass `compare_text` in this
     tree and credit the scratch author in the commit
   - never commit third-party scratch source; reference/adapt only
-- [DOING @dev52] TECH-006 (decomp) — pilot decomp.me perfect scratch: `PauseScreenSetPauseDebugWindow`
-  - scratch `nM76W` (biosp4rk, `0/1800`, 100%), saved as
-    `work/decompme/PauseScreenSetPauseDebugWindow.c`; the function is still
-    asm at `0x080773F8` in `asm/disasm_0x080765f8_08077084.s`
-  - the 9-instruction function only uses `gBackgroundPositions`,
-    `SCREEN_SIZE_Y` and `WRITE_16(REG_WIN0V, …)`; split the asm, insert the C
-    object at the exact address, and verify byte-identically
+- [DONE] TECH-006 (decomp) — pilot decomp.me perfect scratch: `PauseScreenSetPauseDebugWindow`
+  - scratch `nM76W` (biosp4rk, `0/1800`, 100%) landed as
+    `src/menus/pause_debug_window.c` at `0x080773F8`; **40/40 bytes identical**
+    with the default `-O2` flags, no orphan `.rodata`
+  - split `asm/disasm_0x080765f8_08077084.s` into `_08077084_08077084.s` and
+    `_08077420.s`; `linker.ld` inserts the C object between them
+  - neighbours `PauseScreenMoveBackgroundToYPosition` (116) and
+    `PauseDebugWindowAppearing` (128) unchanged; normal `ca33f434…`;
+    audit/smoke/test/check_relocs and `shift-test` (`5888a563…`, DYNAMIC) PASS
+  - landed `f562995`; audit refresh `119572f`; credit `biosp4rk` / decomp.me
   - larger pause-screen scratch `GoKlR` (`PauseScreenProcessOam`, 0/66700) is
-    also saved in `work/decompme/` for a later task
-  - gate: `compare_text`, normal `ca33f434…`, audit/smoke/test/check_relocs,
-    `shift-test`; credit biosp4rk/decomp.me
+    saved in `work/decompme/` for a later task
 - [DOING @dev53] TECH-007 (tools/decomp) — decomp-permuter adapter (ARM32/agbcc)
   - decomp-permuter supports ARM32; pin a commit and clone it under
     `work/tools/decomp-permuter` (ignored), with a venv under
