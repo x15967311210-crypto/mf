@@ -13,7 +13,7 @@ Last updated: 2026-10-23.
 
 ## Engine and decompilation
 
-- [TODO] TECH-009 (tools/decomp) — m2c adapter (GBA/ARM)
+- [DOING @dev55] TECH-009 (tools/decomp) — m2c adapter (GBA/ARM)
   - m2c supports target `gba`; pin in `work/tools`, add setup/run/context +
     how-to. Pilot `SramWrite_MostRecentSaveFile` or `Sram_InitSaveFile`; feed
     the result to objdiff/permuter. Not a gate.
@@ -21,7 +21,7 @@ Last updated: 2026-10-23.
   - 561/600 scratches are perfect (score 0 = 100%). Fetch read-only into
     `work/decompme/`, map names to `thumb_func_start` symbols, port with
     `compare_text`, credit the author. Never commit scratch source.
-- [TODO] SHIFT-009 (REA) — SRAM/Status 54 functions → C
+- [DOING @dev56] SHIFT-009 (REA) — SRAM/Status 54 functions → C
   - `SramRead_WorldData` / `SramWrite_WorldData` done; next `Sram_InitSaveFile`.
     `SramWrite_MostRecentSaveFile` is parked (TECH-003f).
 - [TODO] SHIFT-010 (REA) — Pause 25 + Navigation 27 functions → C

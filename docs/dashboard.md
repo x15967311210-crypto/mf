@@ -8,19 +8,20 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **31 TODO / 0 DOING / 0 DONE / 5 PARK** (36 entries).
+Counts: **29 TODO / 2 DOING / 0 DONE / 5 PARK** (36 entries).
 
 ### In progress (DOING)
 
-_none_
+- `TECH-009` — m2c adapter (GBA/ARM)
+- `SHIFT-009` — SRAM/Status 54 functions → C
 
 ### Next TODO (first 5 in file order)
 
-- `TECH-009` — m2c adapter (GBA/ARM)
 - `TECH-005` — decomp.me preset 250 corpus
-- `SHIFT-009` — SRAM/Status 54 functions → C
 - `SHIFT-010` — Pause 25 + Navigation 27 functions → C
 - `SHIFT-011` — hack-critical behavior suite [deps: SHIFT-009, SHIFT-010]
+- `SHIFT-012` — FileSelect/GameOver 53 functions → C [deps: SHIFT-011]
+- `SHIFT-013` — Intro/Ending/Cutscene 217 functions → C [deps: SHIFT-011]
 
 ### Most recent DONE (last 5 in file order)
 
