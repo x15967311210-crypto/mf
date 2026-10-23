@@ -11,13 +11,6 @@ short: one line plus only the context a fresh dev needs.
 
 Last updated: 2026-10-23.
 
-## Active
-
-- [DOING @dev53] TECH-007 (tools/decomp) — decomp-permuter adapter (ARM32/agbcc)
-  - pin `8556c81…`; clone in `work/tools`, venv in `work/tools`; add
-    `tools/decomp/permuter/` setup/run/import + how-to; bounded pilot on
-    `SramWrite_MostRecentSaveFile` (435 seed). Never a gate, no vendoring.
-
 ## Engine and decompilation
 
 - [TODO] TECH-009 (tools/decomp) — m2c adapter (GBA/ARM)
@@ -96,8 +89,10 @@ Last updated: 2026-10-23.
 ## Parked / blocked
 
 - [PARK] TECH-003f (decomp) — `SramWrite_MostRecentSaveFile` kept asm
-  - C port stopped at a 17-byte diff; function remains asm, SHA/gates clean.
-    Revisit only with a new epilogue/checksum shape or via m2c/permuter.
+  - C port stopped at a 17-byte diff; permuter 900 s best **200**, no `score 0`
+    (best source: `work/decompme/SramWrite_MostRecentSaveFile.best200.c`).
+    Function remains asm, SHA/gates clean; revisit with m2c or a new
+    epilogue/checksum shape.
 - [PARK] QA-014 (emulator) — valid elevator/pre-entry reproducer
   - existing states are post-entry; capture matched normal/shifted/reordered
     pre-entry states before BUG-010 is actionable.
