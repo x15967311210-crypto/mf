@@ -115,6 +115,7 @@ HOST_TEST_ROOM_BIN = $(HOST_TEST_DIR)/room_rle_test
 HOST_TEST_SPRITE_BIN = $(HOST_TEST_DIR)/sprite_spawn_test
 HOST_TEST_TIMER_BIN = $(HOST_TEST_DIR)/timer_test
 HOST_TEST_FIXED_BIN = $(HOST_TEST_DIR)/fixed_point_test
+HOST_TEST_SAVE_BIN = $(HOST_TEST_DIR)/save_test
 MKDIR = mkdir -p
 RM = rm -f
 SHA1SUM = sha1sum
@@ -282,10 +283,17 @@ host-test:
 	$(MSG) HOSTCC $(HOST_TEST_FIXED_BIN)
 	$Q$(HOSTCC) $(HOST_CFLAGS) tests/host/fixed_point_test.c src/fixed_point.c \
 		-Wl,--gc-sections -o $(HOST_TEST_FIXED_BIN)
+	$(MSG) HOSTCC $(HOST_TEST_SAVE_BIN)
+# The engine writes completion[2] one byte past struct GameCompletion; the test
+# backs the symbol with extra bytes, so silence the expected warning.
+	$Q$(HOSTCC) $(HOST_CFLAGS) -Wno-stringop-overflow \
+		tests/host/save_test.c src/sram/sram_check_save.c \
+		-Wl,--gc-sections -o $(HOST_TEST_SAVE_BIN)
 	$Q$(HOST_TEST_ROOM_BIN)
 	$Q$(HOST_TEST_SPRITE_BIN)
 	$Q$(HOST_TEST_TIMER_BIN)
 	$Q$(HOST_TEST_FIXED_BIN)
+	$Q$(HOST_TEST_SAVE_BIN)
 	@echo 'host-test: all suites passed'
 
 # Shift/audit/test surface (BUILD-002).  The targets live in mk/shift.mk and

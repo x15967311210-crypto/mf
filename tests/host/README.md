@@ -15,6 +15,7 @@ it covers and links with `-ffunction-sections -fdata-sections
 - `tests/host/sprite_spawn_test.c` + `src/sprite.c`
 - `tests/host/timer_test.c` + `src/in_game_timer.c`
 - `tests/host/fixed_point_test.c` + `src/fixed_point.c`
+- `tests/host/save_test.c` + `src/sram/sram_check_save.c`
 
 The linker drops every unrelated engine function (and its GBA/global
 references), so only the tested functions end up in each binary.  The
@@ -29,6 +30,7 @@ host-test: N/N passed
 sprite-spawn-test: N/N passed
 timer-test: N/N passed
 fixed-point-test: N/N passed
+save-test: N/N passed
 host-test: all suites passed
 ```
 
@@ -89,6 +91,34 @@ checks them against `Q_8_8` expectations from `include/macros.h`:
   numerator/denominator, and truncation;
 - `FixedInverse`: `1.0`, `0.5`, `2.0`, `0.25`, negative values, and
   truncation.
+
+`save_test.c` links the real `Sram_CheckLoadSaveFile` from
+`src/sram/sram_check_save.c` and stubs only the two hardware-bound calls
+(`Sram_InitSaveFile`, `SramLoad_CurrentSave`) with counters.  The fixture
+globals are the per-file info table, the most-recent index, the loading flag,
+the completion bytes, the button/boot-debug source blocks, and the flags the
+function clears.
+
+- `loading == 0`: `Sram_InitSaveFile` is called once and the selected file's
+  `completion0`/`completion1` are copied into `gGameCompletion`, with the third
+  byte zeroed;
+- the completion copy uses `gMostRecentSaveFile`, not slot 0;
+- `loading != 0`: `SramLoad_CurrentSave` is called once and the completion
+  bytes are left untouched;
+- a high loading byte (`0x80`) takes the load branch and is stored verbatim in
+  the signed `gIsLoadingFile`;
+- the button assignments (`sUnk_582280 + 0x48`) and boot-debug block
+  (`gBootOptionsSrc`) are copied before the branch in both paths;
+- all eleven trailing flags are cleared in both paths;
+- repeated calls follow the current loading byte instead of latching.
+
+Two engine quirks are asserted as real behavior: `completion[2]` is written
+one byte past `struct GameCompletion`, so the test backs that symbol with four
+bytes; and the loading byte is sign-extended into the `s32` local.
+
+The checksum computation for the most-recent header lives in
+`SramWrite_MostRecentSaveFile` (still asm, TECH-003f) and is deliberately
+**not** duplicated here.
 
 ## Scope
 
