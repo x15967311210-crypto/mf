@@ -297,6 +297,8 @@ SECTIONS {
         . = 0x000053f9; gUnk_30053f9 = .;
         . = 0x000053fc; gHazeProcessCodePointer = .;
 
+        . = 0x00005400; gUnk_3005400 = .;
+
         . = 0x00005408; *libgcc.a:dp-bit.o(.bss);
         . = 0x00005420; *libgcc.a:fp-bit.o(.bss);
 
@@ -492,6 +494,8 @@ SECTIONS {
         asm/disasm_0x080765f8_08077084_08077270.o(.text);
         src/menus/pause_debug_window.o(.text);
         asm/disasm_0x080765f8_08077084_08077420.o(.text);
+        src/menus/check_maintained_input.o(.text);
+        asm/disasm_0x080765f8_08078a74_08078af0.o(.text);
         src/menus/pause_nav_text_panel.o(.text);
         asm/disasm_0x080765f8_08078ba4_08078c44.o(.text);
 
