@@ -8,7 +8,7 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **30 TODO / 1 DOING / 84 DONE / 5 PARK** (120 entries).
+Counts: **31 TODO / 1 DOING / 0 DONE / 5 PARK** (37 entries).
 
 ### In progress (DOING)
 
@@ -16,24 +16,15 @@ Counts: **30 TODO / 1 DOING / 84 DONE / 5 PARK** (120 entries).
 
 ### Next TODO (first 5 in file order)
 
-- `SHIFT-001a` — add title/new-game/pause/save scenarios
-- `SHIFT-001b` — room-sweep scenario and telemetry mailbox
-- `QA-004` — scanner for 2-byte/4-byte pointer-like data in raw
-- `QA-027` — host harness: save validation/checksum
-- `QA-028` — settle window restarts on every new byte pair
+- `TECH-009` — m2c adapter (GBA/ARM)
+- `TECH-005` — decomp.me preset 250 corpus
+- `SHIFT-009` — SRAM/Status 54 functions → C
+- `SHIFT-010` — Pause 25 + Navigation 27 functions → C
+- `SHIFT-011` — hack-critical behavior suite [deps: SHIFT-009, SHIFT-010]
 
 ### Most recent DONE (last 5 in file order)
 
-- `HACK-008d1` — hack-owned scroll table for AREA_TEST_1
-  - evidence: commit `5251917`
-- `HACK-008d2` — text ID space and hack-owned message table
-  - evidence: commit `a148b76`
-- `HACK-008d3` — hack spriteset selection + Echo Hunter
-  - evidence: commit `1f73189`
-- `HACK-008d4a` — hack entry warp + room-load check
-  - evidence: commit `d6deecb`
-- `HACK-008d4b` — liveness gate + golden-path doc
-  - evidence: commit `e5347570`
+_none_
 
 ## Gates
 
