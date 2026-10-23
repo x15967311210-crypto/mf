@@ -26,5 +26,5 @@ permute:
 		$(if $(PERMUTE_JOBS),--jobs $(PERMUTE_JOBS)) $(PERMUTE_ARGS)
 
 define PERMUTE_HELP
-  permute: bounded decomp-permuter pilot (manual; never a gate or CI target)
+	@echo "  permute: bounded decomp-permuter pilot (manual; never a gate or CI target)"
 endef

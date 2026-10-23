@@ -183,7 +183,7 @@ RULES_NO_SCAN += symbols audit-asm audit-blobs rewrite report audit \
 	shift-check shift-reorder shift-start shift-input shift-input-30k \
 	shift-screen screen-diff oam-diff event-diff shift-check-all \
 	postlink-scan postlink-scan-strict shift-help \
-	compare-text c-port-check permute \
+	compare-text c-port-check permute m2c \
 	content-tables content-tables-check hack-build hack-sha1 hack-smoke \
 	format format-check format-list
 
@@ -313,6 +313,10 @@ include mk/format.mk
 # owns no `all`/`help` target and is never a gate.
 include mk/permute.mk
 
+# Manual m2c decompiler pilot (TECH-009).  Contributes $(M2C_HELP); it owns no
+# `all`/`help` target and is never a gate.
+include mk/m2c.mk
+
 .PHONY: help
 help:
 	@echo 'Targets:'
@@ -344,6 +348,7 @@ help:
 	@echo ''
 	@echo 'Manual decomp tooling (never part of a gate):'
 	$(PERMUTE_HELP)
+	$(M2C_HELP)
 	@echo ''
 	@echo 'Flags:'
 	@echo '  V=1: enable verbose output'

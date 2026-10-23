@@ -1,0 +1,20 @@
+# symbols/sram.syms -- literal-pool rewrites for the SramWrite pilot (TECH-009).
+#
+# Format (tools/decomp/m2c/extract.py): one `LITERAL NAME` pair per line.
+# LITERAL must match the `.4byte`/`.word` operand exactly as written in the
+# split disassembly; `#` starts a comment.  Only data directives are rewritten
+# -- instruction operands and the `@ =0x...` comments are left alone.
+#
+# Everything here is a decompiler hint: the rewritten .s is fed to m2c, it is
+# not part of the ROM build.
+
+# EWRAM save buffer, raw address; no C symbol in the project yet.
+0x0203F000 gSramMostRecent
+
+# IWRAM byte holding the selected save file (include/structs/save_file.h).
+0x03000B8D gMostRecentSaveFile
+
+# 0x08582288 == one past sUnk_582280 (a 2-element pointer table), which is also
+# the start of the ROM blob src/data/sram_pointers.c calls sBlob_582288_58b3cc.
+# m2c wants one plain symbol, so use the blob name.
+sUnk_582280+0x8 sBlob_582288
