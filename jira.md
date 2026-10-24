@@ -22,10 +22,11 @@ Last updated: 2026-10-23.
     candidate is blocked on `gEquipment`/door register shape and the
     `0x4C/0x4D` fold; `yEnd`/`yExit` are confirmed (struct offsets 5/8).
     Use the m2c draft next. `SramWrite_MostRecentSaveFile` is parked.
-- [DOING @dev77] SHIFT-010 (REA) — Pause 25 + Navigation 27 functions → C
-  - Twenty pause/input functions are done; next
-    `NavigationConversationProcessText` (decomp.me `y9K10`, 0x08079AFC).
-    Continue with the perfect sources, objdiff and permuter.
+- [DOING @dev78] SHIFT-010 (REA) — Pause 25 + Navigation 27 functions → C
+  - Twenty pause/input functions are done. `NavigationConversationProcessText`
+    was attempted but the perfect scratch still differed (1278/1536) and was
+    reverted; next `StatusScreenHandler` (0x0807E678, 0x34). Continue with
+    perfect sources, m2c/objdiff and permuter.
 - [TODO] SHIFT-011 (emulator) — hack-critical behavior suite  [deps: SHIFT-009, SHIFT-010]
 - [TODO] SHIFT-012 (REA) — FileSelect/GameOver 53 functions → C  [deps: SHIFT-011]
 - [TODO] SHIFT-013 (REA) — Intro/Ending/Cutscene 217 functions → C  [deps: SHIFT-011]
