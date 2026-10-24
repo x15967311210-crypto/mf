@@ -26,6 +26,7 @@ Last updated: 2026-10-23.
   - Twenty-eight functions are done. `IntroSamusInShipProcess` was attempted
     but reverted (0x298 vs 0x294); next `unk_9209c` (decomp.me `l8g1R`,
     0x0809209C). Continue from `work/decompme/perfect.tsv`.
+- [DOING @dev91] SHIFT-010b (REA) — IntroShipAlertInit (decomp.me `VM5F9`, 0x080924D0)
 - [TODO] SHIFT-011 (emulator) — hack-critical behavior suite  [deps: SHIFT-009, SHIFT-010]
 - [TODO] SHIFT-012 (REA) — FileSelect/GameOver 53 functions → C  [deps: SHIFT-011]
 - [TODO] SHIFT-013 (REA) — Intro/Ending/Cutscene 217 functions → C  [deps: SHIFT-011]

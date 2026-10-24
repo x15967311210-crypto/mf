@@ -8,11 +8,12 @@ Sources: [backlog](../jira.md) · [roadmap](roadmap.md) · [playtest](playtest.m
 
 _`jira.md` is the backlog source of truth._  Source: [jira.md](../jira.md)
 
-Counts: **28 TODO / 1 DOING / 0 DONE / 5 PARK** (34 entries).
+Counts: **28 TODO / 2 DOING / 0 DONE / 5 PARK** (35 entries).
 
 ### In progress (DOING)
 
 - `SHIFT-010` — Pause 25 + Navigation 27 functions → C
+- `SHIFT-010b` — IntroShipAlertInit (decomp.me `VM5F9`, 0x080924D0)
 
 ### Next TODO (first 5 in file order)
 
