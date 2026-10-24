@@ -504,7 +504,7 @@ SECTIONS {
         src/menus/pause_setup_oam.o(.text);
         src/menus/pause_process_oam.o(.text);
         src/menus/check_maintained_input.o(.text);
-        asm/disasm_0x080765f8_08078a74_08078af0.o(.text);
+        src/menus/pause_unk_78af0.o(.text);
         src/menus/pause_nav_text_panel.o(.text);
         asm/disasm_0x080765f8_08078ba4_08078c44.o(.text);
 
@@ -1158,6 +1158,13 @@ SECTIONS {
     sUnk_576142 = sSecurityUnlockEvents + 0x7A;
     sUnk_576150 = sSecurityUnlockEvents + 0x88;
     sUnk_576158 = sSecurityUnlockEvents + 0x90;
+
+    /* Pause-screen navigation OAM id triplets at 0x5767F0.  The literal in
+       the original asm is spelled sCharacterWidths+0x5BC; those 0x11C bytes
+       are the head of the sBlob_5766D4_prefix blob that follows the
+       sCharacterWidths array (0x4A0 bytes) in src/data/menus/pause_debug.c.
+       Anchoring on the exported array keeps the view relocatable. */
+    sUnk_5767f0 = sCharacterWidths + 0x5BC;
 
     /* Completion/tank OAM rows inside the pause-screen map data: the 4x4
        table at 0x79BE8C and the 3x4 table at 0x79BE9C, both slices of the
