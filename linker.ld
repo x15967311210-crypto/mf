@@ -513,7 +513,8 @@ SECTIONS {
 
         src/text.o(.text);
 
-        asm/disasm_0x08079afc_08079afc_0807a2dc.o(.text);
+        asm/disasm_0x08079afc_08079afc_0807a0fc.o(.text);
+        src/menus/pause_yes_no_prompt.o(.text);
         src/menus/nav_conversation_get_current.o(.text);
         asm/disasm_0x08079afc_0807a3a4_0807b8d4.o(.text);
         asm/disasm_0x08079afc_0807b8d4.o(.text);
