@@ -495,7 +495,8 @@ SECTIONS {
         asm/disasm_0x080765f8_08077270_08077318.o(.text);
         src/menus/pause_debug_window.o(.text);
         src/menus/pause_debug_appearing.o(.text);
-        asm/disasm_0x080765f8_08077420_080774a0.o(.text);
+        src/menus/pause_debug_disappearing.o(.text);
+        asm/disasm_0x080765f8_080774a0_08077500.o(.text);
         src/menus/pause_setup_oam.o(.text);
         src/menus/pause_process_oam.o(.text);
         src/menus/check_maintained_input.o(.text);

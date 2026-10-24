@@ -2,59 +2,6 @@
 
     .syntax unified
 
-	thumb_func_start PauseDebugWindowDisappearing
-PauseDebugWindowDisappearing: @ 0x080774A0
-	push {r4, r5, lr}
-	movs r5, #0
-	ldr r4, _080774B8 @ =gNonGameplayRam
-	ldrb r0, [r4, #7]
-	cmp r0, #1
-	beq _080774D4
-	cmp r0, #1
-	bgt _080774BC
-	cmp r0, #0
-	beq _080774C2
-	b _080774F6
-	.align 2, 0
-_080774B8: .4byte gNonGameplayRam
-_080774BC:
-	cmp r0, #2
-	beq _080774E2
-	b _080774F6
-_080774C2:
-	ldr r0, _080774D0 @ =0x00000201
-	bl SoundPlay
-	movs r0, #4
-	bl unk_77840
-	b _080774DA
-	.align 2, 0
-_080774D0: .4byte 0x00000201
-_080774D4:
-	ldrb r0, [r4, #6]
-	cmp r0, #4
-	bls _080774F6
-_080774DA:
-	movs r0, #2
-	strb r0, [r4, #7]
-	strb r5, [r4, #6]
-	b _080774F6
-_080774E2:
-	movs r1, #0x80
-	lsls r1, r1, #1
-	movs r0, #1
-	bl PauseScreenMoveBackgroundToYPosition
-	cmp r0, #0
-	beq _080774F2
-	movs r5, #1
-_080774F2:
-	bl PauseScreenSetPauseDebugWindow
-_080774F6:
-	adds r0, r5, #0
-	pop {r4, r5}
-	pop {r1}
-	bx r1
-	.align 2, 0
-
 	thumb_func_start EasySleepMenuInit
 EasySleepMenuInit: @ 0x08077500
 	push {r4, r5, lr}
