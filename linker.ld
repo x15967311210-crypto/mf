@@ -506,7 +506,8 @@ SECTIONS {
         src/menus/check_maintained_input.o(.text);
         src/menus/pause_unk_78af0.o(.text);
         src/menus/pause_nav_text_panel.o(.text);
-        asm/disasm_0x080765f8_08078ba4_08078c44.o(.text);
+        src/menus/pause_unk_78c44.o(.text);
+        asm/disasm_0x080765f8_08078c44_08078ea4.o(.text);
 
         src/text.o(.text);
 
@@ -1165,6 +1166,12 @@ SECTIONS {
        sCharacterWidths array (0x4A0 bytes) in src/data/menus/pause_debug.c.
        Anchoring on the exported array keeps the view relocatable. */
     sUnk_5767f0 = sCharacterWidths + 0x5BC;
+
+    /* Navigation-conversation pop-up Y positions at 0x5766E0: the byte the
+       transition reads as sUnk_5766e0[2].  Same prefix blob, 0x110 bytes
+       before the OAM id triplets above; the literal in the original asm is
+       spelled sCharacterWidths+0x4AC. */
+    sUnk_5766e0 = sCharacterWidths + 0x4AC;
 
     /* Completion/tank OAM rows inside the pause-screen map data: the 4x4
        table at 0x79BE8C and the 3x4 table at 0x79BE9C, both slices of the
