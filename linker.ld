@@ -486,7 +486,8 @@ SECTIONS {
         src/minimap.o(.text);
         src/menus/pause_screen_map.o(.text);
 
-        asm/disasm_0x080765f8_080765f8_080765f8.o(.text);
+        asm/disasm_0x080765f8_080765f8_080768a4.o(.text);
+        src/menus/pause_vblank.o(.text);
         src/menus/pause_vblank_unused.o(.text);
         asm/disasm_0x080765f8_080765f8_08076984.o(.text);
         src/menus/get_minimap_data.o(.text);
