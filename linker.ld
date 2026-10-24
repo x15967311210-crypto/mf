@@ -500,7 +500,7 @@ SECTIONS {
         src/menus/easy_sleep_menu_quit.o(.text);
         src/menus/pause_unk_77840.o(.text);
         src/menus/map_screen_update_arrows.o(.text);
-        asm/disasm_0x080765f8_08077c7c_08077e40.o(.text);
+        src/menus/map_screen_draw_special_oam.o(.text);
         src/menus/pause_setup_oam.o(.text);
         src/menus/pause_process_oam.o(.text);
         src/menus/check_maintained_input.o(.text);
@@ -1152,10 +1152,19 @@ SECTIONS {
 
     /* Pause-screen OAM tables in the trailing event-data blob.  The blob
        starts right after sSecurityUnlockEvents (which is 0x20 bytes) and the
-       tables sit at blob+0x5A and blob+0x70.  Anchoring on that exported
-       symbol keeps both arrays relocatable with the data they live in. */
+       tables sit at blob+0x5A, blob+0x68 and blob+0x70.  Anchoring on that
+       exported symbol keeps the arrays relocatable with the data they live
+       in. */
     sUnk_576142 = sSecurityUnlockEvents + 0x7A;
+    sUnk_576150 = sSecurityUnlockEvents + 0x88;
     sUnk_576158 = sSecurityUnlockEvents + 0x90;
+
+    /* Completion/tank OAM rows inside the pause-screen map data: the 4x4
+       table at 0x79BE8C and the 3x4 table at 0x79BE9C, both slices of the
+       sUnk_79be88 array in src/menus/pause_screen_map.c (which .data places
+       right after sExploredMinimapBitFlags). */
+    sUnk_79be8c = sExploredMinimapBitFlags + 0xB0;
+    sUnk_79be9c = sExploredMinimapBitFlags + 0xC0;
 
     /DISCARD/ : { src/sram/sram_file_info.o(.rodata) src/sram/sram_check_save.o(.rodata) src/sram/sram_world_write.o(.rodata) }
 }
