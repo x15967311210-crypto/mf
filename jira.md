@@ -22,11 +22,10 @@ Last updated: 2026-10-23.
     candidate is blocked on `gEquipment`/door register shape and the
     `0x4C/0x4D` fold; `yEnd`/`yExit` are confirmed (struct offsets 5/8).
     Use the m2c draft next. `SramWrite_MostRecentSaveFile` is parked.
-- [DOING @dev82] SHIFT-010 (REA) — Pause 25 + Navigation 27 functions → C
-  - Twenty-two pause/input/status functions are done. BeamOrSuit and
-    RemoveAmmoHeader were attempted but reverted after non-matching shapes.
-    Next `PauseScreenMoveBackgroundToYPosition` (decomp.me `ebAfU`,
-    0x08077384). Remaining perfect-scratch queue: `work/decompme/perfect.tsv`.
+- [TODO] SHIFT-010 (REA) — Pause 25 + Navigation 27 functions → C
+  - Twenty-three pause/input/status functions are done, including
+    `PauseScreenMoveBackgroundToYPosition`. BeamOrSuit and RemoveAmmoHeader
+    were reverted. Continue from `work/decompme/perfect.tsv`.
 - [TODO] SHIFT-011 (emulator) — hack-critical behavior suite  [deps: SHIFT-009, SHIFT-010]
 - [TODO] SHIFT-012 (REA) — FileSelect/GameOver 53 functions → C  [deps: SHIFT-011]
 - [TODO] SHIFT-013 (REA) — Intro/Ending/Cutscene 217 functions → C  [deps: SHIFT-011]
