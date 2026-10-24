@@ -489,7 +489,7 @@ SECTIONS {
         asm/disasm_0x080765f8_080765f8_080765f8.o(.text);
         src/menus/pause_vblank_unused.o(.text);
         asm/disasm_0x080765f8_080765f8_08076984.o(.text);
-        asm/disasm_0x080765f8_08077084_08077084.o(.text);
+        src/menus/get_minimap_data.o(.text);
         src/menus/pause_call_current_handler.o(.text);
         src/menus/pause_move_debug_cursor.o(.text);
         src/menus/pause_move_bg_x.o(.text);
@@ -1185,6 +1185,12 @@ SECTIONS {
        right after sExploredMinimapBitFlags). */
     sUnk_79be8c = sExploredMinimapBitFlags + 0xB0;
     sUnk_79be9c = sExploredMinimapBitFlags + 0xC0;
+
+    /* LZ77 minimap tile data table at 0x79BE5C: the 11-entry sUnk_79be5c
+       pointer array that heads src/menus/pause_screen_map.c's .data, i.e.
+       the bytes right after the 0x80-byte sExploredMinimapBitFlags array.
+       The original literal spells the same address this way. */
+    sUnk_79be5c = sExploredMinimapBitFlags + 0x80;
 
     /* Status-screen section info table at 0x58217C: {top, bottom, left,
        right, section} per drawable status section.  The table starts one byte
