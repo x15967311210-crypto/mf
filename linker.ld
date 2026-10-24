@@ -518,7 +518,8 @@ SECTIONS {
 
         src/menus/pause_debug.o(.text);
 
-        asm/disasm_0x0807e678_0807e678.o(.text);
+        src/status_screen_handler.o(.text);
+        asm/disasm_0x0807e678_0807e6ac_0807e754.o(.text);
         src/status_screen_draw_number.o(.text);
         asm/disasm_0x0807e678_0807e834_0807eea4.o(.text);
         asm/disasm_0x0807e678_0807eea4_0807eea4.o(.text);
