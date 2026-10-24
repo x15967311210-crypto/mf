@@ -22,9 +22,10 @@ Last updated: 2026-10-23.
     candidate is blocked on `gEquipment`/door register shape and the
     `0x4C/0x4D` fold; `yEnd`/`yExit` are confirmed (struct offsets 5/8).
     Use the m2c draft next. `SramWrite_MostRecentSaveFile` is parked.
-- [DOING @dev87] SHIFT-010 (REA) — Pause 25 + Navigation 27 functions → C
-  - Twenty-seven pause/input/status functions are done; next `PauseScreenInit`
-    (decomp.me `l9gWk`, 0x08076990). Continue from
+- [DOING @dev88] SHIFT-010 (REA) — Pause 25 + Navigation 27 functions → C
+  - Twenty-seven pause/input/status functions are done; `PauseScreenInit` was
+    scoped but not attempted (large blob-offset rewrite). Next `unk_7a0fc`
+    (decomp.me `9kD14`, 0x0807A0FC). Continue from
     `work/decompme/perfect.tsv`.
 - [TODO] SHIFT-011 (emulator) — hack-critical behavior suite  [deps: SHIFT-009, SHIFT-010]
 - [TODO] SHIFT-012 (REA) — FileSelect/GameOver 53 functions → C  [deps: SHIFT-011]
