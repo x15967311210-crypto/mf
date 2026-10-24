@@ -507,7 +507,7 @@ SECTIONS {
         src/menus/pause_unk_78af0.o(.text);
         src/menus/pause_nav_text_panel.o(.text);
         src/menus/pause_unk_78c44.o(.text);
-        asm/disasm_0x080765f8_08078c44_08078ea4.o(.text);
+        src/menus/nav_conversation_update_panel.o(.text);
 
         src/text.o(.text);
 
