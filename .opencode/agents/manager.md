@@ -58,7 +58,13 @@ Read `AGENTS.md`, `docs/roadmap.md`, `docs/decisions.md` and `jira.md` first.
 5. **Land.** `git merge --ff-only devN`; never a plain merge, never resolve a
    conflict yourself. On refusal, bounce the dev with the new tip.
 6. **Board.** Remove landed tasks, clear `[deps:]`, commit `jira.md` by pathspec.
-7. **Repeat.** Keep at most 3 dev subagents live; QA/design can run alongside.
+7. **Reap.** Once the merge is on `hack` and the worktree has no uncommitted
+   work, remove it and its branch:
+   `git worktree remove <path>` (if it refuses only because of the ignored
+   `data`/`sound` symlinks, remove those symlinks and retry), then
+   `git branch -d devN` and `git worktree prune`.  Never reap the active dev;
+   keep a dirty/parked worktree only while it holds a real WIP and record why.
+8. **Repeat.** Keep at most 3 dev subagents live; QA/design can run alongside.
 
 ## Dispatch rules
 
@@ -69,7 +75,10 @@ Read `AGENTS.md`, `docs/roadmap.md`, `docs/decisions.md` and `jira.md` first.
 - The charter must include: worktree/branch, task line, acceptance commands,
   commit rules (explicit pathspec, no push), and "do not touch files outside
   scope".
-- Devs work in `../mf-devN` worktrees; the manager tree is the integration tree.
+- Devs work in their own worktrees; the manager tree is the integration tree.
+  OpenCode creates them under
+  `~/.local/share/opencode/worktree/<session>/devN`.  `../mf-devN` in charters
+  is shorthand for “a dedicated dev worktree”, not a literal path.
 - The manager never pushes `main`; the human opens/merges the PR.
 
 ## Human playtest gates

@@ -19,7 +19,9 @@ project agents live in `.opencode/agents/`: `manager`, `game-designer`,
 `engine-dev`, `tools-dev`, `content-dev`, `qa`.
 
 - The manager dispatches ONE background subagent per task, with a self-contained
-  charter and a worktree/branch (`../mf-devN` / `devN`).
+  charter and a dedicated worktree/branch.  OpenCode creates them under
+  `~/.local/share/opencode/worktree/<session>/devN`; `../mf-devN` is shorthand,
+  not a literal path.
 - Devs work only in their worktree, commit by explicit pathspec, never push.
 - The manager gates a dev branch with `make -f Makefile.shift audit/smoke/test`
   and `check_relocs.py`, then merges `--ff-only`.
@@ -41,7 +43,9 @@ git commit tools/shift/audit_asm.py docs/shiftability-audit.md -m "dev1: DONE SH
 
 Never use `git add -A`, `git add .`, or `git commit -a`.  Never push from a dev
 worktree.  The manager merges with `git merge --ff-only devN`; a refusal means
-the tip moved, so the dev rebases and re-runs the gate.
+the tip moved, so the dev rebases and re-runs the gate.  After landing, reap the
+merged worktree and branch (`git worktree remove`, `git branch -d`, `git
+worktree prune`); keep a worktree only while it holds a real WIP.
 
 ## Change classes
 
