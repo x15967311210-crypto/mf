@@ -517,6 +517,8 @@ SECTIONS {
         src/menus/pause_debug.o(.text);
 
         asm/disasm_0x0807e678_0807e678.o(.text);
+        src/status_screen_draw_number.o(.text);
+        asm/disasm_0x0807e678_0807e834_0807eea4.o(.text);
         asm/disasm_0x0807e678_0807eea4_0807eea4.o(.text);
         src/sram/sram_world_write.o(.text);
         src/sram/sram_world_read.o(.text);
@@ -1179,6 +1181,14 @@ SECTIONS {
        right after sExploredMinimapBitFlags). */
     sUnk_79be8c = sExploredMinimapBitFlags + 0xB0;
     sUnk_79be9c = sExploredMinimapBitFlags + 0xC0;
+
+    /* Status-screen section info table at 0x58217C: {top, bottom, left,
+       right, section} per drawable status section.  The table starts one byte
+       into sBlob_58217b_58225c, the blob that follows sDebugSectionInfo in
+       src/data/menus/pause_debug.c (the original literal spells the same
+       address as sDebugSectionInfo+0x60).  Anchoring on the exported array
+       keeps the view relocatable with the data it lives in. */
+    sStatusScreenSectionInfo = sDebugSectionInfo + 0x60;
 
     /DISCARD/ : { src/sram/sram_file_info.o(.rodata) src/sram/sram_check_save.o(.rodata) src/sram/sram_world_write.o(.rodata) }
 }
